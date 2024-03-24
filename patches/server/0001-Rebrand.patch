@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 32366253c04c493135f2b22d1940f83669104723..6054bb888851e5bfc50de32958bd2185c44af5de 100644
+index 32366253c04c493135f2b22d1940f83669104723..d643c575d8e5cae728a42b58220bb8aed7aa9658 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,12 +13,10 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -32,7 +32,7 @@ index 32366253c04c493135f2b22d1940f83669104723..6054bb888851e5bfc50de32958bd2185
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..9e3e1ddb6ff728533e1d0d11ac62de0ca273cc9e 100644
+index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..734b81e532ef912beef1a75b52d2352fafc1e6a4 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 @@ -33,8 +33,8 @@ public class PaperVersionFetcher implements VersionFetcher {
@@ -46,6 +46,15 @@ index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..9e3e1ddb6ff728533e1d0d11ac62de0c
          final Component history = getHistory();
  
          return history != null ? Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.newline()), history, updateMessage) : updateMessage; // Purpur
+@@ -47,7 +47,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+                 String result = matcher.group();
+                 mcVer = result.substring(0, result.length() - 2); // strip 'R' anchor and trailing '-'
+             } else {
+-                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to Purpur!"); // Purpur
++                org.bukkit.Bukkit.getLogger().warning("Unable to match version to pattern! Report to Horizon!"); // Purpur // Horizon
+                 org.bukkit.Bukkit.getLogger().warning("Pattern: " + VER_PATTERN.toString());
+                 org.bukkit.Bukkit.getLogger().warning("Version: " + org.bukkit.Bukkit.getBukkitVersion());
+             }
 @@ -58,6 +58,7 @@ public class PaperVersionFetcher implements VersionFetcher {
  
      private static Component getUpdateStatusMessage(@Nonnull String repo, @Nonnull String branch, @Nonnull String versionInfo) {
@@ -65,8 +74,47 @@ index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..9e3e1ddb6ff728533e1d0d11ac62de0c
  
          switch (distance) {
              case -1:
+diff --git a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+index 3cb56595822799926a8141e60a42f5d1edfc6de5..665e6ea074ddc95ebb6f6e58820ec5259862cef5 100644
+--- a/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
++++ b/src/main/java/com/destroystokyo/paper/console/PaperConsole.java
+@@ -17,7 +17,7 @@ public final class PaperConsole extends SimpleTerminalConsole {
+     @Override
+     protected LineReader buildReader(LineReaderBuilder builder) {
+         builder
+-                .appName("Purpur") // Purpur
++                .appName("Horizon") // Purpur // Horizon
+                 .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
+                 .completer(new ConsoleCommandCompleter(this.server))
+                 .option(LineReader.Option.COMPLETE_IN_WORD, true);
+diff --git a/src/main/java/net/minecraft/CrashReport.java b/src/main/java/net/minecraft/CrashReport.java
+index f91ea723a1c85f6cf8c4f6dd7f182b948c2f2e81..525b734a5b55db732836c22df177198607e20d72 100644
+--- a/src/main/java/net/minecraft/CrashReport.java
++++ b/src/main/java/net/minecraft/CrashReport.java
+@@ -127,7 +127,7 @@ public class CrashReport {
+         stringbuilder.append("---- Minecraft Crash Report ----\n");
+         // Purpur start
+         stringbuilder.append("// ");
+-        stringbuilder.append("// DO NOT REPORT THIS TO PAPER! REPORT TO PURPUR INSTEAD!");
++        stringbuilder.append("// DO NOT REPORT THIS TO PAPER! REPORT TO HORIZON INSTEAD!"); // Horizon
+         // Purpur end
+         stringbuilder.append("// ");
+         stringbuilder.append(CrashReport.getErrorComment());
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index e34bada9626702c8b7eeb7dfd77b08cb8f50c640..5194c054b1c4653516b781968a991d789b57f1f3 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -956,7 +956,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         shutdownThread = Thread.currentThread();
+         org.spigotmc.WatchdogThread.doStop(); // Paper
+         if (!isSameThread()) {
+-            MinecraftServer.LOGGER.info("Stopping main thread (Ignore any thread death message you see! - DO NOT REPORT THREAD DEATH TO PURPUR)"); // Purpur
++            MinecraftServer.LOGGER.info("Stopping main thread (Ignore any thread death message you see! - DO NOT REPORT THREAD DEATH TO HORIZON)"); // Horizon
+             while (this.getRunningThread().isAlive()) {
+                 this.getRunningThread().stop();
+                 try {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index dabaf0cff6dafe8ca411996e67ead9a2cf84dfb8..7f21f291209cd246ef7a5998e721a2a062bed859 100644
+index dabaf0cff6dafe8ca411996e67ead9a2cf84dfb8..5194c792235632e3872788b9274daa00ba483bb8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -266,7 +266,7 @@ import javax.annotation.Nullable; // Paper
@@ -78,8 +126,34 @@ index dabaf0cff6dafe8ca411996e67ead9a2cf84dfb8..7f21f291209cd246ef7a5998e721a2a0
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
+index e3f724a19ab2f9821d84f9b03acf7c925c88f455..40dfb08a522c085376e7162280d729ce4741172c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
+@@ -953,7 +953,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+             return EntityCategory.WATER;
+         }
+ 
+-        throw new UnsupportedOperationException("Unsupported monster type: " + type + ". This is a bug, report this to Purpur."); // Purpur
++        throw new UnsupportedOperationException("Unsupported monster type: " + type + ". This is a bug, report this to Horizon."); // Purpur // Horizon
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+index ca8ae8e1c51b937dac916e0b0dc94b5e2e61efeb..ea0b989a4fc6289259e68ada8bb8e386f4933d53 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
+@@ -503,7 +503,7 @@ public class CraftScheduler implements BukkitScheduler {
+                 this.parsePending();
+             } else {
+                 // this.debugTail = this.debugTail.setNext(new CraftAsyncDebugger(currentTick + CraftScheduler.RECENT_TICKS, task.getOwner(), task.getTaskClass())); // Paper
+-                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Purpur"); // Paper // Purpur
++                task.getOwner().getLogger().log(Level.SEVERE, "Unexpected Async Task in the Sync Scheduler. Report this to Horizon"); // Paper // Purpur // Horizon
+                 // We don't need to parse pending
+                 // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
+             }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
-index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..5e8569c0661d6cb38e8dafe47b812c7ba834dc0e 100644
+index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..207400ecf514a1609979c363ddf28c056765b78b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
 @@ -11,7 +11,7 @@ public final class Versioning {
@@ -92,7 +166,7 @@ index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..5e8569c0661d6cb38e8dafe47b812c7b
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index efe25d3894f3ad000257c72d9a5e06ef22446d41..14a5b6a93d813e57377717c99438338282d4a36d 100644
+index efe25d3894f3ad000257c72d9a5e06ef22446d41..64d4c0e643d58226c8d4727b86ebf8b78e9585df 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -231,7 +231,7 @@ public class PurpurConfig {
@@ -104,3 +178,46 @@ index efe25d3894f3ad000257c72d9a5e06ef22446d41..14a5b6a93d813e57377717c994383382
      private static void serverModName() {
          serverModName = getString("settings.server-mod-name", serverModName);
      }
+diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
+index f7296691cb4af7814de1520347b307ff209082e4..300c72df1390597829da807981549e127aa10c87 100644
+--- a/src/main/java/org/spigotmc/WatchdogThread.java
++++ b/src/main/java/org/spigotmc/WatchdogThread.java
+@@ -155,12 +155,12 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                 if (isLongTimeout) {
+                 // Paper end
+                 log.log( Level.SEVERE, "------------------------------" );
+-                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Purpur bug." ); // Paper // Purpur
++                log.log( Level.SEVERE, "The server has stopped responding! This is (probably) not a Horizon bug." ); // Paper // Purpur // Horizon
+                 log.log( Level.SEVERE, "If you see a plugin in the Server thread dump below, then please report it to that author" );
+                 log.log( Level.SEVERE, "\t *Especially* if it looks like HTTP or MySQL operations are occurring" );
+                 log.log( Level.SEVERE, "If you see a world save or edit, then it means you did far more than your server can handle at once" );
+                 log.log( Level.SEVERE, "\t If this is the case, consider increasing timeout-time in spigot.yml but note that this will replace the crash with LARGE lag spikes" );
+-                log.log( Level.SEVERE, "If you are unsure or still think this is a Purpur bug, please report this to https://github.com/PurpurMC/Purpur/issues" ); // Purpur
++                log.log( Level.SEVERE, "If you are unsure or still think this is a Horizon bug, please report this to https://github.com/GideonWhite1029/Horizon/issues" ); // Purpur // Horizon
+                 log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
+                 log.log( Level.SEVERE, "Purpur version: " + Bukkit.getServer().getVersion() ); // Purpur
+                 //
+@@ -184,12 +184,12 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                 // Paper end
+                 } else
+                 {
+-                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PURPUR - THIS IS NOT A BUG OR A CRASH  - " + Bukkit.getServer().getVersion() + " ---"); // Purpur
++                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO HORIZON - THIS IS NOT A BUG OR A CRASH  - " + Bukkit.getServer().getVersion() + " ---"); // Purpur // Horizon
+                     log.log(Level.SEVERE, "The server has not responded for " + (currentTime - lastTick) / 1000 + " seconds! Creating thread dump");
+                 }
+                 // Paper end - Different message for short timeout
+                 log.log( Level.SEVERE, "------------------------------" );
+-                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Purpur!):" ); // Paper // Purpur
++                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Horizon!):" ); // Paper // Purpur // Horizon
+                 io.papermc.paper.chunk.system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(isLongTimeout); // Paper - rewrite chunk system
+                 this.dumpTickingInfo(); // Paper - log detailed tick information
+                 WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
+@@ -205,7 +205,7 @@ public final class WatchdogThread extends io.papermc.paper.util.TickThread // Pa
+                     WatchdogThread.dumpThread( thread, log );
+                 }
+                 } else {
+-                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO PURPUR - THIS IS NOT A BUG OR A CRASH ---"); // Purpur
++                    log.log(Level.SEVERE, "--- DO NOT REPORT THIS TO HORIZON - THIS IS NOT A BUG OR A CRASH ---"); // Purpur // Horizon
+                 }
+ 
+                 log.log( Level.SEVERE, "------------------------------" );
