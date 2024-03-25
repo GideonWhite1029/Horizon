@@ -1262,6 +1262,27 @@ index e9701ed4e5b35ace1accd2b46f082191d8ab6497..001088a37dd5be56000c9429c180e107
      // CraftBukkit start - data containers
      private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
      public CraftPersistentDataContainer persistentDataContainer;
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 409c0e81571e23c9d535b541c61538424259d60a..48f07991c9b13f9fad01cd8559bd40f191bfd81c 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -358,8 +358,6 @@ public class Main {
+             tryPreloadClass("org.jline.terminal.impl.MouseSupport");
+             tryPreloadClass("org.jline.terminal.impl.MouseSupport$1");
+             tryPreloadClass("org.jline.terminal.Terminal$MouseTracking");
+-            tryPreloadClass("co.aikar.timings.TimingHistory");
+-            tryPreloadClass("co.aikar.timings.TimingHistory$MinuteReport");
+             tryPreloadClass("io.netty.channel.AbstractChannelHandlerContext");
+             tryPreloadClass("io.netty.channel.AbstractChannelHandlerContext$11");
+             tryPreloadClass("io.netty.channel.AbstractChannelHandlerContext$12");
+@@ -372,7 +370,6 @@ public class Main {
+             tryPreloadClass("org.bukkit.craftbukkit.scheduler.CraftScheduler$1");
+             tryPreloadClass("org.bukkit.craftbukkit.scheduler.CraftScheduler$2");
+             tryPreloadClass("org.bukkit.craftbukkit.scheduler.CraftScheduler$3");
+-            tryPreloadClass("org.bukkit.craftbukkit.scheduler.CraftScheduler$4");
+             tryPreloadClass("org.slf4j.helpers.MessageFormatter");
+             tryPreloadClass("org.slf4j.helpers.FormattingTuple");
+             tryPreloadClass("org.slf4j.helpers.BasicMarker");
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 index ea0b989a4fc6289259e68ada8bb8e386f4933d53..c9ffab2a77f5a9428c94a7b755b73940d0d1ba9a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
