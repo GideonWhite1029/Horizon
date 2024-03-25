@@ -1,0 +1,991 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 25 Mar 2024 19:36:15 +0400
+Subject: [PATCH] Add Config
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index d643c575d8e5cae728a42b58220bb8aed7aa9658..1977c68ff77d2ad38f9d6589e1a4c5953078e878 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -235,4 +235,13 @@ tasks.registerRunTask("runDev") {
+     classpath(tasks.filterProjectDir.flatMap { it.outputJar })
+     classpath(runtimeClasspathForRunDev)
+     jvmArgs("-DPaper.isRunDev=true")
++
++    // Horizon start - create config file
++    tasks.registerRunTask("createHorizonConfig") {
++            description = "Create a new horizon.yml"
++            mainClass = "dev.horizonmc.horizon.config.GlobalConfigCreator"
++            classpath(tasks.filterProjectDir.flatMap { it.outputJar })
++            classpath(runtimeClasspathForRunDev)
++    }
++    // Horizon end - create config file
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ada0dfb2c4e15ef8bf3ec3ca4d817c3292890ae9
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -0,0 +1,78 @@
++package dev.horizonmc.horizon;
++
++import com.destroystokyo.paper.util.SneakyThrow;
++import dev.horizonmc.horizon.commands.HorizonCommand;
++import dev.horizonmc.horizon.config.GlobalConfigManager;
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.Bukkit;
++import org.bukkit.command.Command;
++import org.bukkit.configuration.file.YamlConfiguration;
++
++import java.io.File;
++import java.io.IOException;
++import java.util.Collections;
++import java.util.logging.Level;
++
++public final class HorizonConfig {
++    public static final String CONFIG_HEADER = "Configuration file for Horizon.";
++    public static final int CURRENT_CONFIG_VERSION = 1;
++
++    private static File configFile;
++    public static YamlConfiguration config;
++    private static int configVersion;
++    public static boolean createWorldSections = true;
++
++    public static void init(final File file) {
++        HorizonConfig.configFile = file;
++        config = new YamlConfiguration();
++        config.options().setHeader(Collections.singletonList(CONFIG_HEADER));
++        config.options().copyDefaults(true);
++
++        if (!file.exists()) {
++            try {
++                boolean is = file.createNewFile();
++                if (!is) {
++                    throw new IOException("Can't create file");
++                }
++            } catch (final Exception ex) {
++                Bukkit.getLogger().log(Level.SEVERE, "Failure to create horizon config", ex);
++            }
++        } else {
++            try {
++                config.load(file);
++            } catch (final Exception ex) {
++                Bukkit.getLogger().log(Level.SEVERE, "Failure to load horizon config", ex);
++                SneakyThrow.sneaky(ex);
++                throw new RuntimeException(ex);
++            }
++        }
++
++        HorizonConfig.configVersion = HorizonConfig.config.getInt("config-version", CURRENT_CONFIG_VERSION);
++        HorizonConfig.config.set("config-version", CURRENT_CONFIG_VERSION);
++
++        GlobalConfigManager.init();
++
++        registerCommand("horizon", new HorizonCommand("horizon"));
++    }
++
++    public static void save() {
++        try {
++            config.save(HorizonConfig.configFile);
++        } catch (final Exception ex) {
++            Bukkit.getLogger().log(Level.SEVERE, "Unable to save horizon config", ex);
++        }
++    }
++
++    public static void registerCommand(String name, Command command) {
++        MinecraftServer.getServer().server.getCommandMap().register(name, "horizon", command);
++        MinecraftServer.getServer().server.syncCommands();
++    }
++
++    public static void unregisterCommand(String name) {
++        name = name.toLowerCase(java.util.Locale.ENGLISH).trim();
++        MinecraftServer.getServer().server.getCommandMap().getKnownCommands().remove(name);
++        MinecraftServer.getServer().server.getCommandMap().getKnownCommands().remove("horizon:" + name);
++        MinecraftServer.getServer().server.syncCommands();
++    }
++
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/CommandArgument.java b/src/main/java/dev/horizonmc/horizon/commands/CommandArgument.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..349266b0cad5bb2b85b4714c1d1cf98b60e49881
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/CommandArgument.java
+@@ -0,0 +1,42 @@
++package dev.horizonmc.horizon.commands;
++
++import org.jetbrains.annotations.NotNull;
++
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
++
++public class CommandArgument {
++    private final List<CommandArgumentType<?>> argumentTypes;
++    private final List<List<String>> tabComplete;
++
++    public CommandArgument(CommandArgumentType<?>... argumentTypes) {
++        this.argumentTypes = List.of(argumentTypes);
++        this.tabComplete = new ArrayList<>();
++        for (int i = 0; i < argumentTypes.length; i++) {
++            tabComplete.add(new ArrayList<>());
++        }
++    }
++
++    public List<String> tabComplete(int n) {
++        if (tabComplete.size() > n) {
++            return tabComplete.get(n);
++        } else {
++            return List.of();
++        }
++    }
++
++    public CommandArgument setTabComplete(int index, List<String> list) {
++        tabComplete.set(index, list);
++        return this;
++    }
++
++    public CommandArgumentResult parse(int index, String @NotNull [] args) {
++        Object[] result = new Object[argumentTypes.size()];
++        Arrays.fill(result, null);
++        for (int i = index, j = 0; i < args.length && j < result.length; i++, j++) {
++            result[j] = argumentTypes.get(j).pasre(args[i]);
++        }
++        return new CommandArgumentResult(new ArrayList<>(Arrays.asList(result)));
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentResult.java b/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentResult.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..970fd28117b61d0b2cee696410244b3f484cc2f9
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentResult.java
+@@ -0,0 +1,62 @@
++package dev.horizonmc.horizon.commands;
++
++import net.minecraft.core.BlockPos;
++import org.bukkit.util.Vector;
++
++import java.util.List;
++import java.util.Objects;
++
++public class CommandArgumentResult {
++
++    private final List<Object> result;
++
++    public CommandArgumentResult(List<Object> result) {
++        this.result = result;
++    }
++
++    public Integer readInt(int def) {
++        return Objects.requireNonNullElse(read(Integer.class), def);
++    }
++
++    public Double readDouble(double def) {
++        return Objects.requireNonNullElse(read(Double.class), def);
++    }
++
++    public String readString(String def) {
++        return Objects.requireNonNullElse(read(String.class), def);
++    }
++
++    public BlockPos readPos() {
++        Integer[] pos = {read(Integer.class), read(Integer.class), read(Integer.class)};
++        for (Integer po : pos) {
++            if (po == null) {
++                return null;
++            }
++        }
++        return new BlockPos(pos[0], pos[1], pos[2]);
++    }
++
++    public Vector readVector() {
++        Double[] pos = {read(Double.class), read(Double.class), read(Double.class)};
++        for (Double po : pos) {
++            if (po == null) {
++                return null;
++            }
++        }
++        return new Vector(pos[0], pos[1], pos[2]);
++    }
++
++    public <T> T read(Class<T> tClass) {
++        if (result.isEmpty()) {
++            return null;
++        }
++
++        Object obj = result.remove(0);
++        if (tClass.isInstance(obj)) {
++            return tClass.cast(obj);
++        } else {
++            return null;
++        }
++    }
++
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentType.java b/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentType.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6c99ebfec937371b1a36a21199e16ecbb8ff7de1
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/CommandArgumentType.java
+@@ -0,0 +1,37 @@
++package dev.horizonmc.horizon.commands;
++
++import org.jetbrains.annotations.NotNull;
++
++public abstract class CommandArgumentType<E> {
++
++    public static final CommandArgumentType<Integer> INTEGER = new CommandArgumentType<>() {
++        @Override
++        public Integer pasre(@NotNull String arg) {
++            try {
++                return Integer.parseInt(arg);
++            } catch (NumberFormatException e) {
++                return null;
++            }
++        }
++    };
++
++    public static final CommandArgumentType<Double> DOUBLE = new CommandArgumentType<>() {
++        @Override
++        public Double pasre(@NotNull String arg) {
++            try {
++                return Double.parseDouble(arg);
++            } catch (NumberFormatException e) {
++                return null;
++            }
++        }
++    };
++
++    public static final CommandArgumentType<String> STRING = new CommandArgumentType<>() {
++        @Override
++        public String pasre(@NotNull String arg) {
++            return arg;
++        }
++    };
++
++    public abstract E pasre(@NotNull String arg);
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9e2ef63c001f14b1fc281506ba3484ea96febe68
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
+@@ -0,0 +1,118 @@
++package dev.horizonmc.horizon.commands;
++
++import dev.horizonmc.horizon.commands.subcommands.ConfigCommand;
++import io.papermc.paper.command.CommandUtil;
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.Util;
++import org.bukkit.Bukkit;
++import org.bukkit.Location;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.permissions.Permission;
++import org.bukkit.permissions.PermissionDefault;
++import org.bukkit.plugin.PluginManager;
++import org.checkerframework.checker.nullness.qual.Nullable;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Locale;
++import java.util.Map;
++import java.util.Set;
++import java.util.stream.Collectors;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.NamedTextColor.RED;
++
++public final class HorizonCommand extends Command {
++    static final String BASE_PERM = "bukkit.command.horizon.";
++    // subcommand label -> subcommand
++    private static final Map<String, HorizonSubcommand> SUBCOMMANDS = Util.make(() -> {
++        final Map<Set<String>, HorizonSubcommand> commands = new HashMap<>();
++        commands.put(Set.of("config"), new ConfigCommand());
++
++        return commands.entrySet().stream()
++                .flatMap(entry -> entry.getKey().stream().map(s -> Map.entry(s, entry.getValue())))
++                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
++    });
++    private static final Set<String> COMPLETABLE_SUBCOMMANDS = SUBCOMMANDS.entrySet().stream().filter(entry -> entry.getValue().tabCompletes()).map(Map.Entry::getKey).collect(Collectors.toSet());
++
++    public HorizonCommand(final String name) {
++        super(name);
++        this.description = "Horizon related commands";
++        this.usageMessage = "/horizon [" + String.join(" | ", SUBCOMMANDS.keySet()) + "]";
++        final List<String> permissions = new ArrayList<>();
++        permissions.add("bukkit.command.horizon");
++        permissions.addAll(SUBCOMMANDS.keySet().stream().map(s -> BASE_PERM + s).toList());
++        this.setPermission(String.join(";", permissions));
++        final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
++        for (final String perm : permissions) {
++            if (pluginManager.getPermission(perm) == null) {
++                pluginManager.addPermission(new Permission(perm, PermissionDefault.OP));
++            }
++        }
++    }
++
++    private static boolean testPermission(final CommandSender sender, final String permission) {
++        if (sender.hasPermission(BASE_PERM + permission) || sender.hasPermission("bukkit.command.horizon")) {
++            return true;
++        }
++        sender.sendMessage(Bukkit.permissionMessage());
++        return false;
++    }
++
++    @NotNull
++
++    @Override
++    public List<String> tabComplete(final @NotNull CommandSender sender, final @NotNull String alias, final String[] args, final @Nullable Location location) throws IllegalArgumentException {
++        if (args.length <= 1) {
++            return CommandUtil.getListMatchingLast(sender, args, COMPLETABLE_SUBCOMMANDS);
++        }
++
++        final @Nullable Pair<String, HorizonSubcommand> subCommand = resolveCommand(args[0]);
++        if (subCommand != null) {
++            return subCommand.second().tabComplete(sender, subCommand.first(), Arrays.copyOfRange(args, 1, args.length));
++        }
++
++        return Collections.emptyList();
++    }
++
++    @Override
++    public boolean execute(final @NotNull CommandSender sender, final @NotNull String commandLabel, final String[] args) {
++        if (!testPermission(sender)) {
++            return true;
++        }
++
++        if (args.length == 0) {
++            sender.sendMessage(text("Usage: " + this.usageMessage, RED));
++            return false;
++        }
++        final Pair<String, HorizonSubcommand> subCommand = resolveCommand(args[0]);
++
++        if (subCommand == null) {
++            sender.sendMessage(text("Usage: " + this.usageMessage, RED));
++            return false;
++        }
++
++        if (!testPermission(sender, subCommand.first())) {
++            return true;
++        }
++        final String[] choppedArgs = Arrays.copyOfRange(args, 1, args.length);
++        return subCommand.second().execute(sender, subCommand.first(), choppedArgs);
++    }
++
++    @Nullable
++    private static Pair<String, HorizonSubcommand> resolveCommand(String label) {
++        label = label.toLowerCase(Locale.ENGLISH);
++        HorizonSubcommand subCommand = SUBCOMMANDS.get(label);
++
++        if (subCommand != null) {
++            return Pair.of(label, subCommand);
++        }
++
++        return null;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonSubcommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonSubcommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d6e2deef3d2db13fd7b0affaaed03193c14395a2
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonSubcommand.java
+@@ -0,0 +1,18 @@
++package dev.horizonmc.horizon.commands;
++
++import org.bukkit.command.CommandSender;
++
++import java.util.Collections;
++import java.util.List;
++
++public interface HorizonSubcommand {
++    boolean execute(CommandSender sender, String subCommand, String[] args);
++
++    default List<String> tabComplete(final CommandSender sender, final String subCommand, final String[] args) {
++        return Collections.emptyList();
++    }
++
++    default boolean tabCompletes() {
++        return true;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..beb9b18119c12c284f8af6f9c59895604e1496ff
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java
+@@ -0,0 +1,86 @@
++package dev.horizonmc.horizon.commands.subcommands;
++
++import dev.horizonmc.horizon.commands.HorizonSubcommand;
++import dev.horizonmc.horizon.config.GlobalConfigManager;
++import io.papermc.paper.command.CommandUtil;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.JoinConfiguration;
++import net.kyori.adventure.text.format.NamedTextColor;
++import org.bukkit.command.CommandSender;
++
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++
++public class ConfigCommand implements HorizonSubcommand {
++
++    @Override
++    public boolean execute(CommandSender sender, String subCommand, String[] args) {
++        if (args.length < 1) {
++            sender.sendMessage(Component.text("Horizon Config", NamedTextColor.GRAY));
++            return true;
++        }
++
++        GlobalConfigManager.VerifiedConfig verifiedConfig = GlobalConfigManager.getVerifiedConfig(args[0]);
++        if (verifiedConfig == null) {
++            sender.sendMessage(Component.join(JoinConfiguration.noSeparators(),
++                    Component.text("Config ", NamedTextColor.GRAY),
++                    Component.text(args[0], NamedTextColor.RED),
++                    Component.text(" is Not Found.", NamedTextColor.GRAY)
++            ));
++            return true;
++        }
++
++        if (args.length > 1) {
++            try {
++                verifiedConfig.set(args[1]);
++                sender.sendMessage(Component.join(JoinConfiguration.noSeparators(),
++                        Component.text("Config ", NamedTextColor.GRAY),
++                        Component.text(args[0], NamedTextColor.AQUA),
++                        Component.text(" changed to ", NamedTextColor.GRAY),
++                        Component.text(verifiedConfig.getString(), NamedTextColor.AQUA)
++                ));
++            } catch (IllegalArgumentException exception) {
++                sender.sendMessage(Component.join(JoinConfiguration.noSeparators(),
++                        Component.text("Config ", NamedTextColor.GRAY),
++                        Component.text(args[0], NamedTextColor.RED),
++                        Component.text(" modify error by ", NamedTextColor.GRAY),
++                        Component.text(exception.getMessage(), NamedTextColor.RED)
++                ));
++            }
++        } else {
++            sender.sendMessage(Component.join(JoinConfiguration.noSeparators(),
++                    Component.text("Config ", NamedTextColor.GRAY),
++                    Component.text(args[0], NamedTextColor.AQUA),
++                    Component.text(" value is ", NamedTextColor.GRAY),
++                    Component.text(verifiedConfig.getString(), NamedTextColor.AQUA)
++            ));
++        }
++
++        return true;
++    }
++
++    @Override
++    public List<String> tabComplete(CommandSender sender, String subCommand, String[] args) {
++        switch (args.length) {
++            case 1 -> {
++                List<String> list = new ArrayList<>(GlobalConfigManager.getVerifiedConfigPaths());
++                return CommandUtil.getListMatchingLast(sender, args, list);
++            }
++
++            case 2 -> {
++                GlobalConfigManager.VerifiedConfig verifiedConfig = GlobalConfigManager.getVerifiedConfig(args[0]);
++                if (verifiedConfig != null) {
++                    if (verifiedConfig.config().lock()) {
++                        return Collections.singletonList("<LOCKED CONFIG>");
++                    }
++                    return CommandUtil.getListMatchingLast(sender, args, verifiedConfig.verify().valueSuggest());
++                } else {
++                    return Collections.singletonList("<ERROR CONFIG>");
++                }
++            }
++        }
++
++        return Collections.emptyList();
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/ConfigConvert.java b/src/main/java/dev/horizonmc/horizon/config/ConfigConvert.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9f4c81720c63750fa7c0429d1b01d24a79245cd6
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/ConfigConvert.java
+@@ -0,0 +1,5 @@
++package dev.horizonmc.horizon.config;
++
++public interface ConfigConvert<E> {
++    E convert(String value);
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/ConfigVerify.java b/src/main/java/dev/horizonmc/horizon/config/ConfigVerify.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..eaad2da11d10dc1af3fbe864b1b2bec5506439c5
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/ConfigVerify.java
+@@ -0,0 +1,90 @@
++package dev.horizonmc.horizon.config;
++
++import java.lang.reflect.ParameterizedType;
++import java.lang.reflect.Type;
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Locale;
++
++public interface ConfigVerify<E> extends ConfigConvert<E> {
++
++    default String check(E old, E value) {
++        return null;
++    }
++
++    default List<String> valueSuggest() {
++        return List.of("<value>");
++    }
++
++    default void runAfterLoader(E value) {
++    }
++
++    class BooleanConfigVerify implements ConfigVerify<Boolean> {
++
++        @Override
++        public Boolean convert(String value) {
++            return Boolean.parseBoolean(value);
++        }
++
++        @Override
++        public List<String> valueSuggest() {
++            return List.of("false", "true");
++        }
++    }
++
++    class IntConfigVerify implements ConfigVerify<Integer> {
++        @Override
++        public Integer convert(String value) {
++            return Integer.parseInt(value);
++        }
++    }
++
++    class StringConfigVerify implements ConfigVerify<String> {
++        @Override
++        public String convert(String value) {
++            return value;
++        }
++    }
++
++    class DoubleConfigVerify implements ConfigVerify<Double> {
++        @Override
++        public Double convert(String value) {
++            return Double.parseDouble(value);
++        }
++    }
++
++    class ListConfigVerify implements ConfigVerify<List<?>> {
++        @Override
++        public List<?> convert(String value) {
++            throw new IllegalArgumentException("not support"); // TODO
++        }
++    }
++
++    class EnumConfigVerify<E extends Enum<E>> implements ConfigVerify<Enum<E>> {
++
++        private final Class<E> enumClass;
++        private final List<String> enumValues;
++
++        @SuppressWarnings({"unchecked", "unused"})
++        public EnumConfigVerify() {
++            Type genericSuperclass = getClass().getGenericSuperclass();
++            Type[] typeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
++            this.enumClass = (Class<E>) typeArguments[0];
++            this.enumValues = new ArrayList<>() {{
++                for (E e : enumClass.getEnumConstants()) {
++                    add(e.name().toLowerCase(Locale.ROOT));
++                }
++            }};
++        }
++
++        @Override
++        public Enum<E> convert(String value) {
++            return Enum.valueOf(enumClass, value.toUpperCase(Locale.ROOT));
++        }
++
++        @Override
++        public List<String> valueSuggest() {
++            return enumValues;
++        }
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ca4bd360f5d3c4e2d9b5de3ca24c28f2d554c819
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java
+@@ -0,0 +1,15 @@
++package dev.horizonmc.horizon.config;
++
++import java.lang.annotation.ElementType;
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++@Target(ElementType.FIELD)
++@Retention(RetentionPolicy.RUNTIME)
++public @interface GlobalConfig {
++    String name();
++    String[] category();
++    boolean lock() default false;
++    Class<? extends ConfigVerify<?>> verify() default ConfigVerify.BooleanConfigVerify.class;
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..bd8802e0a1ccb58bba4302847e5c8c372a050c58
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java
+@@ -0,0 +1,53 @@
++package dev.horizonmc.horizon.config;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import org.bukkit.configuration.file.YamlConfiguration;
++
++import java.io.File;
++import java.io.IOException;
++import java.lang.reflect.Field;
++import java.lang.reflect.Modifier;
++import java.util.Collections;
++
++public class GlobalConfigCreator {
++
++    public static void main(String[] args) {
++        YamlConfiguration config = new YamlConfiguration();
++        config.options().setHeader(Collections.singletonList(HorizonConfig.CONFIG_HEADER));
++
++        config.set("config-version", HorizonConfig.CURRENT_CONFIG_VERSION);
++
++        Class<HorizonConfig> clazz = HorizonConfig.class;
++
++        for (Field field : clazz.getDeclaredFields()) {
++            if (Modifier.isStatic(field.getModifiers())) {
++                field.setAccessible(true);
++
++                GlobalConfig globalConfig = field.getAnnotation(GlobalConfig.class);
++                if (globalConfig != null) {
++                    try {
++                        GlobalConfigManager.VerifiedConfig verifiedConfig = GlobalConfigManager.VerifiedConfig.build(globalConfig, field);
++
++                        ConfigVerify<? super Object> verify = verifiedConfig.verify();
++                        boolean isEnumConfig = verify instanceof ConfigVerify.EnumConfigVerify;
++
++                        Object defValue = isEnumConfig ? field.get(null).toString() : field.get(null);
++                        config.set(verifiedConfig.path(), defValue);
++                    } catch (Exception e) {
++                        e.printStackTrace();
++                    }
++                }
++            }
++        }
++        try {
++            File file = new File("horizon.yml");
++            if (file.exists()) {
++                file.delete();
++            }
++            file.createNewFile();
++            config.save(file);
++        } catch (IOException e) {
++            e.printStackTrace();
++        }
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2714e2f675d9d38479a7b9d8c78bbd4acd2440a7
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java
+@@ -0,0 +1,189 @@
++package dev.horizonmc.horizon.config;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.HorizonLogger;
++import org.bukkit.Bukkit;
++
++import java.lang.reflect.Constructor;
++import java.lang.reflect.Field;
++import java.lang.reflect.Modifier;
++import java.util.HashMap;
++import java.util.Locale;
++import java.util.Map;
++import java.util.Set;
++import java.util.logging.Level;
++
++public class GlobalConfigManager {
++
++    private static boolean firstLoad = true;
++    private static final Map<String, VerifiedConfig> verifiedConfigs = new HashMap<>();
++
++    public static void init() {
++        verifiedConfigs.clear();
++
++        Class<HorizonConfig> clazz = HorizonConfig.class;
++        for (Field field : clazz.getDeclaredFields()) {
++            if (Modifier.isStatic(field.getModifiers())) {
++                field.setAccessible(true);
++
++                RemovedConfig removedConfig = field.getAnnotation(RemovedConfig.class);
++                if (removedConfig != null) {
++                    RemovedVerifiedConfig verifiedConfig = RemovedVerifiedConfig.build(removedConfig, field);
++                    verifiedConfig.run();
++                }
++
++                GlobalConfig globalConfig = field.getAnnotation(GlobalConfig.class);
++                if (globalConfig != null) {
++                    try {
++                        VerifiedConfig verifiedConfig = VerifiedConfig.build(globalConfig, field);
++
++                        if (globalConfig.lock() && !firstLoad) {
++                            verifiedConfigs.put(verifiedConfig.path.substring("settings.".length()), verifiedConfig);
++                            continue;
++                        }
++
++                        ConfigVerify<? super Object> verify = verifiedConfig.verify;
++                        boolean isEnumConfig = verify instanceof ConfigVerify.EnumConfigVerify;
++
++                        Object defValue = isEnumConfig ? field.get(null).toString() : field.get(null);
++                        HorizonConfig.config.addDefault(verifiedConfig.path, defValue);
++
++                        try {
++                            Object savedValue = HorizonConfig.config.get(verifiedConfig.path);
++                            if (isEnumConfig) {
++                                savedValue = verify.convert(savedValue.toString());
++                            }
++                            String checkInfo = verify.check(null, savedValue);
++
++                            if (checkInfo == null) {
++                                field.set(null, savedValue);
++                            } else {
++                                throw new IllegalArgumentException(checkInfo);
++                            }
++                        } catch (IllegalArgumentException | ClassCastException e) {
++                            HorizonConfig.config.set(verifiedConfig.path, defValue);
++                            HorizonLogger.LOGGER.warning(e.getMessage() + ", reset to " + defValue);
++                        }
++
++                        verifiedConfigs.put(verifiedConfig.path.substring("settings.".length()), verifiedConfig);
++                    } catch (Exception e) {
++                        Bukkit.getLogger().log(Level.SEVERE, "Failure to load leaves config", e);
++                    }
++                }
++            }
++        }
++
++        verifiedConfigs.forEach((path, config) -> config.verify.runAfterLoader(config.get()));
++
++        firstLoad = false;
++        HorizonConfig.save();
++    }
++
++    public static VerifiedConfig getVerifiedConfig(String path) {
++        return verifiedConfigs.get(path);
++    }
++
++    public static Set<String> getVerifiedConfigPaths() {
++        return verifiedConfigs.keySet();
++    }
++
++    public record RemovedVerifiedConfig(RemovedConfig config, ConfigConvert<? super Object> convert, Field field,
++                                        String path) {
++
++        public void run() {
++            if (config.transform()) {
++                if (HorizonConfig.config.contains(path)) {
++                    String string = HorizonConfig.config.get(path).toString();
++                    try {
++                        Object object = convert.convert(string);
++                        field.set(null, object);
++                    } catch (Exception e) {
++                        e.printStackTrace();
++                    }
++                }
++            }
++            HorizonConfig.config.set(path, null);
++        }
++
++        public static RemovedVerifiedConfig build(RemovedConfig config, Field field) {
++            StringBuilder path = new StringBuilder("settings.");
++            for (int i = 0; i < config.category().length; ++i) {
++                path.append(config.category()[i]).append(".");
++            }
++            path.append(config.name());
++
++            ConfigConvert configConvert = null;
++            try {
++                Constructor<? extends ConfigConvert<?>> constructor = config.convert().getDeclaredConstructor();
++                constructor.setAccessible(true);
++                configConvert = constructor.newInstance();
++            } catch (Exception e) {
++                e.printStackTrace();
++            }
++
++            return new RemovedVerifiedConfig(config, configConvert, field, path.toString());
++        }
++    }
++
++    public record VerifiedConfig(GlobalConfig config, ConfigVerify<? super Object> verify, Field field, String path) {
++
++        public void set(String realValue) throws IllegalArgumentException {
++            if (config.lock()) {
++                throw new IllegalArgumentException("locked");
++            }
++
++            Object value;
++            try {
++                value = verify.convert(realValue);
++            } catch (Exception e) {
++                throw new IllegalArgumentException("value parse error: " + e.getMessage());
++            }
++
++            String checkInfo = verify.check(this.get(), value);
++            if (checkInfo != null) {
++                throw new IllegalArgumentException(checkInfo);
++            }
++
++            try {
++                field.set(null, value);
++                HorizonConfig.config.set(path, verify instanceof ConfigVerify.EnumConfigVerify ? realValue.toUpperCase(Locale.ROOT) : value);
++                HorizonConfig.save();
++            } catch (IllegalAccessException e) {
++                throw new IllegalArgumentException("?");
++            }
++        }
++
++        public String getString() {
++            return this.get().toString();
++        }
++
++        public Object get() {
++            try {
++                return field.get(null);
++            } catch (IllegalAccessException e) {
++                HorizonLogger.LOGGER.log(Level.SEVERE, "Failure to get " + path + " value", e);
++                return "<VALUE ERROR>";
++            }
++        }
++
++        public static VerifiedConfig build(GlobalConfig config, Field field) {
++            StringBuilder path = new StringBuilder("settings.");
++            for (int i = 0; i < config.category().length; ++i) {
++                path.append(config.category()[i]).append(".");
++            }
++            path.append(config.name());
++
++            ConfigVerify configVerify = null;
++            try {
++                Constructor<? extends ConfigVerify<?>> constructor = config.verify().getDeclaredConstructor();
++                constructor.setAccessible(true);
++                configVerify = constructor.newInstance();
++            } catch (Exception e) {
++                e.printStackTrace();
++            }
++
++
++            return new VerifiedConfig(config, configVerify, field, path.toString());
++        }
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/config/RemovedConfig.java b/src/main/java/dev/horizonmc/horizon/config/RemovedConfig.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c4a4551c0
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/config/RemovedConfig.java
+@@ -0,0 +1,19 @@
++package dev.horizonmc.horizon.config;
++
++import java.lang.annotation.ElementType;
++import java.lang.annotation.Retention;
++import java.lang.annotation.RetentionPolicy;
++import java.lang.annotation.Target;
++
++@Target(ElementType.FIELD)
++@Retention(RetentionPolicy.RUNTIME)
++public @interface RemovedConfig {
++
++    String name();
++
++    String[] category();
++
++    boolean transform() default false;
++
++    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
++}
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 34b4301d566a3ea07c1029e019401656b868c840..e5aa2c785700ff09177d80bb967976b4dc5c012f 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
+ import com.mojang.authlib.minecraft.MinecraftSessionService;
+ import com.mojang.datafixers.DataFixer;
+ import com.mojang.logging.LogUtils;
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.longs.LongIterator;
+ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+ import java.awt.image.BufferedImage;
+@@ -1159,6 +1160,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             LOGGER.info("Done ({})! For help, type \"help\"", doneTime);
+             // Paper end
+ 
++            HorizonConfig.createWorldSections = false; // Horizon
+             org.spigotmc.WatchdogThread.tick(); // Paper
+             org.spigotmc.WatchdogThread.hasStarted = true; // Paper
+             Arrays.fill( this.recentTps, 20 );
+diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+index ead8f8f80bc6200fc13fd590bc414d48b5cfa6e7..ed4a336448a8f26d2132ba5255d70555b76ddd3e 100644
+--- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -230,6 +230,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         // Purpur end
+         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // Paper - init PaperBrigadierProvider
++        dev.horizonmc.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config
+         gg.pufferfish.pufferfish.PufferfishConfig.pufferfishFile = (java.io.File) options.valueOf("pufferfish-settings"); // Purpur
+         gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
+         gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 5194c792235632e3872788b9274daa00ba483bb8..7687b6642b53c015d3c2a99493b1d358f7dcc338 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -1097,6 +1097,7 @@ public final class CraftServer implements Server {
+             playerMetadata.removeAll(plugin);
+         }
+         // Paper end
++        dev.horizonmc.horizon.HorizonConfig.init((File) console.options.valueOf("horizon-settings")); // Horizon - Server Config
+         this.reloadData();
+         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
+         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
+@@ -3099,6 +3100,13 @@ public final class CraftServer implements Server {
+             return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
+         }
+ 
++        // Horizon start
++        @Override
++        public YamlConfiguration getHorizonConfig() {
++            return dev.horizonmc.horizon.HorizonConfig.config;
++        }
++        // Horizon end
++
+         // Purpur start
+         @Override
+         public YamlConfiguration getPurpurConfig() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 409c0e81571e23c9d535b541c61538424259d60a..974eda1df15f3788b5fb1b7363f8a436829e09ce 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -188,6 +188,14 @@ public class Main {
+                         .describedAs("Yml file");
+                 // Purpur end
+ 
++                // Horizon start - Server Config
++                acceptsAll(asList("horizon", "horizon-settings"), "File for horizon settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("horizon.yml"))
++                        .describedAs("Yml file");
++                // Horizon end - Server Config
++
+                 // Paper start
+                 acceptsAll(asList("server-name"), "Name of the server")
+                         .withRequiredArg()

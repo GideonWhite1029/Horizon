@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 25 Mar 2024 14:26:47 +0400
+Subject: [PATCH] Add Logger
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonLogger.java b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd41f02a82
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
+@@ -0,0 +1,16 @@
++package dev.horizonmc.horizon;
++
++import org.bukkit.Bukkit;
++
++import java.util.logging.Level;
++import java.util.logging.Logger;
++
++public class HorizonLogger extends Logger {
++    public static final HorizonLogger LOGGER = new HorizonLogger();
++
++    private HorizonLogger() {
++        super("Horizon", null);
++        setParent(Bukkit.getLogger());
++        setLevel(Level.ALL);
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index a951d8dad03d7e03e695adf4790e5ab117b3f362..cb7921131de405ca607a7c24419306279208451d 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -424,6 +424,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     private UUID originWorld;
+     public boolean freezeLocked = false; // Paper - Freeze Tick Lock API
+     public boolean fixedPose = false; // Paper - Expand Pose API
++    private CompoundTag horizonData = new CompoundTag(); // Horizon - Horizon ex data
+     public boolean activatedPriorityReset = false; // Pufferfish - DAB
+     public int activatedPriority = gg.pufferfish.pufferfish.PufferfishConfig.maximumActivationPrio; // Pufferfish - DAB (golf score)
+     public final BlockPos.MutableBlockPos cachedBlockPos = new BlockPos.MutableBlockPos(); // Pufferfish - reduce entity allocations
+@@ -2531,6 +2532,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+                 nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
+             }
+             // Purpur end
++            nbttagcompound.put("Horizon.Data", horizonData); // Horizon - Horizon ex data
+             return nbttagcompound;
+         } catch (Throwable throwable) {
+             CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
+@@ -2683,6 +2685,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+                 immuneToFire = nbt.getBoolean("Purpur.FireImmune");
+             }
+             // Purpur end
++            // Horizon start
++            if (nbt.contains("Horizon.Data")) {
++                horizonData = nbt.getCompound("Horizon.Data");
++            }
++            // Horizon end
+ 
+         } catch (Throwable throwable) {
+             CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
