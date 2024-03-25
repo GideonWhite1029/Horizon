@@ -855,7 +855,7 @@ index 166cd0f8e72189d10e56cd7bc095409aa919840e..ce44e30d7e2dd6d71d4fa74983437f66
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 5194c054b1c4653516b781968a991d789b57f1f3..780572324fc960d3969c5aa6b7fe8dc91edd65d4 100644
+index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656b868c840 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -883,7 +883,7 @@ index 5194c054b1c4653516b781968a991d789b57f1f3..780572324fc960d3969c5aa6b7fe8dc9
          // Purpur start
          if (upnp) {
              if (dev.omega24.upnp4j.UPnP4J.close(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
-@@ -1439,7 +1435,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1430,7 +1426,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              return;
          }
  
@@ -891,7 +891,7 @@ index 5194c054b1c4653516b781968a991d789b57f1f3..780572324fc960d3969c5aa6b7fe8dc9
          try {
              for (;;) {
                  boolean moreTasks = this.tickMidTickTasks();
-@@ -1466,7 +1461,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1457,7 +1452,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          } finally {
@@ -899,7 +899,7 @@ index 5194c054b1c4653516b781968a991d789b57f1f3..780572324fc960d3969c5aa6b7fe8dc9
          }
      }
      // Paper end - execute chunk tasks mid tick
-@@ -1545,11 +1539,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1536,11 +1530,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick

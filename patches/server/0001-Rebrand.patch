@@ -101,7 +101,7 @@ index f91ea723a1c85f6cf8c4f6dd7f182b948c2f2e81..525b734a5b55db732836c22df1771986
          stringbuilder.append("// ");
          stringbuilder.append(CrashReport.getErrorComment());
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e34bada9626702c8b7eeb7dfd77b08cb8f50c640..5194c054b1c4653516b781968a991d789b57f1f3 100644
+index e34bada9626702c8b7eeb7dfd77b08cb8f50c640..5ebddfebe5a37cfd39eeefa252936ad14cb771ab 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -956,7 +956,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -113,6 +113,22 @@ index e34bada9626702c8b7eeb7dfd77b08cb8f50c640..5194c054b1c4653516b781968a991d78
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
+@@ -1170,15 +1170,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             long tickSection = Util.getNanos();
+             long currentTime;
+             // Paper end - further improve server tick loop
+-            // Paper start - Add onboarding message for initial server start
+-            if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
+-                LOGGER.info("*************************************************************************************");
+-                LOGGER.info("This is the first time you're starting this server.");
+-                LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
+-                LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
+-                LOGGER.info("*************************************************************************************");
+-            }
+-            // Paper end - Add onboarding message for initial server start
+ 
+             while (this.running) {
+                 // Paper start - rewrite chunk system
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 index dabaf0cff6dafe8ca411996e67ead9a2cf84dfb8..5194c792235632e3872788b9274daa00ba483bb8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
