@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 26 Mar 2024 18:08:07 +0400
+Subject: [PATCH] Fix minecart hopper not work without player
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java b/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
+index fc35cfc9d045f3e5b6a50af1d0ba83b6e322091f..f1ac998780816f85e6fd1d6119c9ee75c890685c 100644
+--- a/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
++++ b/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
+@@ -88,6 +88,13 @@ public class MinecartHopper extends AbstractMinecartContainer implements Hopper
+ 
+     }
+ 
++    // Horizon start - tick every
++    @Override
++    public void inactiveTick() {
++        this.tick();
++    }
++    // Horizon start - tick every
++
+     public boolean suckInItems() {
+         if (HopperBlockEntity.suckInItems(this.level(), this)) {
+             this.immunize();  // Paper
