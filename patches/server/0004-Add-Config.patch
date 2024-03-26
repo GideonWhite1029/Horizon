@@ -24,10 +24,10 @@ index d643c575d8e5cae728a42b58220bb8aed7aa9658..1977c68ff77d2ad38f9d6589e1a4c595
  }
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ada0dfb2c4e15ef8bf3ec3ca4d817c3292890ae9
+index 0000000000000000000000000000000000000000..5009f97586ad996cc279c0ac9eebc72aff2520c6
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,81 @@
 +package dev.horizonmc.horizon;
 +
 +import com.destroystokyo.paper.util.SneakyThrow;
@@ -44,7 +44,10 @@ index 0000000000000000000000000000000000000000..ada0dfb2c4e15ef8bf3ec3ca4d817c32
 +import java.util.logging.Level;
 +
 +public final class HorizonConfig {
-+    public static final String CONFIG_HEADER = "Configuration file for Horizon.";
++    public static final String CONFIG_HEADER = "This is the main configuration file for Horizon.\n"
++            + "\n"
++            + "Created by GideonWhite1029\n"
++            + "Boosty: https://boosty.to/gideonwhite1029\n";
 +    public static final int CURRENT_CONFIG_VERSION = 1;
 +
 +    private static File configFile;
@@ -971,7 +974,7 @@ index 5194c792235632e3872788b9274daa00ba483bb8..7687b6642b53c015d3c2a99493b1d358
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 409c0e81571e23c9d535b541c61538424259d60a..974eda1df15f3788b5fb1b7363f8a436829e09ce 100644
+index 48f07991c9b13f9fad01cd8559bd40f191bfd81c..d6cd06d8d4a9a63fa9b20659cd2c134140e9763b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -188,6 +188,14 @@ public class Main {

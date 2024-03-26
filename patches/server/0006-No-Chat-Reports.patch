@@ -5,7 +5,7 @@ Subject: [PATCH] No Chat Reports
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index ada0dfb2c4e15ef8bf3ec3ca4d817c3292890ae9..5c214b8b756ac4efecd7eafd8db80ee4681f3f59 100644
+index 5009f97586ad996cc279c0ac9eebc72aff2520c6..4d2aa573926583c3d09b7a78b8fe12772b2b8967 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
@@ -16,7 +16,7 @@ index ada0dfb2c4e15ef8bf3ec3ca4d817c3292890ae9..5c214b8b756ac4efecd7eafd8db80ee4
  import dev.horizonmc.horizon.config.GlobalConfigManager;
  import net.minecraft.server.MinecraftServer;
  import org.bukkit.Bukkit;
-@@ -75,4 +76,7 @@ public final class HorizonConfig {
+@@ -78,4 +79,7 @@ public final class HorizonConfig {
          MinecraftServer.getServer().server.syncCommands();
      }
  

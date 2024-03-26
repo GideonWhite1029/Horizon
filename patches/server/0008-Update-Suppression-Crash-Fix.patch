@@ -5,10 +5,10 @@ Subject: [PATCH] Update Suppression Crash Fix
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 48be3745696dae11e6d4667d8356d13cf285f215..f5f7407a9c4cc88b6fb2a5d7ebac2c59d21b5965 100644
+index 32fa60e9ca71f826e839fc096924391d14356696..9a95b88257298b6c52446f9bd1095fbb201964ff 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -82,4 +82,9 @@ public final class HorizonConfig {
+@@ -85,4 +85,9 @@ public final class HorizonConfig {
      @GlobalConfig(name = "use-vanilla-random", category = {"features"})
      public static boolean useVanillaRandom = false;
  
