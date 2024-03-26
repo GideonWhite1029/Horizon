@@ -5,13 +5,14 @@ Subject: [PATCH] Use Vanilla Random
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 4d2aa573926583c3d09b7a78b8fe12772b2b8967..32fa60e9ca71f826e839fc096924391d14356696 100644
+index 39f2bc18ccf2a942064dfb976d3cb0e3d6d31049..10536b275f6c1e540b691a7aee9eb562f5fe27c6 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -82,4 +82,7 @@ public final class HorizonConfig {
+@@ -80,4 +80,8 @@ public final class HorizonConfig {
+     }
      @GlobalConfig(name = "no-chat-reports", category = {"features"})
      public static boolean noChatReports = false;
- 
++
 +    @GlobalConfig(name = "use-vanilla-random", category = {"features"})
 +    public static boolean useVanillaRandom = false;
 +
