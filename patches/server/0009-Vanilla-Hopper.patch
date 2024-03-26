@@ -1,0 +1,104 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 26 Mar 2024 13:35:58 +0400
+Subject: [PATCH] Vanilla Hopper
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index f5f7407a9c4cc88b6fb2a5d7ebac2c59d21b5965..579ccd506dfbb6d8b2479689b308261cf1e2a113 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -87,4 +87,7 @@ public final class HorizonConfig {
+ 
+     @GlobalConfig(name = "cce-update-suppression", category = {"features"})
+     public static boolean cceUpdateSuppression = false;
++
++    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
++    public static boolean vanillaHopper = false;
+ }
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b41896364e 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -6,6 +6,8 @@ import java.util.function.BooleanSupplier;
+ import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.core.NonNullList;
+@@ -313,36 +315,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         ItemStack movedItem = origItemStack;
+         final int originalItemCount = origItemStack.getCount();
+         final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
+-        container.setChanged(); // original logic always marks source inv as changed even if no move happens.
+-        movedItem.setCount(movedItemCount);
+-
+-        if (!skipPullModeEventFire) {
+-            movedItem = callPullMoveEvent(hopper, container, movedItem);
+-            if (movedItem == null) { // cancelled
+-                origItemStack.setCount(originalItemCount);
+-                // Drastically improve performance by returning true.
+-                // No plugin could of relied on the behavior of false as the other call
+-                // site for IMIE did not exhibit the same behavior
++        // Horizon start - fix vanilla
++        if (HorizonConfig.vanillaHopper && movedItem.getCount() <= movedItemCount) {
++            movedItem = origItemStack.copy();
++            final ItemStack remainingItem = addItem(container, hopper, container.removeItem(i, movedItemCount), null);
++            if (remainingItem.isEmpty()) {
++                container.setChanged();
+                 return true;
+             }
+-        }
++            container.setItem(i, movedItem);
++        } else {
++            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
++            movedItem.setCount(movedItemCount);
+ 
+-        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
+-        final int remainingItemCount = remainingItem.getCount();
+-        if (remainingItemCount != movedItemCount) {
+-            origItemStack = origItemStack.copy(true);
+-            origItemStack.setCount(originalItemCount);
+-            if (!origItemStack.isEmpty()) {
+-                origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
++            if (!skipPullModeEventFire) {
++                movedItem = callPullMoveEvent(hopper, container, movedItem);
++                if (movedItem == null) { // cancelled
++                    origItemStack.setCount(originalItemCount);
++                    // Drastically improve performance by returning true.
++                    // No plugin could of relied on the behavior of false as the other call
++                    // site for IMIE did not exhibit the same behavior
++                    return true;
++                }
+             }
+ 
+-            ignoreTileUpdates = true;
+-            container.setItem(i, origItemStack);
+-            ignoreTileUpdates = false;
+-            container.setChanged();
+-            return true;
++            final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
++            final int remainingItemCount = remainingItem.getCount();
++            if (remainingItemCount != movedItemCount) {
++                origItemStack = origItemStack.copy(true);
++                origItemStack.setCount(originalItemCount);
++                if (!origItemStack.isEmpty()) {
++                    origItemStack.setCount(originalItemCount - movedItemCount + remainingItemCount);
++                }
++
++                ignoreTileUpdates = true;
++                container.setItem(i, origItemStack);
++                ignoreTileUpdates = false;
++                container.setChanged();
++                return true;
++            }
++            origItemStack.setCount(originalItemCount);
+         }
+-        origItemStack.setCount(originalItemCount);
++        // Horizon end - fix vanilla
+ 
+         if (level.paperConfig().hopper.cooldownWhenFull) {
+             cooldownHopper(hopper);
