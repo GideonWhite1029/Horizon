@@ -1,0 +1,131 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 26 Mar 2024 13:00:07 +0400
+Subject: [PATCH] Use Vanilla Random
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 5c214b8b756ac4efecd7eafd8db80ee4681f3f59..48be3745696dae11e6d4667d8356d13cf285f215 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -79,4 +79,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "no-chat-reports", category = {"features"})
+     public static boolean noChatReports = false;
+ 
++    @GlobalConfig(name = "use-vanilla-random", category = {"features"})
++    public static boolean useVanillaRandom = false;
++
+ }
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 1561eb633300a6906ab7a95f8f858efd40a399e7..a86e772c6ef4def818c8b49d37c9537bc4246362 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
+ import com.google.common.collect.Sets;
+ import com.google.common.collect.UnmodifiableIterator;
+ import com.mojang.logging.LogUtils;
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
+ import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+ import java.util.Arrays;
+@@ -599,7 +600,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+         this.bb = Entity.INITIAL_AABB;
+         this.stuckSpeedMultiplier = Vec3.ZERO;
+         this.nextStep = 1.0F;
+-        this.random = world == null || world.purpurConfig.entitySharedRandom ? SHARED_RANDOM : RandomSource.create(); // Paper - Share random for entities to make them more random // Purpur
++        this.random = HorizonConfig.useVanillaRandom ? RandomSource.create() : SHARED_RANDOM; // Paper - Share random for entities to make them more random // Purpur // Horizon
+         this.remainingFireTicks = -this.getFireImmuneTicks();
+         this.fluidHeight = new Object2DoubleArrayMap(2);
+         this.fluidOnEyes = new HashSet();
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
+index 997ab942be9f742804041b07d607e7dd6473ba96..f254321b03dbd478f744b9b72b046e56a3131e2a 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
+@@ -12,6 +12,8 @@ import java.util.function.Predicate;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.particles.ParticleOptions;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -1111,7 +1113,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+ 
+         BeeGoToHiveGoal() {
+             super();
+-            this.travellingTicks = Bee.this.random.nextInt(10); // CraftBukkit - SPIGOT-7495: Give Bees another chance and let them use their own random, avoid concurrency issues
++            this.travellingTicks = HorizonConfig.useVanillaRandom ? Bee.this.level().random.nextInt(10) : Bee.this.random.nextInt(10); // CraftBukkit - SPIGOT-7495: Give Bees another chance and let them use their own random, avoid concurrency issues // Horizon
+             this.blacklistedTargets = Lists.newArrayList();
+             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+         }
+diff --git a/src/main/java/net/minecraft/world/entity/animal/Squid.java b/src/main/java/net/minecraft/world/entity/animal/Squid.java
+index cba0823bfd10a3e7fd3a7548b9cc11a77ce07ce7..b76a7989eb065d407e96267398ced166a58b30c9 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/Squid.java
++++ b/src/main/java/net/minecraft/world/entity/animal/Squid.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.entity.animal;
+ 
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.particles.ParticleOptions;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -44,7 +45,7 @@ public class Squid extends WaterAnimal {
+ 
+     public Squid(EntityType<? extends Squid> type, Level world) {
+         super(type, world);
+-        if (!world.purpurConfig.entitySharedRandom) this.random.setSeed((long) this.getId()); // Paper - Share random for entities to make them more random // Purpur
++        if (HorizonConfig.useVanillaRandom) this.random.setSeed(this.getId()); // Paper - Share random for entities to make them more random // Purpur // Horizon
+         this.tentacleSpeed = 1.0F / (this.random.nextFloat() + 1.0F) * 0.2F;
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+index 3cac817351a149935df75ef23d9f9417f6502016..7bcf653379d7410b068811895dbe41be8af008fa 100644
+--- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+@@ -5,6 +5,8 @@ import java.util.List;
+ import java.util.Objects;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.tags.DamageTypeTags;
+ import net.minecraft.tags.FluidTags;
+ import net.minecraft.tags.ItemTags;
+@@ -77,7 +79,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+         // Paper start - Don't use level random in entity constructors (to make them thread-safe)
+         this(EntityType.ITEM, world);
+         this.setPos(x, y, z);
+-        this.setDeltaMovement(this.random.nextDouble() * 0.2D - 0.1D, 0.2D, this.random.nextDouble() * 0.2D - 0.1D);
++        // Horizon start
++        if (HorizonConfig.useVanillaRandom) {
++            this.setDeltaMovement(world.random.nextDouble() * 0.2D - 0.1D, 0.2D, world.random.nextDouble() * 0.2D - 0.1D);
++        } else {
++            this.setDeltaMovement(this.random.nextDouble() * 0.2D - 0.1D, 0.2D, this.random.nextDouble() * 0.2D - 0.1D);
++        }
++        // Horizon end
+         this.setItem(stack);
+         // Paper end - Don't use level random in entity constructors
+     }
+diff --git a/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java b/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
+index 6d934405cd18d63943171448743cafd5c52026e2..d9f052bff105780b372154ee918ac512e7434406 100644
+--- a/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
++++ b/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.world.entity.item;
+ 
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.particles.ParticleTypes;
+ import net.minecraft.core.registries.Registries;
+ import net.minecraft.nbt.CompoundTag;
+@@ -44,7 +46,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
+     public PrimedTnt(Level world, double x, double y, double z, @Nullable LivingEntity igniter) {
+         this(EntityType.TNT, world);
+         this.setPos(x, y, z);
+-        double d3 = this.random.nextDouble() * 6.2831854820251465D; // Paper - Don't use level random in entity constructors
++        double d3 = (HorizonConfig.useVanillaRandom ? world.random.nextDouble() : this.random.nextDouble()) * 6.2831854820251465D; // Paper - Don't use level random in entity constructors // Horizon
+ 
+         this.setDeltaMovement(-Math.sin(d3) * 0.02D, 0.20000000298023224D, -Math.cos(d3) * 0.02D);
+         this.setFuse(80);
