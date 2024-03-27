@@ -11,7 +11,7 @@ index f1e236d39f6c3bc337ce8db60d20f04ffa5a515e..825b1658d5d24b01630316921cde097f
 @@ -85,4 +85,10 @@ public final class HorizonConfig {
      @GlobalConfig(name = "use-vanilla-random", category = {"features"})
      public static boolean useVanillaRandom = false;
- 
+
 +    @GlobalConfig(name = "update-suppression-crash-fix", category = {"features"})
 +    public static boolean updateSuppressionCrashFix = false;
 +
@@ -79,7 +79,7 @@ index e5aa2c785700ff09177d80bb967976b4dc5c012f..28536de4f2a890b68c1cd61d90eeccfc
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1743,7 +1743,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
- 
+
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
 -                worldserver.tick(shouldKeepTicking);
@@ -107,7 +107,7 @@ index 42407c5c0c09cd9d19bc7af92af8868bb038c686..2c55bb0afd4ad821313b032ea58c96a6
  import net.minecraft.Util;
  import net.minecraft.core.BlockPos;
 @@ -265,7 +267,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
- 
+
      @Override
      public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
 -        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(world.getBlockEntity(pos));
@@ -127,14 +127,14 @@ index 42407c5c0c09cd9d19bc7af92af8868bb038c686..2c55bb0afd4ad821313b032ea58c96a6
 +        }
 +        // Horizon end - fix update suppression crash and cce fix
      }
- 
+
      @Override
 diff --git a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
 index 19faa8f5f891c1ffbed0af8391dee8202433c447..36469674969b4fff276f48365abeab84e2fc9d73 100644
 --- a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
 +++ b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
 @@ -2,6 +2,8 @@ package net.minecraft.world.level.redstone;
- 
+
  import java.util.Locale;
  import javax.annotation.Nullable;
 +
@@ -159,4 +159,3 @@ index 19faa8f5f891c1ffbed0af8391dee8202433c447..36469674969b4fff276f48365abeab84
 +            // Horizon end - fix update suppression crash
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception while updating neighbours");
              CrashReportCategory crashreportsystemdetails = crashreport.addCategory("Block being updated");
- 
