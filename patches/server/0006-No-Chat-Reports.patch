@@ -142,7 +142,6 @@ index 9d6db4a378036559efab91c8b7dcf2a6b0c2cce6..e69b8e55818309e7335333a15eac9025
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
 @@ -1,5 +1,6 @@
  package net.minecraft.network.protocol.game;
-
 +import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.network.FriendlyByteBuf;
  import net.minecraft.network.chat.RemoteChatSession;

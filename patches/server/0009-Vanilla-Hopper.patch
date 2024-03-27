@@ -11,7 +11,7 @@ index 825b1658d5d24b01630316921cde097f97de449d..c27225cc1a2eb9aa983c6ef8afe26aca
 @@ -91,4 +91,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "cce-update-suppression", category = {"features"})
      public static boolean cceUpdateSuppression = false;
-
+     
 +    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
 +    public static boolean vanillaHopper = false;
 +
