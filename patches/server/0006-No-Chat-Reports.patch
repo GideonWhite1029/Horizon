@@ -9,7 +9,7 @@ index 7adabd30ff441970d15adc93376037721bab8a63..04508398758784ae3a8d37e6af4c7613
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
-
+ 
  import com.destroystokyo.paper.util.SneakyThrow;
  import dev.horizonmc.horizon.commands.HorizonCommand;
 +import dev.horizonmc.horizon.config.GlobalConfig;
@@ -19,7 +19,7 @@ index 7adabd30ff441970d15adc93376037721bab8a63..04508398758784ae3a8d37e6af4c7613
 @@ -78,4 +79,7 @@ public final class HorizonConfig {
          MinecraftServer.getServer().server.syncCommands();
      }
-
+ 
 +    @GlobalConfig(name = "no-chat-reports", category = {"features"})
 +    public static boolean noChatReports = false;
 +
@@ -30,20 +30,20 @@ index e4fd372a1d585887287253a02531cd192929377b..7816e2622395a493eb9d771d83916b3a
 +++ b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 @@ -1,5 +1,6 @@
  package io.papermc.paper.adventure;
-
+ 
 +import dev.horizonmc.horizon.HorizonConfig;
  import io.papermc.paper.chat.ChatRenderer;
  import io.papermc.paper.event.player.AbstractChatEvent;
  import io.papermc.paper.event.player.AsyncChatEvent;
 @@ -355,7 +356,7 @@ public final class ChatProcessor {
-
+ 
          private void sendToServer(final ChatType.Bound chatType, final @Nullable Function<Audience, net.minecraft.network.chat.Component> msgFunction) {
              final PlayerChatMessage toConsoleMessage = msgFunction == null ? ChatProcessor.this.message : ChatProcessor.this.message.withUnsignedContent(msgFunction.apply(ChatProcessor.this.server.console));
 -            ChatProcessor.this.server.logChatMessage(toConsoleMessage.decoratedContent(), chatType, ChatProcessor.this.server.getPlayerList().verifyChatTrusted(toConsoleMessage) ? null : "Not Secure");
 +            ChatProcessor.this.server.logChatMessage(toConsoleMessage.decoratedContent(), chatType, ChatProcessor.this.server.getPlayerList().verifyChatTrusted(toConsoleMessage) || HorizonConfig.noChatReports ? null : "Not Secure"); // Horizon - No Chat Reports
          }
      }
-
+ 
 diff --git a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java b/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
 index 72a8aa676836fcb3b4578689d16af65e18f55bbe..ac58d638b238b589a5d67359993b422cbea71384 100644
 --- a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
@@ -60,7 +60,7 @@ index 72a8aa676836fcb3b4578689d16af65e18f55bbe..ac58d638b238b589a5d67359993b422c
 @@ -13,9 +15,16 @@ public record ArgumentSignatures(List<ArgumentSignatures.Entry> entries) {
      private static final int MAX_ARGUMENT_COUNT = 8;
      private static final int MAX_ARGUMENT_NAME_LENGTH = 16;
-
+ 
 +    // Horizon start - No Chat Reports
      public ArgumentSignatures(FriendlyByteBuf buf) {
 -        this(buf.readCollection(FriendlyByteBuf.limitValue(ArrayList::new, 8), ArgumentSignatures.Entry::new));
@@ -72,7 +72,7 @@ index 72a8aa676836fcb3b4578689d16af65e18f55bbe..ac58d638b238b589a5d67359993b422c
 +        return HorizonConfig.noChatReports ? List.of() : entries;
      }
 +    // Horizon end - No Chat Reports
-
+ 
      @Nullable
      public MessageSignature get(String argumentName) {
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
@@ -90,7 +90,7 @@ index bdcfd80f937c34956911373905d66424bbff8e1d..86ecb376f157eec55ab69e1d5b66e43b
 @@ -145,6 +146,16 @@ public class FriendlyByteBuf extends ByteBuf {
          // Paper end - Adventure; add max length parameter
          DataResult<JsonElement> dataresult = codec.encodeStart(JsonOps.INSTANCE, value);
-
+ 
 +        // Horizon start - No Chat Reports
 +        if (codec == net.minecraft.network.protocol.status.ServerStatus.CODEC) {
 +            JsonElement element = Util.getOrThrow(dataresult, string -> new EncoderException("Failed to encode: " + string + " " + value));
@@ -109,7 +109,7 @@ index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7
 --- a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 @@ -2,15 +2,26 @@ package net.minecraft.network.protocol.game;
-
+ 
  import java.time.Instant;
  import javax.annotation.Nullable;
 +
@@ -118,7 +118,7 @@ index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7
  import net.minecraft.network.chat.LastSeenMessages;
  import net.minecraft.network.chat.MessageSignature;
  import net.minecraft.network.protocol.Packet;
-
+ 
  public record ServerboundChatPacket(String message, Instant timeStamp, long salt, @Nullable MessageSignature signature, LastSeenMessages.Update lastSeenMessages) implements Packet<ServerGamePacketListener> {
 +
 +    // Horizon start - No Chat Reports
@@ -133,7 +133,7 @@ index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7
 +        return HorizonConfig.noChatReports ? null : new MessageSignature(bs);
      }
 +    // Horizon end - No Chat Reports
-
+ 
      @Override
      public void write(FriendlyByteBuf buf) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
@@ -142,12 +142,13 @@ index 9d6db4a378036559efab91c8b7dcf2a6b0c2cce6..e69b8e55818309e7335333a15eac9025
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
 @@ -1,5 +1,6 @@
  package net.minecraft.network.protocol.game;
+ 
 +import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.network.FriendlyByteBuf;
  import net.minecraft.network.chat.RemoteChatSession;
  import net.minecraft.network.protocol.Packet;
 @@ -16,6 +17,11 @@ public record ServerboundChatSessionUpdatePacket(RemoteChatSession.Data chatSess
-
+ 
      @Override
      public void handle(ServerGamePacketListener listener) {
 +        // Horizon start - No Chat Reports
@@ -179,7 +180,7 @@ index ed4a336448a8f26d2132ba5255d70555b76ddd3e..fa339758dd00ecd15f36601fd0c5b48b
 +            && this.services.canValidateProfileKeys() && !HorizonConfig.noChatReports; // Horizon - No Chat Reports
          // Paper end - Add setting for proxy online mode status
      }
-
+ 
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91c34d3fab 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
@@ -195,7 +196,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
  import net.minecraft.CrashReportCategory;
 @@ -271,10 +273,27 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
-
+ 
      public void send(Packet<?> packet) {
 +        // Horizon start - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
 +        if (HorizonConfig.noChatReports) {
@@ -208,7 +209,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
 +        // Horizon end - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
          this.send(packet, (PacketSendListener) null);
      }
-
+ 
      public void send(Packet<?> packet, @Nullable PacketSendListener callbacks) {
 +        // Horizon start - no ClientboundPlayerChatHeaderPacket and rebuild ClientboundPlayerChatPacket
 +        if (HorizonConfig.noChatReports) {
@@ -236,10 +237,10 @@ index 5a84bf0ae304f7719ff4f33b72d54a03331e316d..c4cb62f853e9eff0367cf605c977d59b
  import net.minecraft.commands.CommandSourceStack;
 @@ -1497,7 +1499,7 @@ public abstract class PlayerList {
      }
-
+ 
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public
 -        return message.hasSignature() && !message.hasExpiredServer(Instant.now());
 +        return HorizonConfig.noChatReports || message.hasSignature() && !message.hasExpiredServer(Instant.now()); // Horizon - No Chat Reports
      }
-
+ 
      // CraftBukkit start

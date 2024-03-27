@@ -11,7 +11,7 @@ index 825b1658d5d24b01630316921cde097f97de449d..c27225cc1a2eb9aa983c6ef8afe26aca
 @@ -91,4 +91,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "cce-update-suppression", category = {"features"})
      public static boolean cceUpdateSuppression = false;
-     
+ 
 +    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
 +    public static boolean vanillaHopper = false;
 +
@@ -56,7 +56,7 @@ index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b4
 +        } else {
 +            container.setChanged(); // original logic always marks source inv as changed even if no move happens.
 +            movedItem.setCount(movedItemCount);
-
+ 
 -        final ItemStack remainingItem = addItem(container, hopper, movedItem, null);
 -        final int remainingItemCount = remainingItem.getCount();
 -        if (remainingItemCount != movedItemCount) {
@@ -74,7 +74,7 @@ index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b4
 +                    return true;
 +                }
              }
-
+ 
 -            ignoreTileUpdates = true;
 -            container.setItem(i, origItemStack);
 -            ignoreTileUpdates = false;
@@ -99,6 +99,6 @@ index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b4
          }
 -        origItemStack.setCount(originalItemCount);
 +        // Horizon end - fix vanilla
-
+ 
          if (level.paperConfig().hopper.cooldownWhenFull) {
              cooldownHopper(hopper);
