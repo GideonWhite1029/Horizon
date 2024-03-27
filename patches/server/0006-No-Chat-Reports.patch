@@ -5,7 +5,7 @@ Subject: [PATCH] No Chat Reports
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 5009f97586ad996cc279c0ac9eebc72aff2520c6..4d2aa573926583c3d09b7a78b8fe12772b2b8967 100644
+index 7adabd30ff441970d15adc93376037721bab8a63..04508398758784ae3a8d37e6af4c761358841dbe 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
@@ -45,84 +45,38 @@ index e4fd372a1d585887287253a02531cd192929377b..7816e2622395a493eb9d771d83916b3a
      }
  
 diff --git a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java b/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..27a4f7b1dd04efb6050c2cb805de9f9f1dedc5d5
---- /dev/null
+index 72a8aa676836fcb3b4578689d16af65e18f55bbe..ac58d638b238b589a5d67359993b422cbea71384 100644
+--- a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
 +++ b/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
-@@ -0,0 +1,71 @@
-+package net.minecraft.commands.arguments;
-+
-+import java.util.ArrayList;
-+import java.util.List;
-+import java.util.Objects;
-+import javax.annotation.Nullable;
+@@ -4,6 +4,8 @@ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.Objects;
+ import javax.annotation.Nullable;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
-+import net.minecraft.network.FriendlyByteBuf;
-+import net.minecraft.network.chat.MessageSignature;
-+import net.minecraft.network.chat.SignableCommand;
-+
-+public record ArgumentSignatures(List<ArgumentSignatures.Entry> entries) {
-+    public static final ArgumentSignatures EMPTY = new ArgumentSignatures(List.of());
-+    private static final int MAX_ARGUMENT_COUNT = 8;
-+    private static final int MAX_ARGUMENT_NAME_LENGTH = 16;
-+
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.MessageSignature;
+ import net.minecraft.network.chat.SignableCommand;
+@@ -13,9 +15,16 @@ public record ArgumentSignatures(List<ArgumentSignatures.Entry> entries) {
+     private static final int MAX_ARGUMENT_COUNT = 8;
+     private static final int MAX_ARGUMENT_NAME_LENGTH = 16;
+ 
 +    // Horizon start - No Chat Reports
-+    public ArgumentSignatures(FriendlyByteBuf buf) {
+     public ArgumentSignatures(FriendlyByteBuf buf) {
+-        this(buf.readCollection(FriendlyByteBuf.limitValue(ArrayList::new, 8), ArgumentSignatures.Entry::new));
 +        this(readSign(buf));
 +    }
 +
 +    private static List<ArgumentSignatures.Entry> readSign(FriendlyByteBuf buf) {
 +        var entries = buf.readCollection(FriendlyByteBuf.limitValue(ArrayList::new, 8), Entry::new);
 +        return HorizonConfig.noChatReports ? List.of() : entries;
-+    }
+     }
 +    // Horizon end - No Chat Reports
-+
-+
-+    @Nullable
-+    public MessageSignature get(String argumentName) {
-+        for(ArgumentSignatures.Entry entry : this.entries) {
-+            if (entry.name.equals(argumentName)) {
-+                return entry.signature;
-+            }
-+        }
-+
-+        return null;
-+    }
-+
-+    public void write(FriendlyByteBuf buf) {
-+        buf.writeCollection(this.entries, (buf2, entry) -> {
-+            entry.write(buf2);
-+        });
-+    }
-+
-+    public static ArgumentSignatures signCommand(SignableCommand<?> arguments, ArgumentSignatures.Signer signer) {
-+        List<ArgumentSignatures.Entry> list = arguments.arguments().stream().map((argument) -> {
-+            MessageSignature messageSignature = signer.sign(argument.value());
-+            return messageSignature != null ? new ArgumentSignatures.Entry(argument.name(), messageSignature) : null;
-+        }).filter(Objects::nonNull).toList();
-+        return new ArgumentSignatures(list);
-+    }
-+
-+    public static record Entry(String name, MessageSignature signature) {
-+        public Entry(FriendlyByteBuf buf) {
-+            this(buf.readUtf(16), MessageSignature.read(buf));
-+        }
-+
-+        public void write(FriendlyByteBuf buf) {
-+            buf.writeUtf(this.name, 16);
-+            MessageSignature.write(buf, this.signature);
-+        }
-+    }
-+
-+    @FunctionalInterface
-+    public interface Signer {
-+        @Nullable
-+        MessageSignature sign(String value);
-+    }
-+}
+ 
+     @Nullable
+     public MessageSignature get(String argumentName) {
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index bdcfd80f937c34956911373905d66424bbff8e1d..3092649109fbfb4bc0fa7eb9d1d6a2471780f438 100644
+index bdcfd80f937c34956911373905d66424bbff8e1d..86ecb376f157eec55ab69e1d5b66e43b45145528 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -12,6 +12,7 @@ import com.mojang.serialization.Codec;
@@ -133,7 +87,7 @@ index bdcfd80f937c34956911373905d66424bbff8e1d..3092649109fbfb4bc0fa7eb9d1d6a247
  import io.netty.buffer.ByteBuf;
  import io.netty.buffer.ByteBufAllocator;
  import io.netty.buffer.ByteBufInputStream;
-@@ -145,6 +146,17 @@ public class FriendlyByteBuf extends ByteBuf {
+@@ -145,6 +146,16 @@ public class FriendlyByteBuf extends ByteBuf {
          // Paper end - Adventure; add max length parameter
          DataResult<JsonElement> dataresult = codec.encodeStart(JsonOps.INSTANCE, value);
  
@@ -147,31 +101,29 @@ index bdcfd80f937c34956911373905d66424bbff8e1d..3092649109fbfb4bc0fa7eb9d1d6a247
 +        }
 +        // Horizon end - No Chat Reports
 +
-+
          this.writeUtf(FriendlyByteBuf.GSON.toJson((JsonElement) Util.getOrThrow(dataresult, (s) -> {
              return new EncoderException("Failed to encode: " + s + " " + value);
          })), maxLength); // Paper - Adventure; add max length parameter
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..f14d0a02691178f9b7187bfb3fa7a1a7b6e28930
---- /dev/null
+index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7b6e28930 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
-@@ -0,0 +1,39 @@
-+package net.minecraft.network.protocol.game;
-+
-+import java.time.Instant;
-+import javax.annotation.Nullable;
+@@ -2,15 +2,26 @@ package net.minecraft.network.protocol.game;
+ 
+ import java.time.Instant;
+ import javax.annotation.Nullable;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
-+import net.minecraft.network.FriendlyByteBuf;
-+import net.minecraft.network.chat.LastSeenMessages;
-+import net.minecraft.network.chat.MessageSignature;
-+import net.minecraft.network.protocol.Packet;
-+
-+public record ServerboundChatPacket(String message, Instant timeStamp, long salt, @Nullable MessageSignature signature, LastSeenMessages.Update lastSeenMessages) implements Packet<ServerGamePacketListener> {
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.LastSeenMessages;
+ import net.minecraft.network.chat.MessageSignature;
+ import net.minecraft.network.protocol.Packet;
+ 
+ public record ServerboundChatPacket(String message, Instant timeStamp, long salt, @Nullable MessageSignature signature, LastSeenMessages.Update lastSeenMessages) implements Packet<ServerGamePacketListener> {
 +
 +    // Horizon start - No Chat Reports
-+    public ServerboundChatPacket(FriendlyByteBuf buf) {
+     public ServerboundChatPacket(FriendlyByteBuf buf) {
+-        this(buf.readUtf(256), buf.readInstant(), buf.readLong(), buf.readNullable(MessageSignature::read), new LastSeenMessages.Update(buf));
 +        this(buf.readUtf(256), buf.readInstant(), buf.readLong(), buf.readNullable(ServerboundChatPacket::readSign), new LastSeenMessages.Update(buf));
 +    }
 +
@@ -179,56 +131,34 @@ index 0000000000000000000000000000000000000000..f14d0a02691178f9b7187bfb3fa7a1a7
 +        byte[] bs = new byte[256];
 +        buf.readBytes(bs);
 +        return HorizonConfig.noChatReports ? null : new MessageSignature(bs);
-+    }
+     }
 +    // Horizon end - No Chat Reports
-+
-+    @Override
-+    public void write(FriendlyByteBuf buf) {
-+        buf.writeUtf(this.message, 256);
-+        buf.writeInstant(this.timeStamp);
-+        buf.writeLong(this.salt);
-+        buf.writeNullable(this.signature, MessageSignature::write);
-+        this.lastSeenMessages.write(buf);
-+    }
-+
-+    @Override
-+    public void handle(ServerGamePacketListener listener) {
-+        listener.handleChat(this);
-+    }
-+}
+ 
+     @Override
+     public void write(FriendlyByteBuf buf) {
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..e69b8e55818309e7335333a15eac9025d5f7c4d1
---- /dev/null
+index 9d6db4a378036559efab91c8b7dcf2a6b0c2cce6..e69b8e55818309e7335333a15eac9025d5f7c4d1 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatSessionUpdatePacket.java
-@@ -0,0 +1,27 @@
-+package net.minecraft.network.protocol.game;
-+
+@@ -1,5 +1,6 @@
+ package net.minecraft.network.protocol.game;
+ 
 +import dev.horizonmc.horizon.HorizonConfig;
-+import net.minecraft.network.FriendlyByteBuf;
-+import net.minecraft.network.chat.RemoteChatSession;
-+import net.minecraft.network.protocol.Packet;
-+
-+public record ServerboundChatSessionUpdatePacket(RemoteChatSession.Data chatSession) implements Packet<ServerGamePacketListener> {
-+    public ServerboundChatSessionUpdatePacket(FriendlyByteBuf buf) {
-+        this(RemoteChatSession.Data.read(buf));
-+    }
-+
-+    @Override
-+    public void write(FriendlyByteBuf buf) {
-+        RemoteChatSession.Data.write(buf, this.chatSession);
-+    }
-+
-+    @Override
-+    public void handle(ServerGamePacketListener listener) {
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.RemoteChatSession;
+ import net.minecraft.network.protocol.Packet;
+@@ -16,6 +17,11 @@ public record ServerboundChatSessionUpdatePacket(RemoteChatSession.Data chatSess
+ 
+     @Override
+     public void handle(ServerGamePacketListener listener) {
 +        // Horizon start - No Chat Reports
 +        if (HorizonConfig.noChatReports) {
 +            return;
 +        }
 +        // Horizon end - No Chat Reports
-+        listener.handleChatSessionUpdate(this);
-+    }
-+}
+         listener.handleChatSessionUpdate(this);
+     }
+ }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 index ed4a336448a8f26d2132ba5255d70555b76ddd3e..fa339758dd00ecd15f36601fd0c5b48b9c02e6b3 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java

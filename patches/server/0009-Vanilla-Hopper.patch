@@ -5,16 +5,16 @@ Subject: [PATCH] Vanilla Hopper
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 9a95b88257298b6c52446f9bd1095fbb201964ff..9246e132b82a4dca2d64f6bc738a32dbcbf708a4 100644
+index 825b1658d5d24b01630316921cde097f97de449d..c27225cc1a2eb9aa983c6ef8afe26aca3567bd94 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -90,4 +90,7 @@ public final class HorizonConfig {
- 
+@@ -91,4 +91,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "cce-update-suppression", category = {"features"})
      public static boolean cceUpdateSuppression = false;
-+
+ 
 +    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
 +    public static boolean vanillaHopper = false;
++
  }
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b41896364e 100644
