@@ -1,0 +1,53 @@
+name: Horizon CI
+
+on:
+  push:
+    branches: [ dev/1.20.4 ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Git Config
+        run: |
+          git config --global user.email "gideonwhite1029@gmail.com"
+          git config --global user.name "Horizon CI"
+      - name: Apply Patches
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        with:
+          arguments: applyPatches
+      - name: Create Paperclip Jar
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        with:
+          arguments: createReobfPaperclipJar
+      - name: Create Release
+        if: "!contains(github.event.commits[0].message, '[release-skip]')"
+        uses: ncipollo/release-action@v1.12.0
+        with:
+          artifacts: ${{ env.jar }}
+          bodyFile: ${{ env.info }}
+          tag: ${{ env.tag }}
+          name: ${{ env.name }}
+          prerelease: ${{ env.pre }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          makeLatest: ${{ env.make_latest }}
+      - name: Delete Draft Releases
+        uses: hugo19941994/delete-draft-releases@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.jar }}
+          path: ${{ env.jar }}
