@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sat, 30 Mar 2024 13:09:01 +0400
+Subject: [PATCH] Horizon Reload Command
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
+index 83326c0ccc7dbe9129890d26a008f715c725730b..3f59f92730f5b2c15fbc0e42466c663fdde16782 100644
+--- a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
++++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
+@@ -2,6 +2,7 @@ package dev.horizonmc.horizon.commands;
+ 
+ import dev.horizonmc.horizon.commands.subcommands.ConfigCommand;
+ import dev.horizonmc.horizon.commands.subcommands.CounterCommand;
++import dev.horizonmc.horizon.commands.subcommands.ReloadCommand;
+ import io.papermc.paper.command.CommandUtil;
+ import it.unimi.dsi.fastutil.Pair;
+ import net.minecraft.Util;
+@@ -37,6 +38,7 @@ public final class HorizonCommand extends Command {
+         final Map<Set<String>, HorizonSubcommand> commands = new HashMap<>();
+         commands.put(Set.of("config"), new ConfigCommand());
+         commands.put(Set.of("counter"), new CounterCommand());
++        commands.put(Set.of("reload"), new ReloadCommand());
+ 
+         return commands.entrySet().stream()
+                 .flatMap(entry -> entry.getKey().stream().map(s -> Map.entry(s, entry.getValue())))
+diff --git a/src/main/java/dev/horizonmc/horizon/commands/subcommands/ReloadCommand.java b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ReloadCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..51d373c56c079ce26d91fcfe595dedd5b594bca9
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ReloadCommand.java
+@@ -0,0 +1,22 @@
++package dev.horizonmc.horizon.commands.subcommands;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.commands.HorizonSubcommand;
++import net.minecraft.server.MinecraftServer;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++
++import java.io.File;
++
++import static net.kyori.adventure.text.Component.text;
++import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
++
++public class ReloadCommand implements HorizonSubcommand {
++    @Override
++    public boolean execute(CommandSender sender, String subCommand, String[] args) {
++        MinecraftServer server = MinecraftServer.getServer();
++        HorizonConfig.init((File) server.options.valueOf("horizon-settings"));
++        Command.broadcastCommandMessage(sender, text("Horizon config reload complete.", GREEN));
++        return false;
++    }
++}

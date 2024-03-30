@@ -1,0 +1,284 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 28 Mar 2024 14:45:24 +0400
+Subject: [PATCH] Fast Resume
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index c5c5604b8ac1735a893a5e5b40a22eb9e367a658..4724c485e3769387a0517ba5c8231952e07b54b2 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -97,4 +97,6 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "spectator-dont-get-advancement", category = {"features"})
+     public static boolean spectatorDontGetAdvancement = false;
+ 
++    @GlobalConfig(name = "fast-resume", category = {"features"})
++    public static boolean fastResume = false;
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java b/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1dda7ce4db36235f18f6692b0c48d983307bb3ae
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java
+@@ -0,0 +1,179 @@
++package dev.horizonmc.horizon.util;
++
++import com.google.gson.Gson;
++import com.google.gson.JsonArray;
++import com.google.gson.JsonElement;
++import com.google.gson.JsonObject;
++import dev.horizonmc.horizon.HorizonConfig;
++import io.papermc.paper.chunk.system.RegionizedPlayerChunkLoader;
++import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
++import net.minecraft.core.BlockPos;
++import net.minecraft.core.registries.Registries;
++import net.minecraft.resources.ResourceKey;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.DistanceManager;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.server.level.Ticket;
++import net.minecraft.server.level.TicketType;
++import net.minecraft.util.SortedArraySet;
++import net.minecraft.world.level.ChunkPos;
++import net.minecraft.world.level.storage.LevelResource;
++
++import java.io.BufferedReader;
++import java.io.BufferedWriter;
++import java.io.File;
++import java.io.IOException;
++import java.nio.charset.StandardCharsets;
++import java.nio.file.Files;
++import java.util.Set;
++
++public class TicketHelper {
++
++    private static final Set<TicketType<?>> NEED_SAVED = Set.of(TicketType.PLAYER, TicketType.PORTAL, TicketType.ENTITY_LOAD, TicketType.POI_LOAD);
++
++    public static void tryToLoadTickets() {
++        if (!HorizonConfig.fastResume) {
++            return;
++        }
++
++        File file = MinecraftServer.getServer().getWorldPath(LevelResource.ROOT).resolve("chunk_tickets.horizon.json").toFile();
++        if (file.isFile()) {
++            try (BufferedReader bfr = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
++                JsonObject json = new Gson().fromJson(bfr, JsonObject.class);
++                loadSavedChunkTickets(json);
++                file.delete();
++            } catch (IOException e) {
++                e.printStackTrace();
++            }
++        }
++    }
++
++    public static void tryToSaveTickets() {
++        if (!HorizonConfig.fastResume) {
++            return;
++        }
++
++        File file = MinecraftServer.getServer().getWorldPath(LevelResource.ROOT).resolve("chunk_tickets.horizon.json").toFile();
++        if (!file.isFile()) {
++            try {
++                file.createNewFile();
++            } catch (IOException e) {
++                e.printStackTrace();
++            }
++        }
++        try (BufferedWriter bfw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
++            bfw.write(new Gson().toJson(getSavedChunkTickets()));
++        } catch (IOException e) {
++            e.printStackTrace();
++        }
++    }
++
++    public static void loadSavedChunkTickets(JsonObject json) {
++        MinecraftServer server = MinecraftServer.getServer();
++        for (String worldKey : json.keySet()) {
++            ServerLevel level = server.getLevel(ResourceKey.create(Registries.DIMENSION, new ResourceLocation(worldKey)));
++            if (level == null) {
++                continue;
++            }
++
++            DistanceManager chunkDistanceManager = level.getChunkSource().chunkMap.distanceManager;
++            for (JsonElement chunkElement : json.get(worldKey).getAsJsonArray()) {
++                JsonObject chunkJson = (JsonObject) chunkElement;
++                long chunkKey = chunkJson.get("key").getAsLong();
++
++                for (JsonElement ticketElement : chunkJson.get("tickets").getAsJsonArray()) {
++                    Ticket<?> ticket = tickFormJson((JsonObject) ticketElement);
++                    chunkDistanceManager.getChunkHolderManager().addTicketAtLevelCustom(ticket, chunkKey, true);
++                }
++            }
++        }
++    }
++
++    public static JsonObject getSavedChunkTickets() {
++        JsonObject json = new JsonObject();
++
++        for (ServerLevel level : MinecraftServer.getServer().getAllLevels()) {
++            JsonArray levelArray = new JsonArray();
++            DistanceManager chunkDistanceManager = level.getChunkSource().chunkMap.distanceManager;
++
++            for (Long2ObjectMap.Entry<SortedArraySet<Ticket<?>>> chunkTickets : chunkDistanceManager.getChunkHolderManager().getTicketsCopy().long2ObjectEntrySet()) {
++                long chunkKey = chunkTickets.getLongKey();
++                JsonArray ticketArray = new JsonArray();
++                SortedArraySet<Ticket<?>> tickets = chunkTickets.getValue();
++
++                for (Ticket<?> ticket : tickets) {
++                    if (!NEED_SAVED.contains(ticket.getType())) {
++                        continue;
++                    }
++
++                    ticketArray.add(ticketToJson(ticket));
++                }
++
++                if (!ticketArray.isEmpty()) {
++                    JsonObject chunkJson = new JsonObject();
++                    chunkJson.addProperty("key", chunkKey);
++                    chunkJson.add("tickets", ticketArray);
++                    levelArray.add(chunkJson);
++                }
++            }
++
++            if (!levelArray.isEmpty()) {
++                json.add(level.dimension().location().toString(), levelArray);
++            }
++        }
++
++        return json;
++    }
++
++    private static JsonObject ticketToJson(Ticket<?> ticket) {
++        JsonObject json = new JsonObject();
++        json.addProperty("type", ticket.getType().toString());
++        json.addProperty("ticketLevel", ticket.getTicketLevel());
++        json.addProperty("removeDelay", ticket.removeDelay);
++        if (ticket.key instanceof BlockPos pos) {
++            json.addProperty("key", pos.asLong());
++        } else if (ticket.key instanceof ChunkPos pos) {
++            json.addProperty("key", pos.toLong());
++        } else if (ticket.key instanceof Long l) {
++            json.addProperty("key", l);
++        }
++        return json;
++    }
++
++    private static <T> Ticket<T> tickFormJson(JsonObject json) {
++        TicketType<?> ticketType = null;
++        Object key = null;
++        switch (json.get("type").getAsString()) {
++            case "player" -> {
++                ticketType = TicketType.PLAYER;
++                key = new ChunkPos(json.get("key").getAsLong());
++            }
++            case "portal" -> {
++                ticketType = TicketType.PORTAL;
++                key = BlockPos.of(json.get("key").getAsLong());
++            }
++            case "entity_load" -> {
++                ticketType = TicketType.ENTITY_LOAD;
++                key = json.get("key").getAsLong();
++            }
++            case "poi_load" -> {
++                ticketType = TicketType.POI_LOAD;
++                key = json.get("key").getAsLong();
++            }
++            case "region_player_ticket" -> {
++                ticketType = RegionizedPlayerChunkLoader.REGION_PLAYER_TICKET;
++                key = json.get("key").getAsLong();
++            }
++        }
++
++        if (ticketType == null) {
++            throw new IllegalArgumentException("???");
++        }
++
++        int ticketLevel = json.get("ticketLevel").getAsInt();
++        long removeDelay = json.get("removeDelay").getAsLong();
++
++        return new Ticket<T>((TicketType<T>) ticketType, ticketLevel, (T) key, removeDelay);
++    }
++}
+diff --git a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
+index 5b446e6ac151f99f64f0c442d0b40b5e251bc4c4..1dd49b80d5b3e05bbcb124a5853213fbd163cfec 100644
+--- a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
++++ b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
+@@ -566,6 +566,56 @@ public final class ChunkHolderManager {
+         }
+     }
+ 
++    // Horizon start
++    public <T> boolean addTicketAtLevelCustom(final Ticket<T> ticket, final long chunk, final boolean lock) {
++        final long removeDelay = ticket.removeDelay;
++        if (ticket.getTicketLevel() > MAX_TICKET_LEVEL) {
++            return false;
++        }
++
++        final int chunkX = CoordinateUtils.getChunkX(chunk);
++        final int chunkZ = CoordinateUtils.getChunkZ(chunk);
++        final RegionFileIOThread.ChunkCoordinate chunkCoord = new RegionFileIOThread.ChunkCoordinate(chunk);
++
++        final ReentrantAreaLock.Node ticketLock = lock ? this.ticketLockArea.lock(chunkX, chunkZ) : null;
++        try {
++            final SortedArraySet<Ticket<?>> ticketsAtChunk = this.tickets.computeIfAbsent(chunkCoord, (final RegionFileIOThread.ChunkCoordinate keyInMap) -> {
++                return SortedArraySet.create(4);
++            });
++
++            final int levelBefore = getTicketLevelAt(ticketsAtChunk);
++            final Ticket<T> current = (Ticket<T>) ticketsAtChunk.replace(ticket);
++            final int levelAfter = getTicketLevelAt(ticketsAtChunk);
++
++            if (current != ticket) {
++                final long oldRemoveDelay = current.removeDelay;
++                if (removeDelay != oldRemoveDelay) {
++                    if (oldRemoveDelay != NO_TIMEOUT_MARKER && removeDelay == NO_TIMEOUT_MARKER) {
++                        this.removeExpireCount(chunkX, chunkZ);
++                    } else if (oldRemoveDelay == NO_TIMEOUT_MARKER) {
++                        // since old != new, we have that NO_TIMEOUT_MARKER != new
++                        this.addExpireCount(chunkX, chunkZ);
++                    }
++                }
++            } else {
++                if (removeDelay != NO_TIMEOUT_MARKER) {
++                    this.addExpireCount(chunkX, chunkZ);
++                }
++            }
++
++            if (levelBefore != levelAfter) {
++                this.updateTicketLevel(chunk, levelAfter);
++            }
++
++            return current == ticket;
++        } finally {
++            if (ticketLock != null) {
++                this.ticketLockArea.unlock(ticketLock);
++            }
++        }
++    }
++    // Horizon end
++
+     public <T> boolean removeTicketAtLevel(final TicketType<T> type, final ChunkPos chunkPos, final int level, final T identifier) {
+         return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
+     }
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 28536de4f2a890b68c1cd61d90eeccfce29d9503..0a7109443f1a32ce8660e38414a88920228a8008 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -670,6 +670,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         }
+         // Paper end - Configurable player collision
+ 
++        dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
++
+         this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
+         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
+         this.connection.acceptConnections();
+@@ -944,6 +946,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     // CraftBukkit end
+ 
+     public void stopServer() {
++        dev.horizonmc.horizon.util.TicketHelper.tryToSaveTickets(); // Horizon
+         // CraftBukkit start - prevent double stopping on multiple threads
+         synchronized(this.stopLock) {
+             if (this.hasStopped) return;
