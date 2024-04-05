@@ -1,0 +1,372 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 4 Apr 2024 19:27:14 +0400
+Subject: [PATCH] Stackable Shulker Boxes
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index c34da598a94caae87968ecc4b596d82ff1055552..1b757ed984265618527212ea4803329e30a751a2 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -15,6 +15,8 @@ import java.io.IOException;
+ import java.util.Collections;
+ import java.util.logging.Level;
+ 
++import static org.codehaus.plexus.util.StringUtils.isNumeric;
++
+ public final class HorizonConfig {
+     public static final String CONFIG_HEADER = "This is the main configuration file for Horizon.\n"
+             + "# \n"
+@@ -156,4 +158,17 @@ public final class HorizonConfig {
+     public static boolean linearCrashOnBrokenSymlink = true;
+ 
+     // Horizon end - Linear region
++
++    public static int shulkerBoxStackSize = 1;
++    @GlobalConfig(name = "stackable-shulker-boxes", category = "utils", verify = StackableShulkerVerify.class)
++    private static String stackableShulkerBoxes = "false";
++
++    private static class StackableShulkerVerify extends ConfigVerify.StringConfigVerify {
++        @Override
++        public String check(String old, String value) {
++            String realValue = isNumeric(value) ? value : value.equals("true") ? "2" : "1";
++            shulkerBoxStackSize = Integer.parseInt(realValue);
++            return null;
++        }
++    }
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/util/ShulkerBoxUtils.java b/src/main/java/dev/horizonmc/horizon/util/ShulkerBoxUtils.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7b1a1bcb13bb406cbe6538cb11309467b1e20cf9
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/ShulkerBoxUtils.java
+@@ -0,0 +1,71 @@
++package dev.horizonmc.horizon.util;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.world.inventory.Slot;
++import net.minecraft.world.item.BlockItem;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.block.ShulkerBoxBlock;
++import org.jetbrains.annotations.NotNull;
++
++// Powered by fabric-carpet/src/main/java/carpet/helpers/InventoryHelper.java
++public class ShulkerBoxUtils {
++    // From nbt/NbtElement.java createTag()
++    public static final int TAG_END = 0;
++    public static final int TAG_BYTE = 1;
++    public static final int TAG_SHORT = 2;
++    public static final int TAG_INT = 3;
++    public static final int TAG_LONG = 4;
++    public static final int TAG_FLOAT = 5;
++    public static final int TAG_DOUBLE = 6;
++    public static final int TAG_BYTEARRAY = 7;
++    public static final int TAG_STRING = 8;
++    public static final int TAG_LIST = 9;
++    public static final int TAG_COMPOUND = 10;
++    public static final int TAG_INTARRAY = 11;
++    public static final int TAG_LONGARRAY = 12;
++
++    public static boolean cleanUpShulkerBoxTag(@NotNull ItemStack stack) {
++        boolean changed = false;
++        CompoundTag tag = stack.getTag();
++
++        if (tag == null || !tag.contains("BlockEntityTag", TAG_COMPOUND)) return false;
++
++        CompoundTag bet = tag.getCompound("BlockEntityTag");
++        if (bet.contains("Items", TAG_LIST) && bet.getList("Items", TAG_COMPOUND).isEmpty()) {
++            bet.remove("Items");
++            changed = true;
++        }
++
++        if (bet.isEmpty() || (bet.size() == 1 && bet.getString("id").equals("minecraft:shulker_box"))) {
++            tag.remove("BlockEntityTag");
++            changed = true;
++        }
++        if (tag.isEmpty()) {
++            stack.setTag(null);
++            changed = true;
++        }
++        return changed;
++    }
++
++    public static boolean shulkerBoxHasItems(@NotNull ItemStack stack) {
++        CompoundTag tag = stack.getTag();
++
++        if (tag == null || !tag.contains("BlockEntityTag", TAG_COMPOUND)) return false;
++
++        CompoundTag bet = tag.getCompound("BlockEntityTag");
++        return bet.contains("Items", TAG_LIST) && !bet.getList("Items", TAG_COMPOUND).isEmpty();
++    }
++
++    public static int getItemStackMaxCount(ItemStack stack) {
++        if (HorizonConfig.shulkerBoxStackSize > 1 && stack.getItem() instanceof BlockItem bi &&
++                bi.getBlock() instanceof ShulkerBoxBlock && !dev.horizonmc.horizon.util.ShulkerBoxUtils.shulkerBoxHasItems(stack)) {
++            return dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize;
++        }
++        return stack.getMaxStackSize();
++    }
++
++    public static boolean isStackable(ItemStack itemStack) {
++        return getItemStackMaxCount(itemStack) > 1 && (!itemStack.isDamageableItem() || !itemStack.isDamaged());
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+index 7bcf653379d7410b068811895dbe41be8af008fa..62d8b757fcb79225e26fb6294e4bfb2f5518027c 100644
+--- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+@@ -16,10 +16,12 @@ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.entity.MoverType;
+ import net.minecraft.world.entity.TraceableEntity;
++import net.minecraft.world.item.BlockItem;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.ShulkerBoxBlock;
+ import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.phys.Vec3;
+ import net.minecraft.core.BlockPos;
+@@ -88,6 +90,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+         // Horizon end
+         this.setItem(stack);
+         // Paper end - Don't use level random in entity constructors
++        // Horizon start - stackable shulker boxes
++        if (dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize > 1) {
++            if (stack.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
++                dev.horizonmc.horizon.util.ShulkerBoxUtils.cleanUpShulkerBoxTag(stack);
++            }
++        }
++        // Horizon end - stackable shulker boxes
+     }
+ 
+     public ItemEntity(Level world, double x, double y, double z, ItemStack stack, double velocityX, double velocityY, double velocityZ) {
+@@ -322,10 +331,48 @@ public class ItemEntity extends Entity implements TraceableEntity {
+     private boolean isMergable() {
+         ItemStack itemstack = this.getItem();
+ 
+-        return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && itemstack.getCount() < itemstack.getMaxStackSize(); // Paper - Alternative item-despawn-rate
++        return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && itemstack.getCount() < dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack); // Paper - Alternative item-despawn-rate // Horizon - stackable shulker boxes
+     }
+ 
++    // Horizon end - stackable shulker boxes
++    private boolean tryStackShulkerBoxes(ItemEntity other) {
++        ItemStack selfStack = this.getItem();
++        if (dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize == 1 || !(selfStack.getItem() instanceof BlockItem bi) || !(bi.getBlock() instanceof ShulkerBoxBlock)) {
++            return false;
++        }
++
++        ItemStack otherStack = other.getItem();
++        if (selfStack.getItem() == otherStack.getItem()
++                && !dev.horizonmc.horizon.util.ShulkerBoxUtils.shulkerBoxHasItems(selfStack)
++                && !dev.horizonmc.horizon.util.ShulkerBoxUtils.shulkerBoxHasItems(otherStack)
++                && Objects.equals(selfStack.getTag(), otherStack.getTag()) // empty block entity tags are cleaned up when spawning
++                && selfStack.getCount() != dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize) {
++            int amount = Math.min(otherStack.getCount(), dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize - selfStack.getCount());
++
++            selfStack.grow(amount);
++            this.setItem(selfStack);
++
++            this.pickupDelay = Math.max(other.pickupDelay, this.pickupDelay);
++            this.age = Math.min(other.getAge(), this.age);
++
++            otherStack.shrink(amount);
++            if (otherStack.isEmpty()) {
++                other.discard();
++            } else {
++                other.setItem(otherStack);
++            }
++            return true;
++        }
++        return false;
++    }
++    // Horizon end - stackable shulker boxes
++
+     private void tryToMerge(ItemEntity other) {
++        // Horizon start - stackable shulker boxes
++        if (tryStackShulkerBoxes(other)) {
++            return;
++        }
++        // Horizon end - stackable shulker boxes
+         ItemStack itemstack = this.getItem();
+         ItemStack itemstack1 = other.getItem();
+ 
+diff --git a/src/main/java/net/minecraft/world/entity/player/Inventory.java b/src/main/java/net/minecraft/world/entity/player/Inventory.java
+index c6a925cbd35eb33b27b90bfa8344ac7515d28b76..69777b349764261120e5a46f2f33a58b5417edd2 100644
+--- a/src/main/java/net/minecraft/world/entity/player/Inventory.java
++++ b/src/main/java/net/minecraft/world/entity/player/Inventory.java
+@@ -114,7 +114,7 @@ public class Inventory implements Container, Nameable {
+     }
+ 
+     private boolean hasRemainingSpaceForItem(ItemStack existingStack, ItemStack stack) {
+-        return !existingStack.isEmpty() && existingStack.isStackable() && existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < this.getMaxStackSize() && ItemStack.isSameItemSameTags(existingStack, stack); // Paper - check if itemstack is stackable first
++        return !existingStack.isEmpty() && dev.horizonmc.horizon.util.ShulkerBoxUtils.isStackable(existingStack) && existingStack.getCount() < dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(existingStack) && existingStack.getCount() < this.getMaxStackSize() && ItemStack.isSameItemSameTags(existingStack, stack); // Paper - check if itemstack is stackable first // Horizon - stackable shulker boxes
+     }
+ 
+     // CraftBukkit start - Watch method above! :D
+@@ -289,9 +289,11 @@ public class Inventory implements Container, Nameable {
+ 
+         int k = j;
+ 
+-        if (j > itemstack1.getMaxStackSize() - itemstack1.getCount()) {
+-            k = itemstack1.getMaxStackSize() - itemstack1.getCount();
++        // Horizon start - stackable shulker boxes
++        if (j > dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack1) - itemstack1.getCount()) {
++            k = dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack1) - itemstack1.getCount();
+         }
++        // Horizon stop - stackable shulker boxes
+ 
+         if (k > this.getMaxStackSize() - itemstack1.getCount()) {
+             k = this.getMaxStackSize() - itemstack1.getCount();
+@@ -409,7 +411,7 @@ public class Inventory implements Container, Nameable {
+                 }
+ 
+                 if (i != -1) {
+-                    int j = stack.getMaxStackSize() - this.getItem(i).getCount();
++                    int j = dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack) - this.getItem(i).getCount(); // Horizon - stackable shulker boxes
+ 
+                     if (this.add(i, stack.split(j)) && notifiesClient && this.player instanceof ServerPlayer) {
+                         ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetSlotPacket(-2, 0, i, this.getItem(i)));
+diff --git a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
+index fa185a8145843edf44fc0aeedb6c36b2b13263ae..fb634dad66cc74e25f9f29cf79534740ab6f5fcb 100644
+--- a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
++++ b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
+@@ -455,7 +455,7 @@ public abstract class AbstractContainerMenu {
+ 
+                         if (slot1 != null && AbstractContainerMenu.canItemQuickReplace(slot1, itemstack2, true) && slot1.mayPlace(itemstack2) && (this.quickcraftType == 2 || itemstack2.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot1)) {
+                             int j1 = slot1.hasItem() ? slot1.getItem().getCount() : 0;
+-                            int k1 = Math.min(itemstack1.getMaxStackSize(), slot1.getMaxStackSize(itemstack1));
++                            int k1 = Math.min(dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack1), slot1.getMaxStackSize(itemstack1)); // Leaves - stackable shulker boxes
+                             int l1 = Math.min(AbstractContainerMenu.getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemstack1) + j1, k1);
+ 
+                             l -= l1 - j1;
+@@ -574,7 +574,7 @@ public abstract class AbstractContainerMenu {
+                                     slot.setByPlayer(itemstack3);
+                                 }
+                             } else if (ItemStack.isSameItemSameTags(itemstack, itemstack3)) {
+-                                Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), itemstack3.getMaxStackSize() - itemstack3.getCount(), player);
++                                Optional<ItemStack> optional1 = slot.tryRemove(itemstack.getCount(), dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack3) - itemstack3.getCount(), player); // Horizon
+ 
+                                 optional1.ifPresent((itemstack4) -> {
+                                     itemstack3.grow(itemstack4.getCount());
+@@ -644,7 +644,7 @@ public abstract class AbstractContainerMenu {
+                         slot2 = (Slot) this.slots.get(slotIndex);
+                         if (slot2.hasItem()) {
+                             itemstack1 = slot2.getItem();
+-                            this.setCarried(itemstack1.copyWithCount(itemstack1.getMaxStackSize()));
++                            this.setCarried(itemstack1.copyWithCount(dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack1))); // Horizon - stackable shulker boxes
+                         }
+                     } else if (actionType == ClickType.THROW && this.getCarried().isEmpty() && slotIndex >= 0) {
+                         slot2 = (Slot) this.slots.get(slotIndex);
+@@ -659,13 +659,13 @@ public abstract class AbstractContainerMenu {
+                             j2 = button == 0 ? 1 : -1;
+ 
+                             for (i2 = 0; i2 < 2; ++i2) {
+-                                for (int k2 = l; k2 >= 0 && k2 < this.slots.size() && itemstack1.getCount() < itemstack1.getMaxStackSize(); k2 += j2) {
++                                for (int k2 = l; k2 >= 0 && k2 < this.slots.size() && itemstack1.getCount() < dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack1); k2 += j2) { // Horizon - stackable shulker boxes
+                                     Slot slot3 = (Slot) this.slots.get(k2);
+ 
+                                     if (slot3.hasItem() && AbstractContainerMenu.canItemQuickReplace(slot3, itemstack1, true) && slot3.mayPickup(player) && this.canTakeItemForPickAll(itemstack1, slot3)) {
+                                         ItemStack itemstack5 = slot3.getItem();
+ 
+-                                        if (i2 != 0 || itemstack5.getCount() != itemstack5.getMaxStackSize()) {
++                                        if (i2 != 0 || itemstack5.getCount() != dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(itemstack5)) {
+                                             ItemStack itemstack6 = slot3.safeTake(itemstack5.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), player);
+ 
+                                             itemstack1.grow(itemstack6.getCount());
+@@ -787,7 +787,7 @@ public abstract class AbstractContainerMenu {
+         Slot slot;
+         ItemStack itemstack1;
+ 
+-        if (stack.isStackable()) {
++        if (dev.horizonmc.horizon.util.ShulkerBoxUtils.isStackable(stack)) { // Horizon - stackable shulker boxes
+             while (!stack.isEmpty()) {
+                 if (fromLast) {
+                     if (k < startIndex) {
+@@ -807,16 +807,18 @@ public abstract class AbstractContainerMenu {
+                 if (!itemstack1.isEmpty() && ItemStack.isSameItemSameTags(stack, itemstack1)) {
+                     int l = itemstack1.getCount() + stack.getCount();
+ 
+-                    if (l <= stack.getMaxStackSize()) {
++                    if (l <= dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack)) { // Horizon - stackable shulker boxes
+                         stack.setCount(0);
+                         itemstack1.setCount(l);
+                         if (!isCheck) { // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
+                         slot.setChanged();
+                         } // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
+                         flag1 = true;
+-                    } else if (itemstack1.getCount() < stack.getMaxStackSize()) {
+-                        stack.shrink(stack.getMaxStackSize() - itemstack1.getCount());
+-                        itemstack1.setCount(stack.getMaxStackSize());
++                        // Horizon start - stackable shulker boxes
++                    } else if (itemstack1.getCount() < dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack)) {
++                        stack.shrink(dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack) - itemstack1.getCount());
++                        itemstack1.setCount(dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack));
++                        // Horizon end - stackable shulker boxes
+                         if (!isCheck) { // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
+                         slot.setChanged();
+                         } // Paper - Add PlayerTradeEvent and PlayerPurchaseEvent
+diff --git a/src/main/java/net/minecraft/world/inventory/Slot.java b/src/main/java/net/minecraft/world/inventory/Slot.java
+index e2fd415b69e0213688561e9a19aec2cdcd267211..2567e9afcb964a43b00ce56cfc1b4c1d5a846594 100644
+--- a/src/main/java/net/minecraft/world/inventory/Slot.java
++++ b/src/main/java/net/minecraft/world/inventory/Slot.java
+@@ -77,7 +77,7 @@ public class Slot {
+     }
+ 
+     public int getMaxStackSize(ItemStack stack) {
+-        return Math.min(this.getMaxStackSize(), stack.getMaxStackSize());
++        return Math.min(this.getMaxStackSize(), dev.horizonmc.horizon.util.ShulkerBoxUtils.getItemStackMaxCount(stack)); // Horizon - stackable shulker boxes
+     }
+ 
+     @Nullable
+diff --git a/src/main/java/net/minecraft/world/level/block/AbstractCauldronBlock.java b/src/main/java/net/minecraft/world/level/block/AbstractCauldronBlock.java
+index 5780d349f968ea3d05cf569b63531f8e76884827..915bcc6771fa62c7d8021784cd26d4f78467d8b6 100644
+--- a/src/main/java/net/minecraft/world/level/block/AbstractCauldronBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/AbstractCauldronBlock.java
+@@ -53,9 +53,27 @@ public abstract class AbstractCauldronBlock extends Block {
+     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+         ItemStack itemStack = player.getItemInHand(hand);
+         CauldronInteraction cauldronInteraction = this.interactions.map().get(itemStack.getItem());
+-        return cauldronInteraction.interact(state, world, pos, player, hand, itemStack);
++        return wrapInteractor(cauldronInteraction, state, world, pos, player, hand, itemStack); // Horizon - stackable shulker boxes
+     }
+ 
++    // Horizon start - stackable shulker boxes
++    private InteractionResult wrapInteractor(CauldronInteraction cauldronBehavior, BlockState blockState, Level world, BlockPos blockPos, Player playerEntity, InteractionHand hand, ItemStack itemStack) {
++        int count = -1;
++        if (dev.horizonmc.horizon.HorizonConfig.shulkerBoxStackSize > 1 && itemStack.getItem() instanceof net.minecraft.world.item.BlockItem bi &&
++                bi.getBlock() instanceof ShulkerBoxBlock) {
++            count = itemStack.getCount();
++        }
++        InteractionResult result = cauldronBehavior.interact(blockState, world, blockPos, playerEntity, hand, itemStack);
++        if (count > 0 && result.consumesAction()) {
++            ItemStack current = playerEntity.getItemInHand(hand);
++            if (current.getItem() instanceof net.minecraft.world.item.BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock) {
++                current.setCount(count);
++            }
++        }
++        return result;
++    }
++    // Horizon end - stackable shulker boxes
++
+     @Override
+     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+         return SHAPE;
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+index 6d639e7dde741e3b05baf6c1f4ab27884ff4c7ec..25958e04d80770685fcbf3e299e97a4e47c01a72 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
+@@ -787,9 +787,9 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+             if (itemstack1.isEmpty()) {
+                 // Spigot start - SPIGOT-6693, InventorySubcontainer#setItem
+                 ItemStack leftover = ItemStack.EMPTY; // Paper - Make hoppers respect inventory max stack size
+-                if (!stack.isEmpty() && stack.getCount() > to.getMaxStackSize()) {
++                if (!stack.isEmpty() && (stack.getCount() > to.getMaxStackSize() || stack.getCount() > stack.getMaxStackSize())) { // Horizon - stackable shulker boxes
+                     leftover = stack; // Paper - Make hoppers respect inventory max stack size
+-                    stack = stack.split(to.getMaxStackSize());
++                    stack = stack.split(Math.min(to.getMaxStackSize(), stack.getMaxStackSize())); // Horizon - stackable shulker boxes
+                 }
+                 // Spigot end
+                 ignoreTileUpdates = true; // Paper - Perf: Optimize Hoppers
