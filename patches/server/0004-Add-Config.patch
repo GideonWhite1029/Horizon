@@ -5,20 +5,21 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index d643c575d8e5cae728a42b58220bb8aed7aa9658..1977c68ff77d2ad38f9d6589e1a4c5953078e878 100644
+index e9bd47ec8e170b3483c24918f9d2fe13fb58587d..726fa49cf8c7b5c032c947bdbbe1632bfe19f8c7 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -235,4 +235,13 @@ tasks.registerRunTask("runDev") {
-     classpath(tasks.filterProjectDir.flatMap { it.outputJar })
-     classpath(runtimeClasspathForRunDev)
-     jvmArgs("-DPaper.isRunDev=true")
+@@ -224,4 +224,14 @@ tasks.registerRunTask("runDev") {
+     description = "Spin up a non-relocated Mojang-mapped test server"
+     classpath(sourceSets.main.map { it.runtimeClasspath })
+     jvmArgs("-DPaper.pushPaperAssetsRoot=true")
++    classpath(tasks.filterProjectDir.flatMap { it.outputJar })
++    jvmArgs("-DPaper.isRunDev=true")
 +
 +    // Horizon start - create config file
 +    tasks.registerRunTask("createHorizonConfig") {
 +            description = "Create a new horizon.yml"
 +            mainClass = "dev.horizonmc.horizon.config.GlobalConfigCreator"
 +            classpath(tasks.filterProjectDir.flatMap { it.outputJar })
-+            classpath(runtimeClasspathForRunDev)
 +    }
 +    // Horizon end - create config file
  }
@@ -916,7 +917,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 34b4301d566a3ea07c1029e019401656b868c840..e5aa2c785700ff09177d80bb967976b4dc5c012f 100644
+index 09b2bf60fdb0f21cd41c01350543587498946e07..e800e62196f966902ef547307687df5ab2902460 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -927,7 +928,7 @@ index 34b4301d566a3ea07c1029e019401656b868c840..e5aa2c785700ff09177d80bb967976b4
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import java.awt.image.BufferedImage;
-@@ -1159,6 +1160,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1160,6 +1161,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              LOGGER.info("Done ({})! For help, type \"help\"", doneTime);
              // Paper end
  

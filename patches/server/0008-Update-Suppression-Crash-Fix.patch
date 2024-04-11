@@ -60,7 +60,7 @@ index 0000000000000000000000000000000000000000..f30e535767b44e1feadfafa001774b67
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index ce44e30d7e2dd6d71d4fa74983437f66ce53183b..f01c16d041a7d6ad5afee81a5693c6a941169dff 100644
+index 33301e4c7e68f91ce6401a0de6f32fb8c6e0b744..5a3a14f9405e350a6cf9e98adc43dea587e333e5 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 @@ -51,6 +51,10 @@ public class PacketUtils {
@@ -75,10 +75,10 @@ index ce44e30d7e2dd6d71d4fa74983437f66ce53183b..f01c16d041a7d6ad5afee81a5693c6a9
                          label25:
                          {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e5aa2c785700ff09177d80bb967976b4dc5c012f..28536de4f2a890b68c1cd61d90eeccfce29d9503 100644
+index 0fedec2b6548d5078f0f4a918ef40bc3218c9467..c5abe75d767778f390bdf616b836d81825ba4b6e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1743,7 +1743,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1744,7 +1744,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur

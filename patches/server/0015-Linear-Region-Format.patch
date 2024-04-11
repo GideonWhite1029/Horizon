@@ -5,7 +5,7 @@ Subject: [PATCH] Linear Region Format
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 1977c68ff77d2ad38f9d6589e1a4c5953078e878..245a2b3befcef97dd490e323e7df8f5fc6302a2f 100644
+index 726fa49cf8c7b5c032c947bdbbe1632bfe19f8c7..aa047bff32db2b6db129b14c5433f1cde7193d51 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -34,6 +34,10 @@ dependencies {
@@ -17,7 +17,7 @@ index 1977c68ff77d2ad38f9d6589e1a4c5953078e878..245a2b3befcef97dd490e323e7df8f5f
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    // Horizon - Linear format
      implementation("org.apache.logging.log4j:log4j-iostreams:2.19.0") // Paper - remove exclusion
-     implementation("org.ow2.asm:asm-commons:9.5")
+     implementation("org.ow2.asm:asm-commons:9.7")
      implementation("org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT") // Paper - config files
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..c34da598a94caae87968ecc4b596d82ff1055552 100644
@@ -656,10 +656,10 @@ index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a
              }
          }
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index b293a36ad7998c2ce13eceea37cdc56b62945227..60f55fda246905322d9bb13155f53e666bdc36b4 100644
+index d525869542025761efc781ff5b10b3275249b44c..6cfd03bfbfd9887b3cad1e457e206c1fea7ea3b5 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -832,13 +832,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -871,13 +871,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public ChunkStatus getChunkStatusOnDiskIfCached(ChunkPos chunkPos) {
@@ -675,7 +675,7 @@ index b293a36ad7998c2ce13eceea37cdc56b62945227..60f55fda246905322d9bb13155f53e66
  
          if (regionFile == null || !regionFileCache.chunkExists(chunkPos)) {
              return null;
-@@ -856,7 +855,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -895,7 +894,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void updateChunkStatusOnDisk(ChunkPos chunkPos, @Nullable CompoundTag compound) throws IOException {
@@ -1073,10 +1073,10 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
              regionfile.flush();
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index 69f0c853ed7287c5a93b0a67e266255090e2a9ca..2a99c8fd53009e00c93c7b868afcda6a517ef8b2 100644
+index b5222519f646b303ea7f2b914f749df815489937..a868d9a2952935f8f54df2f20cbf4cb217911109 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -573,7 +573,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -574,7 +574,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
                  world.getChunk(x, z); // make sure we're at ticket level 32 or lower
                  return true;
              }
