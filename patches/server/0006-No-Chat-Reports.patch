@@ -182,7 +182,7 @@ index ed4a336448a8f26d2132ba5255d70555b76ddd3e..fa339758dd00ecd15f36601fd0c5b48b
      }
  
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91c34d3fab 100644
+index d70cac2b554f0dbee789c8b5bf637e1f308929d9..de9d019e2cd0d871d5ffd1212b01b151f4202677 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
@@ -194,7 +194,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
  import net.minecraft.ChatFormatting;
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
-@@ -271,10 +273,27 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -273,10 +275,27 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -223,7 +223,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 5a84bf0ae304f7719ff4f33b72d54a03331e316d..c4cb62f853e9eff0367cf605c977d59bbe7c89a0 100644
+index bffe84a94be6b1bbb04660774af7122fd80c3ed0..a28218cbcc095f68f18f1d8bb7446050e0ee74c6 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;
@@ -235,7 +235,7 @@ index 5a84bf0ae304f7719ff4f33b72d54a03331e316d..c4cb62f853e9eff0367cf605c977d59b
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -1497,7 +1499,7 @@ public abstract class PlayerList {
+@@ -1500,7 +1502,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public
