@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 1cad0728d005df9475a978b272adef9703f2ba46..e9bd47ec8e170b3483c24918f9d2fe13fb58587d 100644
+index 1cad0728d005df9475a978b272adef9703f2ba46..0bc3904b157b6f565de43bd95913d9436eba1f31 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,12 +13,10 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -31,6 +31,19 @@ index 1cad0728d005df9475a978b272adef9703f2ba46..e9bd47ec8e170b3483c24918f9d2fe13
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
+@@ -226,4 +224,12 @@ tasks.registerRunTask("runDev") {
+     description = "Spin up a non-relocated Mojang-mapped test server"
+     classpath(sourceSets.main.map { it.runtimeClasspath })
+     jvmArgs("-DPaper.pushPaperAssetsRoot=true")
++    jvmArgs("-DPaper.isRunDev=true")
++
++    // Horizon start - create config file
++    tasks.registerRunTask("createHorizonConfig") {
++            description = "Create a new horizon.yml"
++            mainClass = "dev.horizonmc.horizon.config.GlobalConfigCreator"
++    }
++    // Horizon end - create config file
+ }
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..734b81e532ef912beef1a75b52d2352fafc1e6a4 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
