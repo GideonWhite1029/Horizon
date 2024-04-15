@@ -3311,10 +3311,10 @@ index fd1318aa26e9ba136180d9e26a50c685a427f30f..7f68494f351d84f324d94458ef8b0e2d
          RegisteredListener[] listeners = handlers.getRegisteredListeners();
  
 diff --git a/src/main/java/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java b/src/main/java/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
-index a327973e37b5b8d4e15683ef24548482ac3dc3d5..50b556f53ad16e8d3ed6ab3a24bbe23b6bfc5aa7 100644
+index 35772110e9318df46a2729dbc0b5879b290011b7..762fac22d091962fb3e92b30fc4f8a6ceef8edb0 100644
 --- a/src/main/java/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
 +++ b/src/main/java/net/minecraft/advancements/critereon/SimpleCriterionTrigger.java
-@@ -42,6 +42,7 @@ public abstract class SimpleCriterionTrigger<T extends SimpleCriterionTrigger.Si
+@@ -39,6 +39,7 @@ public abstract class SimpleCriterionTrigger<T extends SimpleCriterionTrigger.Si
      }
  
      protected void trigger(ServerPlayer player, Predicate<T> predicate) {
@@ -3323,10 +3323,10 @@ index a327973e37b5b8d4e15683ef24548482ac3dc3d5..50b556f53ad16e8d3ed6ab3a24bbe23b
          Set<CriterionTrigger.Listener<T>> set = (Set) playerAdvancements.criterionData.get(this); // Paper - fix AdvancementDataPlayer leak
          if (set != null && !set.isEmpty()) {
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index b41cab778f446434b788946ea9d3e02c152e570e..a899c63b8b695c217a49aad98b327a6b011082e7 100644
+index 9e31954212b1d6162dca2fbc91d373e908560335..d47e149bbe3adcffdc5e5b419f5fa909b42a331f 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -339,6 +339,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -340,6 +340,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          }
      }
  
@@ -3342,7 +3342,7 @@ index b41cab778f446434b788946ea9d3e02c152e570e..a899c63b8b695c217a49aad98b327a6b
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7252ce21026cfa7e6172dcc5ebf2ee202b4c13f1..dbe967a9c47b07b92dffec7515246368e8abed75 100644
+index 25dda7c1a0858f731afb7778b09aa2502ddd7ce1..8b8e1ac96ce717927d0a1810866871c31839bc0e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -671,6 +671,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -3589,7 +3589,7 @@ index a28218cbcc095f68f18f1d8bb7446050e0ee74c6..1754daa6ffd28fa257b13c3dc7cbbaab
 +    // Horizon end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 41b50987b78068f820e24cb16884b946abf7b982..795c9adce58b3bdd8fee49b839048fde5114d90b 100644
+index 0b079f3e99709ae63b9720206d28a0c32ab6190a..3109d7ace833fc94bbadc40f806e5b8268efe913 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1498,7 +1498,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S

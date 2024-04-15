@@ -787,7 +787,7 @@ index e6f56bc5b129699bab60db9c97c7f73b6ede2351..40db98e85ac66575676978e8170350bf
          return executedUnloadTask | canSaveChunk | canSaveEntities | canSavePOI ? new SaveStat(executedUnloadTask || canSaveChunk, canSaveEntities, canSavePOI): null;
      }
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 0cc2307636279915c1f8529e62174cc696e185ee..dd402f077922ea3946a18cdf04285c67fd093538 100644
+index 30fe1c0645a07d663b08c0f988a1ab3a750bf7c4..47408dbce3a627236694c0d0f956c7f87a898b86 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 @@ -1,6 +1,5 @@
@@ -847,7 +847,7 @@ index dab211c458311869c61779305580a1c7da830f71..92be4ddd1199886b5aea782e4526bb79
  
      @Override
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index 79068c75de7c0a74bd59b5b3c4756b447a5c44ee..33301e4c7e68f91ce6401a0de6f32fb8c6e0b744 100644
+index 620edb63cacd15e38f7fc859efd4095bfb5e5f72..6ae56ce2909d80b13678f283ebf476f86e8d3bc9 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 @@ -49,7 +49,6 @@ public class PacketUtils {
@@ -859,7 +859,7 @@ index 79068c75de7c0a74bd59b5b3c4756b447a5c44ee..33301e4c7e68f91ce6401a0de6f32fb8
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 9323aa15bf79943686592a9d30f7cbc2a852b695..09b2bf60fdb0f21cd41c01350543587498946e07 100644
+index 055f168450ed0f46c26e4f43d529ef13b4db9dc8..ee573884759277356b0519c26072db4315c94d62 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -1054,10 +1054,10 @@ index a9e2a758669550530eb29475ba99fe42e520f6ae..b1aacb4be371395414ad97e4379b4648
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java b/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
-index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6a7e09dca 100644
+index 1387930c5d3ecb430d73f3bdc0968fd0f028629d..8dfbf13845264a3bca530276d0beb2be4d6fdbf7 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
-@@ -15,7 +15,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
+@@ -16,7 +16,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
      private final int maxDuration;
      // Paper start - configurable behavior tick rate and timings
      private final String configKey;
@@ -1065,7 +1065,7 @@ index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6
      // Paper end - configurable behavior tick rate and timings
  
      public Behavior(Map<MemoryModuleType<?>, MemoryStatus> requiredMemoryState) {
-@@ -37,7 +36,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
+@@ -38,7 +37,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
              key = key.substring(lastSeparator + 1);
          }
          this.configKey = key.toLowerCase(java.util.Locale.ROOT);
@@ -1074,10 +1074,10 @@ index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java b/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
-index 7094701d213c73ba47ace806962244c10fdf4dda..f470787fc445b589e27c339ab136a5a823a56d96 100644
+index f5ee1a4cc4aa85d14008900efb48204917259b09..261e7d57a504b485eac3c3725bbacd19830b03e5 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
-@@ -21,7 +21,6 @@ public abstract class Sensor<E extends LivingEntity> {
+@@ -28,7 +28,6 @@ public abstract class Sensor<E extends LivingEntity> {
      private long timeToTick;
      // Paper start - configurable sensor tick rate and timings
      private final String configKey;
@@ -1085,14 +1085,14 @@ index 7094701d213c73ba47ace806962244c10fdf4dda..f470787fc445b589e27c339ab136a5a8
      // Paper end
  
      public Sensor(int senseInterval) {
-@@ -32,7 +31,6 @@ public abstract class Sensor<E extends LivingEntity> {
+@@ -39,7 +38,6 @@ public abstract class Sensor<E extends LivingEntity> {
              key = key.substring(lastSeparator + 1);
          }
          this.configKey = key.toLowerCase(java.util.Locale.ROOT);
 -        this.timing = co.aikar.timings.MinecraftTimings.getSensorTimings(configKey, senseInterval);
          // Paper end
          this.scanRate = senseInterval;
-         this.timeToTick = (long)RANDOM.nextInt(senseInterval);
+         this.timeToTick = RANDOM.nextInt(senseInterval);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
 index 597f49fb213899c4da654d83557d2a18ef256288..c0440fec530efb9a075990ccb33b642d5ff5f0f3 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java

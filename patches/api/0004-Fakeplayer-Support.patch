@@ -270,13 +270,13 @@ index 0000000000000000000000000000000000000000..c9affd016706e645b8933291d2cf7690
 +        return name;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotActionEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotActionEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1c43f7c75bcdb3a644a5730d1e9f5bde68be3e11
+index 0000000000000000000000000000000000000000..dc1ce98326617468f4f2b84e6ddcef51525e86af
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotActionEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java
 @@ -0,0 +1,49 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Cancellable;
@@ -325,13 +325,13 @@ index 0000000000000000000000000000000000000000..1c43f7c75bcdb3a644a5730d1e9f5bde
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotConfigModifyEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotConfigModifyEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..337de20adba511c71e067d974f57855a5b414f0b
+index 0000000000000000000000000000000000000000..092794ce8bccfeddbd03768c5e7b74c98afce7ac
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotConfigModifyEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
 @@ -0,0 +1,49 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Cancellable;
@@ -380,13 +380,13 @@ index 0000000000000000000000000000000000000000..337de20adba511c71e067d974f57855a
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotCreateEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotCreateEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0452ba137f83151f638373f92f6f80df84fd1c8d
+index 0000000000000000000000000000000000000000..0610e6bff0be78102cdcbf8478a4c648b997c7c4
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotCreateEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
 @@ -0,0 +1,106 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import org.bukkit.Location;
 +import org.bukkit.event.Cancellable;
@@ -492,13 +492,13 @@ index 0000000000000000000000000000000000000000..0452ba137f83151f638373f92f6f80df
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6a5684b6f557c4fff639fc5819d95d93a7a86c97
+index 0000000000000000000000000000000000000000..cc7d29a65a0627f200e6537b058bf39afc3a7598
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java
 @@ -0,0 +1,31 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Event;
@@ -529,13 +529,13 @@ index 0000000000000000000000000000000000000000..6a5684b6f557c4fff639fc5819d95d93
 +        return bot;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotInventoryOpenEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotInventoryOpenEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b16f2f7cc5a90c89639eb79bfa94f4446adc616a
+index 0000000000000000000000000000000000000000..f358a23a070536eab6a5f453dcc6da27cdfd1cd4
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotInventoryOpenEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java
 @@ -0,0 +1,46 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.entity.Player;
@@ -581,13 +581,13 @@ index 0000000000000000000000000000000000000000..b16f2f7cc5a90c89639eb79bfa94f444
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotJoinEvent.java b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotJoinEvent.java
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bf526ec96af499b228cec67b037c53ea5f2b3341
+index 0000000000000000000000000000000000000000..f021c30affc63d58d2181cde078d3310f7ac24a5
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/event/bot/BotJoinEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java
 @@ -0,0 +1,27 @@
-+package dev.horizonmc.horizon.entity.event.bot;
++package dev.horizonmc.horizon.event.bot;
 +
 +import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.HandlerList;
