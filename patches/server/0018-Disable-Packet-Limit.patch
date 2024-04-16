@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 16 Apr 2024 16:08:08 +0400
+Subject: [PATCH] Disable Packet Limit
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 8579c0bfc8ce36054e2a65ff540e79fb75bf11e3..b2ebf0ee73f398f9808c04338b2cc86c62054b0e 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -240,4 +240,7 @@ public final class HorizonConfig {
+     }
+     // Horizon end - Fakeplayer
+ 
++    @GlobalConfig(name = "disable-packet-limit", category = {"features"})
++    public static boolean disablePacketLimit = false;
++
+ }
+diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+index 47408dbce3a627236694c0d0f956c7f87a898b86..e231d0a6a1a66c2ec9553514b54a6fcbc2d20f4c 100644
+--- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+@@ -267,7 +267,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+             }
+ 
+             public boolean isEnabled() {
+-                return this.interval > 0.0 && this.maxPacketRate > 0.0;
++                return !dev.horizonmc.horizon.HorizonConfig.disablePacketLimit && (this.interval > 0.0 && this.maxPacketRate > 0.0); // Horizon - disable packet limit
+             }
+ 
+             public enum ViolateAction {

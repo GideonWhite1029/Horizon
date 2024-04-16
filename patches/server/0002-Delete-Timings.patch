@@ -585,10 +585,9 @@ index b35a9f4c5f8960864c402ede8a51fb5ab9c4fcc0..e69de29bb2d1d6434b8b29ae775ad8c2
 -    }
 -}
 diff --git a/src/main/java/co/aikar/timings/WorldTimingsHandler.java b/src/main/java/co/aikar/timings/WorldTimingsHandler.java
-deleted file mode 100644
-index 22687667ec69a954261e55e59261286ac1b8b8cd..0000000000000000000000000000000000000000
+index 22687667ec69a954261e55e59261286ac1b8b8cd..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 100644
 --- a/src/main/java/co/aikar/timings/WorldTimingsHandler.java
-+++ /dev/null
++++ b/src/main/java/co/aikar/timings/WorldTimingsHandler.java
 @@ -1,140 +0,0 @@
 -package co.aikar.timings;
 -
@@ -745,10 +744,15 @@ index e1ffd62f4ebceecb9bc5471df3da406cffea0483..5b446e6ac151f99f64f0c442d0b40b5e
  
      private static final ThreadLocal<List<ChunkProgressionTask>> CURRENT_TICKET_UPDATE_SCHEDULING = new ThreadLocal<>();
 diff --git a/src/main/java/io/papermc/paper/chunk/system/scheduling/NewChunkHolder.java b/src/main/java/io/papermc/paper/chunk/system/scheduling/NewChunkHolder.java
-index e6f56bc5b129699bab60db9c97c7f73b6ede2351..e4d3f280b35d977f28233b1db1dc855cb252e827 100644
+index e6f56bc5b129699bab60db9c97c7f73b6ede2351..40db98e85ac66575676978e8170350bf3060a67a 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/scheduling/NewChunkHolder.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/scheduling/NewChunkHolder.java
-@@ -1779,21 +1779,19 @@ public final class NewChunkHolder {
+@@ -1775,25 +1775,23 @@ public final class NewChunkHolder {
+         }
+ 
+         boolean canSaveChunk = !(chunk instanceof LevelChunk levelChunk && levelChunk.mustNotSave) &&
+-                                (chunk != null && ((shutdown || chunk instanceof LevelChunk) && chunk.isUnsaved()));
++                (chunk != null && ((shutdown || chunk instanceof LevelChunk) && chunk.isUnsaved()));
          boolean canSavePOI = !(chunk instanceof LevelChunk levelChunk && levelChunk.mustNotSave) && (poi != null && poi.isDirty());
          boolean canSaveEntities = entities != null;
  
@@ -783,7 +787,7 @@ index e6f56bc5b129699bab60db9c97c7f73b6ede2351..e4d3f280b35d977f28233b1db1dc855c
          return executedUnloadTask | canSaveChunk | canSaveEntities | canSavePOI ? new SaveStat(executedUnloadTask || canSaveChunk, canSaveEntities, canSavePOI): null;
      }
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index f2e30d8743a97c0541808dc5c03300c0d881b843..77b76c56ceac9ee797e74ffa2eec07a9d987e7bc 100644
+index 30fe1c0645a07d663b08c0f988a1ab3a750bf7c4..47408dbce3a627236694c0d0f956c7f87a898b86 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 @@ -1,6 +1,5 @@
@@ -843,19 +847,19 @@ index dab211c458311869c61779305580a1c7da830f71..92be4ddd1199886b5aea782e4526bb79
  
      @Override
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index 166cd0f8e72189d10e56cd7bc095409aa919840e..ce44e30d7e2dd6d71d4fa74983437f66ce53183b 100644
+index 620edb63cacd15e38f7fc859efd4095bfb5e5f72..6ae56ce2909d80b13678f283ebf476f86e8d3bc9 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 @@ -49,7 +49,6 @@ public class PacketUtils {
                  try { // Paper - detailed watchdog information
-                 if (MinecraftServer.getServer().hasStopped() || (listener instanceof ServerCommonPacketListenerImpl && ((ServerCommonPacketListenerImpl) listener).processedDisconnect)) return; // CraftBukkit, MC-142590
+                 if (listener instanceof ServerCommonPacketListenerImpl serverCommonPacketListener && serverCommonPacketListener.processedDisconnect) return; // CraftBukkit - Don't handle sync packets for kicked players
                  if (listener.shouldHandleMessage(packet)) {
 -                    co.aikar.timings.Timing timing = co.aikar.timings.MinecraftTimings.getPacketTiming(packet); // Paper - timings
                      try { // Paper - timings // Purpur
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656b868c840 100644
+index 055f168450ed0f46c26e4f43d529ef13b4db9dc8..ee573884759277356b0519c26072db4315c94d62 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -866,16 +870,15 @@ index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656
  import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
  import com.google.common.base.Stopwatch;
  import com.google.common.collect.Lists;
-@@ -189,8 +188,6 @@ import org.bukkit.craftbukkit.Main;
+@@ -189,7 +188,6 @@ import org.bukkit.craftbukkit.Main;
  import org.bukkit.event.server.ServerLoadEvent;
  // CraftBukkit end
  
 -import co.aikar.timings.MinecraftTimings; // Paper
--
+ 
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, CommandSource, AutoCloseable {
  
-     private static MinecraftServer SERVER; // Paper
-@@ -972,7 +969,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -972,7 +970,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -883,7 +886,7 @@ index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656
          // Purpur start
          if (upnp) {
              if (dev.omega24.upnp4j.UPnP4J.close(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
-@@ -1430,7 +1426,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1430,7 +1427,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              return;
          }
  
@@ -891,7 +894,7 @@ index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656
          try {
              for (;;) {
                  boolean moreTasks = this.tickMidTickTasks();
-@@ -1457,7 +1452,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1457,7 +1453,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  }
              }
          } finally {
@@ -899,7 +902,7 @@ index 5ebddfebe5a37cfd39eeefa252936ad14cb771ab..34b4301d566a3ea07c1029e019401656
          }
      }
      // Paper end - execute chunk tasks mid tick
-@@ -1536,11 +1530,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1536,11 +1531,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick
@@ -950,125 +953,18 @@ index 5ca6af93362d205438f8321ee2461ae7f8160df1..ead8f8f80bc6200fc13fd590bc414d48
          // Paper start
          if (waitableArray[0] != null) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index bb412ca874b85d777c0e3565fcefcee15b23182b..b293a36ad7998c2ce13eceea37cdc56b62945227 100644
+index bb412ca874b85d777c0e3565fcefcee15b23182b..d525869542025761efc781ff5b10b3275249b44c 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1,13 +1,10 @@
+@@ -1,6 +1,5 @@
  package net.minecraft.server.level;
  
 -import co.aikar.timings.Timing; // Paper
  import com.google.common.collect.ImmutableList;
  import com.google.common.collect.ImmutableList.Builder;
  import com.google.common.collect.Iterables;
--import com.google.common.collect.ComparisonChain; // Paper
- import com.google.common.collect.Lists;
- import com.google.common.collect.Queues;
--import com.google.common.collect.Sets;
- import com.google.gson.JsonElement;
- import com.mojang.datafixers.DataFixer;
- import com.mojang.datafixers.util.Either;
-@@ -20,38 +17,7 @@ import it.unimi.dsi.fastutil.longs.Long2ByteMap;
- import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
- import it.unimi.dsi.fastutil.longs.Long2LongMap;
- import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
--import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
--import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
--import it.unimi.dsi.fastutil.longs.LongIterator;
--import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
--import it.unimi.dsi.fastutil.longs.LongSet;
--import it.unimi.dsi.fastutil.objects.ObjectBidirectionalIterator;
- import it.unimi.dsi.fastutil.objects.ObjectIterator;
--import java.io.IOException;
--import java.io.Writer;
--import java.nio.file.Path;
--import java.util.ArrayList;
--import java.util.HashMap;
--import java.util.Iterator;
--import java.util.List;
--import java.util.Locale;
--import java.util.Map;
--import java.util.Objects;
--import java.util.Optional;
--import java.util.Queue;
--import java.util.Set;
--import java.util.concurrent.CancellationException;
--import java.util.concurrent.CompletableFuture;
--import java.util.concurrent.CompletionException;
--import java.util.concurrent.CompletionStage;
--import java.util.concurrent.Executor;
--import java.util.concurrent.atomic.AtomicInteger;
--import java.util.function.BooleanSupplier;
--import java.util.function.Consumer;
--import java.util.function.IntFunction;
--import java.util.function.IntSupplier;
--import java.util.function.Supplier;
--import javax.annotation.Nullable;
- import net.minecraft.CrashReport;
- import net.minecraft.CrashReportCategory;
- import net.minecraft.ReportedException;
-@@ -63,30 +29,17 @@ import net.minecraft.core.registries.Registries;
- import net.minecraft.nbt.CompoundTag;
- import net.minecraft.network.protocol.Packet;
- import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
--import net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket;
- import net.minecraft.server.level.progress.ChunkProgressListener;
- import net.minecraft.server.network.ServerPlayerConnection;
--import net.minecraft.util.CsvOutput;
- import net.minecraft.util.Mth;
--import net.minecraft.util.profiling.ProfilerFiller;
- import net.minecraft.util.thread.BlockableEventLoop;
--import net.minecraft.util.thread.ProcessorHandle;
--import net.minecraft.util.thread.ProcessorMailbox;
- import net.minecraft.world.entity.Entity;
- import net.minecraft.world.entity.EntityType;
- import net.minecraft.world.entity.ai.village.poi.PoiManager;
- import net.minecraft.world.entity.boss.EnderDragonPart;
- import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.GameRules;
--import net.minecraft.world.level.chunk.ChunkAccess;
--import net.minecraft.world.level.chunk.ChunkGenerator;
--import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
--import net.minecraft.world.level.chunk.ChunkStatus;
--import net.minecraft.world.level.chunk.ImposterProtoChunk;
--import net.minecraft.world.level.chunk.LevelChunk;
--import net.minecraft.world.level.chunk.LightChunkGetter;
--import net.minecraft.world.level.chunk.ProtoChunk;
--import net.minecraft.world.level.chunk.UpgradeData;
-+import net.minecraft.world.level.chunk.*;
- import net.minecraft.world.level.chunk.storage.ChunkSerializer;
- import net.minecraft.world.level.chunk.storage.ChunkStorage;
- import net.minecraft.world.level.entity.ChunkStatusUpdateListener;
-@@ -95,16 +48,23 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
- import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
- import net.minecraft.world.level.levelgen.RandomState;
- import net.minecraft.world.level.levelgen.blending.BlendingData;
--import net.minecraft.world.level.levelgen.structure.StructureStart;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
- import net.minecraft.world.level.storage.DimensionDataStorage;
- import net.minecraft.world.level.storage.LevelStorageSource;
--import net.minecraft.world.phys.Vec3;
--import org.apache.commons.lang3.mutable.MutableBoolean;
-+import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
- import org.slf4j.Logger;
- 
--// CraftBukkit start
--import org.bukkit.craftbukkit.generator.CustomChunkGenerator;
-+import javax.annotation.Nullable;
-+import java.io.IOException;
-+import java.io.Writer;
-+import java.nio.file.Path;
-+import java.util.*;
-+import java.util.concurrent.CancellationException;
-+import java.util.concurrent.CompletableFuture;
-+import java.util.concurrent.CompletionException;
-+import java.util.concurrent.Executor;
-+import java.util.concurrent.atomic.AtomicInteger;
-+import java.util.function.*;
- // CraftBukkit end
- 
- public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider {
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 99cb0d3a9a64f8be8322a24d9f4e833a5b7d3588..08509c5ba2b2c16e0c1bfd7102230a82d6d9452a 100644
+index ec5d2b572d614d710dcbfbd39a08fbf7c2288659..57f6e9e7282a5106f6c31c7ea7510f2af524de1f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1,7 +1,6 @@
@@ -1098,7 +994,7 @@ index 99cb0d3a9a64f8be8322a24d9f4e833a5b7d3588..08509c5ba2b2c16e0c1bfd7102230a82
          entity.postTick(); // CraftBukkit
          } else { entity.inactiveTick(); } // Paper - EAR 2
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index ae5a2152cde8922deeb8d1d8a85bf39518ccd759..3311b3bdd3401b94bda46bcad4e062837a0deafa 100644
+index 9ba9356260d54ec318f07a8af221e9567ee03b12..fddbf658b71d5e0687af8b9295a9d34f04b2aaa2 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -2480,15 +2480,10 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
@@ -1158,10 +1054,10 @@ index a9e2a758669550530eb29475ba99fe42e520f6ae..b1aacb4be371395414ad97e4379b4648
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java b/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
-index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6a7e09dca 100644
+index 1387930c5d3ecb430d73f3bdc0968fd0f028629d..8dfbf13845264a3bca530276d0beb2be4d6fdbf7 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/behavior/Behavior.java
-@@ -15,7 +15,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
+@@ -16,7 +16,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
      private final int maxDuration;
      // Paper start - configurable behavior tick rate and timings
      private final String configKey;
@@ -1169,7 +1065,7 @@ index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6
      // Paper end - configurable behavior tick rate and timings
  
      public Behavior(Map<MemoryModuleType<?>, MemoryStatus> requiredMemoryState) {
-@@ -37,7 +36,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
+@@ -38,7 +37,6 @@ public abstract class Behavior<E extends LivingEntity> implements BehaviorContro
              key = key.substring(lastSeparator + 1);
          }
          this.configKey = key.toLowerCase(java.util.Locale.ROOT);
@@ -1178,10 +1074,10 @@ index 4f3a1c2bfaec6787c8fc62c7df13c512dfc2cb7a..d1304e8cc0977a5b989c7e63ee99e8e6
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java b/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
-index 7094701d213c73ba47ace806962244c10fdf4dda..f470787fc445b589e27c339ab136a5a823a56d96 100644
+index f5ee1a4cc4aa85d14008900efb48204917259b09..261e7d57a504b485eac3c3725bbacd19830b03e5 100644
 --- a/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
 +++ b/src/main/java/net/minecraft/world/entity/ai/sensing/Sensor.java
-@@ -21,7 +21,6 @@ public abstract class Sensor<E extends LivingEntity> {
+@@ -28,7 +28,6 @@ public abstract class Sensor<E extends LivingEntity> {
      private long timeToTick;
      // Paper start - configurable sensor tick rate and timings
      private final String configKey;
@@ -1189,16 +1085,16 @@ index 7094701d213c73ba47ace806962244c10fdf4dda..f470787fc445b589e27c339ab136a5a8
      // Paper end
  
      public Sensor(int senseInterval) {
-@@ -32,7 +31,6 @@ public abstract class Sensor<E extends LivingEntity> {
+@@ -39,7 +38,6 @@ public abstract class Sensor<E extends LivingEntity> {
              key = key.substring(lastSeparator + 1);
          }
          this.configKey = key.toLowerCase(java.util.Locale.ROOT);
 -        this.timing = co.aikar.timings.MinecraftTimings.getSensorTimings(configKey, senseInterval);
          // Paper end
          this.scanRate = senseInterval;
-         this.timeToTick = (long)RANDOM.nextInt(senseInterval);
+         this.timeToTick = RANDOM.nextInt(senseInterval);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index eebe6378de52e780aabfad3c414564349196ec6e..59ef979effe8522d58d2390b93ee7cab659f98d7 100644
+index 597f49fb213899c4da654d83557d2a18ef256288..c0440fec530efb9a075990ccb33b642d5ff5f0f3 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -174,7 +174,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -1357,7 +1253,7 @@ index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..a6dc7679602df92cd3f825c5727b58ce
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index d5f642e4b1c1ede7e9d2dea072aa5f22c73b5c23..ab8361903202802a9414bb5e3fd103c6e90911e8 100644
+index e29dc1101c7aa4b7b2a2d2e732e27a1a14a2a234..87324d0dd644aa4266c452a93339509996e0363a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -217,7 +217,6 @@ public final class CraftMagicNumbers implements UnsafeValues {
@@ -1369,7 +1265,7 @@ index d5f642e4b1c1ede7e9d2dea072aa5f22c73b5c23..ab8361903202802a9414bb5e3fd103c6
      // Paper end
  
 diff --git a/src/main/java/org/spigotmc/ActivationRange.java b/src/main/java/org/spigotmc/ActivationRange.java
-index 2e9aed328e576abbe216fdb2071c13421e6645b8..45f0d7b7488fdad0e797cbacb3f477d6de8161ea 100644
+index 56e52b16b419c882440a15947f037ae1a902bc70..f01ff31bc6cf7e0681bb0b1824ff1f7b40ffa3dd 100644
 --- a/src/main/java/org/spigotmc/ActivationRange.java
 +++ b/src/main/java/org/spigotmc/ActivationRange.java
 @@ -35,7 +35,6 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;

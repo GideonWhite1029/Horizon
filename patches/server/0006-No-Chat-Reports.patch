@@ -45,7 +45,7 @@ index e4fd372a1d585887287253a02531cd192929377b..7816e2622395a493eb9d771d83916b3a
      }
  
 diff --git a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java b/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
-index 72a8aa676836fcb3b4578689d16af65e18f55bbe..ac58d638b238b589a5d67359993b422cbea71384 100644
+index 4abd7babc3aa7268975386e7c2319f7961b0c3aa..7cc183ee7db586010acee6ee9c7b74bba4b2a342 100644
 --- a/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
 +++ b/src/main/java/net/minecraft/commands/arguments/ArgumentSignatures.java
 @@ -4,6 +4,8 @@ import java.util.ArrayList;
@@ -105,10 +105,10 @@ index bdcfd80f937c34956911373905d66424bbff8e1d..86ecb376f157eec55ab69e1d5b66e43b
              return new EncoderException("Failed to encode: " + s + " " + value);
          })), maxLength); // Paper - Adventure; add max length parameter
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
-index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7b6e28930 100644
+index 831178218ddfaa1828c00d0662b251d11bb29ff5..7839ad1a1bafd59768db89e96cea40a2a123cbac 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ServerboundChatPacket.java
-@@ -2,15 +2,26 @@ package net.minecraft.network.protocol.game;
+@@ -2,6 +2,8 @@ package net.minecraft.network.protocol.game;
  
  import java.time.Instant;
  import javax.annotation.Nullable;
@@ -117,9 +117,10 @@ index d1d2fc0c57523c1abf1e8bfec913c78927c3dafc..f14d0a02691178f9b7187bfb3fa7a1a7
  import net.minecraft.network.FriendlyByteBuf;
  import net.minecraft.network.chat.LastSeenMessages;
  import net.minecraft.network.chat.MessageSignature;
- import net.minecraft.network.protocol.Packet;
+@@ -9,9 +11,18 @@ import net.minecraft.network.protocol.Packet;
  
- public record ServerboundChatPacket(String message, Instant timeStamp, long salt, @Nullable MessageSignature signature, LastSeenMessages.Update lastSeenMessages) implements Packet<ServerGamePacketListener> {
+ public record ServerboundChatPacket(String message, Instant timeStamp, long salt, @Nullable MessageSignature signature, LastSeenMessages.Update lastSeenMessages)
+     implements Packet<ServerGamePacketListener> {
 +
 +    // Horizon start - No Chat Reports
      public ServerboundChatPacket(FriendlyByteBuf buf) {
@@ -182,7 +183,7 @@ index ed4a336448a8f26d2132ba5255d70555b76ddd3e..fa339758dd00ecd15f36601fd0c5b48b
      }
  
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91c34d3fab 100644
+index d70cac2b554f0dbee789c8b5bf637e1f308929d9..de9d019e2cd0d871d5ffd1212b01b151f4202677 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
@@ -194,7 +195,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
  import net.minecraft.ChatFormatting;
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
-@@ -271,10 +273,27 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -273,10 +275,27 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -223,7 +224,7 @@ index 02e65b0bd212d46855baee48fab35dc95a88b43f..7d6c9702ae2fe832ae15a02c6fd96e91
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 5a84bf0ae304f7719ff4f33b72d54a03331e316d..c4cb62f853e9eff0367cf605c977d59bbe7c89a0 100644
+index bffe84a94be6b1bbb04660774af7122fd80c3ed0..a28218cbcc095f68f18f1d8bb7446050e0ee74c6 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;
@@ -235,7 +236,7 @@ index 5a84bf0ae304f7719ff4f33b72d54a03331e316d..c4cb62f853e9eff0367cf605c977d59b
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -1497,7 +1499,7 @@ public abstract class PlayerList {
+@@ -1500,7 +1502,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public

@@ -60,7 +60,7 @@ index 0000000000000000000000000000000000000000..f30e535767b44e1feadfafa001774b67
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index ce44e30d7e2dd6d71d4fa74983437f66ce53183b..f01c16d041a7d6ad5afee81a5693c6a941169dff 100644
+index 6ae56ce2909d80b13678f283ebf476f86e8d3bc9..ff1ab555c6bcc2d81745011a54fccdbe9b8d481a 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 @@ -51,6 +51,10 @@ public class PacketUtils {
@@ -75,10 +75,10 @@ index ce44e30d7e2dd6d71d4fa74983437f66ce53183b..f01c16d041a7d6ad5afee81a5693c6a9
                          label25:
                          {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e5aa2c785700ff09177d80bb967976b4dc5c012f..28536de4f2a890b68c1cd61d90eeccfce29d9503 100644
+index 87e4c8ee42001fa57c42a19574dd1b7bc09a07ca..c34a84d8eda12f0b18fb7690e0167a198fb48fd9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1743,7 +1743,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1744,7 +1744,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
@@ -94,7 +94,7 @@ index e5aa2c785700ff09177d80bb967976b4dc5c012f..28536de4f2a890b68c1cd61d90eeccfc
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index 42407c5c0c09cd9d19bc7af92af8868bb038c686..2c55bb0afd4ad821313b032ea58c96a634841017 100644
+index 793363c58ac4b4329d72d281c89bd604f831a2d9..d854d7014756ff2537e206ea2c1cb1804d8957b2 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -7,6 +7,8 @@ import java.util.List;
@@ -106,7 +106,7 @@ index 42407c5c0c09cd9d19bc7af92af8868bb038c686..2c55bb0afd4ad821313b032ea58c96a6
  import net.minecraft.ChatFormatting;
  import net.minecraft.Util;
  import net.minecraft.core.BlockPos;
-@@ -265,7 +267,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
+@@ -254,7 +256,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
  
      @Override
      public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {

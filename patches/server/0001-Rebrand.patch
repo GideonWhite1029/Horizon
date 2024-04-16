@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 32366253c04c493135f2b22d1940f83669104723..d643c575d8e5cae728a42b58220bb8aed7aa9658 100644
+index 1cad0728d005df9475a978b272adef9703f2ba46..0bc3904b157b6f565de43bd95913d9436eba1f31 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,12 +13,10 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -31,6 +31,19 @@ index 32366253c04c493135f2b22d1940f83669104723..d643c575d8e5cae728a42b58220bb8ae
              "Implementation-Vendor" to date, // Paper
              "Specification-Title" to "Bukkit",
              "Specification-Version" to project.version,
+@@ -226,4 +224,12 @@ tasks.registerRunTask("runDev") {
+     description = "Spin up a non-relocated Mojang-mapped test server"
+     classpath(sourceSets.main.map { it.runtimeClasspath })
+     jvmArgs("-DPaper.pushPaperAssetsRoot=true")
++    jvmArgs("-DPaper.isRunDev=true")
++
++    // Horizon start - create config file
++    tasks.registerRunTask("createHorizonConfig") {
++            description = "Create a new horizon.yml"
++            mainClass = "dev.horizonmc.horizon.config.GlobalConfigCreator"
++    }
++    // Horizon end - create config file
+ }
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 index 462a6eed350fd660ddaf25d567bb6e97b77d0b2b..734b81e532ef912beef1a75b52d2352fafc1e6a4 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
@@ -101,7 +114,7 @@ index f91ea723a1c85f6cf8c4f6dd7f182b948c2f2e81..525b734a5b55db732836c22df1771986
          stringbuilder.append("// ");
          stringbuilder.append(CrashReport.getErrorComment());
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e34bada9626702c8b7eeb7dfd77b08cb8f50c640..5ebddfebe5a37cfd39eeefa252936ad14cb771ab 100644
+index 185d5df0d93d239329ddf61d7a816fcdce10a432..9323aa15bf79943686592a9d30f7cbc2a852b695 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -956,7 +956,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -143,10 +156,10 @@ index dabaf0cff6dafe8ca411996e67ead9a2cf84dfb8..5194c792235632e3872788b9274daa00
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index e3f724a19ab2f9821d84f9b03acf7c925c88f455..40dfb08a522c085376e7162280d729ce4741172c 100644
+index 64c73cc7370c23c9ce68b68476fd0ddb3ca6beca..2f02ee27524f02412c185dedfde2de0e1bceeb89 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -953,7 +953,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+@@ -969,7 +969,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
              return EntityCategory.WATER;
          }
  

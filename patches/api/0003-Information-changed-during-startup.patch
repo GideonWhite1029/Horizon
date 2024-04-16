@@ -5,25 +5,26 @@ Subject: [PATCH] Information changed during startup
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index afe47ecf0e7ae673aaf62b226e9cb07d2ed393eb..9acad5d8a8bcbcd75057bfa31f50a66eca9caaa9 100644
+index 53ce0fb2dac9c22680ab934f535b5a2037139445..8db90b576540dd14769a3c020d8e49f680ff6a97 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -125,7 +125,18 @@ public final class Bukkit {
+@@ -125,7 +125,19 @@ public final class Bukkit {
          if ("master".equals(gitBranch) || "main".equals(gitBranch)) {
              branchMsg = "";  // Don't show branch on main/master
          }
 -        return "This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ") (Git: " + gitCommit + branchMsg + ")";
 +        // Horizon start
 +        return "\n" +
-+                "      __ ______  ___  ________  ____  _  __\n" +
-+                "     / // / __ \\/ _ \\/  _/_  / / __ \\/ |/ /\n" +
-+                "    / _  / /_/ / , _// /  / /_/ /_/ /    / \n" +
-+                "   /_//_/\\____/_/|_/___/ /___/\\____/_/|_/  \n" +
++                "\u001B[38;2;0;130;0m      __ ______  ___  ________  ____  _  __\n" +
++                "\u001B[38;2;0;150;0m     / // / __ \\/ _ \\/  _/_  / / __ \\/ |/ /\n" +
++                "\u001B[38;2;0;170;0m    / _  / /_/ / , _// /  / /_/ /_/ /    / \n" +
++                "\u001B[38;2;0;190;0m   /_//_/\\____/_/|_/___/ /___/\\____/_/|_/  \u001B[0m\n" +
 +                "\n" +
-+                "   Server name: " + getName() + "\n"+
-+                "   Version: " + getVersion() + "\n" +
-+                "   API version: " + getBukkitVersion() + "\n" +
-+                "   Github commit: " + gitCommit + "\n";
++                "  \u001b[38;5;86m Server name: \u001B[0m" + getName() + "\n"+
++                "  \u001b[38;5;86m Version: \u001B[0m" + getVersion() + "\n" +
++                "  \u001b[38;5;86m API version: \u001B[0m" + getBukkitVersion() + "\n" +
++                "  \u001b[38;5;86m Github commit: \u001B[0m" + gitCommit + "\n";
++
 +        // Horizon stop
          // Paper end
      }

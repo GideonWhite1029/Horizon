@@ -262,10 +262,10 @@ index 5b446e6ac151f99f64f0c442d0b40b5e251bc4c4..1dd49b80d5b3e05bbcb124a5853213fb
          return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 28536de4f2a890b68c1cd61d90eeccfce29d9503..0a7109443f1a32ce8660e38414a88920228a8008 100644
+index c5abe75d767778f390bdf616b836d81825ba4b6e..7252ce21026cfa7e6172dcc5ebf2ee202b4c13f1 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -670,6 +670,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -671,6 +671,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Paper end - Configurable player collision
  
@@ -274,7 +274,7 @@ index 28536de4f2a890b68c1cd61d90eeccfce29d9503..0a7109443f1a32ce8660e38414a88920
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
          this.connection.acceptConnections();
-@@ -944,6 +946,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -945,6 +947,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // CraftBukkit end
  
      public void stopServer() {
