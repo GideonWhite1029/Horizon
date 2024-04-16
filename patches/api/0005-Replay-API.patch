@@ -1,0 +1,150 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 16 Apr 2024 19:04:26 +0400
+Subject: [PATCH] Replay API
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/entity/Photographer.java b/src/main/java/dev/horizonmc/horizon/entity/Photographer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..23eacf4232ec5b13bf391274061eb30201f1071d
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/entity/Photographer.java
+@@ -0,0 +1,27 @@
++package dev.horizonmc.horizon.entity;
++
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++
++public interface Photographer extends Player {
++
++    @NotNull
++    public String getId();
++
++    public void setRecordFile(@NotNull File file);
++
++    public void stopRecording();
++
++    public void stopRecording(boolean async);
++
++    public void stopRecording(boolean async, boolean save);
++
++    public void pauseRecording();
++
++    public void resumeRecording();
++
++    public void setFollowPlayer(@Nullable Player player);
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1bbf332d0ec975105379fd99fdb7e9f49e359c50
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
+@@ -0,0 +1,33 @@
++package dev.horizonmc.horizon.entity;
++
++import org.bukkit.Location;
++import org.bukkit.util.Consumer;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++import dev.horizonmc.horizon.entity.botaction.CustomBotAction;
++import dev.horizonmc.horizon.replay.BukkitRecorderOption;
++
++import java.util.Collection;
++import java.util.UUID;
++
++public interface PhotographerManager {
++    @Nullable
++    public Photographer getPhotographer(@NotNull UUID uuid);
++
++    @Nullable
++    public Photographer getPhotographer(@NotNull String id);
++
++    @Nullable
++    public Photographer createPhotographer(@NotNull String id, @NotNull Location location);
++
++    @Nullable
++    public Photographer createPhotographer(@NotNull String id, @NotNull Location location, @NotNull BukkitRecorderOption recorderOption);
++
++    public void removePhotographer(@NotNull String id);
++
++    public void removePhotographer(@NotNull UUID uuid);
++
++    public void removeAllPhotographers();
++
++    public Collection<Photographer> getPhotographers();
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/replay/BukkitRecorderOption.java b/src/main/java/dev/horizonmc/horizon/replay/BukkitRecorderOption.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..24da9e18835f0d214a935e6726c736dd6d7c30ef
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/replay/BukkitRecorderOption.java
+@@ -0,0 +1,17 @@
++package dev.horizonmc.horizon.replay;
++
++public class BukkitRecorderOption {
++    // public int recordDistance = -1;
++    public String serverName = "Horizon";
++    public BukkitRecordWeather forceWeather = BukkitRecordWeather.NULL;
++    public int forceDayTime = -1;
++    public boolean ignoreChat = false;
++    // public boolean ignoreItem = false;
++
++    public enum BukkitRecordWeather {
++        CLEAR,
++        RAIN,
++        THUNDER,
++        NULL
++    }
++}
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 1cd95d5b7e51fa58f3f40956559ffa37ebebb5ad..8d4f3d8999e3db6a512f255ffcd93578ba730811 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -16,6 +16,7 @@ import java.util.function.Consumer;
+ import java.util.logging.Logger;
+ 
+ import dev.horizonmc.horizon.entity.BotManager;
++import dev.horizonmc.horizon.entity.PhotographerManager;
+ import org.bukkit.Warning.WarningState;
+ import org.bukkit.advancement.Advancement;
+ import org.bukkit.block.data.BlockData;
+@@ -2906,6 +2907,12 @@ public final class Bukkit {
+     }
+     // Horizon end - Bot API
+ 
++    // Leaves start - Photographer API
++    public static @NotNull PhotographerManager getPhotographerManager() {
++        return server.getPhotographerManager();
++    }
++    // Leaves end - Photographer API
++
+     @NotNull
+     public static Server.Spigot spigot() {
+         return server.spigot();
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index c22f20bcd56ccef58ca4103b923f881cd79cc609..5ac0dd62f592be07d927dc39d551a1cf431cb9aa 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -16,6 +16,7 @@ import java.util.function.Consumer;
+ import java.util.logging.Logger;
+ 
+ import dev.horizonmc.horizon.entity.BotManager;
++import dev.horizonmc.horizon.entity.PhotographerManager;
+ import org.bukkit.Warning.WarningState;
+ import org.bukkit.advancement.Advancement;
+ import org.bukkit.block.data.BlockData;
+@@ -2551,6 +2552,11 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     BotManager getBotManager();
+     // Horizon end - Bot API
+ 
++    // Leaves start - Photographer API
++    @NotNull
++    PhotographerManager getPhotographerManager();
++    // Leaves end - Photographer API
++
+     // Purpur start
+     /**
+      * Get the name of this server
