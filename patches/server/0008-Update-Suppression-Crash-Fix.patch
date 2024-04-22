@@ -75,10 +75,10 @@ index 6ae56ce2909d80b13678f283ebf476f86e8d3bc9..ff1ab555c6bcc2d81745011a54fccdbe
                          label25:
                          {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 87e4c8ee42001fa57c42a19574dd1b7bc09a07ca..c34a84d8eda12f0b18fb7690e0167a198fb48fd9 100644
+index da82477350446aef81b985e8d2482cf09ed7cbe9..9cbf9a130e5c9a49088062744d9d9d013b05f485 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1744,7 +1744,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1746,7 +1746,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
@@ -94,7 +94,7 @@ index 87e4c8ee42001fa57c42a19574dd1b7bc09a07ca..c34a84d8eda12f0b18fb7690e0167a19
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index 793363c58ac4b4329d72d281c89bd604f831a2d9..d854d7014756ff2537e206ea2c1cb1804d8957b2 100644
+index 62ded304c08678750ae8c56c7de876ac5f39940b..d79cad037d23884f60c2c98448af300e1b123aec 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -7,6 +7,8 @@ import java.util.List;
