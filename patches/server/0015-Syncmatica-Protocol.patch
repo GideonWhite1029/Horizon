@@ -5,13 +5,21 @@ Subject: [PATCH] Syncmatica Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index c34da598a94caae87968ecc4b596d82ff1055552..0f8b5ac1328be7455467d59c802fed1a3ae99802 100644
+index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..9929eb8b0f1443e6d136d7d97c1fab2d431ca5f9 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -156,4 +156,25 @@ public final class HorizonConfig {
-     public static boolean linearCrashOnBrokenSymlink = true;
+@@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
  
-     // Horizon end - Linear region
+ import com.destroystokyo.paper.util.SneakyThrow;
+ import dev.horizonmc.horizon.commands.HorizonCommand;
++import dev.horizonmc.horizon.config.ConfigVerify;
+ import dev.horizonmc.horizon.config.GlobalConfig;
+ import dev.horizonmc.horizon.config.GlobalConfigManager;
+ import net.minecraft.server.MinecraftServer;
+@@ -102,4 +103,25 @@ public final class HorizonConfig {
+ 
+     @GlobalConfig(name = "hopper-counter", category = {"utils"})
+     public static boolean hopperCounter = false;
 +
 +    // Horizon start - Syncmatic Protocol
 +    @GlobalConfig(name = "enable", category = {"protocols", "syncmatica"}, verify = SyncmaticaVerify.class)
@@ -2024,7 +2032,7 @@ index 0000000000000000000000000000000000000000..2128bf8459abc9eb9df4aa3880559115
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index fddbf658b71d5e0687af8b9295a9d34f04b2aaa2..2595e39cc1d999c2721c00ee4acd1038f4fc1608 100644
+index aca3edf4fa4af87765576cfd02dc95afd115ced3..78fc60529ba2bffd7339228184d7077391128e83 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -306,6 +306,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl

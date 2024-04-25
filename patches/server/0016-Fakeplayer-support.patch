@@ -5,7 +5,7 @@ Subject: [PATCH] Fakeplayer support
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 0f8b5ac1328be7455467d59c802fed1a3ae99802..8579c0bfc8ce36054e2a65ff540e79fb75bf11e3 100644
+index 9929eb8b0f1443e6d136d7d97c1fab2d431ca5f9..26433e2588dc087678de6686a9f70316bc9b9aa9 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +16,7 @@ index 0f8b5ac1328be7455467d59c802fed1a3ae99802..8579c0bfc8ce36054e2a65ff540e79fb
  import java.util.logging.Level;
  
  public final class HorizonConfig {
-@@ -177,4 +178,66 @@ public final class HorizonConfig {
+@@ -124,4 +125,66 @@ public final class HorizonConfig {
          }
      }
      // Horizon end - Syncmatic Protocol
@@ -3342,7 +3342,7 @@ index 9e31954212b1d6162dca2fbc91d373e908560335..d47e149bbe3adcffdc5e5b419f5fa909
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 25dda7c1a0858f731afb7778b09aa2502ddd7ce1..8b8e1ac96ce717927d0a1810866871c31839bc0e 100644
+index 52e2efd751c5fc3fb7a50d74abc368cd0505ac5a..c193c62f6adde7720363ebd38bf7fc3bbd92b8e9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -671,6 +671,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -3385,10 +3385,10 @@ index 32f7c86698ac34f67e488cd5ea2d3f0986896076..2a473e9f3c122ec177754cfef0f4a44d
          AdvancementProgress advancementprogress = this.getOrStartProgress(advancement);
          boolean flag1 = advancementprogress.isDone();
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 6cfd03bfbfd9887b3cad1e457e206c1fea7ea3b5..e390ad530464a706a53ca7b7641bec013dfb1faf 100644
+index d525869542025761efc781ff5b10b3275249b44c..28f71483548a29ff8a56620d07ffc03175c02b67 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1395,6 +1395,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1396,6 +1396,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
              if (this.seenBy.remove(player.connection)) {
                  this.serverEntity.removePairing(player);
@@ -3487,7 +3487,7 @@ index 305b90d10a499e9731f5178433fb10207e428091..38dd5f4371662105ece197e733cee8e6
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 2595e39cc1d999c2721c00ee4acd1038f4fc1608..77f4cf8d93cb2ee6d312ae834031def70f9bad31 100644
+index 78fc60529ba2bffd7339228184d7077391128e83..47c20035d86760d756f56bef0aa307df36cfaeb9 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -297,7 +297,13 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl

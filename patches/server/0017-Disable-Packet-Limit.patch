@@ -5,10 +5,10 @@ Subject: [PATCH] Disable Packet Limit
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 8579c0bfc8ce36054e2a65ff540e79fb75bf11e3..b2ebf0ee73f398f9808c04338b2cc86c62054b0e 100644
+index 26433e2588dc087678de6686a9f70316bc9b9aa9..34843493fd67492514cff794b5fb37af3b15e011 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -240,4 +240,7 @@ public final class HorizonConfig {
+@@ -187,4 +187,7 @@ public final class HorizonConfig {
      }
      // Horizon end - Fakeplayer
  

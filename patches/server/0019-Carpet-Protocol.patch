@@ -5,10 +5,10 @@ Subject: [PATCH] Carpet Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index b2ebf0ee73f398f9808c04338b2cc86c62054b0e..5db425a74504cafcbc611fc9ad612fcbdbd4610b 100644
+index 34843493fd67492514cff794b5fb37af3b15e011..1280c25ca97a871d0ab7b62a621cb39f93934e26 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -243,4 +243,7 @@ public final class HorizonConfig {
+@@ -190,4 +190,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "disable-packet-limit", category = {"features"})
      public static boolean disablePacketLimit = false;
  
