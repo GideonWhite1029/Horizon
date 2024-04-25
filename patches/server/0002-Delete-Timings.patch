@@ -1175,19 +1175,26 @@ index ea0b989a4fc6289259e68ada8bb8e386f4933d53..c9ffab2a77f5a9428c94a7b755b73940
          for (CraftTask taskPending = this.head.getNext(); taskPending != null; taskPending = taskPending.getNext()) {
              if (taskPending == task) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftTask.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftTask.java
-index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..87c12d39db052aaa46293acd84c4d8a66ef72aea 100644
+index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..e6ef79005de07b4716f62463bc6e636d7109b3bc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftTask.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftTask.java
-@@ -8,8 +8,6 @@ import org.bukkit.plugin.Plugin;
+@@ -2,15 +2,10 @@ package org.bukkit.craftbukkit.scheduler;
+ 
+ import java.util.function.Consumer;
+ 
+-import co.aikar.timings.NullTimingHandler;
+ import org.bukkit.Bukkit;
+ import org.bukkit.plugin.Plugin;
  import org.bukkit.scheduler.BukkitTask;
  
- import org.spigotmc.CustomTimingsHandler; // Spigot
+-import org.spigotmc.CustomTimingsHandler; // Spigot
 -import co.aikar.timings.MinecraftTimings; // Paper
 -import co.aikar.timings.Timing; // Paper
- 
+-
  public class CraftTask implements BukkitTask, Runnable { // Spigot
  
-@@ -31,7 +29,6 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
+     private volatile CraftTask next = null;
+@@ -31,7 +26,6 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
      private long nextRun;
      public final Runnable rTask; // Paper
      public final Consumer<BukkitTask> cTask; // Paper
@@ -1195,7 +1202,7 @@ index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..87c12d39db052aaa46293acd84c4d8a6
      private final Plugin plugin;
      private final int id;
      private final long createdAt = System.nanoTime();
-@@ -54,8 +51,7 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
+@@ -54,8 +48,7 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
          this.internal = true;
          this.id = id;
          this.period = CraftTask.NO_REPEATING;
@@ -1205,7 +1212,7 @@ index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..87c12d39db052aaa46293acd84c4d8a6
      }
      // Paper end
  
-@@ -76,7 +72,6 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
+@@ -76,7 +69,6 @@ public class CraftTask implements BukkitTask, Runnable { // Spigot
          }
          this.id = id;
          this.period = period;
