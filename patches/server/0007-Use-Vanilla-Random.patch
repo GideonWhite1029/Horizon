@@ -60,7 +60,7 @@ index 997ab942be9f742804041b07d607e7dd6473ba96..f254321b03dbd478f744b9b72b046e56
              this.setFlags(EnumSet.of(Goal.Flag.MOVE));
          }
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Squid.java b/src/main/java/net/minecraft/world/entity/animal/Squid.java
-index 4c607abf5e6235b2f325cf9eff1676f565d251f5..c432df920d240326faf0006d8f82bc4ecd3f21ce 100644
+index 38d1eb5680281b2812f2396677ffb959a6e089ce..ba1f8f845bb1d66eba0444e414aba20b5eb09144 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Squid.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Squid.java
 @@ -1,5 +1,6 @@
@@ -74,7 +74,7 @@ index 4c607abf5e6235b2f325cf9eff1676f565d251f5..c432df920d240326faf0006d8f82bc4e
  
      public Squid(EntityType<? extends Squid> type, Level world) {
          super(type, world);
--        if (!world.purpurConfig.entitySharedRandom) this.random.setSeed(this.getId()); // Paper - Share random for entities to make them more random // Purpur
+-        if (!world.purpurConfig.entitySharedRandom) this.random.setSeed((long)this.getId()); // Paper - Share random for entities to make them more random // Purpur
 +        if (HorizonConfig.useVanillaRandom) this.random.setSeed(this.getId()); // Paper - Share random for entities to make them more random // Purpur // Horizon
          this.tentacleSpeed = 1.0F / (this.random.nextFloat() + 1.0F) * 0.2F;
      }

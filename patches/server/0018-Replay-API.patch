@@ -1197,10 +1197,10 @@ index fc1bba350030c076405711716e9830f8ae7f3953..2148b0ef4a5184f86c5296d66bc1fac7
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8b8e1ac96ce717927d0a1810866871c31839bc0e..eb151859b86fe0892085807ee96959fc6299599b 100644
+index c193c62f6adde7720363ebd38bf7fc3bbd92b8e9..e08c0031ab218853f0e2dba9c9024338a52f3783 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1643,7 +1643,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1645,7 +1645,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -1237,7 +1237,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..54365b54778c3d98e7fd5e68d40406dd
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 77f4cf8d93cb2ee6d312ae834031def70f9bad31..997433de1df47530e0351ad1b02e03cf2131a82e 100644
+index 47c20035d86760d756f56bef0aa307df36cfaeb9..350e6dd283b7a77f4ea788116399496c5ccca72c 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -298,7 +298,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
@@ -1535,10 +1535,10 @@ index 1ed49a2016ce1a2530d56017753a945725e41e6b..43b46bd8d1cfc119995db13e85d53485
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index f3ae9a2d594a90c128402af57bc9536a136e7395..672655f5d0a4fa2c6ef387f8e77350ed8fd0db58 100644
+index fb2d05e43df3bfb72b1f6e325736dd3cbc6c3096..acba5b23e602ac7e6d3a9bc1602734acaab97bdb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2145,7 +2145,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2147,7 +2147,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

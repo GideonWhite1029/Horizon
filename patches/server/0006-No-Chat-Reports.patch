@@ -25,7 +25,7 @@ index 7adabd30ff441970d15adc93376037721bab8a63..04508398758784ae3a8d37e6af4c7613
 +
  }
 diff --git a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
-index e4fd372a1d585887287253a02531cd192929377b..7816e2622395a493eb9d771d83916b3ab27bc22c 100644
+index 1d78e8beacbc93ef2cd6beb418edca843f8a5429..477b55f87515935f11f585ff346efa82081f2f2c 100644
 --- a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 +++ b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 @@ -1,5 +1,6 @@
@@ -35,7 +35,7 @@ index e4fd372a1d585887287253a02531cd192929377b..7816e2622395a493eb9d771d83916b3a
  import io.papermc.paper.chat.ChatRenderer;
  import io.papermc.paper.event.player.AbstractChatEvent;
  import io.papermc.paper.event.player.AsyncChatEvent;
-@@ -355,7 +356,7 @@ public final class ChatProcessor {
+@@ -317,7 +318,7 @@ public final class ChatProcessor {
  
          private void sendToServer(final ChatType.Bound chatType, final @Nullable Function<Audience, net.minecraft.network.chat.Component> msgFunction) {
              final PlayerChatMessage toConsoleMessage = msgFunction == null ? ChatProcessor.this.message : ChatProcessor.this.message.withUnsignedContent(msgFunction.apply(ChatProcessor.this.server.console));
