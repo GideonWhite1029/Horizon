@@ -4,8 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     java
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
-    id("io.papermc.paperweight.patcher") version "1.5.13"
+    id("io.papermc.paperweight.patcher") version "1.6.3"
 }
 
 allprojects {
@@ -14,7 +13,7 @@ allprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
+            languageVersion = JavaLanguageVersion.of(21)
         }
     }
 }
@@ -24,7 +23,7 @@ val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
 subprojects {
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = Charsets.UTF_8.name()
-        options.release = 17
+        options.release = 21
     }
     tasks.withType<Javadoc> {
         options.encoding = Charsets.UTF_8.name()
@@ -57,8 +56,8 @@ repositories {
 }
 
 dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.8.10:fat")
-    decompiler("net.minecraftforge:forgeflower:2.0.627.2")
+    remapper("net.fabricmc:tiny-remapper:0.10.1:fat")
+    decompiler("org.vineflower:vineflower:1.10.1")
     paperclip("io.papermc:paperclip:3.0.3")
 }
 
@@ -99,6 +98,7 @@ tasks.generateDevelopmentBundle {
             "https://repo.maven.apache.org/maven2/",
             paperMavenPublicUrl,
             "https://repo.purpurmc.org/snapshots",
+            "https://s01.oss.sonatype.org/content/repositories/snapshots/" // TODO - Adventure snapshot
         )
     )
 }

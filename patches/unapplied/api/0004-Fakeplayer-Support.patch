@@ -615,7 +615,7 @@ index 0000000000000000000000000000000000000000..f021c30affc63d58d2181cde078d3310
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 8db90b576540dd14769a3c020d8e49f680ff6a97..1cd95d5b7e51fa58f3f40956559ffa37ebebb5ad 100644
+index 1660824df8deaa290424a33d6c3794f125d463be..22aacb93b550f0ee4e11692a5c2b5b246fddeadd 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -14,6 +14,8 @@ import java.util.Set;
@@ -627,7 +627,7 @@ index 8db90b576540dd14769a3c020d8e49f680ff6a97..1cd95d5b7e51fa58f3f40956559ffa37
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2892,6 +2894,18 @@ public final class Bukkit {
+@@ -2918,6 +2920,18 @@ public final class Bukkit {
      }
      // Paper end - Folia region threading API
  
@@ -647,7 +647,7 @@ index 8db90b576540dd14769a3c020d8e49f680ff6a97..1cd95d5b7e51fa58f3f40956559ffa37
      public static Server.Spigot spigot() {
          return server.spigot();
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 5db367e12a91e929cdfe0ab38b9f6d1ddfa1fed9..c22f20bcd56ccef58ca4103b923f881cd79cc609 100644
+index b536d754784230be1e20e0e10e4c4f8f34855805..76cbc574c0945e66084d0609f441597fef416998 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -14,6 +14,8 @@ import java.util.Set;
@@ -659,7 +659,7 @@ index 5db367e12a91e929cdfe0ab38b9f6d1ddfa1fed9..c22f20bcd56ccef58ca4103b923f881c
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2538,6 +2540,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2562,6 +2564,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      boolean isOwnedByCurrentRegion(@NotNull Entity entity);
      // Paper end - Folia region threading API
  

@@ -2,9 +2,9 @@ name: Horizon CI
 
 on:
   push:
-    branches: [ "ver/1.20.4" ]
+    branches: [ "ver/1.20.6" ]
   pull_request:
-    branches: [ "ver/1.20.4" ]
+    branches: [ "ver/1.20.6" ]
 
 permissions: write-all
 
@@ -20,12 +20,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 8.5
+          gradle-version: 8.7
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - name: Setup Git Config
         run: git config --global user.email "action@github.com" && git config --global user.name "Github Action"
       - name: Apply Patches

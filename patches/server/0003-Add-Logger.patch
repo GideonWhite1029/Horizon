@@ -27,18 +27,18 @@ index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index a951d8dad03d7e03e695adf4790e5ab117b3f362..cb7921131de405ca607a7c24419306279208451d 100644
+index 3aae4fa4176c0bf170f4532ae187e3122c142a6a..c3d330a22a6cb053b6468b4b0759c89b3ab312a4 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -424,6 +424,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -427,6 +427,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private UUID originWorld;
      public boolean freezeLocked = false; // Paper - Freeze Tick Lock API
      public boolean fixedPose = false; // Paper - Expand Pose API
 +    private CompoundTag horizonData = new CompoundTag(); // Horizon - Horizon ex data
-     public boolean activatedPriorityReset = false; // Pufferfish - DAB
-     public int activatedPriority = gg.pufferfish.pufferfish.PufferfishConfig.maximumActivationPrio; // Pufferfish - DAB (golf score)
-     public final BlockPos.MutableBlockPos cachedBlockPos = new BlockPos.MutableBlockPos(); // Pufferfish - reduce entity allocations
-@@ -2531,6 +2532,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+     public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
+ 
+     public void setOrigin(@javax.annotation.Nonnull Location location) {
+@@ -2582,6 +2583,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end
@@ -46,7 +46,7 @@ index a951d8dad03d7e03e695adf4790e5ab117b3f362..cb7921131de405ca607a7c2441930627
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2683,6 +2685,11 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource, S
+@@ -2734,6 +2736,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  immuneToFire = nbt.getBoolean("Purpur.FireImmune");
              }
              // Purpur end

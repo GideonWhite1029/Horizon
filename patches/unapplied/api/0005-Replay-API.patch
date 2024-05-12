@@ -100,7 +100,7 @@ index 0000000000000000000000000000000000000000..24da9e18835f0d214a935e6726c736dd
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 1cd95d5b7e51fa58f3f40956559ffa37ebebb5ad..8d4f3d8999e3db6a512f255ffcd93578ba730811 100644
+index 22aacb93b550f0ee4e11692a5c2b5b246fddeadd..73f71952e79d517e7174a5ebc8066067b21a34e3 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -16,6 +16,7 @@ import java.util.function.Consumer;
@@ -111,7 +111,7 @@ index 1cd95d5b7e51fa58f3f40956559ffa37ebebb5ad..8d4f3d8999e3db6a512f255ffcd93578
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2906,6 +2907,12 @@ public final class Bukkit {
+@@ -2932,6 +2933,12 @@ public final class Bukkit {
      }
      // Horizon end - Bot API
  
@@ -125,7 +125,7 @@ index 1cd95d5b7e51fa58f3f40956559ffa37ebebb5ad..8d4f3d8999e3db6a512f255ffcd93578
      public static Server.Spigot spigot() {
          return server.spigot();
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index c22f20bcd56ccef58ca4103b923f881cd79cc609..5ac0dd62f592be07d927dc39d551a1cf431cb9aa 100644
+index 76cbc574c0945e66084d0609f441597fef416998..925c878534725b7449f2f658037d3b54bf045d5a 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -16,6 +16,7 @@ import java.util.function.Consumer;
@@ -136,7 +136,7 @@ index c22f20bcd56ccef58ca4103b923f881cd79cc609..5ac0dd62f592be07d927dc39d551a1cf
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2551,6 +2552,11 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2575,6 +2576,11 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      BotManager getBotManager();
      // Horizon end - Bot API
  

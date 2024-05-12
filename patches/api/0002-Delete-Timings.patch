@@ -2102,7 +2102,7 @@ index 632c4961515f5052551f841cfa840e60bba7a257..00000000000000000000000000000000
 -    }
 -}
 diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
-index b791358f90fe92bc2264d9a26492245763813af3..17fd039363e909492d31ddb0f6cf941e0ae9969d 100644
+index b3a2c274f05156fd603bcc7a68ab41265f2eaf44..5be4954ec7dd58b88fa4700c7dc7731c46960442 100644
 --- a/src/main/java/org/bukkit/command/Command.java
 +++ b/src/main/java/org/bukkit/command/Command.java
 @@ -33,7 +33,6 @@ public abstract class Command {
@@ -2159,10 +2159,10 @@ index 5349f16136d9348c374a7dfe5b89a71dfcb0e66d..f0b9bc44e3754038f8c1aa67231c7b2f
              //try (co.aikar.timings.Timing ignored = target.timings.startTiming()) { // Paper - use try with resources // Purpur
              // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
 diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-index 899d67fa782fac639fe7fb096e05c551d75bd647..27c1d89b1a2e8ba9fcdd07a91c68819dd611f626 100644
+index 07a9c9e254188c251165ca84c8e961fccda01175..95b66384a8115787288dc7e67cfa317dfc590022 100644
 --- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 +++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-@@ -711,12 +711,7 @@ public final class SimplePluginManager implements PluginManager {
+@@ -719,12 +719,7 @@ public final class SimplePluginManager implements PluginManager {
              throw new IllegalPluginAccessException("Plugin attempted to register " + event + " while not enabled");
          }
  
@@ -2176,7 +2176,7 @@ index 899d67fa782fac639fe7fb096e05c551d75bd647..27c1d89b1a2e8ba9fcdd07a91c68819d
      }
  
      @NotNull
-@@ -946,8 +941,7 @@ public final class SimplePluginManager implements PluginManager {
+@@ -954,8 +949,7 @@ public final class SimplePluginManager implements PluginManager {
  
      @Override
      public boolean useTimings() {
@@ -2186,7 +2186,7 @@ index 899d67fa782fac639fe7fb096e05c551d75bd647..27c1d89b1a2e8ba9fcdd07a91c68819d
      }
  
      /**
-@@ -956,7 +950,6 @@ public final class SimplePluginManager implements PluginManager {
+@@ -964,7 +958,6 @@ public final class SimplePluginManager implements PluginManager {
       * @param use True if per event timing code should be used
       */
      public void useTimings(boolean use) {
@@ -2195,7 +2195,7 @@ index 899d67fa782fac639fe7fb096e05c551d75bd647..27c1d89b1a2e8ba9fcdd07a91c68819d
  
      // Paper start
 diff --git a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
-index 0c6ca7588fb3d6b6497ddf032fe75e5c6c9719e5..02a80011fa9fcd967f8df1315439469ec0087bb9 100644
+index f1e58639213be0c43cd2ff090b625e7d0a67e8be..0c01bcc50800fd11a4ef9e5fcf21bc8459b26603 100644
 --- a/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 +++ b/src/main/java/org/bukkit/plugin/java/JavaPluginLoader.java
 @@ -43,7 +43,6 @@ import org.bukkit.plugin.TimedRegisteredListener;

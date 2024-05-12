@@ -52,4 +52,7 @@ manifest.mf
 run/
 
 build-data/
+Horizon-API/
+Horizon-Server/
+paper-api-generator/
 Horizon-MojangAPI

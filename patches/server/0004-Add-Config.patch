@@ -6,7 +6,7 @@ Subject: [PATCH] Add Config
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..7adabd30ff441970d15adc93376037721bab8a63
+index 0000000000000000000000000000000000000000..d2369c9afb47486a329e989d541d905246a3c655
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -0,0 +1,81 @@
@@ -27,9 +27,9 @@ index 0000000000000000000000000000000000000000..7adabd30ff441970d15adc9337603772
 +
 +public final class HorizonConfig {
 +    public static final String CONFIG_HEADER = "This is the main configuration file for Horizon.\n"
-+            + "# \n"
-+            + "# Created by GideonWhite1029\n"
-+            + "# Boosty: https://boosty.to/gideonwhite1029\n";
++                        + "# \n"
++                        + "# Created by GideonWhite1029\n"
++                        + "# Boosty: https://boosty.to/gideonwhite1029\n";
 +    public static final int CURRENT_CONFIG_VERSION = 1;
 +
 +    private static File configFile;
@@ -91,6 +91,7 @@ index 0000000000000000000000000000000000000000..7adabd30ff441970d15adc9337603772
 +    }
 +
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/CommandArgument.java b/src/main/java/dev/horizonmc/horizon/commands/CommandArgument.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..349266b0cad5bb2b85b4714c1d1cf98b60e49881
@@ -252,7 +253,7 @@ index 0000000000000000000000000000000000000000..6c99ebfec937371b1a36a21199e16ecb
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9e2ef63c001f14b1fc281506ba3484ea96febe68
+index 0000000000000000000000000000000000000000..164e8df439afaad06d5a056e4d385471b6710382
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 @@ -0,0 +1,118 @@
@@ -374,6 +375,7 @@ index 0000000000000000000000000000000000000000..9e2ef63c001f14b1fc281506ba3484ea
 +        return null;
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonSubcommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonSubcommand.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..d6e2deef3d2db13fd7b0affaaed03193c14395a2
@@ -400,7 +402,7 @@ index 0000000000000000000000000000000000000000..d6e2deef3d2db13fd7b0affaaed03193
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..beb9b18119c12c284f8af6f9c59895604e1496ff
+index 0000000000000000000000000000000000000000..20798303e5dea6b7f37536988c7a9c6207fd606f
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/commands/subcommands/ConfigCommand.java
 @@ -0,0 +1,86 @@
@@ -490,6 +492,7 @@ index 0000000000000000000000000000000000000000..beb9b18119c12c284f8af6f9c5989560
 +        return Collections.emptyList();
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/config/ConfigConvert.java b/src/main/java/dev/horizonmc/horizon/config/ConfigConvert.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..9f4c81720c63750fa7c0429d1b01d24a79245cd6
@@ -599,10 +602,10 @@ index 0000000000000000000000000000000000000000..eaad2da11d10dc1af3fbe864b1b2bec5
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ca4bd360f5d3c4e2d9b5de3ca24c28f2d554c819
+index 0000000000000000000000000000000000000000..2a83ff4ba93d970f1d0d5587746f2a5b28c33e58
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfig.java
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,18 @@
 +package dev.horizonmc.horizon.config;
 +
 +import java.lang.annotation.ElementType;
@@ -614,13 +617,16 @@ index 0000000000000000000000000000000000000000..ca4bd360f5d3c4e2d9b5de3ca24c28f2
 +@Retention(RetentionPolicy.RUNTIME)
 +public @interface GlobalConfig {
 +    String name();
++
 +    String[] category();
++
 +    boolean lock() default false;
++
 +    Class<? extends ConfigVerify<?>> verify() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..bd8802e0a1ccb58bba4302847e5c8c372a050c58
+index 0000000000000000000000000000000000000000..c7ff273d8b4a532a147bb72f3c003cb43c1bb20c
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigCreator.java
 @@ -0,0 +1,53 @@
@@ -677,9 +683,10 @@ index 0000000000000000000000000000000000000000..bd8802e0a1ccb58bba4302847e5c8c37
 +        }
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2714e2f675d9d38479a7b9d8c78bbd4acd2440a7
+index 0000000000000000000000000000000000000000..575e94a74971c9363feea3bc149975733c4521b2
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/config/GlobalConfigManager.java
 @@ -0,0 +1,189 @@
@@ -792,7 +799,7 @@ index 0000000000000000000000000000000000000000..2714e2f675d9d38479a7b9d8c78bbd4a
 +
 +        public static RemovedVerifiedConfig build(RemovedConfig config, Field field) {
 +            StringBuilder path = new StringBuilder("settings.");
-+            for (int i = 0; i < config.category().length; ++i) {
++            for (int i = 0; i < config.category().length; i++) {
 +                path.append(config.category()[i]).append(".");
 +            }
 +            path.append(config.name());
@@ -853,7 +860,7 @@ index 0000000000000000000000000000000000000000..2714e2f675d9d38479a7b9d8c78bbd4a
 +
 +        public static VerifiedConfig build(GlobalConfig config, Field field) {
 +            StringBuilder path = new StringBuilder("settings.");
-+            for (int i = 0; i < config.category().length; ++i) {
++            for (int i = 0; i < config.category().length; i++) {
 +                path.append(config.category()[i]).append(".");
 +            }
 +            path.append(config.name());
@@ -872,6 +879,7 @@ index 0000000000000000000000000000000000000000..2714e2f675d9d38479a7b9d8c78bbd4a
 +        }
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/config/RemovedConfig.java b/src/main/java/dev/horizonmc/horizon/config/RemovedConfig.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c4a4551c0
@@ -898,7 +906,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 09b2bf60fdb0f21cd41c01350543587498946e07..e800e62196f966902ef547307687df5ab2902460 100644
+index 59785edd7321d9f8e18f531f72f7e1ebd21907aa..fbb2d1bc51648a6e58a4ed10b2a9ffac2013859f 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -908,8 +916,8 @@ index 09b2bf60fdb0f21cd41c01350543587498946e07..e800e62196f966902ef547307687df5a
 +import dev.horizonmc.horizon.HorizonConfig;
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
- import java.awt.image.BufferedImage;
-@@ -1160,6 +1161,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+@@ -1167,6 +1168,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              LOGGER.info("Done ({})! For help, type \"help\"", doneTime);
              // Paper end
  
@@ -918,19 +926,19 @@ index 09b2bf60fdb0f21cd41c01350543587498946e07..e800e62196f966902ef547307687df5a
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              Arrays.fill( this.recentTps, 20 );
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index ead8f8f80bc6200fc13fd590bc414d48b5cfa6e7..ed4a336448a8f26d2132ba5255d70555b76ddd3e 100644
+index d67bcb141708f04a9d518b4b254eaa2cd2677fd5..3e811e0f3a2f9aaa45948bb026184e8f54e051bd 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -230,6 +230,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -243,6 +243,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Purpur end
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
          io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // Paper - init PaperBrigadierProvider
 +        dev.horizonmc.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config
-         gg.pufferfish.pufferfish.PufferfishConfig.pufferfishFile = (java.io.File) options.valueOf("pufferfish-settings"); // Purpur
-         gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
-         gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
+ 
+         this.setPvpAllowed(dedicatedserverproperties.pvp);
+         this.setFlightAllowed(dedicatedserverproperties.allowFlight);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 5194c792235632e3872788b9274daa00ba483bb8..7687b6642b53c015d3c2a99493b1d358f7dcc338 100644
+index ef9078fe7164c717a70db4ff3ebc20a368220e23..7a28bd315c1272dc6e55ab6c4d083a31686f35be 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1097,6 +1097,7 @@ public final class CraftServer implements Server {
@@ -941,7 +949,7 @@ index 5194c792235632e3872788b9274daa00ba483bb8..7687b6642b53c015d3c2a99493b1d358
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3099,6 +3100,13 @@ public final class CraftServer implements Server {
+@@ -3114,6 +3115,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
@@ -956,11 +964,11 @@ index 5194c792235632e3872788b9274daa00ba483bb8..7687b6642b53c015d3c2a99493b1d358
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 48f07991c9b13f9fad01cd8559bd40f191bfd81c..d6cd06d8d4a9a63fa9b20659cd2c134140e9763b 100644
+index 800a18fb7267c4c32b376a55f5a2d9a8ddde0c80..4246cb3e725fbeb9ac78437b8e0715b50af94b0d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -188,6 +188,14 @@ public class Main {
-                         .describedAs("Yml file");
+@@ -183,6 +183,14 @@ public class Main {
+                     .describedAs("Yml file");
                  // Purpur end
  
 +                // Horizon start - Server Config

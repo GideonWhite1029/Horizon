@@ -5,10 +5,10 @@ Subject: [PATCH] Information changed during startup
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 53ce0fb2dac9c22680ab934f535b5a2037139445..8db90b576540dd14769a3c020d8e49f680ff6a97 100644
+index 70ef8f63ab79e102cb4326c21cc344488f4fbdd3..1660824df8deaa290424a33d6c3794f125d463be 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -125,7 +125,19 @@ public final class Bukkit {
+@@ -127,7 +127,19 @@ public final class Bukkit {
          if ("master".equals(gitBranch) || "main".equals(gitBranch)) {
              branchMsg = "";  // Don't show branch on main/master
          }
