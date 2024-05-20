@@ -5,31 +5,50 @@ Subject: [PATCH] Vanilla Hopper
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 825b1658d5d24b01630316921cde097f97de449d..c27225cc1a2eb9aa983c6ef8afe26aca3567bd94 100644
+index 6b34b88f0da416b4bfedd338a92cbc74630395c1..9ca2fbf31f686e252b06a550d0bbd5e1a07dd3d6 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -91,4 +91,7 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "cce-update-suppression", category = {"features"})
-     public static boolean cceUpdateSuppression = false;
+@@ -85,4 +85,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "use-vanilla-random", category = {"features"})
+     public static boolean useVanillaRandom = false;
  
 +    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
 +    public static boolean vanillaHopper = false;
 +
  }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java b/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
+index d7f8464bf3eed0e42a5fc7f14a5b243d171f8b5e..71387c73f6925b5bd0f4391ea610426f7b0fbe0b 100644
+--- a/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
++++ b/src/main/java/net/minecraft/world/entity/vehicle/MinecartHopper.java
+@@ -91,6 +91,13 @@ public class MinecartHopper extends AbstractMinecartContainer implements Hopper
+         }
+     }
+ 
++    // Horizon start - tick every
++    @Override
++    public void inactiveTick() {
++        this.tick();
++    }
++    // Horizon start - tick every
++
+     public boolean suckInItems() {
+         if (HopperBlockEntity.suckInItems(this.level(), this)) {
+             this.immunize();  // Paper
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 6b9cd8543a5bfc2b936ba18f66ffd60f2f792e43..6a5e1b4a85d4bb37a339cc7dcae309b41896364e 100644
+index 8310d132006043e93c612890514c4c7f3eb1c74d..a605039631e47390c7263badcbdbe770fb080733 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -6,6 +6,8 @@ import java.util.function.BooleanSupplier;
- import java.util.stream.Collectors;
- import java.util.stream.IntStream;
+@@ -4,6 +4,8 @@ import java.util.Iterator;
+ import java.util.List;
+ import java.util.function.BooleanSupplier;
  import javax.annotation.Nullable;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.Direction;
- import net.minecraft.core.NonNullList;
-@@ -313,36 +315,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ import net.minecraft.core.HolderLookup;
+@@ -290,36 +292,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          ItemStack movedItem = origItemStack;
          final int originalItemCount = origItemStack.getCount();
          final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);

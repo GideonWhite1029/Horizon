@@ -6,7 +6,7 @@ Subject: [PATCH] Add Config
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d2369c9afb47486a329e989d541d905246a3c655
+index 0000000000000000000000000000000000000000..1f2984d87abeea7645018409e530f7130eafb2e0
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -0,0 +1,81 @@
@@ -30,7 +30,7 @@ index 0000000000000000000000000000000000000000..d2369c9afb47486a329e989d541d9052
 +                        + "# \n"
 +                        + "# Created by GideonWhite1029\n"
 +                        + "# Boosty: https://boosty.to/gideonwhite1029\n";
-+    public static final int CURRENT_CONFIG_VERSION = 1;
++    public static final int CURRENT_CONFIG_VERSION = 2;
 +
 +    private static File configFile;
 +    public static YamlConfiguration config;
