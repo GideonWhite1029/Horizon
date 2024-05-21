@@ -2102,7 +2102,7 @@ index 632c4961515f5052551f841cfa840e60bba7a257..00000000000000000000000000000000
 -    }
 -}
 diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
-index b3a2c274f05156fd603bcc7a68ab41265f2eaf44..5be4954ec7dd58b88fa4700c7dc7731c46960442 100644
+index c7cdc2ad8a2c43e8c0fcaa1761d3b81726c5ebcb..3ab75d571be4032e1bcfc5bb38168b81af63f0ad 100644
 --- a/src/main/java/org/bukkit/command/Command.java
 +++ b/src/main/java/org/bukkit/command/Command.java
 @@ -33,7 +33,6 @@ public abstract class Command {
@@ -2114,7 +2114,7 @@ index b3a2c274f05156fd603bcc7a68ab41265f2eaf44..5be4954ec7dd58b88fa4700c7dc7731c
  
      protected Command(@NotNull String name) {
 diff --git a/src/main/java/org/bukkit/command/FormattedCommandAlias.java b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
-index 9d4f553c04784cca63901a56a7aea62a5cae1d72..46cc7bb2dc761d2de13993ff6fb9286e30ab58c2 100644
+index abe256e1e45ce28036da4aa1586715bc8a1a3414..b359306500e640f4b0761ae9aa996cf64e4fe63f 100644
 --- a/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 +++ b/src/main/java/org/bukkit/command/FormattedCommandAlias.java
 @@ -12,7 +12,6 @@ public class FormattedCommandAlias extends Command {
@@ -2126,10 +2126,10 @@ index 9d4f553c04784cca63901a56a7aea62a5cae1d72..46cc7bb2dc761d2de13993ff6fb9286e
      }
  
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-index 5349f16136d9348c374a7dfe5b89a71dfcb0e66d..f0b9bc44e3754038f8c1aa67231c7b2f7150947c 100644
+index fdedac32544be6534288c8ba28abe7f5c4c56f3b..d750d59ba9c6b0bcc3d0b897c69cc0b3e3ee27c7 100644
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-@@ -34,7 +34,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -38,7 +38,6 @@ public class SimpleCommandMap implements CommandMap {
          register("bukkit", new VersionCommand("version"));
          register("bukkit", new ReloadCommand("reload"));
          //register("bukkit", new PluginsCommand("plugins")); // Paper
@@ -2137,7 +2137,7 @@ index 5349f16136d9348c374a7dfe5b89a71dfcb0e66d..f0b9bc44e3754038f8c1aa67231c7b2f
      }
  
      public void setFallbackCommands() {
-@@ -66,7 +65,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -70,7 +69,6 @@ public class SimpleCommandMap implements CommandMap {
       */
      @Override
      public boolean register(@NotNull String label, @NotNull String fallbackPrefix, @NotNull Command command) {
@@ -2145,7 +2145,7 @@ index 5349f16136d9348c374a7dfe5b89a71dfcb0e66d..f0b9bc44e3754038f8c1aa67231c7b2f
          label = label.toLowerCase(java.util.Locale.ENGLISH).trim();
          fallbackPrefix = fallbackPrefix.toLowerCase(java.util.Locale.ENGLISH).trim();
          boolean registered = register(label, command, false, fallbackPrefix);
-@@ -156,12 +154,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -165,12 +163,6 @@ public class SimpleCommandMap implements CommandMap {
          parsedArgs = event.getArgs();
          // Purpur end
  

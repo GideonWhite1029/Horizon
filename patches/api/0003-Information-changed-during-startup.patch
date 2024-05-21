@@ -5,14 +5,15 @@ Subject: [PATCH] Information changed during startup
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 70ef8f63ab79e102cb4326c21cc344488f4fbdd3..fd3b2746f4524be1c8da71a953961026f0c2810d 100644
+index 75fe3bdbd44440c7cbea45dbd248e260f322dbb2..bf161f9bb61b381a464debb8ca8e389fe294b418 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -127,7 +127,19 @@ public final class Bukkit {
-         if ("master".equals(gitBranch) || "main".equals(gitBranch)) {
-             branchMsg = "";  // Don't show branch on main/master
-         }
--        return "This server is running " + getName() + " version " + getVersion() + " (Implementing API version " + getBukkitVersion() + ") (Git: " + gitCommit + branchMsg + ")";
+@@ -119,8 +119,18 @@ public final class Bukkit {
+       */
+     @NotNull
+     public static String getVersionMessage() {
+-        final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();
+-        return "This server is running " + getName() + " version " + version.asString(io.papermc.paper.ServerBuildInfo.StringRepresentation.VERSION_FULL) + " (Implementing API version " + getBukkitVersion() + ")";
 +        // Horizon start
 +        return "\n" +
 +                "\u001B[38;5;99m      __ ______  ___  ________  ____  _  __\n" +
@@ -22,8 +23,7 @@ index 70ef8f63ab79e102cb4326c21cc344488f4fbdd3..fd3b2746f4524be1c8da71a953961026
 +                "\n" +
 +                "  \u001b[38;5;105m Server name: \u001B[0m" + getName() + "\n"+
 +                "  \u001b[38;5;105m Version: \u001B[0m" + getVersion() + "\n" +
-+                "  \u001b[38;5;105m API version: \u001B[0m" + getBukkitVersion() + "\n" +
-+                "  \u001b[38;5;105m Github commit: \u001B[0m" + gitCommit + "\n";
++                "  \u001b[38;5;105m API version: \u001B[0m" + getBukkitVersion() + "\n";
 +
 +        // Horizon stop
          // Paper end

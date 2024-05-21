@@ -906,7 +906,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 59785edd7321d9f8e18f531f72f7e1ebd21907aa..fbb2d1bc51648a6e58a4ed10b2a9ffac2013859f 100644
+index 3325d075dacb561b97d2be6e08380f4c15fe1bfb..2f83bf79ae9f79956b6abba7a72dd726c39c71f2 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -917,7 +917,7 @@ index 59785edd7321d9f8e18f531f72f7e1ebd21907aa..fbb2d1bc51648a6e58a4ed10b2a9ffac
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1167,6 +1168,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1166,6 +1167,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              LOGGER.info("Done ({})! For help, type \"help\"", doneTime);
              // Paper end
  
@@ -926,22 +926,23 @@ index 59785edd7321d9f8e18f531f72f7e1ebd21907aa..fbb2d1bc51648a6e58a4ed10b2a9ffac
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              Arrays.fill( this.recentTps, 20 );
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index d67bcb141708f04a9d518b4b254eaa2cd2677fd5..3e811e0f3a2f9aaa45948bb026184e8f54e051bd 100644
+index c552031986f2945f410e34af48812eeb90ce3c57..64d8f194895d279a9357048084aa02383eca3955 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -243,6 +243,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -243,6 +243,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Purpur end
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
-         io.papermc.paper.brigadier.PaperBrigadierProviderImpl.INSTANCE.getClass(); // Paper - init PaperBrigadierProvider
-+        dev.horizonmc.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config
  
++        dev.horizonmc.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config
++
          this.setPvpAllowed(dedicatedserverproperties.pvp);
          this.setFlightAllowed(dedicatedserverproperties.allowFlight);
+         this.setMotd(dedicatedserverproperties.motd);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ef9078fe7164c717a70db4ff3ebc20a368220e23..7a28bd315c1272dc6e55ab6c4d083a31686f35be 100644
+index 7c6382e5afac6443e6c65b39bf93d7424b1c3d6c..caaf6f68e2cc7b8a6d4f47daad13ca0b8b42c962 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1097,6 +1097,7 @@ public final class CraftServer implements Server {
+@@ -1077,6 +1077,7 @@ public final class CraftServer implements Server {
              playerMetadata.removeAll(plugin);
          }
          // Paper end
@@ -949,7 +950,7 @@ index ef9078fe7164c717a70db4ff3ebc20a368220e23..7a28bd315c1272dc6e55ab6c4d083a31
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3114,6 +3115,13 @@ public final class CraftServer implements Server {
+@@ -3100,6 +3101,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
@@ -964,10 +965,10 @@ index ef9078fe7164c717a70db4ff3ebc20a368220e23..7a28bd315c1272dc6e55ab6c4d083a31
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 800a18fb7267c4c32b376a55f5a2d9a8ddde0c80..4246cb3e725fbeb9ac78437b8e0715b50af94b0d 100644
+index 7c94342926590bbf83a4775fe77eb9dd1321f186..1569ba32f78c2fb28300e5a9982eb3e64c46e09b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -183,6 +183,14 @@ public class Main {
+@@ -184,6 +184,14 @@ public class Main {
                      .describedAs("Yml file");
                  // Purpur end
  
