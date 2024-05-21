@@ -5,12 +5,12 @@ Subject: [PATCH] Update Suppression Crash Fix
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index f1e236d39f6c3bc337ce8db60d20f04ffa5a515e..825b1658d5d24b01630316921cde097f97de449d 100644
+index 8fddce4a0d873160ede3d11563e72e7254179c40..162ba6f3495054d88e9220fcdd30b22e34ccf41c 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -85,4 +85,10 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "use-vanilla-random", category = {"features"})
-     public static boolean useVanillaRandom = false;
+@@ -97,4 +97,10 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "disable-packet-limit", category = {"features"})
+     public static boolean disablePacketLimit = true;
  
 +    @GlobalConfig(name = "update-suppression-crash-fix", category = {"features"})
 +    public static boolean updateSuppressionCrashFix = false;
@@ -19,6 +19,7 @@ index f1e236d39f6c3bc337ce8db60d20f04ffa5a515e..825b1658d5d24b01630316921cde097f
 +    public static boolean cceUpdateSuppression = false;
 +
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/util/UpdateSuppressionException.java b/src/main/java/dev/horizonmc/horizon/util/UpdateSuppressionException.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..f30e535767b44e1feadfafa001774b670990d03d
@@ -60,10 +61,10 @@ index 0000000000000000000000000000000000000000..f30e535767b44e1feadfafa001774b67
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index 6ae56ce2909d80b13678f283ebf476f86e8d3bc9..ff1ab555c6bcc2d81745011a54fccdbe9b8d481a 100644
+index 9f78020aff6da660541253b2f056a4a354ad287a..a291f9f2634ad83602dee2b7971ef3fbf755dc31 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-@@ -51,6 +51,10 @@ public class PacketUtils {
+@@ -52,6 +52,10 @@ public class PacketUtils {
                  if (listener.shouldHandleMessage(packet)) {
                      try { // Paper - timings // Purpur
                          packet.handle(listener);
@@ -72,13 +73,13 @@ index 6ae56ce2909d80b13678f283ebf476f86e8d3bc9..ff1ab555c6bcc2d81745011a54fccdbe
 +                        dev.horizonmc.horizon.HorizonLogger.LOGGER.info(exception.getMessage());
 +                        // Horizon start - update suppression crash fix
                      } catch (Exception exception) {
-                         label25:
-                         {
+                         if (exception instanceof ReportedException) {
+                             ReportedException reportedexception = (ReportedException) exception;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index da82477350446aef81b985e8d2482cf09ed7cbe9..9cbf9a130e5c9a49088062744d9d9d013b05f485 100644
+index 7c1ecd1fb0fa5852eff4c68143c9ef4c92ad8789..fc2a61cf9dd1674d4c49e0c2a4c041b5bf0993e9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1746,7 +1746,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1807,7 +1807,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
@@ -94,7 +95,7 @@ index da82477350446aef81b985e8d2482cf09ed7cbe9..9cbf9a130e5c9a49088062744d9d9d01
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index 62ded304c08678750ae8c56c7de876ac5f39940b..d79cad037d23884f60c2c98448af300e1b123aec 100644
+index 68431244432a4342041e63218cf7d1eb4eb7ebc0..7e7a1c5d5fe73f880311d4aee9d32dbfd4691393 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -7,6 +7,8 @@ import java.util.List;
@@ -106,10 +107,10 @@ index 62ded304c08678750ae8c56c7de876ac5f39940b..d79cad037d23884f60c2c98448af300e
  import net.minecraft.ChatFormatting;
  import net.minecraft.Util;
  import net.minecraft.core.BlockPos;
-@@ -254,7 +256,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
+@@ -231,7 +233,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
  
      @Override
-     public int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
+     protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {
 -        return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(world.getBlockEntity(pos));
 +        // Horizon start - fix update suppression crash and cce fix
 +        if (HorizonConfig.updateSuppressionCrashFix) {
@@ -130,7 +131,7 @@ index 62ded304c08678750ae8c56c7de876ac5f39940b..d79cad037d23884f60c2c98448af300e
  
      @Override
 diff --git a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
-index 19faa8f5f891c1ffbed0af8391dee8202433c447..36469674969b4fff276f48365abeab84e2fc9d73 100644
+index e679b40b9628b0eb7152978ef641f9c918c4c8b2..f711fa41eb948debb1642ad3d8519beb9ad7db0c 100644
 --- a/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
 +++ b/src/main/java/net/minecraft/world/level/redstone/NeighborUpdater.java
 @@ -2,6 +2,8 @@ package net.minecraft.world.level.redstone;
@@ -143,7 +144,7 @@ index 19faa8f5f891c1ffbed0af8391dee8202433c447..36469674969b4fff276f48365abeab84
  import net.minecraft.CrashReportCategory;
  import net.minecraft.ReportedException;
 @@ -66,9 +68,17 @@ public interface NeighborUpdater {
-             state.neighborChanged(world, pos, sourceBlock, sourcePos, notify);
+             state.handleNeighborChanged(world, pos, sourceBlock, sourcePos, notify);
              // Spigot Start
          } catch (StackOverflowError ex) {
 +            // Horizon start - fix update suppression crash

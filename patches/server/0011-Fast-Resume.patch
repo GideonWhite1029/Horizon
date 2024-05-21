@@ -5,16 +5,18 @@ Subject: [PATCH] Fast Resume
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index c5c5604b8ac1735a893a5e5b40a22eb9e367a658..4724c485e3769387a0517ba5c8231952e07b54b2 100644
+index 07d91160b1d3a01ba63255481eb27bb2113f798d..e172ca0dcefa6df737bcd37e855076a07374ca30 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -97,4 +97,6 @@ public final class HorizonConfig {
+@@ -91,4 +91,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "spectator-dont-get-advancement", category = {"features"})
      public static boolean spectatorDontGetAdvancement = false;
  
 +    @GlobalConfig(name = "fast-resume", category = {"features"})
-+    public static boolean fastResume = false;
++    public static boolean fastResume = true;
++
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java b/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..1dda7ce4db36235f18f6692b0c48d983307bb3ae
@@ -201,7 +203,7 @@ index 0000000000000000000000000000000000000000..1dda7ce4db36235f18f6692b0c48d983
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
-index 5b446e6ac151f99f64f0c442d0b40b5e251bc4c4..1dd49b80d5b3e05bbcb124a5853213fbd163cfec 100644
+index e1ffd62f4ebceecb9bc5471df3da406cffea0483..dd9ef4ed10c2df344c33f24e3c39ab083afaec85 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
 @@ -566,6 +566,56 @@ public final class ChunkHolderManager {
@@ -262,19 +264,19 @@ index 5b446e6ac151f99f64f0c442d0b40b5e251bc4c4..1dd49b80d5b3e05bbcb124a5853213fb
          return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index c5abe75d767778f390bdf616b836d81825ba4b6e..7252ce21026cfa7e6172dcc5ebf2ee202b4c13f1 100644
+index 3c495949c2c82d307506d2430008097ca9af48fb..7c1ecd1fb0fa5852eff4c68143c9ef4c92ad8789 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -671,6 +671,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -676,6 +676,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Paper end - Configurable player collision
  
 +        dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
 +
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
-         this.server.getPluginManager().callEvent(new ServerLoadEvent(ServerLoadEvent.LoadType.STARTUP));
-         this.connection.acceptConnections();
-@@ -945,6 +947,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
+         io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // Paper - reset invalid state for event fire below
+@@ -950,6 +952,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // CraftBukkit end
  
      public void stopServer() {

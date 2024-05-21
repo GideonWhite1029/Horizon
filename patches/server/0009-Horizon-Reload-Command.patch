@@ -5,21 +5,21 @@ Subject: [PATCH] Horizon Reload Command
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
-index 83326c0ccc7dbe9129890d26a008f715c725730b..3f59f92730f5b2c15fbc0e42466c663fdde16782 100644
+index 164e8df439afaad06d5a056e4d385471b6710382..79b10f05268cfc8a1f30aa3fb3fce232b6da90ae 100644
 --- a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 +++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
-@@ -2,6 +2,7 @@ package dev.horizonmc.horizon.commands;
+@@ -1,6 +1,7 @@
+ package dev.horizonmc.horizon.commands;
  
  import dev.horizonmc.horizon.commands.subcommands.ConfigCommand;
- import dev.horizonmc.horizon.commands.subcommands.CounterCommand;
 +import dev.horizonmc.horizon.commands.subcommands.ReloadCommand;
  import io.papermc.paper.command.CommandUtil;
  import it.unimi.dsi.fastutil.Pair;
  import net.minecraft.Util;
-@@ -37,6 +38,7 @@ public final class HorizonCommand extends Command {
+@@ -33,6 +34,7 @@ public final class HorizonCommand extends Command {
+     private static final Map<String, HorizonSubcommand> SUBCOMMANDS = Util.make(() -> {
          final Map<Set<String>, HorizonSubcommand> commands = new HashMap<>();
          commands.put(Set.of("config"), new ConfigCommand());
-         commands.put(Set.of("counter"), new CounterCommand());
 +        commands.put(Set.of("reload"), new ReloadCommand());
  
          return commands.entrySet().stream()

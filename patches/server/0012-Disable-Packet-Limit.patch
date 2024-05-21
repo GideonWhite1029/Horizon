@@ -5,22 +5,23 @@ Subject: [PATCH] Disable Packet Limit
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 26433e2588dc087678de6686a9f70316bc9b9aa9..34843493fd67492514cff794b5fb37af3b15e011 100644
+index e172ca0dcefa6df737bcd37e855076a07374ca30..8fddce4a0d873160ede3d11563e72e7254179c40 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -187,4 +187,7 @@ public final class HorizonConfig {
-     }
-     // Horizon end - Fakeplayer
+@@ -94,4 +94,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "fast-resume", category = {"features"})
+     public static boolean fastResume = true;
  
 +    @GlobalConfig(name = "disable-packet-limit", category = {"features"})
-+    public static boolean disablePacketLimit = false;
++    public static boolean disablePacketLimit = true;
 +
  }
+\ No newline at end of file
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 47408dbce3a627236694c0d0f956c7f87a898b86..e231d0a6a1a66c2ec9553514b54a6fcbc2d20f4c 100644
+index 0cb47b5fee85230989293d430c02e53391e0ef67..153c62021f36f1e112d95088945f2693b1ae5819 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -267,7 +267,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -265,7 +265,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {

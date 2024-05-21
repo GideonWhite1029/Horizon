@@ -5,10 +5,10 @@ Subject: [PATCH] Spectator dont get Advancement
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index c27225cc1a2eb9aa983c6ef8afe26aca3567bd94..c5c5604b8ac1735a893a5e5b40a22eb9e367a658 100644
+index 9ca2fbf31f686e252b06a550d0bbd5e1a07dd3d6..07d91160b1d3a01ba63255481eb27bb2113f798d 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -94,4 +94,7 @@ public final class HorizonConfig {
+@@ -88,4 +88,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "vanilla-hopper", category = {"features"})
      public static boolean vanillaHopper = false;
  
@@ -16,19 +16,20 @@ index c27225cc1a2eb9aa983c6ef8afe26aca3567bd94..c5c5604b8ac1735a893a5e5b40a22eb9
 +    public static boolean spectatorDontGetAdvancement = false;
 +
  }
+\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index ba8a8575af92541cef2e116743d51cd68d1e794a..32f7c86698ac34f67e488cd5ea2d3f0986896076 100644
+index ef520d1dd00ae9473c1f34e2df4d8b064fe4d6ea..88eaf7eecef1cad28210d23170f2c049b3833e6f 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-@@ -25,6 +25,8 @@ import java.util.Map.Entry;
+@@ -26,6 +26,8 @@ import java.util.Map.Entry;
  import java.util.Set;
  import java.util.function.BiConsumer;
  import javax.annotation.Nullable;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.FileUtil;
- import net.minecraft.Util;
  import net.minecraft.advancements.Advancement;
+ import net.minecraft.advancements.AdvancementHolder;
 @@ -45,6 +47,7 @@ import net.minecraft.server.level.ServerPlayer;
  import net.minecraft.server.players.PlayerList;
  import net.minecraft.util.datafix.DataFixTypes;
@@ -41,11 +42,11 @@ index ba8a8575af92541cef2e116743d51cd68d1e794a..32f7c86698ac34f67e488cd5ea2d3f09
      }
  
      public boolean award(AdvancementHolder advancement, String criterionName) {
-+        // Leaves start - spectator don't get advancement
++        // Horizon start - spectator don't get advancement
 +        if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
 +            return false;
 +        }
-+        // Leaves end - spectator don't get advancement
++        // Horizon end - spectator don't get advancement
          boolean flag = false;
          AdvancementProgress advancementprogress = this.getOrStartProgress(advancement);
          boolean flag1 = advancementprogress.isDone();

@@ -5,7 +5,7 @@ Subject: [PATCH] Syncmatica Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..9929eb8b0f1443e6d136d7d97c1fab2d431ca5f9 100644
+index 162ba6f3495054d88e9220fcdd30b22e34ccf41c..fff45708dde3e8c3d339854061e647bf44351a9b 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
@@ -16,11 +16,10 @@ index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..9929eb8b0f1443e6d136d7d97c1fab2d
  import dev.horizonmc.horizon.config.GlobalConfig;
  import dev.horizonmc.horizon.config.GlobalConfigManager;
  import net.minecraft.server.MinecraftServer;
-@@ -102,4 +103,25 @@ public final class HorizonConfig {
+@@ -103,4 +104,25 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "cce-update-suppression", category = {"features"})
+     public static boolean cceUpdateSuppression = false;
  
-     @GlobalConfig(name = "hopper-counter", category = {"utils"})
-     public static boolean hopperCounter = false;
-+
 +    // Horizon start - Syncmatic Protocol
 +    @GlobalConfig(name = "enable", category = {"protocols", "syncmatica"}, verify = SyncmaticaVerify.class)
 +    public static boolean syncmaticaProtocol = false;
@@ -41,10 +40,12 @@ index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..9929eb8b0f1443e6d136d7d97c1fab2d
 +        }
 +    }
 +    // Horizon end - Syncmatic Protocol
++
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3e480760df9a2d9e11185c646302b30b6bcdbf15
+index 0000000000000000000000000000000000000000..b7babce93aa9fecec79c737c66db2b75327603f4
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java
 @@ -0,0 +1,384 @@
@@ -432,10 +433,9 @@ index 0000000000000000000000000000000000000000..3e480760df9a2d9e11185c646302b30b
 +        handleExchange(e);
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/Feature.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/Feature.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f4664f7313815a56e0a80bc17f48d21abdcf58ad
+index 0000000000000000000000000000000000000000..07feedcc9a63e747c67eba8db5a167f674e791e4
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/Feature.java
 @@ -0,0 +1,23 @@
@@ -462,6 +462,7 @@ index 0000000000000000000000000000000000000000..f4664f7313815a56e0a80bc17f48d21a
 +        return null;
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/FeatureSet.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/FeatureSet.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..6c06e25664afc729075618908dcc43610e36d532
@@ -798,7 +799,7 @@ index 0000000000000000000000000000000000000000..3f890be64a603e0a387c3be555894d9f
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/ServerPlacement.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/ServerPlacement.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..444a65c62e076f553a49d81b6113cc2f811a4aee
+index 0000000000000000000000000000000000000000..6b5e6da761656d1768bfc2ee9c456a18f3e936fb
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/ServerPlacement.java
 @@ -0,0 +1,166 @@
@@ -968,6 +969,7 @@ index 0000000000000000000000000000000000000000..444a65c62e076f553a49d81b6113cc2f
 +        return null;
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/ServerPosition.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/ServerPosition.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..03ed4964fa691977443414ec5b9c47074c93293d
@@ -1027,7 +1029,7 @@ index 0000000000000000000000000000000000000000..03ed4964fa691977443414ec5b9c4707
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SubRegionData.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SubRegionData.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..40cc81a1a0459f815a87e8ae5e47599059682eef
+index 0000000000000000000000000000000000000000..b77a69bf5e14887ba6714dba5f9abea001bfd12b
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SubRegionData.java
 @@ -0,0 +1,90 @@
@@ -1121,7 +1123,6 @@ index 0000000000000000000000000000000000000000..40cc81a1a0459f815a87e8ae5e475990
 +        return modificationData == null ? "[ERROR:null]" : modificationData.toString();
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SubRegionPlacementModification.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SubRegionPlacementModification.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..9c9ff91688c3daa8ed002efbf7d8e13cd9a39ed0
@@ -1195,7 +1196,7 @@ index 0000000000000000000000000000000000000000..9c9ff91688c3daa8ed002efbf7d8e13c
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticManager.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..77647e39ef6ab3a5587c73d64236ebcd0a67ce73
+index 0000000000000000000000000000000000000000..a29cac1f666b3170a65c9a96d7b2031545f84b0e
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticManager.java
 @@ -0,0 +1,108 @@
@@ -1307,7 +1308,6 @@ index 0000000000000000000000000000000000000000..77647e39ef6ab3a5587c73d64236ebcd
 +        }
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaProtocol.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..09ff3bc8cd82aa5722aca9174678a135807ad0e7
@@ -1962,7 +1962,7 @@ index 0000000000000000000000000000000000000000..e42606330f7029dbc4eaf851338fd588
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2128bf8459abc9eb9df4aa3880559115ce1e98af
+index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df8719901875a4cb
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java
 @@ -0,0 +1,65 @@
@@ -2031,19 +2031,20 @@ index 0000000000000000000000000000000000000000..2128bf8459abc9eb9df4aa3880559115
 +        getPartner().sendPacket(PacketType.REGISTER_VERSION.identifier, newBuf);
 +    }
 +}
+\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index aca3edf4fa4af87765576cfd02dc95afd115ced3..78fc60529ba2bffd7339228184d7077391128e83 100644
+index 0c3768bb183451e9dfe94bbc9b203bd79e474b99..425484e2f6f6a6c49b5ac137629903fd6e1f46fc 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -306,6 +306,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -314,6 +314,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
          Objects.requireNonNull(server);
          this.signedMessageDecoder = SignedMessageChain.Decoder.unsigned(uuid, server::enforceSecureProfile);
          this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
 +        this.exchangeTarget = new dev.horizonmc.horizon.protocol.syncmatica.exchange.ExchangeTarget(this); // Horizon - Syncmatic Protocol
      }
  
-     // CraftBukkit start - add fields
-@@ -324,6 +325,8 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+     // CraftBukkit start - add fields and methods
+@@ -332,6 +333,8 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
      private boolean justTeleported = false;
      // CraftBukkit end
  
