@@ -728,6 +728,29 @@ index 22687667ec69a954261e55e59261286ac1b8b8cd..e69de29bb2d1d6434b8b29ae775ad8c2
 -        return Timings.ofSafe(((PrimaryLevelData) worldserver.getLevelData()).getLevelName() + " - Scheduled " + timingsType);
 -    }
 -}
+diff --git a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java b/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
+index 02597f890ac7f2dc12c94c283356b8309638dd17..950f83d605b53e03b1dc8a0e24b6005eaad702ba 100644
+--- a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
++++ b/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
+@@ -1,6 +1,5 @@
+ package io.papermc.paper.command.brigadier.bukkit;
+ 
+-import co.aikar.timings.Timing;
+ import com.mojang.brigadier.arguments.StringArgumentType;
+ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+ import com.mojang.brigadier.context.CommandContext;
+@@ -73,11 +72,6 @@ public class BukkitCommandNode extends LiteralCommandNode<CommandSourceStack> {
+         public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+             CommandSender sender = context.getSource().getSender();
+ 
+-            // Plugins do weird things to workaround normal registration
+-            if (this.command.timings == null) {
+-                //this.command.timings = co.aikar.timings.TimingsManager.getCommandTiming(null, this.command); // Purpur
+-            }
+-
+             String content = context.getRange().get(context.getInput());
+             String[] args = org.apache.commons.lang3.StringUtils.split(content, ' '); // fix adjacent spaces (from console/plugins) causing empty array elements
+ 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 index 2874bc3001c4e7d9191e47ba512c5a68369c21f1..0cb47b5fee85230989293d430c02e53391e0ef67 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
