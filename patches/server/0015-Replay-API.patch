@@ -6,19 +6,19 @@ Subject: [PATCH] Replay API
 
 diff --git a/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographer.java b/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4de8345f5315e5e2330cf564b0bd5272a5cac8eb
+index 0000000000000000000000000000000000000000..f52d9c5f4d707efcd7458b4ec587b5c9f64a66d9
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographer.java
 @@ -0,0 +1,73 @@
 +package dev.horizonmc.horizon.entity;
 +
-+import dev.horizonmc.horizon.replay.ServerPhotographer;
 +import net.minecraft.server.level.ServerPlayer;
 +import org.bukkit.craftbukkit.CraftServer;
 +import org.bukkit.craftbukkit.entity.CraftPlayer;
 +import org.bukkit.entity.Player;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++import dev.horizonmc.horizon.replay.ServerPhotographer;
 +
 +import java.io.File;
 +
@@ -85,10 +85,10 @@ index 0000000000000000000000000000000000000000..4de8345f5315e5e2330cf564b0bd5272
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographerManager.java b/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographerManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8a73c01a10b513e9672f64e12ba981c64ae4d3bd
+index 0000000000000000000000000000000000000000..165d828679099a2f4e070da6cde190766572c326
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/entity/CraftPhotographerManager.java
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,83 @@
 +package dev.horizonmc.horizon.entity;
 +
 +import com.google.common.collect.Lists;
@@ -96,7 +96,6 @@ index 0000000000000000000000000000000000000000..8a73c01a10b513e9672f64e12ba981c6
 +import org.bukkit.util.Consumer;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
-+import dev.horizonmc.horizon.bot.ServerBot;
 +import dev.horizonmc.horizon.replay.BukkitRecorderOption;
 +import dev.horizonmc.horizon.replay.RecorderOption;
 +import dev.horizonmc.horizon.replay.ServerPhotographer;
@@ -256,18 +255,21 @@ index 0000000000000000000000000000000000000000..f551cfcabaa6bce88ae268700d4ed2ac
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/Recorder.java b/src/main/java/dev/horizonmc/horizon/replay/Recorder.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a403d9589c4
+index 0000000000000000000000000000000000000000..15705190ad688437e03f183d89882cc5b546c003
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/replay/Recorder.java
-@@ -0,0 +1,264 @@
+@@ -0,0 +1,289 @@
 +package dev.horizonmc.horizon.replay;
 +
++import com.mojang.serialization.DynamicOps;
 +import dev.horizonmc.horizon.HorizonLogger;
 +import io.netty.channel.local.LocalChannel;
 +import net.minecraft.SharedConstants;
 +import net.minecraft.core.LayeredRegistryAccess;
 +import net.minecraft.core.RegistryAccess;
 +import net.minecraft.core.RegistrySynchronization;
++import net.minecraft.nbt.NbtOps;
++import net.minecraft.nbt.Tag;
 +import net.minecraft.network.Connection;
 +import net.minecraft.network.ConnectionProtocol;
 +import net.minecraft.network.PacketSendListener;
@@ -275,10 +277,12 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +import net.minecraft.network.protocol.PacketFlow;
 +import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 +import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
++import net.minecraft.network.protocol.common.ClientboundResourcePackPushPacket;
 +import net.minecraft.network.protocol.common.ClientboundUpdateTagsPacket;
 +import net.minecraft.network.protocol.common.custom.BrandPayload;
 +import net.minecraft.network.protocol.configuration.ClientboundFinishConfigurationPacket;
 +import net.minecraft.network.protocol.configuration.ClientboundRegistryDataPacket;
++import net.minecraft.network.protocol.configuration.ClientboundSelectKnownPacks;
 +import net.minecraft.network.protocol.configuration.ClientboundUpdateEnabledFeaturesPacket;
 +import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 +import net.minecraft.network.protocol.game.ClientboundBundlePacket;
@@ -289,6 +293,8 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +import net.minecraft.network.protocol.login.ClientboundGameProfilePacket;
 +import net.minecraft.server.MinecraftServer;
 +import net.minecraft.server.RegistryLayer;
++import net.minecraft.server.network.config.ServerResourcePackConfigurationTask;
++import net.minecraft.server.packs.repository.KnownPack;
 +import net.minecraft.tags.TagNetworkSerialization;
 +import net.minecraft.world.entity.EntityType;
 +import net.minecraft.world.flag.FeatureFlags;
@@ -297,6 +303,9 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +
 +import java.io.File;
 +import java.io.IOException;
++import java.util.List;
++import java.util.Optional;
++import java.util.Set;
 +import java.util.concurrent.CompletableFuture;
 +import java.util.concurrent.CompletionException;
 +import java.util.concurrent.ExecutorService;
@@ -341,12 +350,12 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +
 +        metaData.singleplayer = false;
 +        metaData.serverName = recorderOption.serverName;
-+        metaData.generator = "horizon";
++        metaData.generator = "Horizon";
 +        metaData.date = startTime;
 +        metaData.mcversion = SharedConstants.getCurrentVersion().getName();
 +
 +        // TODO start event
-+        savePacket(new ClientboundGameProfilePacket(photographer.getGameProfile()), ConnectionProtocol.LOGIN);
++        savePacket(new ClientboundGameProfilePacket(photographer.getGameProfile(), true), ConnectionProtocol.LOGIN);
 +        startConfiguration();
 +
 +        if (recorderOption.forceWeather != null) {
@@ -358,12 +367,27 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +        state = ConnectionProtocol.CONFIGURATION;
 +        MinecraftServer server = MinecraftServer.getServer();
 +        savePacket(new ClientboundCustomPayloadPacket(new BrandPayload(server.getServerModName())), ConnectionProtocol.CONFIGURATION);
-+        LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = server.registries();
 +
 +        savePacket(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(server.getWorldData().enabledFeatures())), ConnectionProtocol.CONFIGURATION);
-+        savePacket(new ClientboundRegistryDataPacket((new RegistryAccess.ImmutableRegistryAccess(RegistrySynchronization.networkedRegistries(layeredregistryaccess))).freeze()), ConnectionProtocol.CONFIGURATION);
++
++        List<KnownPack> knownPackslist = server.getResourceManager().listPacks().flatMap((iresourcepack) -> iresourcepack.location().knownPackInfo().stream()).toList();
++        LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = server.registries();
++
++        savePacket(new ClientboundSelectKnownPacks(knownPackslist));
++        DynamicOps<Tag> dynamicOps = layeredregistryaccess.compositeAccess().createSerializationContext(NbtOps.INSTANCE);
++        RegistrySynchronization.packRegistries(
++                dynamicOps,
++                layeredregistryaccess.getAccessFrom(RegistryLayer.WORLDGEN),
++                Set.copyOf(knownPackslist),
++                (key, entries) -> savePacket(new ClientboundRegistryDataPacket(key, entries), ConnectionProtocol.CONFIGURATION)
++        );
 +        savePacket(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(layeredregistryaccess)), ConnectionProtocol.CONFIGURATION);
-+        savePacket(new ClientboundFinishConfigurationPacket(), ConnectionProtocol.CONFIGURATION);
++
++        server.getServerResourcePack().ifPresent((info) -> {
++            savePacket(new ClientboundResourcePackPushPacket(info.id(), info.url(), info.hash(), info.isRequired(), Optional.ofNullable(info.prompt())), ConnectionProtocol.CONFIGURATION);
++        });
++
++        savePacket(ClientboundFinishConfigurationPacket.INSTANCE, ConnectionProtocol.CONFIGURATION);
 +        state = ConnectionProtocol.PLAY;
 +    }
 +
@@ -526,7 +550,7 @@ index 0000000000000000000000000000000000000000..714a2f5a87b7d9b7f0ddae3ae1d76a40
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/RecorderOption.java b/src/main/java/dev/horizonmc/horizon/replay/RecorderOption.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..3cb2a7fd4290fe851cf7fa5d22c5d87895106149
+index 0000000000000000000000000000000000000000..42a9aacb052ecef6f6ce0f6a329fdb4b8a809511
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/replay/RecorderOption.java
 @@ -0,0 +1,57 @@
@@ -542,7 +566,7 @@ index 0000000000000000000000000000000000000000..3cb2a7fd4290fe851cf7fa5d22c5d878
 +public class RecorderOption {
 +
 +    public int recordDistance = -1;
-+    public String serverName = "Horizon";
++    public String serverName = "Leaves";
 +    public RecordWeather forceWeather = null;
 +    public int forceDayTime = -1;
 +    public boolean ignoreChat = false;
@@ -589,10 +613,10 @@ index 0000000000000000000000000000000000000000..3cb2a7fd4290fe851cf7fa5d22c5d878
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/ReplayFile.java b/src/main/java/dev/horizonmc/horizon/replay/ReplayFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca906f3d9a6
+index 0000000000000000000000000000000000000000..b8ba64622a6b8cce6bed5176b9dadfbb68ab4666
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/replay/ReplayFile.java
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,199 @@
 +package dev.horizonmc.horizon.replay;
 +
 +import com.google.gson.Gson;
@@ -603,8 +627,17 @@ index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca9
 +import net.minecraft.SharedConstants;
 +import net.minecraft.network.ConnectionProtocol;
 +import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.ProtocolInfo;
++import net.minecraft.network.RegistryFriendlyByteBuf;
++import net.minecraft.network.codec.StreamCodec;
 +import net.minecraft.network.protocol.Packet;
 +import net.minecraft.network.protocol.PacketFlow;
++import net.minecraft.network.protocol.configuration.ConfigurationProtocols;
++import net.minecraft.network.protocol.game.GameProtocols;
++import net.minecraft.network.protocol.handshake.HandshakeProtocols;
++import net.minecraft.network.protocol.login.LoginProtocols;
++import net.minecraft.network.protocol.status.StatusProtocols;
++import net.minecraft.server.MinecraftServer;
 +import org.jetbrains.annotations.NotNull;
 +
 +import java.io.BufferedOutputStream;
@@ -620,6 +653,7 @@ index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca9
 +import java.nio.charset.StandardCharsets;
 +import java.nio.file.Files;
 +import java.util.List;
++import java.util.Map;
 +import java.util.UUID;
 +import java.util.zip.CRC32;
 +import java.util.zip.ZipEntry;
@@ -642,6 +676,8 @@ index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca9
 +    private final File markerFile;
 +    private final File metaFile;
 +
++    private final Map<ConnectionProtocol, ProtocolInfo<?>> protocols;
++
 +    public ReplayFile(@NotNull File name) throws IOException {
 +        this.tmpDir = new File(name.getParentFile(), name.getName() + ".tmp");
 +        if (tmpDir.exists()) {
@@ -655,18 +691,27 @@ index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca9
 +        }
 +
 +        File packetFile = new File(tmpDir, RECORDING_FILE);
-+        metaFile = new File(tmpDir, META_FILE);
-+        markerFile = new File(tmpDir, MARKER_FILE);
++        this.metaFile = new File(tmpDir, META_FILE);
++        this.markerFile = new File(tmpDir, MARKER_FILE);
 +
-+        packetStream = new DataOutputStream(new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(packetFile)), crc32));
++        this.packetStream = new DataOutputStream(new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(packetFile)), crc32));
++
++        this.protocols = Map.of(
++                ConnectionProtocol.STATUS, StatusProtocols.CLIENTBOUND,
++                ConnectionProtocol.LOGIN, LoginProtocols.CLIENTBOUND,
++                ConnectionProtocol.CONFIGURATION, ConfigurationProtocols.CLIENTBOUND,
++                ConnectionProtocol.PLAY, GameProtocols.CLIENTBOUND.bind(RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess()))
++        );
 +    }
 +
-+    private byte @NotNull [] getPacketBytes(Packet<?> packet, ConnectionProtocol state) {
-+        int packetID = state.codec(PacketFlow.CLIENTBOUND).packetId(packet);
++    private byte @NotNull [] getPacketBytes(Packet packet, ConnectionProtocol state) { // TODO: Fix this
++        ProtocolInfo<?> protocol = this.protocols.get(state);
++        if (protocol == null) {
++            throw new IllegalArgumentException("Unknown protocol state " + state);
++        }
++
 +        ByteBuf buf = Unpooled.buffer();
-+        FriendlyByteBuf packetBuf = new FriendlyByteBuf(buf);
-+        packetBuf.writeVarInt(packetID);
-+        packet.write(packetBuf);
++        protocol.codec().encode(buf, packet);
 +
 +        buf.readerIndex(0);
 +        byte[] ret = new byte[buf.readableBytes()];
@@ -771,7 +816,6 @@ index 0000000000000000000000000000000000000000..79ade90e11f5d6a16fc52c8fd0dd5ca9
 +        return dir.delete();
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/ReplayMarker.java b/src/main/java/dev/horizonmc/horizon/replay/ReplayMarker.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..34be2e06fa39a049519209031ddacae52e0afb9a
@@ -823,27 +867,25 @@ index 0000000000000000000000000000000000000000..34be2e06fa39a049519209031ddacae5
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/ServerPhotographer.java b/src/main/java/dev/horizonmc/horizon/replay/ServerPhotographer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d82598edd069c
+index 0000000000000000000000000000000000000000..f0ce3522dac11e52d24eedfe9b6f723d8d1715cb
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/replay/ServerPhotographer.java
-@@ -0,0 +1,216 @@
+@@ -0,0 +1,199 @@
 +package dev.horizonmc.horizon.replay;
 +
 +import com.mojang.authlib.GameProfile;
 +import dev.horizonmc.horizon.HorizonLogger;
-+import dev.horizonmc.horizon.bot.BotStatsCounter;
 +import dev.horizonmc.horizon.entity.CraftPhotographer;
 +import dev.horizonmc.horizon.entity.Photographer;
 +import net.minecraft.server.MinecraftServer;
 +import net.minecraft.server.level.ClientInformation;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.server.level.ServerPlayer;
-+import net.minecraft.stats.ServerStatsCounter;
 +import net.minecraft.world.damagesource.DamageSource;
-+import net.minecraft.world.level.GameType;
 +import net.minecraft.world.phys.Vec3;
 +import org.bukkit.Location;
 +import org.bukkit.craftbukkit.CraftWorld;
++import org.bukkit.craftbukkit.entity.CraftPlayer;
 +import org.jetbrains.annotations.NotNull;
 +
 +import java.io.File;
@@ -852,8 +894,6 @@ index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d8259
 +import java.util.UUID;
 +import java.util.concurrent.CompletableFuture;
 +import java.util.concurrent.CopyOnWriteArrayList;
-+
-+import static dev.horizonmc.horizon.bot.ServerBot.isCreateLegal;
 +
 +public class ServerPhotographer extends ServerPlayer {
 +
@@ -865,20 +905,14 @@ index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d8259
 +    private File saveFile;
 +    private Vec3 lastPos;
 +
-+    private final ServerStatsCounter stats;
-+
 +    private ServerPhotographer(MinecraftServer server, ServerLevel world, GameProfile profile) {
 +        super(server, world, profile, ClientInformation.createDefault());
 +        this.gameMode = new ServerPhotographerGameMode(this);
 +        this.followPlayer = null;
-+        this.stats = new BotStatsCounter(server);
 +        this.lastPos = this.position();
 +    }
 +
 +    public static ServerPhotographer createPhotographer(@NotNull PhotographerCreateState state) throws IOException {
-+        if (!isCreateLegal(state.id)) {
-+            return null;
-+        }
 +
 +        MinecraftServer server = MinecraftServer.getServer();
 +
@@ -946,12 +980,6 @@ index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d8259
 +    public void setHealth(float health) {
 +    }
 +
-+    @NotNull
-+    @Override
-+    public ServerStatsCounter getStats() {
-+        return stats;
-+    }
-+
 +    public void remove(boolean async) {
 +        this.remove(async, true);
 +    }
@@ -1012,13 +1040,12 @@ index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d8259
 +    }
 +
 +    public Photographer getBukkitPlayer() {
-+        return getBukkitEntity();
++        return (Photographer) getBukkitEntity();
 +    }
 +
 +    @Override
-+    @NotNull
-+    public CraftPhotographer getBukkitEntity() {
-+        return (CraftPhotographer) super.getBukkitEntity();
++    public CraftPlayer getBukkitEntity() {
++        return super.getBukkitEntity();
 +    }
 +
 +    public static class PhotographerCreateState {
@@ -1043,7 +1070,6 @@ index 0000000000000000000000000000000000000000..ee552d0b23c6f6147fdbc043969d8259
 +        }
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/replay/ServerPhotographerGameMode.java b/src/main/java/dev/horizonmc/horizon/replay/ServerPhotographerGameMode.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..f5a0518f338b40b2d463f751959b42e1b81ecf74
@@ -1109,10 +1135,10 @@ index 0000000000000000000000000000000000000000..509e644a97a4e326cbbac08b1debd601
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
-index 8d79cfa371546996ef65f94232c1d344e7c590ec..66bba5167f102bc869f90a6032f1fdd41b611364 100644
+index 7976885b902a6ce7d80f31e49448c99452eb9765..7a7be43ae508a896b5d693daf8bc642daf919fc7 100644
 --- a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
 +++ b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
-@@ -147,6 +147,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
+@@ -146,6 +146,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
                  if (icompletionprovider instanceof CommandSourceStack commandSourceStack && commandSourceStack.getEntity() instanceof ServerPlayer sourcePlayer) {
                      collection = new java.util.ArrayList<>();
                      for (final ServerPlayer player : commandSourceStack.getServer().getPlayerList().getPlayers()) {
@@ -1121,7 +1147,7 @@ index 8d79cfa371546996ef65f94232c1d344e7c590ec..66bba5167f102bc869f90a6032f1fdd4
                              collection.add(player.getGameProfile().getName());
                          }
 diff --git a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
-index fc1bba350030c076405711716e9830f8ae7f3953..2148b0ef4a5184f86c5296d66bc1fac7e47ebacb 100644
+index fc1bba350030c076405711716e9830f8ae7f3953..86236ddb0a14184a92df7f535812859ab5c9119a 100644
 --- a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 @@ -122,6 +122,7 @@ public class EntitySelector {
@@ -1192,15 +1218,15 @@ index fc1bba350030c076405711716e9830f8ae7f3953..2148b0ef4a5184f86c5296d66bc1fac7
                          ServerPlayer entityplayer2 = (ServerPlayer) iterator.next();
  
 -                        if (predicate.test(entityplayer2) && canSee(source, entityplayer2)) { // Purpur
-+                        if (predicate.test(entityplayer2) && !(entityplayer2 instanceof dev.horizonmc.horizon.replay.ServerPhotographer)) { // Horizon - skip photographer
++                        if (predicate.test(entityplayer2) && canSee(source, entityplayer2) && !(entityplayer2 instanceof dev.horizonmc.horizon.replay.ServerPhotographer)) { // Purpur // Horizon - skip photographer
                              ((List) object).add(entityplayer2);
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index c193c62f6adde7720363ebd38bf7fc3bbd92b8e9..e08c0031ab218853f0e2dba9c9024338a52f3783 100644
+index fc2a61cf9dd1674d4c49e0c2a4c041b5bf0993e9..1db233416572d4ca12598805ac914774fbb0d231 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1645,7 +1645,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1700,7 +1700,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -1210,70 +1236,78 @@ index c193c62f6adde7720363ebd38bf7fc3bbd92b8e9..e08c0031ab218853f0e2dba9c9024338
  
          if (this.hidesOnlinePlayers()) {
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index 2a473e9f3c122ec177754cfef0f4a44d6cba55f2..e1aded8f375956bd83dd7c368275467daff76de7 100644
+index 88eaf7eecef1cad28210d23170f2c049b3833e6f..5200379556849e7ede50cfeafd79bf3723ac5f41 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-@@ -226,7 +226,7 @@ public class PlayerAdvancements {
+@@ -27,6 +27,7 @@ import java.util.Set;
+ import java.util.function.BiConsumer;
+ import javax.annotation.Nullable;
  
-     public boolean award(AdvancementHolder advancement, String criterionName) {
-         // Horizon start - bot can't get advancement
--        if (player instanceof dev.horizonmc.horizon.bot.ServerBot) {
-+        if (player instanceof dev.horizonmc.horizon.bot.ServerBot || player instanceof dev.horizonmc.horizon.replay.ServerPhotographer) { // Horizon - and photographer
++import com.sun.jna.platform.linux.Udev;
+ import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.FileUtil;
+ import net.minecraft.advancements.Advancement;
+@@ -229,6 +230,9 @@ public class PlayerAdvancements {
+         if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
          }
-         // Horizon end - bot can't get advancement
++        if (player instanceof dev.horizonmc.horizon.replay.ServerPhotographer) { // Horizon - photographer
++            return false;
++        }
+         // Horizon end - spectator don't get advancement
+         boolean flag = false;
+         AdvancementProgress advancementprogress = this.getOrStartProgress(advancement);
 diff --git a/src/main/java/net/minecraft/server/commands/OpCommand.java b/src/main/java/net/minecraft/server/commands/OpCommand.java
-index e7b444a10b244828827b3c66c53465206ea8e0ec..54365b54778c3d98e7fd5e68d40406dd8bcb9641 100644
+index e7b444a10b244828827b3c66c53465206ea8e0ec..c11a9758be8ecb6a6918dc2d398e38f9ebf0099e 100644
 --- a/src/main/java/net/minecraft/server/commands/OpCommand.java
 +++ b/src/main/java/net/minecraft/server/commands/OpCommand.java
-@@ -24,8 +24,7 @@ public class OpCommand {
-                         .suggests(
+@@ -25,7 +25,7 @@ public class OpCommand {
                              (context, builder) -> {
                                  PlayerList playerList = context.getSource().getServer().getPlayerList();
--                                return SharedSuggestionProvider.suggest(
+                                 return SharedSuggestionProvider.suggest(
 -                                    playerList.getPlayers()
-+                                return SharedSuggestionProvider.suggest(playerList.realPlayers
++                                        playerList.realPlayers // Horizon - only real player
                                          .stream()
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
-diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 47c20035d86760d756f56bef0aa307df36cfaeb9..350e6dd283b7a77f4ea788116399496c5ccca72c 100644
---- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-+++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -298,7 +298,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
-         super(server, connection, clientData, player); // CraftBukkit
-         this.chunkSender = new PlayerChunkSender(connection.isMemoryConnection());
-         // Horizon start - fakeplayer
--        if (player instanceof dev.horizonmc.horizon.bot.ServerBot) {
-+        if (player instanceof dev.horizonmc.horizon.bot.ServerBot || player instanceof dev.horizonmc.horizon.replay.ServerPhotographer) { // Horizon - and photographer
-             connection.setListenerForce(this);
-         } else {
-             connection.setListener(this);
+diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..955e0c20b08bbde67a2343320b8092e644bbcfea 100644
+--- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
++++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
+@@ -208,7 +208,7 @@ public class ServerPlayer extends Player {
+     private static final AttributeModifier CREATIVE_ENTITY_INTERACTION_RANGE_MODIFIER = new AttributeModifier(UUID.fromString("98491ef6-97b1-4584-ae82-71a8cc85cf73"), "Creative entity interaction range modifier", 2.0D, AttributeModifier.Operation.ADD_VALUE);
+     public ServerGamePacketListenerImpl connection;
+     public final MinecraftServer server;
+-    public final ServerPlayerGameMode gameMode;
++    public ServerPlayerGameMode gameMode;
+     private final PlayerAdvancements advancements;
+     private final ServerStatsCounter stats;
+     private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2952f1dbe 100644
+index ce86e1a3d8956557475ec070b478816d227185b2..d05a34a4829ecff057b24a229fed5b5b5f23dc8d 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
-@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
+@@ -26,6 +26,7 @@ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
  
  import dev.horizonmc.horizon.HorizonConfig;
- import dev.horizonmc.horizon.bot.ServerBot;
 +import dev.horizonmc.horizon.replay.ServerPhotographer;
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -155,6 +156,7 @@ public abstract class PlayerList {
-     private boolean allowCheatsForAllPlayers;
+@@ -156,6 +157,7 @@ public abstract class PlayerList {
+     private boolean allowCommandsForAllPlayers;
      private static final boolean ALLOW_LOGOUTIVATOR = false;
      private int sendAllPlayerInfoIn;
 +    public final List<ServerPlayer> realPlayers = new java.util.concurrent.CopyOnWriteArrayList(); // Horizon - replay api
  
      // CraftBukkit start
      private CraftServer cserver;
-@@ -181,6 +183,120 @@ public abstract class PlayerList {
+@@ -182,6 +184,105 @@ public abstract class PlayerList {
      }
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
-+    // Leaves start - replay api
++    // Horizon start - replay api
 +    public void placeNewPhotographer(Connection connection, ServerPhotographer player, ServerLevel worldserver, Location location) {
 +        player.isRealPlayer = true; // Paper
 +        player.loginTime = System.currentTimeMillis(); // Paper
@@ -1287,13 +1321,13 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
 +        LevelData worlddata = worldserver1.getLevelData();
 +
 +        player.loadGameTypes(null);
-+        ServerGamePacketListenerImpl playerconnection = new ServerGamePacketListenerImpl(this.server, connection, player, CommonListenerCookie.createInitial(player.gameProfile));
++        ServerGamePacketListenerImpl playerconnection = new ServerGamePacketListenerImpl(this.server, connection, player, CommonListenerCookie.createInitial(player.gameProfile, false));
 +        GameRules gamerules = worldserver1.getGameRules();
 +        boolean flag = gamerules.getBoolean(GameRules.RULE_DO_IMMEDIATE_RESPAWN);
 +        boolean flag1 = gamerules.getBoolean(GameRules.RULE_REDUCEDDEBUGINFO);
 +        boolean flag2 = gamerules.getBoolean(GameRules.RULE_LIMITED_CRAFTING);
 +
-+        playerconnection.send(new ClientboundLoginPacket(player.getId(), worlddata.isHardcore(), this.server.levelKeys(), this.getMaxPlayers(), worldserver1.getWorld().getSendViewDistance(), worldserver1.getWorld().getSimulationDistance(), flag1, !flag, flag2, player.createCommonSpawnInfo(worldserver1))); // Paper - replace old player chunk management
++        playerconnection.send(new ClientboundLoginPacket(player.getId(), worlddata.isHardcore(), this.server.levelKeys(), this.getMaxPlayers(), worldserver1.getWorld().getSendViewDistance(), worldserver1.getWorld().getSimulationDistance(), flag1, !flag, flag2, player.createCommonSpawnInfo(worldserver1), this.server.enforceSecureProfile())); // Paper - replace old player chunk management
 +        player.getBukkitEntity().sendSupportedChannels(); // CraftBukkit
 +        playerconnection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
 +        playerconnection.send(new ClientboundPlayerAbilitiesPacket(player.getAbilities()));
@@ -1319,7 +1353,7 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
 +        player.supressTrackerForLogin = true;
 +        worldserver1.addNewPlayer(player);
 +        this.server.getCustomBossEvents().onPlayerConnect(player);
-+        mountSavedVehicle(player, worldserver1, null);
++        mountSavedVehicle(player, worldserver1, Optional.empty());
 +        CraftPlayer bukkitPlayer = player.getBukkitEntity();
 +
 +        player.containerMenu.transferTo(player.containerMenu, bukkitPlayer);
@@ -1329,23 +1363,8 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
 +
 +        dev.horizonmc.horizon.protocol.core.HorizonProtocolManager.handlePlayerJoin(player); // Horizon - protocol
 +
-+        // Horizon start - bot support
-+        if (dev.horizonmc.horizon.HorizonConfig.fakeplayerSupport) {
-+            ServerBot bot = ServerBot.getBot(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT));
-+            if (bot != null) {
-+                bot.die(bot.damageSources().fellOutOfWorld()); // Horizon - remove bot with the same name
-+                this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player);
-+                this.playersByUUID.put(player.getUUID(), player);
-+            }
-+            ServerBot.getBots().forEach(bot1 -> {
-+                bot1.sendPlayerInfo(player);
-+                bot1.sendFakeDataIfNeed(player, true);
-+            }); // Horizon - render bot
-+        }
-+        // Horizon end - bot support
-+
 +        final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.players.size() - 1);
-+        for (int i = 0; i < this.players.size(); ++i) {
++        for (int i = 0; i < this.players.size(); i++) {
 +            ServerPlayer entityplayer1 = this.players.get(i);
 +
 +            if (entityplayer1 == player || !bukkitPlayer.canSee(entityplayer1.getBukkitEntity())) {
@@ -1373,7 +1392,7 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
 +        Iterator iterator = player.getActiveEffects().iterator();
 +        while (iterator.hasNext()) {
 +            MobEffectInstance mobeffect = (MobEffectInstance) iterator.next();
-+            playerconnection.send(new ClientboundUpdateMobEffectPacket(player.getId(), mobeffect));
++            playerconnection.send(new ClientboundUpdateMobEffectPacket(player.getId(), mobeffect, false));
 +        }
 +
 +        if (player.isDeadOrDying()) {
@@ -1385,12 +1404,12 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
 +            );
 +        }
 +    }
-+    // Leaves end - replay api
++    // Horizon end - replay api
 +
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie clientData) {
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -327,6 +443,7 @@ public abstract class PlayerList {
+@@ -328,6 +429,7 @@ public abstract class PlayerList {
  
          // entityplayer.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
          this.players.add(player);
@@ -1398,7 +1417,7 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
          this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
          this.playersByUUID.put(player.getUUID(), player);
          // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(entityplayer))); // CraftBukkit - replaced with loop below
-@@ -398,6 +515,12 @@ public abstract class PlayerList {
+@@ -384,6 +486,12 @@ public abstract class PlayerList {
                  continue;
              }
  
@@ -1411,7 +1430,7 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
              onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
          }
          // Paper start - Use single player info update packet on join
-@@ -613,6 +736,43 @@ public abstract class PlayerList {
+@@ -595,6 +703,43 @@ public abstract class PlayerList {
  
      }
  
@@ -1455,7 +1474,7 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(entityplayer, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())));
-@@ -682,6 +842,7 @@ public abstract class PlayerList {
+@@ -664,6 +809,7 @@ public abstract class PlayerList {
          entityplayer.retireScheduler(); // Paper - Folia schedulers
          entityplayer.getAdvancements().stopListening();
          this.players.remove(entityplayer);
@@ -1463,36 +1482,28 @@ index 1754daa6ffd28fa257b13c3dc7cbbaab815a7ff9..53f7b294b150292734cc5810c33df5d2
          this.playersByName.remove(entityplayer.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(entityplayer);
          UUID uuid = entityplayer.getUUID();
-@@ -775,7 +936,7 @@ public abstract class PlayerList {
+@@ -758,7 +904,7 @@ public abstract class PlayerList {
              event.disallow(PlayerLoginEvent.Result.KICK_BANNED, io.papermc.paper.adventure.PaperAdventure.asAdventure(ichatmutablecomponent)); // Paper - Adventure
          } else {
              // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameprofile) ? IChatBaseComponent.translatable("multiplayer.disconnect.server_full") : null;
 -            if (this.players.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameprofile))) { // Purpur
-+            if (this.realPlayers.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameprofile))) { // Purpur // Horizon
++            if (this.realPlayers.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameprofile))) { // Purpur // Horizon - only real player
                  event.disallow(PlayerLoginEvent.Result.KICK_FULL, net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(org.spigotmc.SpigotConfig.serverFullMessage)); // Spigot // Paper - Adventure
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 7c23153814f032d1cc8f4ec1c05d8e5ea885c7d7..f2df07e4c059b3ae8389b0dc7e5cfe0493560ad8 100644
+index f7ad4478f8b0a4e166b2939ad97398a79b2345de..9d30300cb8c3ad930fede5dd2992b96b907a51a8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -15,6 +15,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
- import com.mojang.serialization.Dynamic;
- import com.mojang.serialization.Lifecycle;
- import dev.horizonmc.horizon.entity.CraftBotManager;
-+import dev.horizonmc.horizon.entity.CraftPhotographerManager;
- import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
- import java.awt.image.BufferedImage;
- import java.io.ByteArrayOutputStream;
-@@ -309,6 +310,7 @@ public final class CraftServer implements Server {
+@@ -305,6 +305,7 @@ public final class CraftServer implements Server {
+     public static Exception excessiveVelEx; // Paper - Velocity warnings
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher(); // Paper
-     private final CraftPotionBrewer potionBrewer = new CraftPotionBrewer(); // Paper - Custom Potion Mixes
-     private final CraftBotManager botManager = new CraftBotManager();
-+    private final CraftPhotographerManager photographerManager = new CraftPhotographerManager();
+     private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer; // Paper - Custom Potion Mixes
++    private final dev.horizonmc.horizon.entity.CraftPhotographerManager photographerManager = new dev.horizonmc.horizon.entity.CraftPhotographerManager(); // Horizon
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -390,7 +392,7 @@ public final class CraftServer implements Server {
+@@ -387,7 +388,7 @@ public final class CraftServer implements Server {
      public CraftServer(DedicatedServer console, PlayerList playerList) {
          this.console = console;
          this.playerList = (DedicatedPlayerList) playerList;
@@ -1501,44 +1512,47 @@ index 7c23153814f032d1cc8f4ec1c05d8e5ea885c7d7..f2df07e4c059b3ae8389b0dc7e5cfe04
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3374,4 +3376,11 @@ public final class CraftServer implements Server {
-         return botManager;
+@@ -3365,4 +3366,12 @@ public final class CraftServer implements Server {
+         return getServer().lagging;
      }
-     // Horizon end - Bot API
+     // Purpur end
 +
-+    // Leaves start - replay mod api
++    // Horizon start - replay mod api
 +    @Override
-+    public CraftPhotographerManager getPhotographerManager() {
++    public dev.horizonmc.horizon.entity.CraftPhotographerManager getPhotographerManager() {
 +        return photographerManager;
 +    }
-+    // Leaves end - replay mod api
++    // Horizon end - replay mod api
++
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 1ed49a2016ce1a2530d56017753a945725e41e6b..43b46bd8d1cfc119995db13e85d534850942e12e 100644
+index 0ed18542fd8e2a992dc56a5f421eaa840e0af193..a48a62719a18eae067a8d71125bd568798cd6520 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -11,6 +11,8 @@ import java.util.UUID;
- 
- import dev.horizonmc.horizon.bot.ServerBot;
- import dev.horizonmc.horizon.entity.CraftBot;
+@@ -8,6 +8,9 @@ import com.google.common.collect.Lists;
+ import java.util.List;
+ import java.util.Set;
+ import java.util.UUID;
++
 +import dev.horizonmc.horizon.entity.CraftPhotographer;
 +import dev.horizonmc.horizon.replay.ServerPhotographer;
  import net.minecraft.nbt.CompoundTag;
  import net.minecraft.nbt.Tag;
  import net.minecraft.network.chat.Component;
-@@ -111,6 +113,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+@@ -107,6 +110,8 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+             return new CraftHumanEntity(server, (net.minecraft.world.entity.player.Player) entity);
          }
  
-         if (entity instanceof ServerBot) { return new CraftBot(server, (ServerBot) entity); }
 +        if (entity instanceof ServerPhotographer) { return new CraftPhotographer(server, (ServerPhotographer) entity); }
- 
++
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
+             if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index fb2d05e43df3bfb72b1f6e325736dd3cbc6c3096..acba5b23e602ac7e6d3a9bc1602734acaab97bdb 100644
+index 241340a6d66f17f2a31fb03ff0dfab121b856368..1d525031c2f034fd31a7ef82db32778ab210df0f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2147,7 +2147,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2232,7 +2232,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

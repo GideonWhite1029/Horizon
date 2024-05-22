@@ -39,17 +39,16 @@ index 0000000000000000000000000000000000000000..23eacf4232ec5b13bf391274061eb302
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1bbf332d0ec975105379fd99fdb7e9f49e359c50
+index 0000000000000000000000000000000000000000..bfda133bd9883e20cf0e2f2bc6ad19ec11ab37ae
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,32 @@
 +package dev.horizonmc.horizon.entity;
 +
 +import org.bukkit.Location;
 +import org.bukkit.util.Consumer;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
-+import dev.horizonmc.horizon.entity.botaction.CustomBotAction;
 +import dev.horizonmc.horizon.replay.BukkitRecorderOption;
 +
 +import java.util.Collection;
@@ -100,50 +99,54 @@ index 0000000000000000000000000000000000000000..24da9e18835f0d214a935e6726c736dd
 +    }
 +}
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 22aacb93b550f0ee4e11692a5c2b5b246fddeadd..73f71952e79d517e7174a5ebc8066067b21a34e3 100644
+index bf161f9bb61b381a464debb8ca8e389fe294b418..bb8285e11c17c1ef0e1c8c0bfa16a5fe5a8fa679 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -16,6 +16,7 @@ import java.util.function.Consumer;
+@@ -14,6 +14,9 @@ import java.util.Set;
+ import java.util.UUID;
+ import java.util.function.Consumer;
  import java.util.logging.Logger;
- 
- import dev.horizonmc.horizon.entity.BotManager;
++
 +import dev.horizonmc.horizon.entity.PhotographerManager;
++
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2932,6 +2933,12 @@ public final class Bukkit {
+@@ -2913,6 +2916,12 @@ public final class Bukkit {
      }
-     // Horizon end - Bot API
+     // Paper end - Folia region threading API
  
-+    // Leaves start - Photographer API
++    // Horizon start - Photographer API
 +    public static @NotNull PhotographerManager getPhotographerManager() {
 +        return server.getPhotographerManager();
 +    }
-+    // Leaves end - Photographer API
++    // Horizon end - Photographer API
 +
      @NotNull
      public static Server.Spigot spigot() {
          return server.spigot();
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 76cbc574c0945e66084d0609f441597fef416998..925c878534725b7449f2f658037d3b54bf045d5a 100644
+index b536d754784230be1e20e0e10e4c4f8f34855805..230e1af5c8d7826a1185ba40620ad99ac8c4b9bf 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -16,6 +16,7 @@ import java.util.function.Consumer;
+@@ -14,6 +14,9 @@ import java.util.Set;
+ import java.util.UUID;
+ import java.util.function.Consumer;
  import java.util.logging.Logger;
- 
- import dev.horizonmc.horizon.entity.BotManager;
++
 +import dev.horizonmc.horizon.entity.PhotographerManager;
++
  import org.bukkit.Warning.WarningState;
  import org.bukkit.advancement.Advancement;
  import org.bukkit.block.data.BlockData;
-@@ -2575,6 +2576,11 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-     BotManager getBotManager();
-     // Horizon end - Bot API
+@@ -2562,6 +2565,11 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     boolean isOwnedByCurrentRegion(@NotNull Entity entity);
+     // Paper end - Folia region threading API
  
-+    // Leaves start - Photographer API
++    // Horizon start - Photographer API
 +    @NotNull
 +    PhotographerManager getPhotographerManager();
-+    // Leaves end - Photographer API
++    // Horizon end - Photographer API
 +
      // Purpur start
      /**
