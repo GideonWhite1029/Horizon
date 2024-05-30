@@ -5,19 +5,20 @@ Subject: [PATCH] Hopper Counter
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 4724c485e3769387a0517ba5c8231952e07b54b2..482b07b3bcc7d98759d9c8f5fc507005c9ae327f 100644
+index d1a756b97df31398333fc9f9ad14dac6d7841c85..3df5cef1f6067c36424b15a2b283b5b71346ea8f 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -99,4 +99,7 @@ public final class HorizonConfig {
+@@ -189,4 +189,7 @@ public final class HorizonConfig {
  
-     @GlobalConfig(name = "fast-resume", category = {"features"})
-     public static boolean fastResume = false;
-+
+     // Leaves end - modify - fakeplayer
+ 
 +    @GlobalConfig(name = "hopper-counter", category = {"utils"})
 +    public static boolean hopperCounter = false;
++
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
-index 9e2ef63c001f14b1fc281506ba3484ea96febe68..83326c0ccc7dbe9129890d26a008f715c725730b 100644
+index 79b10f05268cfc8a1f30aa3fb3fce232b6da90ae..ceb512b0a011aaea7aaa184e73e7e845bb188a93 100644
 --- a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 +++ b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 @@ -1,6 +1,7 @@
@@ -25,20 +26,13 @@ index 9e2ef63c001f14b1fc281506ba3484ea96febe68..83326c0ccc7dbe9129890d26a008f715
  
  import dev.horizonmc.horizon.commands.subcommands.ConfigCommand;
 +import dev.horizonmc.horizon.commands.subcommands.CounterCommand;
+ import dev.horizonmc.horizon.commands.subcommands.ReloadCommand;
  import io.papermc.paper.command.CommandUtil;
  import it.unimi.dsi.fastutil.Pair;
- import net.minecraft.Util;
-@@ -28,11 +29,14 @@ import static net.kyori.adventure.text.Component.text;
- import static net.kyori.adventure.text.format.NamedTextColor.RED;
- 
- public final class HorizonCommand extends Command {
-+
-+
-     static final String BASE_PERM = "bukkit.command.horizon.";
-     // subcommand label -> subcommand
-     private static final Map<String, HorizonSubcommand> SUBCOMMANDS = Util.make(() -> {
+@@ -35,6 +36,7 @@ public final class HorizonCommand extends Command {
          final Map<Set<String>, HorizonSubcommand> commands = new HashMap<>();
          commands.put(Set.of("config"), new ConfigCommand());
+         commands.put(Set.of("reload"), new ReloadCommand());
 +        commands.put(Set.of("counter"), new CounterCommand());
  
          return commands.entrySet().stream()
@@ -172,7 +166,7 @@ index 0000000000000000000000000000000000000000..f045cbccebe3c99536c0e1a6cd947775
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/util/HopperCounter.java b/src/main/java/dev/horizonmc/horizon/util/HopperCounter.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c818fa6d6b40bee456b07c38382fc239f9122434
+index 0000000000000000000000000000000000000000..2c420c430169db7838eabfa8f1746c8145233d58
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/util/HopperCounter.java
 @@ -0,0 +1,334 @@
@@ -357,7 +351,7 @@ index 0000000000000000000000000000000000000000..c818fa6d6b40bee456b07c38382fc239
 +            entry(Items.POISONOUS_POTATO, Blocks.SLIME_BLOCK),
 +            entry(Items.SPIDER_EYE, Blocks.NETHERRACK),
 +            entry(Items.GUNPOWDER, Blocks.GRAY_WOOL),
-+            entry(Items.SCUTE, Blocks.LIME_WOOL),
++            entry(Items.TURTLE_SCUTE, Blocks.LIME_WOOL),
 +            entry(Items.FEATHER, Blocks.WHITE_WOOL),
 +            entry(Items.FLINT, Blocks.BLACK_WOOL),
 +            entry(Items.LEATHER, Blocks.SPRUCE_PLANKS),
@@ -455,7 +449,7 @@ index 0000000000000000000000000000000000000000..c818fa6d6b40bee456b07c38382fc239
 +    }
 +
 +    public static List<Recipe<?>> getAllMatching(@NotNull RecipeManager manager, RecipeType<?> type, ResourceLocation output, final RegistryAccess registryAccess) {
-+        Map<ResourceLocation, RecipeHolder<?>> typeRecipes = manager.recipes.get(type);
++        Map<ResourceLocation, RecipeHolder<?>> typeRecipes = manager.byName; // Horizon - hopper counter
 +        if (typeRecipes == null) {
 +            return Collections.emptyList();
 +        }
@@ -555,37 +549,58 @@ index 0000000000000000000000000000000000000000..92e1e1f90044ea82cbeb10e2fc719c34
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/item/crafting/Ingredient.java b/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
-index e8e9a3370ba07dc0ca47c8352f6f04a449f2268f..68b93900ef72b885b49666c8397157e44e3bf50b 100644
+index 21dfb8e91c5427ac12133de2c05d923d87adf5ba..0e8fb4a0c7c95697333882ac74dbe2cac538404f 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/Ingredient.java
-@@ -30,7 +30,7 @@ import net.minecraft.world.level.ItemLike;
- public final class Ingredient implements Predicate<ItemStack> {
- 
-     public static final Ingredient EMPTY = new Ingredient(Stream.empty());
+@@ -35,7 +35,7 @@ public final class Ingredient implements Predicate<ItemStack> {
+     }, (recipeitemstack) -> {
+         return Arrays.asList(recipeitemstack.getItems());
+     });
 -    private final Ingredient.Value[] values;
 +    public final Ingredient.Value[] values; // Horizon - private -> public
      @Nullable
      public ItemStack[] itemStacks;
      @Nullable
+diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
+index a31326e24cb68472c81cd781c5e3041772712862..f0422a70ef79c837405284fd42a74af6c57959de 100644
+--- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
++++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
+@@ -45,7 +45,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final HolderLookup.Provider registries;
+     public Multimap<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.of();
+-    private Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of();
++    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of(); // Leaves - hopper counter
+     private boolean hasErrors;
+ 
+     public RecipeManager(HolderLookup.Provider registryLookup) {
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 6a5e1b4a85d4bb37a339cc7dcae309b41896364e..6d639e7dde741e3b05baf6c1f4ab27884ff4c7ec 100644
+index a605039631e47390c7263badcbdbe770fb080733..20ebf55404794ec5f972315af4523bec3c47df69 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -470,6 +470,13 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -204,7 +204,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+ 
+                 final int fullState = getFullState(blockEntity); // Paper - Perf: Optimize Hoppers
+                 if (fullState != HOPPER_EMPTY) { // Paper - Perf: Optimize Hoppers
+-                    flag = HopperBlockEntity.ejectItems(world, pos, blockEntity);
++                    flag = HopperBlockEntity.ejectItems(world, pos, blockEntity); // Horizon - hopper counter
+                 }
+ 
+                 if (fullState != HOPPER_IS_FULL || flag) { // Paper - Perf: Optimize Hoppers
+@@ -447,6 +447,12 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
      // Paper end - Perf: Optimize Hoppers
  
-     private static boolean ejectItems(Level world, BlockPos blockposition, BlockState iblockdata, Container iinventory, HopperBlockEntity hopper) { // CraftBukkit
-+        // Horizon start - hopper counter
+     private static boolean ejectItems(Level world, BlockPos pos, HopperBlockEntity blockEntity) {
 +        if (dev.horizonmc.horizon.util.HopperCounter.isEnabled()) {
-+            if (woolHopperCounter(world, blockposition, iblockdata, iinventory, hopper)) {
++            if (woolHopperCounter(world, pos, world.getBlockState(pos), (Container) blockEntity, blockEntity)) {
 +                return true;
 +            }
 +        }
-+        // Horizon end - hopper counter
-         Container iinventory1 = HopperBlockEntity.getAttachedContainer(world, blockposition, iblockdata);
++        // Leaves end - hopper counter
+         Container iinventory = HopperBlockEntity.getAttachedContainer(world, pos, blockEntity);
  
-         if (iinventory1 == null) {
-@@ -527,6 +534,23 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+         if (iinventory == null) {
+@@ -505,6 +511,23 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
      }
  
@@ -606,6 +621,6 @@ index 6a5e1b4a85d4bb37a339cc7dcae309b41896364e..6d639e7dde741e3b05baf6c1f4ab2788
 +    }
 +    // Horizon end - hopper counter
 +
-     private static IntStream getSlots(Container inventory, Direction side) {
-         return inventory instanceof WorldlyContainer ? IntStream.of(((WorldlyContainer) inventory).getSlotsForFace(side)) : IntStream.range(0, inventory.getContainerSize());
-     }
+     private static int[] getSlots(Container inventory, Direction side) {
+         if (inventory instanceof WorldlyContainer iworldinventory) {
+             return iworldinventory.getSlotsForFace(side);

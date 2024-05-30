@@ -4,18 +4,69 @@ Date: Sat, 13 Apr 2024 21:11:06 +0400
 Subject: [PATCH] Fakeplayer Support
 
 
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/Bot.java b/src/main/java/dev/horizonmc/horizon/entity/Bot.java
-new file mode 100644
-index 0000000000000000000000000000000000000000..539c04e9fa11f68d907c7644d7202339a9eaeaab
---- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/Bot.java
-@@ -0,0 +1,51 @@
-+package dev.horizonmc.horizon.entity;
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index d590b8062ad8019977c51ad613b23db5eace660b..d117923938129e618ae4672663881addbe230a45 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -2919,6 +2919,17 @@ public final class Bukkit {
+     }
+     // Paper end - Folia region threading API
+ 
++    // Leaves start - Bot API
++    /**
++     * Returns a bot manager.
++     *
++     * @return Bot Manager
++     */
++    public static @NotNull org.leavesmc.leaves.entity.BotManager getBotManager() {
++        return server.getBotManager();
++    }
++    // Leaves end - Bot API
 +
-+import dev.horizonmc.horizon.entity.botaction.HorizonBotAction;
+     @NotNull
+     public static Server.Spigot spigot() {
+         return server.spigot();
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index adf119f487f3f031461b07ca9458143b7745a77c..8c5a33e16566ea04f0d15aee5af4826662b5707e 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -61,6 +61,7 @@ import org.bukkit.util.CachedServerIcon;
+ import org.jetbrains.annotations.Contract;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.entity.BotManager;
+ 
+ /**
+  * Represents a server implementation.
+@@ -2566,6 +2567,16 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     boolean isOwnedByCurrentRegion(@NotNull Entity entity);
+     // Paper end - Folia region threading API
+ 
++    // Leaves start - Bot API
++    /**
++     * Returns a bot manager.
++     *
++     * @return Bot Manager
++     */
++    @NotNull
++    BotManager getBotManager();
++    // Leaves end - Bot API
++
+     // Purpur start
+     /**
+      * Get the name of this server
+diff --git a/src/main/java/org/leavesmc/leaves/entity/Bot.java b/src/main/java/org/leavesmc/leaves/entity/Bot.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e8f1f849357c2f065cf5f9ce7074c67e8c8e34f7
+--- /dev/null
++++ b/src/main/java/org/leavesmc/leaves/entity/Bot.java
+@@ -0,0 +1,51 @@
++package org.leavesmc.leaves.entity;
++
 +import org.bukkit.entity.Player;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.entity.botaction.LeavesBotAction;
 +
 +import java.util.UUID;
 +
@@ -59,21 +110,22 @@ index 0000000000000000000000000000000000000000..539c04e9fa11f68d907c7644d7202339
 +     * @param player player who create this action
 +     * @param args   passed action arguments
 +     */
-+    public boolean setBotAction(@NotNull HorizonBotAction action, @NotNull Player player, @NotNull String[] args);
++    public boolean setBotAction(@NotNull LeavesBotAction action, @NotNull Player player, @NotNull String[] args);
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/BotManager.java b/src/main/java/dev/horizonmc/horizon/entity/BotManager.java
+\ No newline at end of file
+diff --git a/src/main/java/org/leavesmc/leaves/entity/BotManager.java b/src/main/java/org/leavesmc/leaves/entity/BotManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..e1eceeb6d53062885993bcbc0849c46afe878d0f
+index 0000000000000000000000000000000000000000..9a9a2c2fcb62a1bf5c89ddcc5dd993d20ee3eaf6
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/BotManager.java
++++ b/src/main/java/org/leavesmc/leaves/entity/BotManager.java
 @@ -0,0 +1,107 @@
-+package dev.horizonmc.horizon.entity;
++package org.leavesmc.leaves.entity;
 +
-+import dev.horizonmc.horizon.entity.botaction.CustomBotAction;
 +import org.bukkit.Location;
 +import org.bukkit.util.Consumer;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.entity.botaction.CustomBotAction;
 +
 +import java.util.Collection;
 +import java.util.UUID;
@@ -174,18 +226,18 @@ index 0000000000000000000000000000000000000000..e1eceeb6d53062885993bcbc0849c46a
 +     */
 +    public boolean unregisterCustomBotAction(String name);
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/botaction/CustomBotAction.java b/src/main/java/dev/horizonmc/horizon/entity/botaction/CustomBotAction.java
+diff --git a/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java b/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..aadc6f81af946e58a94da59415f19c340ae60bcf
+index 0000000000000000000000000000000000000000..947c6d5d3781605d96bee4b8df64de37c7fd9468
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/botaction/CustomBotAction.java
++++ b/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java
 @@ -0,0 +1,52 @@
-+package dev.horizonmc.horizon.entity.botaction;
++package org.leavesmc.leaves.entity.botaction;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.entity.Player;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.entity.Bot;
 +
 +import java.util.List;
 +
@@ -232,18 +284,18 @@ index 0000000000000000000000000000000000000000..aadc6f81af946e58a94da59415f19c34
 +     */
 +    public int getNumber();
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/entity/botaction/HorizonBotAction.java b/src/main/java/dev/horizonmc/horizon/entity/botaction/HorizonBotAction.java
+diff --git a/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java b/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c9affd016706e645b8933291d2cf7690f8006fb3
+index 0000000000000000000000000000000000000000..b239acd298b299e338ae56aa6507570942ce44e2
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/entity/botaction/HorizonBotAction.java
++++ b/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java
 @@ -0,0 +1,32 @@
-+package dev.horizonmc.horizon.entity.botaction;
++package org.leavesmc.leaves.entity.botaction;
 +
 +/**
-+ * A Horizon bot action enum
++ * A Leaves bot action enum
 + */
-+public enum HorizonBotAction {
++public enum LeavesBotAction {
 +    ATTACK("attack"),
 +    ATTACK_SELF("attack_self"),
 +    BREAK("break"),
@@ -262,7 +314,7 @@ index 0000000000000000000000000000000000000000..c9affd016706e645b8933291d2cf7690
 +
 +    private final String name;
 +
-+    private HorizonBotAction(String name) {
++    private LeavesBotAction(String name) {
 +        this.name = name;
 +    }
 +
@@ -270,18 +322,18 @@ index 0000000000000000000000000000000000000000..c9affd016706e645b8933291d2cf7690
 +        return name;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..dc1ce98326617468f4f2b84e6ddcef51525e86af
+index 0000000000000000000000000000000000000000..91ea5540387b7d7e1be5b6368a2f02b3b784614a
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotActionEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java
 @@ -0,0 +1,49 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Cancellable;
 +import org.bukkit.event.HandlerList;
 +import org.jetbrains.annotations.NotNull;
++import org.leavesmc.leaves.entity.Bot;
 +
 +public class BotActionEvent extends BotEvent implements Cancellable {
 +    private static final HandlerList handlers = new HandlerList();
@@ -325,18 +377,18 @@ index 0000000000000000000000000000000000000000..dc1ce98326617468f4f2b84e6ddcef51
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..092794ce8bccfeddbd03768c5e7b74c98afce7ac
+index 0000000000000000000000000000000000000000..5e55759fd3d7891e8e1d5d6a306dc8144d366469
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java
 @@ -0,0 +1,49 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Cancellable;
 +import org.bukkit.event.HandlerList;
 +import org.jetbrains.annotations.NotNull;
++import org.leavesmc.leaves.entity.Bot;
 +
 +public class BotConfigModifyEvent extends BotEvent implements Cancellable {
 +    private static final HandlerList handlers = new HandlerList();
@@ -380,13 +432,13 @@ index 0000000000000000000000000000000000000000..092794ce8bccfeddbd03768c5e7b74c9
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..0610e6bff0be78102cdcbf8478a4c648b997c7c4
+index 0000000000000000000000000000000000000000..c093f68e5f1749c792255220f39bdbdffb78f0f9
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java
 @@ -0,0 +1,106 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
 +import org.bukkit.Location;
 +import org.bukkit.event.Cancellable;
@@ -492,17 +544,17 @@ index 0000000000000000000000000000000000000000..0610e6bff0be78102cdcbf8478a4c648
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cc7d29a65a0627f200e6537b058bf39afc3a7598
+index 0000000000000000000000000000000000000000..ad358081f1e1da4075243d7ca0a01c1f7b00631b
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotEvent.java
 @@ -0,0 +1,31 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.Event;
 +import org.jetbrains.annotations.NotNull;
++import org.leavesmc.leaves.entity.Bot;
 +
 +/**
 + * Represents a fakeplayer related event
@@ -529,20 +581,20 @@ index 0000000000000000000000000000000000000000..cc7d29a65a0627f200e6537b058bf39a
 +        return bot;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotInventoryOpenEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotInventoryOpenEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f358a23a070536eab6a5f453dcc6da27cdfd1cd4
+index 0000000000000000000000000000000000000000..a369b468d4793b36dd0944a1368a70e07b9fc10f
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotInventoryOpenEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotInventoryOpenEvent.java
 @@ -0,0 +1,46 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.entity.Player;
 +import org.bukkit.event.Cancellable;
 +import org.bukkit.event.HandlerList;
 +import org.jetbrains.annotations.NotNull;
 +import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.entity.Bot;
 +
 +public class BotInventoryOpenEvent extends BotEvent implements Cancellable {
 +    private static final HandlerList handlers = new HandlerList();
@@ -581,17 +633,17 @@ index 0000000000000000000000000000000000000000..f358a23a070536eab6a5f453dcc6da27
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotJoinEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotJoinEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f021c30affc63d58d2181cde078d3310f7ac24a5
+index 0000000000000000000000000000000000000000..58a8bf54aa8ee560099ba9f51d0e6b004c638fbc
 --- /dev/null
-+++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotJoinEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotJoinEvent.java
 @@ -0,0 +1,27 @@
-+package dev.horizonmc.horizon.event.bot;
++package org.leavesmc.leaves.event.bot;
 +
-+import dev.horizonmc.horizon.entity.Bot;
 +import org.bukkit.event.HandlerList;
 +import org.jetbrains.annotations.NotNull;
++import org.leavesmc.leaves.entity.Bot;
 +
 +/**
 + * Called when a fakeplayer joins a server
@@ -614,66 +666,4 @@ index 0000000000000000000000000000000000000000..f021c30affc63d58d2181cde078d3310
 +        return handlers;
 +    }
 +}
-diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 1660824df8deaa290424a33d6c3794f125d463be..22aacb93b550f0ee4e11692a5c2b5b246fddeadd 100644
---- a/src/main/java/org/bukkit/Bukkit.java
-+++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -14,6 +14,8 @@ import java.util.Set;
- import java.util.UUID;
- import java.util.function.Consumer;
- import java.util.logging.Logger;
-+
-+import dev.horizonmc.horizon.entity.BotManager;
- import org.bukkit.Warning.WarningState;
- import org.bukkit.advancement.Advancement;
- import org.bukkit.block.data.BlockData;
-@@ -2918,6 +2920,18 @@ public final class Bukkit {
-     }
-     // Paper end - Folia region threading API
- 
-+    // Horizon start - Bot API
-+
-+    /**
-+     * Returns a bot manager.
-+     *
-+     * @return Bot Manager
-+     */
-+    public static @NotNull BotManager getBotManager() {
-+        return server.getBotManager();
-+    }
-+    // Horizon end - Bot API
-+
-     @NotNull
-     public static Server.Spigot spigot() {
-         return server.spigot();
-diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index b536d754784230be1e20e0e10e4c4f8f34855805..76cbc574c0945e66084d0609f441597fef416998 100644
---- a/src/main/java/org/bukkit/Server.java
-+++ b/src/main/java/org/bukkit/Server.java
-@@ -14,6 +14,8 @@ import java.util.Set;
- import java.util.UUID;
- import java.util.function.Consumer;
- import java.util.logging.Logger;
-+
-+import dev.horizonmc.horizon.entity.BotManager;
- import org.bukkit.Warning.WarningState;
- import org.bukkit.advancement.Advancement;
- import org.bukkit.block.data.BlockData;
-@@ -2562,6 +2564,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-     boolean isOwnedByCurrentRegion(@NotNull Entity entity);
-     // Paper end - Folia region threading API
- 
-+    // Horizon start - Bot API
-+
-+    /**
-+     * Returns a bot manager.
-+     *
-+     * @return Bot Manager
-+     */
-+    @NotNull
-+    BotManager getBotManager();
-+    // Horizon end - Bot API
-+
-     // Purpur start
-     /**
-      * Get the name of this server
+\ No newline at end of file

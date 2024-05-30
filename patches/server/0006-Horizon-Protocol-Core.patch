@@ -576,10 +576,10 @@ index bc885d2cc95572ec68f1df62555fdba7998b1d93..add1addd7972e7d2c07a5f825af64039
          };
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 2f83bf79ae9f79956b6abba7a72dd726c39c71f2..3c495949c2c82d307506d2430008097ca9af48fb 100644
+index 5c16847ebbb76670e0c3c19a33ef581bf689eb4a..153550ee259e59e16f4a26b27a3d2d56d86983e9 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1838,6 +1838,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1835,6 +1835,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          //this.profiler.popPush("server gui refresh"); // Purpur
  
@@ -634,7 +634,7 @@ index 5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5..ce86e1a3d8956557475ec070b478816d
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
          ServerLevel worldserver = entityplayer.serverLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index caaf6f68e2cc7b8a6d4f47daad13ca0b8b42c962..f7ad4478f8b0a4e166b2939ad97398a79b2345de 100644
+index f65d51beb5b8d45d96073a21e2ff8a8158306944..d5c2bf709de7f8ffe950a1d56ad13deaac864cdc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -482,6 +482,7 @@ public final class CraftServer implements Server {

@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 16 Apr 2024 19:04:26 +0400
+Subject: [PATCH] Replay API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index d117923938129e618ae4672663881addbe230a45..2890ad7c25bc6934b1b6206c6332a67eb452cc9e 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -2929,6 +2929,11 @@ public final class Bukkit {
+         return server.getBotManager();
+     }
+     // Leaves end - Bot API
++    // Leaves start - Photographer API
++    public static @NotNull org.leavesmc.leaves.entity.PhotographerManager getPhotographerManager() {
++        return server.getPhotographerManager();
++    }
++    // Leaves end - Photographer API
+ 
+     @NotNull
+     public static Server.Spigot spigot() {
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 8c5a33e16566ea04f0d15aee5af4826662b5707e..c8c18f961a43d251c96706f75a5d3dd365eefc03 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -62,6 +62,7 @@ import org.jetbrains.annotations.Contract;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+ import org.leavesmc.leaves.entity.BotManager;
++import org.leavesmc.leaves.entity.PhotographerManager;
+ 
+ /**
+  * Represents a server implementation.
+@@ -2576,6 +2577,10 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     @NotNull
+     BotManager getBotManager();
+     // Leaves end - Bot API
++    // Leaves start - Photographer API
++    @NotNull
++    PhotographerManager getPhotographerManager();
++    // Leaves end - Photographer API
+ 
+     // Purpur start
+     /**
+diff --git a/src/main/java/org/leavesmc/leaves/entity/Photographer.java b/src/main/java/org/leavesmc/leaves/entity/Photographer.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..cc4226c59aa9f5942bd90e270c5bcd8b354139dd
+--- /dev/null
++++ b/src/main/java/org/leavesmc/leaves/entity/Photographer.java
+@@ -0,0 +1,27 @@
++package org.leavesmc.leaves.entity;
++
++import org.bukkit.entity.Player;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++
++import java.io.File;
++
++public interface Photographer extends Player {
++
++    @NotNull
++    public String getId();
++
++    public void setRecordFile(@NotNull File file);
++
++    public void stopRecording();
++
++    public void stopRecording(boolean async);
++
++    public void stopRecording(boolean async, boolean save);
++
++    public void pauseRecording();
++
++    public void resumeRecording();
++
++    public void setFollowPlayer(@Nullable Player player);
++}
+diff --git a/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java b/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3d7a0eae734513fc0cce5e71cde5087e0a262cab
+--- /dev/null
++++ b/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java
+@@ -0,0 +1,31 @@
++package org.leavesmc.leaves.entity;
++
++import org.bukkit.Location;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++import org.leavesmc.leaves.replay.BukkitRecorderOption;
++
++import java.util.Collection;
++import java.util.UUID;
++
++public interface PhotographerManager {
++    @Nullable
++    public Photographer getPhotographer(@NotNull UUID uuid);
++
++    @Nullable
++    public Photographer getPhotographer(@NotNull String id);
++
++    @Nullable
++    public Photographer createPhotographer(@NotNull String id, @NotNull Location location);
++
++    @Nullable
++    public Photographer createPhotographer(@NotNull String id, @NotNull Location location, @NotNull BukkitRecorderOption recorderOption);
++
++    public void removePhotographer(@NotNull String id);
++
++    public void removePhotographer(@NotNull UUID uuid);
++
++    public void removeAllPhotographers();
++
++    public Collection<Photographer> getPhotographers();
++}
+diff --git a/src/main/java/org/leavesmc/leaves/replay/BukkitRecorderOption.java b/src/main/java/org/leavesmc/leaves/replay/BukkitRecorderOption.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..85e9fe64fb53f11d5e9329679648b780ee3225ad
+--- /dev/null
++++ b/src/main/java/org/leavesmc/leaves/replay/BukkitRecorderOption.java
+@@ -0,0 +1,18 @@
++package org.leavesmc.leaves.replay;
++
++public class BukkitRecorderOption {
++
++    // public int recordDistance = -1;
++    public String serverName = "Horizon";
++    public BukkitRecordWeather forceWeather = BukkitRecordWeather.NULL;
++    public int forceDayTime = -1;
++    public boolean ignoreChat = false;
++    // public boolean ignoreItem = false;
++
++    public enum BukkitRecordWeather {
++        CLEAR,
++        RAIN,
++        THUNDER,
++        NULL
++    }
++}

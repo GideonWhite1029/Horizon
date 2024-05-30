@@ -824,7 +824,7 @@ index 8c134a642ccaf3530022f2e675a858d726e1dda4..9f78020aff6da660541253b2f056a4a3
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index eb3c74ac12d62baca283d3a57ef1d8cff4156f6d..3325d075dacb561b97d2be6e08380f4c15fe1bfb 100644
+index 00667d64aa5e45490502580760e0e8fca2063b02..d59af67ac01992b940c008b8ca4493d5c52e6928 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -844,7 +844,7 @@ index eb3c74ac12d62baca283d3a57ef1d8cff4156f6d..3325d075dacb561b97d2be6e08380f4c
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, CommandSource, AutoCloseable {
  
      private static MinecraftServer SERVER; // Paper
-@@ -978,7 +975,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -975,7 +972,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -852,7 +852,7 @@ index eb3c74ac12d62baca283d3a57ef1d8cff4156f6d..3325d075dacb561b97d2be6e08380f4c
          // Purpur start
          if (upnp) {
              if (dev.omega24.upnp4j.UPnP4J.close(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
-@@ -1587,11 +1583,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1584,11 +1580,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick
@@ -1037,7 +1037,7 @@ index 09a7b418ddf564c0be13297f7c216db2e7ae1578..1e26b1099139d76e49fce14ee72061e1
          this.scanRate = senseInterval;
          this.timeToTick = (long)RANDOM.nextInt(senseInterval);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index eda2f8cc034cf46293be1be117a60cf8b663c303..8fedfa0e2d3f32a97371c5eb5a0186127c12a565 100644
+index 487bb3e75afc5871a79506a54f0f4af806460b14..f5d496123f609111808ee1768d595d49be86f8c3 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -171,7 +171,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
@@ -1048,7 +1048,7 @@ index eda2f8cc034cf46293be1be117a60cf8b663c303..8fedfa0e2d3f32a97371c5eb5a018612
      public static BlockPos lastPhysicsProblem; // Spigot
      private org.spigotmc.TickLimiter entityLimiter;
      private org.spigotmc.TickLimiter tileLimiter;
-@@ -338,7 +337,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -329,7 +328,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              public void onBorderSetDamageSafeZOne(WorldBorder border, double safeZoneRadius) {}
          });
          // CraftBukkit end
@@ -1056,7 +1056,7 @@ index eda2f8cc034cf46293be1be117a60cf8b663c303..8fedfa0e2d3f32a97371c5eb5a018612
          this.entityLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.entityMaxTickTime);
          this.tileLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.tileMaxTickTime);
          this.chunkPacketBlockController = this.paperConfig().anticheat.antiXray.enabled ? new com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray(this, executor) : com.destroystokyo.paper.antixray.ChunkPacketBlockController.NO_OPERATION_INSTANCE; // Paper - Anti-Xray
-@@ -1345,7 +1343,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1336,7 +1334,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
          //this.timings.tileEntityTick.stopTiming(); // Spigot // Purpur
          this.tickingBlockEntities = false;
@@ -1197,7 +1197,7 @@ index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..00a74e8c33ebba7e3fc815752c64f2fd
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 3daf674f1e0de3fdd89db5536cc1e34140a5abb8..df469c4ba8e74beead5d8ce90e39524098151e50 100644
+index 777f1d11d9fb5af29ec895383902daf348eb528e..0d444be03da47b8425e201e476108fbe2853ffb5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -219,7 +219,6 @@ public final class CraftMagicNumbers implements UnsafeValues {
