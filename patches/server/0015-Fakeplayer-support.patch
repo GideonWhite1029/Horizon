@@ -286,7 +286,7 @@ index 887b1666c8a0ede51d754d45c427460b1dde06df..a204d8014fbe309c786d18c67a3647f9
  
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..60c646f24b2c6690cc58c1ed7ff5a690e7c0f10d 100644
+index 4a29e90ff2a0fe9c5be094400d79ab89e61c437d..eff88cb7af3d93dbedd1b24fcc7da6f37498bbe6 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -163,6 +163,7 @@ import net.minecraft.world.phys.Vec3;
@@ -306,7 +306,7 @@ index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..60c646f24b2c6690cc58c1ed7ff5a690
      private final PlayerAdvancements advancements;
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
-@@ -789,16 +790,20 @@ public class ServerPlayer extends Player {
+@@ -790,16 +791,20 @@ public class ServerPlayer extends Player {
              --this.invulnerableTime;
          }
  
@@ -336,7 +336,7 @@ index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..60c646f24b2c6690cc58c1ed7ff5a690
  
          Entity entity = this.getCamera();
  
-@@ -814,7 +819,7 @@ public class ServerPlayer extends Player {
+@@ -815,7 +820,7 @@ public class ServerPlayer extends Player {
              }
          }
  
@@ -345,7 +345,7 @@ index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..60c646f24b2c6690cc58c1ed7ff5a690
          if (this.levitationStartPos != null) {
              CriteriaTriggers.LEVITATION.trigger(this, this.levitationStartPos, this.tickCount - this.levitationStartTime);
          }
-@@ -1043,7 +1048,7 @@ public class ServerPlayer extends Player {
+@@ -1044,7 +1049,7 @@ public class ServerPlayer extends Player {
          List<DefaultDrop> loot = new java.util.ArrayList<>(this.getInventory().getContainerSize()); // Paper - Restore vanilla drops behavior
          boolean keepInventory = this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
  
@@ -354,7 +354,7 @@ index a7ba658a4dc6eeb9d5bc854289c21b3bd21646b1..60c646f24b2c6690cc58c1ed7ff5a690
              for (ItemStack item : this.getInventory().getContents()) {
                  if (!item.isEmpty() && !EnchantmentHelper.hasVanishingCurse(item)) {
                      loot.add(new DefaultDrop(item, stack -> this.drop(stack, true, false, false))); // Paper - Restore vanilla drops behavior; drop function taken from Inventory#dropAll (don't fire drop event)
-@@ -1380,6 +1385,13 @@ public class ServerPlayer extends Player {
+@@ -1381,6 +1386,13 @@ public class ServerPlayer extends Player {
                  this.lastSentHealth = -1.0F;
                  this.lastSentFood = -1;
  
@@ -452,10 +452,10 @@ index ce86e1a3d8956557475ec070b478816d227185b2..5fc01661c3f0c67ad64b864765c217fd
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 60a01c824246020b7968b4932783b1ca429cd658..e8c10fd89e0466ba32914851b3ca05d10e1df126 100644
+index 2c16c01d3149863286cabf0b904261c2a389f1d8..38b3f6fad1b59b78a99458e546bc5cf33a0f743a 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1532,7 +1532,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1531,7 +1531,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return offsetFactor;
      }
  
@@ -465,7 +465,7 @@ index 60a01c824246020b7968b4932783b1ca429cd658..e8c10fd89e0466ba32914851b3ca05d1
          final boolean xZero = movement.x == 0.0;
          final boolean yZero = movement.y == 0.0;
 diff --git a/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java b/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java
-index 35299affb699d745804a3b60cb78b9323f3e068e..f959f1819181b867dfabd19005e730069dffda4d 100644
+index 7dd5e0b935d98d552c916f8412569ff4aa0e9b04..79ed9104efd9695aee9f9f45d342900d88a7ef02 100644
 --- a/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java
 +++ b/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java
 @@ -62,7 +62,7 @@ public class FishingHook extends Projectile {
@@ -476,7 +476,7 @@ index 35299affb699d745804a3b60cb78b9323f3e068e..f959f1819181b867dfabd19005e73006
 +    public int nibble; // Leaves - private -> public
      public int timeUntilLured;
      public int timeUntilHooked;
-     private float fishAngle;
+     public float fishAngle;
 diff --git a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
 index f85eef14b91a0ada1f6f4b13ab3966f051ff92d3..aa9c40471853a8bfb5170219b922d7041ace8220 100644
 --- a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
@@ -530,7 +530,7 @@ index 04f67f7b43d2f461c776c76614dc3e5f060aea63..7f95dac24f73c702a87c0ecd27c9116b
                                      if (randomsource.nextInt(j) >= world.paperConfig().entities.behavior.playerInsomniaStartTicks) { // Paper - Ability to control player's insomnia and phantoms
                                          BlockPos blockposition1 = blockposition.above(20 + randomsource.nextInt(15)).east(-10 + randomsource.nextInt(21)).south(-10 + randomsource.nextInt(21));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index d5c2bf709de7f8ffe950a1d56ad13deaac864cdc..45aaca92c879debc43a3c337bb88bdb6b7e37e3b 100644
+index 947895c97a927e19fd9c46703207a70c6663b897..8e8aa436e24a0ef87dc0da5ece83fd77eb1fff97 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -305,6 +305,7 @@ public final class CraftServer implements Server {
@@ -541,7 +541,7 @@ index d5c2bf709de7f8ffe950a1d56ad13deaac864cdc..45aaca92c879debc43a3c337bb88bdb6
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -3357,4 +3358,11 @@ public final class CraftServer implements Server {
+@@ -3358,4 +3359,11 @@ public final class CraftServer implements Server {
          return getServer().lagging;
      }
      // Purpur end

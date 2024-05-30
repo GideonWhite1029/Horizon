@@ -984,7 +984,7 @@ index 8120f39a9689dae1233b243b74825e9ff110eac3..4573126b15ef802205b6af53bdaaf09e
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 8cda82b7aa3020523400676528398530c6c29b8f..f47638ab89d2cb889a275e7490221542c8f9cb2b 100644
+index 84f19e7ff17d0eb3cd4326b063015ba4c84bc9e1..f7930a199414a4674665c6f13ae01583501e9335 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -150,8 +150,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
@@ -1037,10 +1037,10 @@ index 09a7b418ddf564c0be13297f7c216db2e7ae1578..1e26b1099139d76e49fce14ee72061e1
          this.scanRate = senseInterval;
          this.timeToTick = (long)RANDOM.nextInt(senseInterval);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 487bb3e75afc5871a79506a54f0f4af806460b14..f5d496123f609111808ee1768d595d49be86f8c3 100644
+index 4beada452d014ec7dc7c167466ec2af3c5bfcd33..e47816876ef3511c59eac241cc519b191aa68619 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -171,7 +171,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -172,7 +172,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
      public final com.destroystokyo.paper.antixray.ChunkPacketBlockController chunkPacketBlockController; // Paper - Anti-Xray
      public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig; // Purpur
@@ -1048,7 +1048,7 @@ index 487bb3e75afc5871a79506a54f0f4af806460b14..f5d496123f609111808ee1768d595d49
      public static BlockPos lastPhysicsProblem; // Spigot
      private org.spigotmc.TickLimiter entityLimiter;
      private org.spigotmc.TickLimiter tileLimiter;
-@@ -329,7 +328,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -330,7 +329,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
              public void onBorderSetDamageSafeZOne(WorldBorder border, double safeZoneRadius) {}
          });
          // CraftBukkit end
@@ -1056,7 +1056,7 @@ index 487bb3e75afc5871a79506a54f0f4af806460b14..f5d496123f609111808ee1768d595d49
          this.entityLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.entityMaxTickTime);
          this.tileLimiter = new org.spigotmc.TickLimiter(this.spigotConfig.tileMaxTickTime);
          this.chunkPacketBlockController = this.paperConfig().anticheat.antiXray.enabled ? new com.destroystokyo.paper.antixray.ChunkPacketBlockControllerAntiXray(this, executor) : com.destroystokyo.paper.antixray.ChunkPacketBlockController.NO_OPERATION_INSTANCE; // Paper - Anti-Xray
-@@ -1336,7 +1334,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+@@ -1337,7 +1335,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
  
          //this.timings.tileEntityTick.stopTiming(); // Spigot // Purpur
          this.tickingBlockEntities = false;
@@ -1083,7 +1083,7 @@ index 5ae3decf100d21f7d4a471c155eaf5e00e996580..22d38bd7a8434685f2af084f1c608f48
      @Nullable
      private String descriptionId;
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
-index 8dc1436fe78759cee5247cc28e8a18999e738a1b..ce3cc2d4b8cdfae98c02e03f7290c6115b0198d7 100644
+index cd0e43f4c53a746dd6183a8406269f9b11ad3571..54657ac895fb2fa9c58910d5421f0082d140cfed 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/BlockEntity.java
 @@ -33,14 +33,9 @@ import org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry;
@@ -1197,7 +1197,7 @@ index 5835dc236b3f5291a804f7fb14a12eb466d4e0ba..00a74e8c33ebba7e3fc815752c64f2fd
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 777f1d11d9fb5af29ec895383902daf348eb528e..0d444be03da47b8425e201e476108fbe2853ffb5 100644
+index de3f413dc60ee501e540b68a7b3c1118c750ca0b..f49ffe96b529defb95274cbce9a4a27780a6a3e0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -219,7 +219,6 @@ public final class CraftMagicNumbers implements UnsafeValues {

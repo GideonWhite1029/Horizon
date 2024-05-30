@@ -1,0 +1,79 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 30 May 2024 15:51:20 +0400
+Subject: [PATCH] Virtual Thread for async scheduler
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 3df5cef1f6067c36424b15a2b283b5b71346ea8f..63e034bd6294ef75c07cfe86d92ea64c479852c9 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -192,4 +192,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "hopper-counter", category = {"utils"})
+     public static boolean hopperCounter = false;
+ 
++    @GlobalConfig(name = "use_virtual_thread_for_async_scheduler", category = {"utils"})
++    public static boolean useVirtualThreadForAsyncScheduler = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 1569ba32f78c2fb28300e5a9982eb3e64c46e09b..f75817800f401d4bcc8f7c5e8153203ba0f6d357 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -340,6 +340,8 @@ public class Main {
+                 }
+                 // Paper end - Log Java and OS versioning to help with debugging plugin issues
+ 
++                System.setProperty("org.jline.terminal.disableDeprecatedProviderWarning", "true"); // Horizon - Ignore terminal provider warning
++
+                 System.out.println("Loading libraries, please wait...");
+                 net.minecraft.server.Main.main(options);
+             } catch (Throwable t) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
+index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..f365e2d5f12b6f0f8a352a4386699ab077d7abae 100644
+--- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
++++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
+@@ -25,6 +25,7 @@ package org.bukkit.craftbukkit.scheduler;
+ 
+ import com.destroystokyo.paper.ServerSchedulerReportingWrapper;
+ import com.google.common.util.concurrent.ThreadFactoryBuilder;
++import dev.horizonmc.horizon.HorizonConfig;
+ import org.bukkit.plugin.Plugin;
+ 
+ import java.util.ArrayList;
+@@ -38,17 +39,29 @@ import java.util.concurrent.TimeUnit;
+ 
+ public class CraftAsyncScheduler extends CraftScheduler {
+ 
+-    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+-            4, Integer.MAX_VALUE,30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+-            new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").build());
++    private final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(getClass().getName()); // Leaf - Class logger
++    private final Executor executor; // Horizon - use super class
+     private final Executor management = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+             .setNameFormat("Craft Async Scheduler Management Thread").build());
+     private final List<CraftTask> temp = new ArrayList<>();
+ 
+     CraftAsyncScheduler() {
+         super(true);
+-        executor.allowCoreThreadTimeOut(true);
+-        executor.prestartAllCoreThreads();
++        // Horizon start - Ability to use Virtual Thread for async scheduler
++        if (HorizonConfig.useVirtualThreadForAsyncScheduler) {
++            executor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("Craft Scheduler Thread - ", 0).factory());
++            return;
++        }
++
++        executor = new ThreadPoolExecutor(
++                4, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
++                new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build());
++
++        var threadPoolExecutor = (ThreadPoolExecutor) executor;
++
++        threadPoolExecutor.allowCoreThreadTimeOut(true);
++        threadPoolExecutor.prestartAllCoreThreads();
++        // Horizon end - Ability to use Virtual Thread for async scheduler
+     }
+ 
+     @Override
