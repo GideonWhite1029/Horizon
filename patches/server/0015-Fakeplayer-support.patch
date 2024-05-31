@@ -213,10 +213,10 @@ index 35772110e9318df46a2729dbc0b5879b290011b7..f26989a44cdda9baabf337d573436c6c
          Set<CriterionTrigger.Listener<T>> set = (Set) playerAdvancements.criterionData.get(this); // Paper - fix AdvancementDataPlayer leak
          if (set != null && !set.isEmpty()) {
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index 71b021513f30376c7b09d83059deea89cc92385f..94a7cb5ab1c0a40cf9d4592f4bc906bb0ed67f39 100644
+index 3b66ecc4f110d0f2dc0ef6c560801296d7e0be64..affb7980c84f5ad11c64a08c5ae6749d6cc6f22d 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
-@@ -391,6 +391,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -392,6 +392,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          }
      }
  
@@ -452,7 +452,7 @@ index ce86e1a3d8956557475ec070b478816d227185b2..5fc01661c3f0c67ad64b864765c217fd
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 2c16c01d3149863286cabf0b904261c2a389f1d8..38b3f6fad1b59b78a99458e546bc5cf33a0f743a 100644
+index 9750503b9a9bdd5278697ce5e74c9ffc610d789b..4b798a7b111a714a280fb8e8dc57ba971ce1c6aa 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1531,7 +1531,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -1479,10 +1479,10 @@ index 0000000000000000000000000000000000000000..ce6f6d3e05c962871b4c1daf15db0978
 +}
 diff --git a/src/main/java/org/leavesmc/leaves/bot/ServerBot.java b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..edfaaa90b5bdc692be4cc4fd8743796f829d086f
+index 0000000000000000000000000000000000000000..8160d8fc858a4a1242bbb8f2685c807fba358f86
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
-@@ -0,0 +1,716 @@
+@@ -0,0 +1,715 @@
 +package org.leavesmc.leaves.bot;
 +
 +import com.google.common.collect.Lists;
@@ -1928,7 +1928,6 @@ index 0000000000000000000000000000000000000000..edfaaa90b5bdc692be4cc4fd8743796f
 +        return getBukkitPlayer().getLocation();
 +    }
 +
-+    @Override
 +    public void knockback(double strength, double x, double z, @Nullable Entity knockingBackEntity, EntityKnockbackEvent.@NotNull KnockbackCause cause) {
 +        strength *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
 +        if (strength > 0.0D) {
