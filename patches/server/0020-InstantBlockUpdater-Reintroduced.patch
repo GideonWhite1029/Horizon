@@ -1,0 +1,46 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 2 Jun 2024 16:34:50 +0400
+Subject: [PATCH] InstantBlockUpdater Reintroduced
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index c36b5514b0387fe50e0610125f06392fcaeb91d7..4853123f86957ca915f929662292174511e0a92e 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -198,4 +198,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "no-tnt-place-update", category = {"features"})
+     public static boolean noTNTPlaceUpdate = false;
+ 
++    @GlobalConfig(name = "instant-block-updater-reintroduced", category = {"features"})
++    public static boolean instantBlockUpdaterReintroduced = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index e47816876ef3511c59eac241cc519b191aa68619..645b602d45d9506bd6a218fec8d84ef2d0c791c0 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -73,6 +73,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
+ import net.minecraft.world.level.material.FluidState;
+ import net.minecraft.world.level.material.Fluids;
+ import net.minecraft.world.level.redstone.CollectingNeighborUpdater;
++import net.minecraft.world.level.redstone.InstantNeighborUpdater;
+ import net.minecraft.world.level.redstone.NeighborUpdater;
+ import net.minecraft.world.level.saveddata.maps.MapId;
+ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+@@ -290,7 +291,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable {
+         this.thread = Thread.currentThread();
+         this.biomeManager = new BiomeManager(this, i);
+         this.isDebug = flag1;
+-        this.neighborUpdater = new CollectingNeighborUpdater(this, j);
++        // Horizon start - instantBlockUpdaterReintroduced
++        if (dev.horizonmc.horizon.HorizonConfig.instantBlockUpdaterReintroduced) {
++            this.neighborUpdater = new InstantNeighborUpdater(this);
++        } else {
++            this.neighborUpdater = new CollectingNeighborUpdater(this, j);
++        }
++        // Horizon end - instantBlockUpdaterReintroduced
+         this.registryAccess = iregistrycustom;
+         this.damageSources = new DamageSources(iregistrycustom);
+         // CraftBukkit start

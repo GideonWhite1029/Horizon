@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 2 Jun 2024 16:40:15 +0400
+Subject: [PATCH] Redstone wire dont connect if on trapdoor
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 4853123f86957ca915f929662292174511e0a92e..77e2a44bfce4dbad192a8a1ee93520ada0607eeb 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -201,4 +201,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "instant-block-updater-reintroduced", category = {"features"})
+     public static boolean instantBlockUpdaterReintroduced = false;
+ 
++    @GlobalConfig(name = "redstone-wire-dont-connect-if-on-trapdoor", category = {"features"})
++    public static boolean redstoneDontCantOnTrapDoor = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+index c131734cad123a35456d18f8a161f77a4ac9ac99..c077482cfd06785a25279b7303cbd5210bb07a94 100644
+--- a/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/RedStoneWireBlock.java
+@@ -173,7 +173,7 @@ public class RedStoneWireBlock extends Block {
+     @Override
+     protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
+         if (direction == Direction.DOWN) {
+-            return !this.canSurviveOn(world, neighborPos, neighborState) ? Blocks.AIR.defaultBlockState() : state;
++            return dev.horizonmc.horizon.HorizonConfig.redstoneDontCantOnTrapDoor ? state : !this.canSurviveOn(world, neighborPos, neighborState) ? Blocks.AIR.defaultBlockState() : state; // Horizon - behavior to 1.19
+         } else if (direction == Direction.UP) {
+             return this.getConnectionState(world, state, pos);
+         } else {
+@@ -232,7 +232,7 @@ public class RedStoneWireBlock extends Block {
+         BlockState iblockdata = world.getBlockState(blockposition1);
+ 
+         if (flag) {
+-            boolean flag1 = iblockdata.getBlock() instanceof TrapDoorBlock || this.canSurviveOn(world, blockposition1, iblockdata);
++            boolean flag1 = (!dev.horizonmc.horizon.HorizonConfig.redstoneDontCantOnTrapDoor && iblockdata.getBlock() instanceof TrapDoorBlock) || this.canSurviveOn(world, blockposition1, iblockdata); // Horizon - behavior to 1.19
+ 
+             if (flag1 && RedStoneWireBlock.shouldConnectTo(world.getBlockState(blockposition1.above()))) {
+                 if (iblockdata.isFaceSturdy(world, blockposition1, direction.getOpposite())) {

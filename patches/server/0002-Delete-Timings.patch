@@ -729,7 +729,7 @@ index 22687667ec69a954261e55e59261286ac1b8b8cd..e69de29bb2d1d6434b8b29ae775ad8c2
 -    }
 -}
 diff --git a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java b/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
-index 02597f890ac7f2dc12c94c283356b8309638dd17..950f83d605b53e03b1dc8a0e24b6005eaad702ba 100644
+index 24121a43aeb5e9bce013f30c92dddd15f99736c6..64e192ee588d66499bb54b27644debcc710f8ea9 100644
 --- a/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
 +++ b/src/main/java/io/papermc/paper/command/brigadier/bukkit/BukkitCommandNode.java
 @@ -1,6 +1,5 @@
@@ -739,7 +739,7 @@ index 02597f890ac7f2dc12c94c283356b8309638dd17..950f83d605b53e03b1dc8a0e24b6005e
  import com.mojang.brigadier.arguments.StringArgumentType;
  import com.mojang.brigadier.builder.RequiredArgumentBuilder;
  import com.mojang.brigadier.context.CommandContext;
-@@ -73,11 +72,6 @@ public class BukkitCommandNode extends LiteralCommandNode<CommandSourceStack> {
+@@ -78,11 +77,6 @@ public class BukkitCommandNode extends LiteralCommandNode<CommandSourceStack> {
          public int run(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
              CommandSender sender = context.getSource().getSender();
  
@@ -984,7 +984,7 @@ index 8120f39a9689dae1233b243b74825e9ff110eac3..4573126b15ef802205b6af53bdaaf09e
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 84f19e7ff17d0eb3cd4326b063015ba4c84bc9e1..f7930a199414a4674665c6f13ae01583501e9335 100644
+index 74ec7345ef6a55742e05fe6e6a96eed90ab59f81..aa8d9ebd70665da99890b0019d5bc36d8cfebe55 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -150,8 +150,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;

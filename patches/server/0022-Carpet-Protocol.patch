@@ -5,38 +5,38 @@ Subject: [PATCH] Carpet Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 34843493fd67492514cff794b5fb37af3b15e011..1280c25ca97a871d0ab7b62a621cb39f93934e26 100644
+index 77e2a44bfce4dbad192a8a1ee93520ada0607eeb..b3a2272cac44f4b4645d412fd74a9f65f99427b4 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -190,4 +190,7 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "disable-packet-limit", category = {"features"})
-     public static boolean disablePacketLimit = false;
+@@ -204,4 +204,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "redstone-wire-dont-connect-if-on-trapdoor", category = {"features"})
+     public static boolean redstoneDontCantOnTrapDoor = false;
  
 +    @GlobalConfig(name = "horizon-carpet-support", category = {"protocols"})
 +    public static boolean horizonCarpetSupport = false;
 +
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/CarpetServerProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/CarpetServerProtocol.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..de42cc51ab61283b350d458610c855bbc5eb817b
+index 0000000000000000000000000000000000000000..bf1b41e3edaeddf9508bfa5a59739f33b08b107f
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/CarpetServerProtocol.java
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,119 @@
 +package dev.horizonmc.horizon.protocol;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
 +import dev.horizonmc.horizon.HorizonLogger;
++import dev.horizonmc.horizon.protocol.core.HorizonCustomPayload;
 +import dev.horizonmc.horizon.protocol.core.HorizonProtocol;
 +import dev.horizonmc.horizon.protocol.core.ProtocolHandler;
 +import dev.horizonmc.horizon.protocol.core.ProtocolUtils;
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.network.FriendlyByteBuf;
-+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 +import net.minecraft.resources.ResourceLocation;
 +import net.minecraft.server.level.ServerPlayer;
 +import org.jetbrains.annotations.Contract;
 +import org.jetbrains.annotations.NotNull;
-+
 +import java.util.HashMap;
 +import java.util.Locale;
 +import java.util.Map;
@@ -110,15 +110,22 @@ index 0000000000000000000000000000000000000000..de42cc51ab61283b350d458610c855bb
 +
 +        public void writeNBT(@NotNull CompoundTag rules) {
 +            CompoundTag rule = new CompoundTag();
++            String key = name;
++
++            while (rules.contains(key)) {
++                key = key + "2";
++            }
++
 +            rule.putString("Value", value);
 +            rule.putString("Manager", identifier);
 +            rule.putString("Rule", name);
-+            rules.put(name, rule);
++            rules.put(key, rule);
 +        }
 +    }
 +
-+    public record CarpetPayload(CompoundTag nbt) implements CustomPacketPayload {
++    public record CarpetPayload(CompoundTag nbt) implements HorizonCustomPayload<CarpetPayload> {
 +
++        @New
 +        public CarpetPayload(ResourceLocation location, FriendlyByteBuf buf) {
 +            this(buf.readNbt());
 +        }

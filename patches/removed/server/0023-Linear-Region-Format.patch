@@ -5,38 +5,37 @@ Subject: [PATCH] Linear Region Format
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 726fa49cf8c7b5c032c947bdbbe1632bfe19f8c7..aa047bff32db2b6db129b14c5433f1cde7193d51 100644
+index 1f0fd3cbd45e3d246d44f0861e6851cc30c1559b..c04bc204983c46150aa34c5294b1de00fe03fb2c 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -34,6 +34,10 @@ dependencies {
+@@ -30,6 +30,10 @@ dependencies {
      alsoShade(log4jPlugins.output)
      implementation("io.netty:netty-codec-haproxy:4.1.97.Final") // Paper - Add support for proxy protocol
      // Paper end
-+    // Horizon - Linear format
++    // Horizon start - Linear format
 +    implementation("com.github.luben:zstd-jni:1.5.5-11")
 +    implementation("org.lz4:lz4-java:1.8.0")
-+    // Horizon - Linear format
-     implementation("org.apache.logging.log4j:log4j-iostreams:2.19.0") // Paper - remove exclusion
++    // Horizon end - Linear format
+     implementation("org.apache.logging.log4j:log4j-iostreams:2.22.1") // Paper - remove exclusion
      implementation("org.ow2.asm:asm-commons:9.7")
      implementation("org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT") // Paper - config files
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..c34da598a94caae87968ecc4b596d82ff1055552 100644
+index b3a2272cac44f4b4645d412fd74a9f65f99427b4..8ad43f521c36466f0a4912560b0a8aa1759d2b62 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
- 
- import com.destroystokyo.paper.util.SneakyThrow;
- import dev.horizonmc.horizon.commands.HorizonCommand;
-+import dev.horizonmc.horizon.config.ConfigVerify;
+@@ -5,6 +5,7 @@ import dev.horizonmc.horizon.commands.HorizonCommand;
+ import dev.horizonmc.horizon.config.ConfigVerify;
  import dev.horizonmc.horizon.config.GlobalConfig;
  import dev.horizonmc.horizon.config.GlobalConfigManager;
++import dev.horizonmc.horizon.config.RemovedConfig;
  import net.minecraft.server.MinecraftServer;
-@@ -102,4 +103,57 @@ public final class HorizonConfig {
+ import org.bukkit.Bukkit;
+ import org.bukkit.command.Command;
+@@ -207,4 +208,53 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "horizon-carpet-support", category = {"protocols"})
+     public static boolean horizonCarpetSupport = false;
  
-     @GlobalConfig(name = "hopper-counter", category = {"utils"})
-     public static boolean hopperCounter = false;
-+
-+    // Horizon start - Linear region
++    // Horizon start - region
 +
 +    public static dev.horizonmc.horizon.region.RegionFileFormat regionFormatName = dev.horizonmc.horizon.region.RegionFileFormat.ANVIL;
 +    @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
@@ -84,14 +83,12 @@ index 482b07b3bcc7d98759d9c8f5fc507005c9ae327f..c34da598a94caae87968ecc4b596d82f
 +        }
 +    }
 +
-+    @GlobalConfig(name = "crash-on-broken-symlink", category = {"region", "linear"}, lock = true)
-+    public static boolean linearCrashOnBrokenSymlink = true;
-+
-+    // Horizon end - Linear region
++    // Horizon end - region
  }
+\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFile.java b/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..41a09a7b6a28f3d718d6c8c921033130ba517e5d
+index 0000000000000000000000000000000000000000..5a6c0fbbee9d4d9a783c1de4a5f73c54122fc4a0
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFile.java
 @@ -0,0 +1,44 @@
@@ -99,7 +96,7 @@ index 0000000000000000000000000000000000000000..41a09a7b6a28f3d718d6c8c921033130
 +
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.world.level.ChunkPos;
-+import net.minecraft.world.level.chunk.ChunkStatus;
++import net.minecraft.world.level.chunk.status.ChunkStatus;
 +
 +import java.io.DataInputStream;
 +import java.io.DataOutputStream;
@@ -141,47 +138,47 @@ index 0000000000000000000000000000000000000000..41a09a7b6a28f3d718d6c8c921033130
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFileFactory.java b/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFileFactory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..c7795cd0411f83e73c6fd2822ce09059f4b767e7
+index 0000000000000000000000000000000000000000..2026edc26405e59f8ba41319962a382e0e93a579
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/region/AbstractRegionFileFactory.java
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,31 @@
 +package dev.horizonmc.horizon.region;
 +
 +import net.minecraft.world.level.chunk.storage.RegionFile;
 +import net.minecraft.world.level.chunk.storage.RegionFileVersion;
++import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 +
 +import java.io.IOException;
 +import java.nio.file.Path;
 +
 +public class AbstractRegionFileFactory {
 +
-+    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, boolean dsync) throws IOException {
-+        return getAbstractRegionFile(linearCompression, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync);
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, RegionStorageInfo storageKey, Path file, Path directory, boolean dsync) throws IOException {
++        return getAbstractRegionFile(linearCompression, storageKey, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync);
 +    }
 +
-+    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, boolean dsync, boolean canRecalcHeader) throws IOException {
-+        return getAbstractRegionFile(linearCompression, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync, canRecalcHeader);
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, RegionStorageInfo storageKey, Path file, Path directory, boolean dsync, boolean canRecalcHeader) throws IOException {
++        return getAbstractRegionFile(linearCompression, storageKey, file, directory, RegionFileVersion.VERSION_DEFLATE, dsync, canRecalcHeader);
 +    }
 +
-+    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync) throws IOException {
-+        return getAbstractRegionFile(linearCompression, file, directory, outputChunkStreamVersion, dsync, false);
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, RegionStorageInfo storageKey, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync) throws IOException {
++        return getAbstractRegionFile(linearCompression, storageKey, file, directory, outputChunkStreamVersion, dsync, false);
 +    }
 +
-+    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
++    public static AbstractRegionFile getAbstractRegionFile(int linearCompression, RegionStorageInfo storageKey, Path file, Path directory, RegionFileVersion outputChunkStreamVersion, boolean dsync, boolean canRecalcHeader) throws IOException {
 +        if (file.toString().endsWith(".linear")) {
 +            return new LinearRegionFile(file, linearCompression);
 +        } else {
-+            return new RegionFile(file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
++            return new RegionFile(storageKey, file, directory, outputChunkStreamVersion, dsync, canRecalcHeader);
 +        }
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/region/LinearRegionFile.java b/src/main/java/dev/horizonmc/horizon/region/LinearRegionFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f556789ba71f1c23715db6d7dc670c79565da58e
+index 0000000000000000000000000000000000000000..2842dc4257833c74efeab68efb9ba2206896d392
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/region/LinearRegionFile.java
-@@ -0,0 +1,328 @@
+@@ -0,0 +1,330 @@
 +package dev.horizonmc.horizon.region;
 +
 +import com.github.luben.zstd.ZstdInputStream;
@@ -192,7 +189,7 @@ index 0000000000000000000000000000000000000000..f556789ba71f1c23715db6d7dc670c79
 +import net.jpountz.lz4.LZ4FastDecompressor;
 +import net.minecraft.nbt.CompoundTag;
 +import net.minecraft.world.level.ChunkPos;
-+import net.minecraft.world.level.chunk.ChunkStatus;
++import net.minecraft.world.level.chunk.status.ChunkStatus;
 +import org.slf4j.Logger;
 +
 +import javax.annotation.Nullable;
@@ -207,7 +204,7 @@ index 0000000000000000000000000000000000000000..f556789ba71f1c23715db6d7dc670c79
 +import java.util.concurrent.atomic.AtomicBoolean;
 +import java.util.concurrent.locks.ReentrantLock;
 +
-+// Powered by LinearPurpur (https://github.com/StupidCraft/LinearPurpur)
++// Powered by LinearPaper(https://github.com/StupidCraft/LinearPaper)
 +public class LinearRegionFile implements AbstractRegionFile, AutoCloseable {
 +
 +    private static final long SUPERBLOCK = -4323716122432332390L;
@@ -245,7 +242,9 @@ index 0000000000000000000000000000000000000000..f556789ba71f1c23715db6d7dc670c79
 +
 +        Arrays.fill(this.bufferUncompressedSize, 0);
 +
-+        if (!regionFile.canRead()) return;
++        if (!regionFile.canRead()) {
++            return;
++        }
 +
 +        try (FileInputStream fileStream = new FileInputStream(regionFile);
 +             DataInputStream rawDataStream = new DataInputStream(fileStream)) {
@@ -512,7 +511,7 @@ index 0000000000000000000000000000000000000000..f556789ba71f1c23715db6d7dc670c79
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/region/LinearRegionFileFlusher.java b/src/main/java/dev/horizonmc/horizon/region/LinearRegionFileFlusher.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8f2767380a18434512eed8e7d43cbec06526aabb
+index 0000000000000000000000000000000000000000..85764b1aa84f29505f4b6f1e207271b8baee2068
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/region/LinearRegionFileFlusher.java
 @@ -0,0 +1,52 @@
@@ -524,10 +523,10 @@ index 0000000000000000000000000000000000000000..8f2767380a18434512eed8e7d43cbec0
 +import java.util.concurrent.*;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.HorizonLogger;
 +import org.bukkit.Bukkit;
 +
-+
-+// Powered by LinearPurpur (https://github.com/StupidCraft/LinearPurpur)
++// Powered by LinearPaper(https://github.com/StupidCraft/LinearPaper)
 +public class LinearRegionFileFlusher {
 +    private final Queue<LinearRegionFile> savingQueue = new LinkedBlockingQueue<>();
 +    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
@@ -543,7 +542,7 @@ index 0000000000000000000000000000000000000000..8f2767380a18434512eed8e7d43cbec0
 +    );
 +
 +    public LinearRegionFileFlusher() {
-+        Bukkit.getLogger().info("Using " + HorizonConfig.getLinearFlushThreads() + " threads for linear region flushing.");
++        HorizonLogger.LOGGER.info("Using " + HorizonConfig.getLinearFlushThreads() + " threads for linear region flushing.");
 +        scheduler.scheduleAtFixedRate(this::pollAndFlush, 0L, HorizonConfig.linearFlushFrequency, TimeUnit.SECONDS);
 +    }
 +
@@ -589,7 +588,7 @@ index 0000000000000000000000000000000000000000..d233ab844ee1ad0c67b47b7dbd8ac7df
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java b/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
-index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a881b6fa1 100644
+index 2934f0cf0ef09c84739312b00186c2ef0019a165..4f6b963df63ea05c255e1d13ec0b8c7942de139c 100644
 --- a/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
 +++ b/src/main/java/io/papermc/paper/chunk/system/io/RegionFileIOThread.java
 @@ -816,7 +816,7 @@ public final class RegionFileIOThread extends PrioritisedQueueExecutorThread {
@@ -618,7 +617,7 @@ index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a
 +        public <T> T computeForRegionFile(final int chunkX, final int chunkZ, final boolean existingOnly, final Function<dev.horizonmc.horizon.region.AbstractRegionFile, T> function) { // Horizon
              final RegionFileStorage cache = this.getCache();
 -            final RegionFile regionFile;
-+            final dev.horizonmc.horizon.region.AbstractRegionFile regionFile; // Horizon
++            final dev.horizonmc.horizon.region.AbstractRegionFile regionFile; // Leaves
              synchronized (cache) {
                  try {
                      regionFile = cache.getRegionFile(new ChunkPos(chunkX, chunkZ), existingOnly, true);
@@ -627,7 +626,7 @@ index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a
              } finally {
                  if (regionFile != null) {
 -                    regionFile.fileLock.unlock();
-+                    regionFile.getFileLock().unlock(); // Horizon
++                    regionFile.getFileLock().unlock(); // Leaves
                  }
              }
          }
@@ -642,7 +641,7 @@ index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a
                  regionFile = cache.getRegionFileIfLoaded(new ChunkPos(chunkX, chunkZ));
                  if (regionFile != null) {
 -                    regionFile.fileLock.lock();
-+                    regionFile.getFileLock().lock();
++                    regionFile.getFileLock().lock(); // Horizon
                  }
              }
  
@@ -651,21 +650,21 @@ index 2934f0cf0ef09c84739312b00186c2ef0019a165..8c2fa27cf5764c9e05fb4cf847d9485a
              } finally {
                  if (regionFile != null) {
 -                    regionFile.fileLock.unlock();
-+                    regionFile.getFileLock().unlock();
++                    regionFile.getFileLock().lock(); // Horizon
                  }
              }
          }
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index d525869542025761efc781ff5b10b3275249b44c..6cfd03bfbfd9887b3cad1e457e206c1fea7ea3b5 100644
+index a204d8014fbe309c786d18c67a3647f917ec87e9..f7d1eaf2628bb42c672957153625b2ec0b688695 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -871,13 +871,12 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -889,13 +889,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public ChunkStatus getChunkStatusOnDiskIfCached(ChunkPos chunkPos) {
 -        net.minecraft.world.level.chunk.storage.RegionFile regionFile = regionFileCache.getRegionFileIfLoaded(chunkPos);
--
 +        dev.horizonmc.horizon.region.AbstractRegionFile regionFile = regionFileCache.getRegionFileIfLoaded(chunkPos); // Horizon
+ 
          return regionFile == null ? null : regionFile.getStatusIfCached(chunkPos.x, chunkPos.z);
      }
  
@@ -675,7 +674,7 @@ index d525869542025761efc781ff5b10b3275249b44c..6cfd03bfbfd9887b3cad1e457e206c1f
  
          if (regionFile == null || !regionFileCache.chunkExists(chunkPos)) {
              return null;
-@@ -895,7 +894,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -913,7 +913,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void updateChunkStatusOnDisk(ChunkPos chunkPos, @Nullable CompoundTag compound) throws IOException {
@@ -685,44 +684,32 @@ index d525869542025761efc781ff5b10b3275249b44c..6cfd03bfbfd9887b3cad1e457e206c1f
          regionFile.setStatus(chunkPos.x, chunkPos.z, ChunkSerializer.getStatus(compound));
      }
 diff --git a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 77dd632a266f4abed30b87b7909d77857c01e316..5d047a23b8c730d03222566436a986e347b846b3 100644
+index 954d468459fe167ede0e7fca5b9f99da565d59e1..5c44331b2b03f5c6409a55a0c421158d22bf09da 100644
 --- a/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
 +++ b/src/main/java/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -61,7 +61,7 @@ public class WorldUpgrader {
-     private volatile int skipped;
-     private final Reference2FloatMap<ResourceKey<Level>> progressMap = Reference2FloatMaps.synchronize(new Reference2FloatOpenHashMap());
-     private volatile Component status = Component.translatable("optimizeWorld.stage.counting");
--    public static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-+    public static Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.(linear | mca)$"); // Horizon
-     private final DimensionDataStorage overworldDataStorage;
+@@ -76,7 +76,7 @@ public class WorldUpgrader {
+     volatile int skipped;
+     final Reference2FloatMap<ResourceKey<Level>> progressMap = Reference2FloatMaps.synchronize(new Reference2FloatOpenHashMap());
+     volatile Component status = Component.translatable("optimizeWorld.stage.counting");
+-    static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
++    static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.(linear | mca)$"); // Horizon
+     final DimensionDataStorage overworldDataStorage;
  
-     public WorldUpgrader(LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, Registry<LevelStem> dimensionOptionsRegistry, boolean eraseCache) {
-@@ -241,7 +241,7 @@ public class WorldUpgrader {
-         File file = this.levelStorage.getDimensionPath(world).toFile();
-         File file1 = new File(file, "region");
-         File[] afile = file1.listFiles((file2, s) -> {
--            return s.endsWith(".mca");
-+            return s.endsWith(".mca") || s.endsWith(".linear"); // Horizon
-         });
+     public WorldUpgrader(LevelStorageSource.LevelStorageAccess session, DataFixer dataFixer, RegistryAccess dynamicRegistryManager, boolean eraseCache, boolean recreateRegionFiles) {
+@@ -406,7 +406,7 @@ public class WorldUpgrader {
  
-         if (afile == null) {
-@@ -260,7 +260,10 @@ public class WorldUpgrader {
-                     int l = Integer.parseInt(matcher.group(2)) << 5;
+         private static List<WorldUpgrader.FileToUpgrade> getAllChunkPositions(RegionStorageInfo key, Path regionDirectory) {
+             File[] afile = regionDirectory.toFile().listFiles((file, s) -> {
+-                return s.endsWith(".mca");
++                return s.endsWith(".mca") || s.endsWith(".linear"); // Horizon
+             });
  
-                     try {
--                        RegionFile regionfile = new RegionFile(file2.toPath(), file1.toPath(), true);
-+                        // Horizon start
-+                        int linearCompression = dev.horizonmc.horizon.HorizonConfig.linearCompressionLevel;
-+                        dev.horizonmc.horizon.region.AbstractRegionFile regionfile = dev.horizonmc.horizon.region.AbstractRegionFileFactory.getAbstractRegionFile(linearCompression, file2.toPath(), file1.toPath(), true);
-+                        // Horizon end
- 
-                         try {
-                             for (int i1 = 0; i1 < 32; ++i1) {
+             if (afile == null) {
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
-index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e3aec8f90 100644
+index 1362a47943cf1a51a185a15094b1f74c94bf40ef..9374832f7b84111d8ac7754727edc45444e29e75 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFile.java
-@@ -26,7 +26,7 @@ import net.minecraft.nbt.NbtIo; // Paper
+@@ -28,7 +28,7 @@ import net.minecraft.nbt.NbtIo; // Paper
  import net.minecraft.world.level.ChunkPos;
  import org.slf4j.Logger;
  
@@ -731,13 +718,13 @@ index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e
  
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final int SECTOR_BYTES = 4096;
-@@ -50,6 +50,16 @@ public class RegionFile implements AutoCloseable {
-     public final java.util.concurrent.locks.ReentrantLock fileLock = new java.util.concurrent.locks.ReentrantLock(); // Paper
-     public final Path regionFile; // Paper
+@@ -60,6 +60,16 @@ public class RegionFile implements AutoCloseable {
+         return sectors + (sign >>> 63);
+     }
  
 +    // Horizon start - Abstract getters
 +    public Path getRegionFile() {
-+        return this.regionFile;
++        return this.path;
 +    }
 +
 +    public java.util.concurrent.locks.ReentrantLock getFileLock() {
@@ -745,10 +732,10 @@ index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e
 +    }
 +    // Horizon end
 +
-     // Paper start - Attempt to recalculate regionfile header if it is corrupt
-     private static long roundToSectors(long bytes) {
-         long sectors = bytes >>> 12; // 4096 = 2^12
-@@ -128,7 +138,7 @@ public class RegionFile implements AutoCloseable {
+     private static final CompoundTag OVERSIZED_COMPOUND = new CompoundTag();
+ 
+     private CompoundTag attemptRead(long sector, int chunkDataLength, long fileLength) throws IOException {
+@@ -130,7 +140,7 @@ public class RegionFile implements AutoCloseable {
      }
  
      // note: only call for CHUNK regionfiles
@@ -757,7 +744,7 @@ index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e
          if (!this.canRecalcHeader) {
              return false;
          }
-@@ -955,10 +965,10 @@ public class RegionFile implements AutoCloseable {
+@@ -972,10 +982,10 @@ public class RegionFile implements AutoCloseable {
      private static int getChunkIndex(int x, int z) {
          return (x & 31) + (z & 31) * 32;
      }
@@ -770,8 +757,8 @@ index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e
          final int offset = getChunkIndex(x, z);
          boolean previous = this.oversized[offset] == 1;
          this.oversized[offset] = (byte) (oversized ? 1 : 0);
-@@ -997,7 +1007,7 @@ public class RegionFile implements AutoCloseable {
-         return this.regionFile.getParent().resolve(this.regionFile.getFileName().toString().replaceAll("\\.mca$", "") + "_oversized_" + x + "_" + z + ".nbt");
+@@ -1014,7 +1024,7 @@ public class RegionFile implements AutoCloseable {
+         return this.path.getParent().resolve(this.path.getFileName().toString().replaceAll("\\.mca$", "") + "_oversized_" + x + "_" + z + ".nbt");
      }
  
 -    synchronized CompoundTag getOversizedData(int x, int z) throws IOException {
@@ -780,38 +767,44 @@ index 6cf83502a954cce9c562ec036bfeddb477d38b73..e1f6a9a3f107c3eb6f61046f6435d38e
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new InflaterInputStream(Files.newInputStream(file))))) {
              return NbtIo.read((java.io.DataInput) out);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b385e18b5a 100644
+index 1090b7e36e3c1c105bc36135b82751c651f237d4..ecc6607a239543379d451a9433d2f9f11485381e 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -21,9 +21,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.level.chunk.storage;
+ 
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+ import java.io.DataInput;
+@@ -21,11 +22,15 @@ public class RegionFileStorage implements AutoCloseable {
  
      public static final String ANVIL_EXTENSION = ".mca";
      private static final int MAX_CACHE_SIZE = 256;
 -    public final Long2ObjectLinkedOpenHashMap<RegionFile> regionCache = new Long2ObjectLinkedOpenHashMap();
 +    public final Long2ObjectLinkedOpenHashMap<dev.horizonmc.horizon.region.AbstractRegionFile> regionCache = new Long2ObjectLinkedOpenHashMap(); // Horizon
+     private final RegionStorageInfo info;
      private final Path folder;
      private final boolean sync;
+     private final boolean isChunkData; // Paper
 +    // Horizon start - region format
 +    public final dev.horizonmc.horizon.region.RegionFileFormat format;
 +    public final int linearCompression;
-+    public final boolean linearCrashOnBrokenSymlink;
 +    // Horizon end
-     private final boolean isChunkData; // Paper
  
      // Paper start - cache regionfile does not exist state
-@@ -60,6 +65,11 @@ public class RegionFileStorage implements AutoCloseable {
-         this(directory, dsync, false);
-     }
-     RegionFileStorage(Path directory, boolean dsync, boolean isChunkData) {
-+        // Horizon start
-+        this.format = dev.horizonmc.horizon.HorizonConfig.regionFormatName;
-+        this.linearCompression = dev.horizonmc.horizon.HorizonConfig.linearCompressionLevel;
-+        this.linearCrashOnBrokenSymlink = dev.horizonmc.horizon.HorizonConfig.linearCrashOnBrokenSymlink;
-+        // Horizon end
-         this.isChunkData = isChunkData;
-         // Paper end - add isChunkData param
+     static final int MAX_NON_EXISTING_CACHE = 1024 * 64;
+@@ -66,13 +71,17 @@ public class RegionFileStorage implements AutoCloseable {
          this.folder = directory;
-@@ -70,7 +80,7 @@ public class RegionFileStorage implements AutoCloseable {
+         this.sync = dsync;
+         this.info = storageKey;
++        // Horizon start
++        this.format = HorizonConfig.regionFormatName;
++        this.linearCompression = HorizonConfig.linearCompressionLevel;
++        // Horizon end
+     }
+ 
+     // Paper start
      @Nullable
      public static ChunkPos getRegionFileCoordinates(Path file) {
          String fileName = file.getFileName().toString();
@@ -820,13 +813,11 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
              return null;
          }
  
-@@ -89,30 +99,50 @@ public class RegionFileStorage implements AutoCloseable {
-             return null;
-         }
-     }
--    
+@@ -94,29 +103,29 @@ public class RegionFileStorage implements AutoCloseable {
+     // Paper end
+ 
+     // Paper start
 -    public synchronized RegionFile getRegionFileIfLoaded(ChunkPos chunkcoordintpair) {
-+
 +    public synchronized dev.horizonmc.horizon.region.AbstractRegionFile getRegionFileIfLoaded(ChunkPos chunkcoordintpair) { // Horizon
          return this.regionCache.getAndMoveToFirst(ChunkPos.asLong(chunkcoordintpair.getRegionX(), chunkcoordintpair.getRegionZ()));
      }
@@ -839,26 +830,6 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
      }
  
 -    public synchronized RegionFile getRegionFile(ChunkPos chunkcoordintpair, boolean existingOnly) throws IOException { // CraftBukkit
-+    // Horizon start
-+    private void guardAgainstBrokenSymlinks(Path path) throws IOException {
-+        if (!linearCrashOnBrokenSymlink) {
-+            return;
-+        }
-+        if (this.format != dev.horizonmc.horizon.region.RegionFileFormat.LINEAR) {
-+            return;
-+        }
-+        if (!java.nio.file.Files.isSymbolicLink(path)) {
-+            return;
-+        }
-+        Path link = java.nio.file.Files.readSymbolicLink(path);
-+        if (!java.nio.file.Files.exists(link) || !java.nio.file.Files.isReadable(link)) {
-+            dev.horizonmc.horizon.HorizonLogger.LOGGER.log(java.util.logging.Level.SEVERE, "Linear region file {} is a broken symbolic link, crashing to prevent data loss", path);
-+            net.minecraft.server.MinecraftServer.getServer().halt(false);
-+            throw new IOException("Linear region file " + path + " is a broken symbolic link, crashing to prevent data loss");
-+        }
-+    }
-+
-+    // Horizon end
 +    public synchronized dev.horizonmc.horizon.region.AbstractRegionFile getRegionFile(ChunkPos chunkcoordintpair, boolean existingOnly) throws IOException { // CraftBukkit // Horizon
          return this.getRegionFile(chunkcoordintpair, existingOnly, false);
      }
@@ -878,7 +849,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
              }
              // Paper end
              return regionfile;
-@@ -123,28 +153,47 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -127,28 +136,40 @@ public class RegionFileStorage implements AutoCloseable {
              }
              // Paper end - cache regionfile does not exist state
              if (this.regionCache.size() >= io.papermc.paper.configuration.GlobalConfiguration.get().misc.regionFileCacheSize) { // Paper - Sanitise RegionFileCache and make configurable
@@ -893,36 +864,29 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
 -            if (existingOnly && !java.nio.file.Files.exists(path1)) { // Paper start - cache regionfile does not exist state
 -                this.markNonExisting(regionPos);
 -                return null; // CraftBukkit
-+            // Horizon start
++            // Horizon start - Polyglot
 +            Path path1;
 +            if (existingOnly) {
 +                Path anvil = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".mca");
 +                Path linear = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + ".linear");
-+                guardAgainstBrokenSymlinks(linear);
-+                if (java.nio.file.Files.exists(anvil)) {
-+                    path1 = anvil;
-+                } else if (java.nio.file.Files.exists(linear)) {
-+                    path1 = linear;
-+                } else {
-+                    this.markNonExisting(regionPos);
-+                    return null;
++                path1 = java.nio.file.Files.exists(linear) ? linear : java.nio.file.Files.exists(anvil) ? anvil : null;
++                if (path1 == null) {
++                    markNonExisting(regionPos);
++                    return null; // CraftBukkit
 +                }
-+                // Horizon end
              } else {
-+                // Horizon start
 +                String extension = switch (this.format) {
 +                    case LINEAR -> "linear";
 +                    default -> "mca";
 +                };
 +                path1 = path.resolve("r." + j + "." + chunkcoordintpair.getRegionZ() + "." + extension);
-+                // Horizon end
-+                guardAgainstBrokenSymlinks(path1); // Horizon - Crash on broken symlink
++                // Horizon end - Polyglot
                  this.createRegionFile(regionPos);
              }
              // Paper end - cache regionfile does not exist state
              FileUtil.createDirectoriesSafe(this.folder); // Paper - only create directory if not existing only - moved from above
--            RegionFile regionfile1 = new RegionFile(path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
-+            dev.horizonmc.horizon.region.AbstractRegionFile regionfile1 = dev.horizonmc.horizon.region.AbstractRegionFileFactory.getAbstractRegionFile(this.linearCompression, path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header // Horizon
+-            RegionFile regionfile1 = new RegionFile(this.info, path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header
++            dev.horizonmc.horizon.region.AbstractRegionFile regionfile1 = dev.horizonmc.horizon.region.AbstractRegionFileFactory.getAbstractRegionFile(this.linearCompression, this.info, path1, this.folder, this.sync, this.isChunkData); // Paper - allow for chunk regionfiles to regen header // Horizon
  
              this.regionCache.putAndMoveToFirst(i, regionfile1);
              // Paper start
@@ -933,7 +897,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
              }
              // Paper end
              return regionfile1;
-@@ -156,7 +205,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -160,7 +181,7 @@ public class RegionFileStorage implements AutoCloseable {
          org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PAPER - You may ask for help on Discord, but do not file an issue. These error messages can not be removed.");
      }
  
@@ -942,7 +906,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
                  CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -191,14 +240,14 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -195,14 +216,14 @@ public class RegionFileStorage implements AutoCloseable {
      @Nullable
      public CompoundTag read(ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
@@ -959,38 +923,37 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
          // We add the regionfile parameter to avoid the potential deadlock (on fileLock) if we went back to obtain a regionfile
          // if we decide to re-read
          // Paper end
-@@ -208,7 +257,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -212,7 +233,7 @@ public class RegionFileStorage implements AutoCloseable {
  
          // Paper start
          if (regionfile.isOversized(pos.x, pos.z)) {
--            printOversizedLog("Loading Oversized Chunk!", regionfile.regionFile, pos.x, pos.z);
+-            printOversizedLog("Loading Oversized Chunk!", regionfile.getPath(), pos.x, pos.z);
 +            printOversizedLog("Loading Oversized Chunk!", regionfile.getRegionFile(), pos.x, pos.z); // Horizon
              return readOversizedChunk(regionfile, pos);
          }
          // Paper end
-@@ -222,13 +271,12 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -226,12 +247,12 @@ public class RegionFileStorage implements AutoCloseable {
                      if (this.isChunkData) {
                          ChunkPos chunkPos = ChunkSerializer.getChunkCoordinate(nbttagcompound);
                          if (!chunkPos.equals(pos)) {
--                            net.minecraft.server.MinecraftServer.LOGGER.error("Attempting to read chunk data at " + pos + " but got chunk data for " + chunkPos + " instead! Attempting regionfile recalculation for regionfile " + regionfile.regionFile.toAbsolutePath());
+-                            net.minecraft.server.MinecraftServer.LOGGER.error("Attempting to read chunk data at " + pos + " but got chunk data for " + chunkPos + " instead! Attempting regionfile recalculation for regionfile " + regionfile.getPath().toAbsolutePath());
 +                            net.minecraft.server.MinecraftServer.LOGGER.error("Attempting to read chunk data at " + pos + " but got chunk data for " + chunkPos + " instead! Attempting regionfile recalculation for regionfile " + regionfile.getRegionFile().toAbsolutePath()); // Horizon
                              if (regionfile.recalculateHeader()) {
 -                                regionfile.fileLock.lock(); // otherwise we will unlock twice and only lock once.
 +                                regionfile.getFileLock().lock(); // otherwise we will unlock twice and only lock once. // Horizon
                                  return this.read(pos, regionfile);
                              }
--                            net.minecraft.server.MinecraftServer.LOGGER.error("Can't recalculate regionfile header, regenerating chunk " + pos + " for " + regionfile.regionFile.toAbsolutePath());
--                            return null;
-+                            net.minecraft.server.MinecraftServer.LOGGER.error("Can't recalculate regionfile header, regenerating chunk " + pos + " for " + regionfile.getRegionFile().toAbsolutePath()); // Horizon                            return null;
+-                            net.minecraft.server.MinecraftServer.LOGGER.error("Can't recalculate regionfile header, regenerating chunk " + pos + " for " + regionfile.getPath().toAbsolutePath());
++                            net.minecraft.server.MinecraftServer.LOGGER.error("Can't recalculate regionfile header, regenerating chunk " + pos + " for " + regionfile.getRegionFile().toAbsolutePath()); // Horizon
+                             return null;
                          }
                      }
-                     // Paper end - recover from corrupt regionfile header
-@@ -261,13 +309,13 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -265,13 +286,13 @@ public class RegionFileStorage implements AutoCloseable {
  
          return nbttagcompound;
          } finally { // Paper start
 -            regionfile.fileLock.unlock();
-+            regionfile.getFileLock().unlock(); // Horizon
++            regionfile.getFileLock().unlock(); // Leaves
          } // Paper end
      }
  
@@ -1001,16 +964,16 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
          if (regionfile == null) {
              return;
          }
-@@ -298,7 +346,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -302,7 +323,7 @@ public class RegionFileStorage implements AutoCloseable {
  
      protected void write(ChunkPos pos, @Nullable CompoundTag nbt) throws IOException {
          // Paper start - rewrite chunk system
 -        RegionFile regionfile = this.getRegionFile(pos, nbt == null, true); // CraftBukkit
-+        dev.horizonmc.horizon.region.AbstractRegionFile regionfile = this.getRegionFile(pos, nbt == null, true); // CraftBukkit // Paper // Paper start - rewrite chunk system // Horizon
++        dev.horizonmc.horizon.region.AbstractRegionFile regionfile = this.getRegionFile(pos, nbt == null, true); // CraftBukkit // Horizon
          if (nbt == null && regionfile == null) {
              return;
          }
-@@ -313,7 +361,33 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -317,7 +338,33 @@ public class RegionFileStorage implements AutoCloseable {
          if (nbt == null) {
              regionfile.clear(pos);
          } else {
@@ -1018,9 +981,9 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
 +            // Horizon start - auto convert anvil to linear
 +            DataOutputStream dataoutputstream;
 +
-+            if (regionfile instanceof RegionFile && dev.horizonmc.horizon.HorizonConfig.regionFormatName == dev.horizonmc.horizon.region.RegionFileFormat.LINEAR && dev.horizonmc.horizon.HorizonConfig.autoConvertAnvilToLinear) {
++            if (regionfile instanceof RegionFile && HorizonConfig.regionFormatName == dev.horizonmc.horizon.region.RegionFileFormat.LINEAR && HorizonConfig.autoConvertAnvilToLinear) {
 +                Path linearFilePath = Path.of(regionfile.getRegionFile().toString().replaceAll(".mca", ".linear"));
-+                try (dev.horizonmc.horizon.region.LinearRegionFile linearRegionFile = new dev.horizonmc.horizon.region.LinearRegionFile(linearFilePath, dev.horizonmc.horizon.HorizonConfig.linearCompressionLevel)) {
++                try (dev.horizonmc.horizon.region.LinearRegionFile linearRegionFile = new dev.horizonmc.horizon.region.LinearRegionFile(linearFilePath, HorizonConfig.linearCompressionLevel)) {
 +                    DataInputStream regionDataInputStream = regionfile.getChunkDataInputStream(pos);
 +                    if (regionDataInputStream == null) {
 +                        continue;
@@ -1045,7 +1008,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
  
              try {
                  NbtIo.write(nbt, (DataOutput) dataoutputstream);
-@@ -353,7 +427,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -357,7 +404,7 @@ public class RegionFileStorage implements AutoCloseable {
          // Paper end - Chunk save reattempt
          // Paper start - rewrite chunk system
          } finally {
@@ -1054,7 +1017,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
          }
          // Paper end - rewrite chunk system
      }
-@@ -363,7 +437,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -367,7 +414,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -1063,7 +1026,7 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
  
              try {
                  regionfile.close();
-@@ -379,7 +453,7 @@ public class RegionFileStorage implements AutoCloseable {
+@@ -383,7 +430,7 @@ public class RegionFileStorage implements AutoCloseable {
          ObjectIterator objectiterator = this.regionCache.values().iterator();
  
          while (objectiterator.hasNext()) {
@@ -1073,10 +1036,10 @@ index fe312b1aef579cb4bf81bdd967cf72ff880d7505..2ba5033f7c50934113fa9f6be60785b3
              regionfile.flush();
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-index b5222519f646b303ea7f2b914f749df815489937..a868d9a2952935f8f54df2f20cbf4cb217911109 100644
+index 226ff7c6048b510be2e71ecc5d5ff3581092aa5e..7a7ab660c5bd84165c257a60a86d68b41f23dccf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftWorld.java
-@@ -574,7 +574,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
+@@ -584,7 +584,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
                  world.getChunk(x, z); // make sure we're at ticket level 32 or lower
                  return true;
              }

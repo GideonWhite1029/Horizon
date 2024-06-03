@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sat, 1 Jun 2024 16:10:23 +0400
+Subject: [PATCH] No TNT place update
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 63e034bd6294ef75c07cfe86d92ea64c479852c9..c36b5514b0387fe50e0610125f06392fcaeb91d7 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -195,4 +195,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "use_virtual_thread_for_async_scheduler", category = {"utils"})
+     public static boolean useVirtualThreadForAsyncScheduler = false;
+ 
++    @GlobalConfig(name = "no-tnt-place-update", category = {"features"})
++    public static boolean noTNTPlaceUpdate = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/TntBlock.java b/src/main/java/net/minecraft/world/level/block/TntBlock.java
+index a5e1813ba4fee55f469d5c4884124fccecd908d2..4ec0421363fc7890e02176397fbfbefa6941d81c 100644
+--- a/src/main/java/net/minecraft/world/level/block/TntBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/TntBlock.java
+@@ -49,7 +49,7 @@ public class TntBlock extends Block {
+     @Override
+     protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+         if (!oldState.is(state.getBlock())) {
+-            if (world.hasNeighborSignal(pos) && CraftEventFactory.callTNTPrimeEvent(world, pos, PrimeCause.REDSTONE, null, null)) { // CraftBukkit - TNTPrimeEvent
++            if (!dev.horizonmc.horizon.HorizonConfig.noTNTPlaceUpdate && world.hasNeighborSignal(pos) && CraftEventFactory.callTNTPrimeEvent(world, pos, PrimeCause.REDSTONE, null, null)) { // CraftBukkit - TNTPrimeEvent // Horizon - No tnt place update
+                 // Paper start - TNTPrimeEvent
+                 org.bukkit.block.Block tntBlock = org.bukkit.craftbukkit.block.CraftBlock.at(world, pos);
+                 if (!new com.destroystokyo.paper.event.block.TNTPrimeEvent(tntBlock, com.destroystokyo.paper.event.block.TNTPrimeEvent.PrimeReason.REDSTONE, null).callEvent()) {
