@@ -40,7 +40,7 @@ index 7976885b902a6ce7d80f31e49448c99452eb9765..6bed90ec5effafbad4aaf82878fe2463
                              collection.add(player.getGameProfile().getName());
                          }
 diff --git a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
-index fc1bba350030c076405711716e9830f8ae7f3953..b49150293bfc676c4267e5cd7836f15cce5e89ef 100644
+index 2a0d54f06de7b959055459349365c85c67c11a3f..4c28daa79b50612d219df86501c0365f99408c4f 100644
 --- a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 @@ -122,6 +122,7 @@ public class EntitySelector {
@@ -696,10 +696,10 @@ index 0000000000000000000000000000000000000000..a2a9b2a2ba7416a7b359df2708196de9
 +}
 diff --git a/src/main/java/org/leavesmc/leaves/replay/Recorder.java b/src/main/java/org/leavesmc/leaves/replay/Recorder.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d681a0d5d970d7c44217d6e776084fa02f0d1962
+index 0000000000000000000000000000000000000000..75f106500a4876aaa85169a09176d4592a053f8c
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/replay/Recorder.java
-@@ -0,0 +1,289 @@
+@@ -0,0 +1,291 @@
 +package org.leavesmc.leaves.replay;
 +
 +import com.mojang.serialization.DynamicOps;
@@ -714,6 +714,7 @@ index 0000000000000000000000000000000000000000..d681a0d5d970d7c44217d6e776084fa0
 +import net.minecraft.network.Connection;
 +import net.minecraft.network.ConnectionProtocol;
 +import net.minecraft.network.PacketSendListener;
++import net.minecraft.network.protocol.BundlePacket;
 +import net.minecraft.network.protocol.Packet;
 +import net.minecraft.network.protocol.PacketFlow;
 +import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -814,7 +815,7 @@ index 0000000000000000000000000000000000000000..d681a0d5d970d7c44217d6e776084fa0
 +        List<KnownPack> knownPackslist = server.getResourceManager().listPacks().flatMap((iresourcepack) -> iresourcepack.location().knownPackInfo().stream()).toList();
 +        LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = server.registries();
 +
-+        savePacket(new ClientboundSelectKnownPacks(knownPackslist));
++        savePacket(new ClientboundSelectKnownPacks(knownPackslist), ConnectionProtocol.CONFIGURATION);
 +        DynamicOps<Tag> dynamicOps = layeredregistryaccess.compositeAccess().createSerializationContext(NbtOps.INSTANCE);
 +        RegistrySynchronization.packRegistries(
 +                dynamicOps,
@@ -878,10 +879,11 @@ index 0000000000000000000000000000000000000000..d681a0d5d970d7c44217d6e776084fa0
 +    @Override
 +    public void send(@NotNull Packet<?> packet, @Nullable PacketSendListener callbacks, boolean flush) {
 +        if (!stopped) {
-+            if (packet instanceof ClientboundBundlePacket packet1) {
++            if (packet instanceof BundlePacket<?> packet1) {
 +                packet1.subPackets().forEach(subPacket -> {
 +                    send(subPacket, null);
 +                });
++                return;
 +            }
 +
 +            if (packet instanceof ClientboundAddEntityPacket packet1) {
