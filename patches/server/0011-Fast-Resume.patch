@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 28 Mar 2024 14:45:24 +0400
 Subject: [PATCH] Fast Resume
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 07d91160b1d3a01ba63255481eb27bb2113f798d..e172ca0dcefa6df737bcd37e855076a07374ca30 100644

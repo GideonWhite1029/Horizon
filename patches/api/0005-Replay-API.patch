@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 16 Apr 2024 19:04:26 +0400
 Subject: [PATCH] Replay API
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
 index d117923938129e618ae4672663881addbe230a45..2890ad7c25bc6934b1b6206c6332a67eb452cc9e 100644

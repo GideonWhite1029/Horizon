@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 26 Mar 2024 09:57:41 +0400
 Subject: [PATCH] Horizon Protocol Core
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/core/HorizonCustomPayload.java b/src/main/java/dev/horizonmc/horizon/protocol/core/HorizonCustomPayload.java
 new file mode 100644

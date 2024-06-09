@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Fri, 29 Mar 2024 11:20:50 +0400
 Subject: [PATCH] Hopper Counter
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index d1a756b97df31398333fc9f9ad14dac6d7841c85..3df5cef1f6067c36424b15a2b283b5b71346ea8f 100644

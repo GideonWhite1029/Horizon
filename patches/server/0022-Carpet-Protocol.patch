@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 16 Apr 2024 20:39:52 +0400
 Subject: [PATCH] Carpet Protocol
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 77e2a44bfce4dbad192a8a1ee93520ada0607eeb..b3a2272cac44f4b4645d412fd74a9f65f99427b4 100644

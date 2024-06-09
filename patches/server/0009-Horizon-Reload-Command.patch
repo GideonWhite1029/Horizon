@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 30 Mar 2024 13:09:01 +0400
 Subject: [PATCH] Horizon Reload Command
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java b/src/main/java/dev/horizonmc/horizon/commands/HorizonCommand.java
 index 164e8df439afaad06d5a056e4d385471b6710382..79b10f05268cfc8a1f30aa3fb3fce232b6da90ae 100644

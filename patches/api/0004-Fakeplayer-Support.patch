@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 13 Apr 2024 21:11:06 +0400
 Subject: [PATCH] Fakeplayer Support
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
 index d590b8062ad8019977c51ad613b23db5eace660b..d117923938129e618ae4672663881addbe230a45 100644

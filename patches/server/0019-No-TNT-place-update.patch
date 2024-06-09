@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 1 Jun 2024 16:10:23 +0400
 Subject: [PATCH] No TNT place update
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 63e034bd6294ef75c07cfe86d92ea64c479852c9..c36b5514b0387fe50e0610125f06392fcaeb91d7 100644

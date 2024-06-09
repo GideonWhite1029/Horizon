@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 16 Apr 2024 19:03:37 +0400
 Subject: [PATCH] Replay API
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/util/UUIDSerializer.java b/src/main/java/dev/horizonmc/horizon/util/UUIDSerializer.java
 new file mode 100644

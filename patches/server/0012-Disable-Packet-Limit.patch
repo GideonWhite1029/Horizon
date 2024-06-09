@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 16 Apr 2024 16:08:08 +0400
 Subject: [PATCH] Disable Packet Limit
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index e172ca0dcefa6df737bcd37e855076a07374ca30..8fddce4a0d873160ede3d11563e72e7254179c40 100644

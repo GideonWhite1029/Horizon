@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 13 Apr 2024 21:10:08 +0400
 Subject: [PATCH] Fakeplayer support
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index fff45708dde3e8c3d339854061e647bf44351a9b..d1a756b97df31398333fc9f9ad14dac6d7841c85 100644

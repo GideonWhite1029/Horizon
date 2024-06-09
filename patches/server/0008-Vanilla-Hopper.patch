@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 26 Mar 2024 13:35:58 +0400
 Subject: [PATCH] Vanilla Hopper
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 6b34b88f0da416b4bfedd338a92cbc74630395c1..9ca2fbf31f686e252b06a550d0bbd5e1a07dd3d6 100644

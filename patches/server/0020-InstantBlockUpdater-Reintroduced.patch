@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 2 Jun 2024 16:34:50 +0400
 Subject: [PATCH] InstantBlockUpdater Reintroduced
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index c36b5514b0387fe50e0610125f06392fcaeb91d7..4853123f86957ca915f929662292174511e0a92e 100644

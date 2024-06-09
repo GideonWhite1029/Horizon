@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 30 May 2024 15:51:20 +0400
 Subject: [PATCH] Virtual Thread for async scheduler
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 3df5cef1f6067c36424b15a2b283b5b71346ea8f..63e034bd6294ef75c07cfe86d92ea64c479852c9 100644

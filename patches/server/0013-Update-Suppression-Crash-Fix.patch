@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 26 Mar 2024 13:23:07 +0400
 Subject: [PATCH] Update Suppression Crash Fix
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 8fddce4a0d873160ede3d11563e72e7254179c40..162ba6f3495054d88e9220fcdd30b22e34ccf41c 100644

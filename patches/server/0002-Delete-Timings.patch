@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 25 Mar 2024 09:05:52 +0400
 Subject: [PATCH] Delete Timings
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/co/aikar/timings/MinecraftTimings.java b/src/main/java/co/aikar/timings/MinecraftTimings.java
 index 4b467f1af93452d13829f756d55dee18b8889d40..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 100644

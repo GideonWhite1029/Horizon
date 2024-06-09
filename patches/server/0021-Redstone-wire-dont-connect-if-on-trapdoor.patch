@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 2 Jun 2024 16:40:15 +0400
 Subject: [PATCH] Redstone wire dont connect if on trapdoor
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 4853123f86957ca915f929662292174511e0a92e..77e2a44bfce4dbad192a8a1ee93520ada0607eeb 100644

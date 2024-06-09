@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 10 Apr 2024 19:32:45 +0400
 Subject: [PATCH] Syncmatica Protocol
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 162ba6f3495054d88e9220fcdd30b22e34ccf41c..fff45708dde3e8c3d339854061e647bf44351a9b 100644

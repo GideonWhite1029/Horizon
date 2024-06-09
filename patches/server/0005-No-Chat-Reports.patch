@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 26 Mar 2024 10:23:53 +0400
 Subject: [PATCH] No Chat Reports
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 1f2984d87abeea7645018409e530f7130eafb2e0..c3be1a5df5bae0309b9c6691670988148a43ee47 100644
