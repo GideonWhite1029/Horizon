@@ -1480,7 +1480,7 @@ index 0000000000000000000000000000000000000000..ce6f6d3e05c962871b4c1daf15db0978
 +}
 diff --git a/src/main/java/org/leavesmc/leaves/bot/ServerBot.java b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..8160d8fc858a4a1242bbb8f2685c807fba358f86
+index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c37362822a11201
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
 @@ -0,0 +1,715 @@
@@ -1494,6 +1494,7 @@ index 0000000000000000000000000000000000000000..8160d8fc858a4a1242bbb8f2685c807f
 +import com.mojang.authlib.properties.Property;
 +import dev.horizonmc.horizon.HorizonConfig;
 +import dev.horizonmc.horizon.util.MathUtils;
++import io.papermc.paper.event.entity.EntityKnockbackEvent;
 +import net.minecraft.Util;
 +import net.minecraft.core.BlockPos;
 +import net.minecraft.network.Connection;
@@ -1538,7 +1539,6 @@ index 0000000000000000000000000000000000000000..8160d8fc858a4a1242bbb8f2685c807f
 +import org.bukkit.craftbukkit.CraftWorld;
 +import org.bukkit.craftbukkit.scheduler.CraftScheduler;
 +import org.bukkit.event.entity.CreatureSpawnEvent;
-+import org.bukkit.event.entity.EntityKnockbackEvent;
 +import org.bukkit.util.Vector;
 +import org.jetbrains.annotations.NotNull;
 +import org.leavesmc.leaves.bot.agent.actions.BotAction;
@@ -1929,7 +1929,7 @@ index 0000000000000000000000000000000000000000..8160d8fc858a4a1242bbb8f2685c807f
 +        return getBukkitPlayer().getLocation();
 +    }
 +
-+    public void knockback(double strength, double x, double z, @Nullable Entity knockingBackEntity, EntityKnockbackEvent.@NotNull KnockbackCause cause) {
++    public void knockback(double strength, double x, double z, @Nullable Entity attacker, @NotNull EntityKnockbackEvent.Cause cause) {
 +        strength *= 1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
 +        if (strength > 0.0D) {
 +            this.hasImpulse = true;

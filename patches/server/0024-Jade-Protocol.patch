@@ -1,0 +1,2363 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 12 Jun 2024 16:06:46 +0400
+Subject: [PATCH] Jade Protocol
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index b8dde788f4570c6d0c97150ab4f1b1a58b9f23de..8ccc13bfcca60422b2403ab12aa528eca06d1b59 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -210,4 +210,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "appleskin-protocol", category = {"protocols"})
+     public static boolean appleskinProtocol = false;
+ 
++    @GlobalConfig(name = "jade-protocol", category = {"protocols"})
++    public static boolean jadeProtocol = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/core/ProtocolUtils.java b/src/main/java/dev/horizonmc/horizon/protocol/core/ProtocolUtils.java
+index def75ee76799958df0bb0d2478094dfba0dd9364..b1a2ac4ecfbc6e08dd2b8e546bfbfeafb317ef48 100644
+--- a/src/main/java/dev/horizonmc/horizon/protocol/core/ProtocolUtils.java
++++ b/src/main/java/dev/horizonmc/horizon/protocol/core/ProtocolUtils.java
+@@ -1,16 +1,22 @@
+ package dev.horizonmc.horizon.protocol.core;
+ 
++import io.netty.buffer.ByteBuf;
+ import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.RegistryFriendlyByteBuf;
+ import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
+ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+ import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.MinecraftServer;
+ import net.minecraft.server.level.ServerPlayer;
+ import org.jetbrains.annotations.NotNull;
+ 
+ import java.util.function.Consumer;
++import java.util.function.Function;
+ 
+ public class ProtocolUtils {
+ 
++    private static final Function<ByteBuf, RegistryFriendlyByteBuf> bufDecorator = RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess());
++
+     public static void sendEmptyPayloadPacket(ServerPlayer player, ResourceLocation id) {
+         player.connection.send(new ClientboundCustomPayloadPacket(new HorizonProtocolManager.EmptyPayload(id)));
+     }
+@@ -34,4 +40,8 @@ public class ProtocolUtils {
+     public static void sendPayloadPacket(ServerPlayer player, CustomPacketPayload payload) {
+         player.connection.send(new ClientboundCustomPayloadPacket(payload));
+     }
++
++    public static RegistryFriendlyByteBuf decorate(ByteBuf buf) {
++        return bufDecorator.apply(buf);
++    }
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a2e93032618a0338695ef20f5b1b09adaa97b7a9
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
+@@ -0,0 +1,328 @@
++package dev.horizonmc.horizon.protocol.jade;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.HorizonLogger;
++import dev.horizonmc.horizon.protocol.core.HorizonCustomPayload;
++import dev.horizonmc.horizon.protocol.core.HorizonProtocol;
++import dev.horizonmc.horizon.protocol.core.ProtocolHandler;
++import dev.horizonmc.horizon.protocol.core.ProtocolUtils;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.IServerExtensionProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.ItemStorageExtensionProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.block.*;
++import dev.horizonmc.horizon.protocol.jade.provider.entity.*;
++import dev.horizonmc.horizon.protocol.jade.provider.util.HierarchyLookup;
++import dev.horizonmc.horizon.protocol.jade.provider.util.PairHierarchyLookup;
++import dev.horizonmc.horizon.protocol.jade.provider.util.PriorityStore;
++import dev.horizonmc.horizon.protocol.jade.provider.util.WrappedHierarchyLookup;
++import io.netty.buffer.ByteBuf;
++import net.minecraft.core.BlockPos;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.RegistryFriendlyByteBuf;
++import net.minecraft.network.codec.ByteBufCodecs;
++import net.minecraft.network.codec.StreamCodec;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.util.Mth;
++import net.minecraft.world.entity.AgeableMob;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.LivingEntity;
++import net.minecraft.world.entity.animal.Animal;
++import net.minecraft.world.entity.animal.Chicken;
++import net.minecraft.world.entity.animal.allay.Allay;
++import net.minecraft.world.entity.animal.armadillo.Armadillo;
++import net.minecraft.world.entity.animal.frog.Tadpole;
++import net.minecraft.world.entity.boss.EnderDragonPart;
++import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
++import net.minecraft.world.entity.monster.ZombieVillager;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.CampfireBlock;
++import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
++import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
++import net.minecraft.world.level.block.entity.BlockEntity;
++import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
++import net.minecraft.world.level.block.entity.CalibratedSculkSensorBlockEntity;
++import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
++import net.minecraft.world.level.block.entity.CommandBlockEntity;
++import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
++import net.minecraft.world.level.block.entity.HopperBlockEntity;
++import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
++import net.minecraft.world.level.block.entity.LecternBlockEntity;
++import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.BlockHitResult;
++import net.minecraft.world.phys.Vec3;
++import org.jetbrains.annotations.Contract;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.ArrayList;
++import java.util.Comparator;
++import java.util.List;
++import java.util.function.Predicate;
++import java.util.stream.Collectors;
++
++@HorizonProtocol(namespace = "jade")
++public class JadeProtocol {
++    public static PriorityStore<ResourceLocation, IJadeProvider> priorities;
++
++    public static final String PROTOCOL_ID = "jade";
++
++    // send
++    public static final ResourceLocation PACKET_SERVER_PING = id("server_ping");
++    public static final ResourceLocation PACKET_RECEIVE_DATA = id("receive_data");
++
++    private static final HierarchyLookup<IJadeDataProvider<EntityAccessor>> entityDataProviders = new HierarchyLookup<>(Entity.class);
++    private static final PairHierarchyLookup<IJadeDataProvider<BlockAccessor>> blockDataProviders = new PairHierarchyLookup<>(new HierarchyLookup<>(Block.class), new HierarchyLookup<>(BlockEntity.class));
++
++    public static final WrappedHierarchyLookup<IServerExtensionProvider<ItemStack>> itemStorageProviders = new WrappedHierarchyLookup<>();
++
++    @Contract("_ -> new")
++    public static @NotNull ResourceLocation id(String path) {
++        return new ResourceLocation(PROTOCOL_ID, path);
++    }
++
++    @Contract("_ -> new")
++    public static @NotNull ResourceLocation mc_id(String path) {
++        return new ResourceLocation(path);
++    }
++
++    private static boolean isPrimaryKey(ResourceLocation key) {
++        return !key.getPath().contains(".");
++    }
++
++    private static ResourceLocation getPrimaryKey(ResourceLocation key) {
++        return new ResourceLocation(key.getNamespace(), key.getPath().substring(0, key.getPath().indexOf('.')));
++    }
++
++    @ProtocolHandler.Init
++    public static void init() {
++        priorities = new PriorityStore<>(IJadeProvider::getDefaultPriority, IJadeProvider::getUid);
++        priorities.setSortingFunction((store, allKeys) -> {
++            List<ResourceLocation> keys = allKeys.stream()
++                    .filter(JadeProtocol::isPrimaryKey)
++                    .sorted(Comparator.comparingInt(store::byKey))
++                    .collect(Collectors.toCollection(ArrayList::new));
++            allKeys.stream().filter(Predicate.not(JadeProtocol::isPrimaryKey)).forEach($ -> {
++                int index = keys.indexOf(JadeProtocol.getPrimaryKey($));
++                keys.add(index + 1, $);
++            });
++            return keys;
++        });
++
++        // core plugin
++        blockDataProviders.register(BlockEntity.class, ObjectNameProvider.INSTANCE);
++
++        // universal plugin
++        entityDataProviders.register(Entity.class, EntityStorageProvider.INSTANCE);
++        blockDataProviders.register(Block.class, BlockStorageProvider.INSTANCE);
++
++        itemStorageProviders.register(Object.class, ItemStorageExtensionProvider.INSTANCE);
++        itemStorageProviders.register(Block.class, ItemStorageExtensionProvider.INSTANCE);
++
++        // vanilla plugin
++        entityDataProviders.register(Entity.class, AnimalOwnerProvider.INSTANCE);
++        entityDataProviders.register(LivingEntity.class, StatusEffectsProvider.INSTANCE);
++        entityDataProviders.register(AgeableMob.class, MobGrowthProvider.INSTANCE);
++        entityDataProviders.register(Tadpole.class, MobGrowthProvider.INSTANCE);
++        entityDataProviders.register(Animal.class, MobBreedingProvider.INSTANCE);
++        entityDataProviders.register(Allay.class, MobBreedingProvider.INSTANCE);
++
++        entityDataProviders.register(Chicken.class, NextEntityDropProvider.INSTANCE);
++        entityDataProviders.register(Armadillo.class, NextEntityDropProvider.INSTANCE);
++
++        entityDataProviders.register(ZombieVillager.class, ZombieVillagerProvider.INSTANCE);
++
++        blockDataProviders.register(BrewingStandBlockEntity.class, BrewingStandProvider.INSTANCE);
++        blockDataProviders.register(BeehiveBlockEntity.class, BeehiveProvider.INSTANCE);
++        blockDataProviders.register(CommandBlockEntity.class, CommandBlockProvider.INSTANCE);
++        blockDataProviders.register(JukeboxBlockEntity.class, JukeboxProvider.INSTANCE);
++        blockDataProviders.register(LecternBlockEntity.class, LecternProvider.INSTANCE);
++
++        blockDataProviders.register(ComparatorBlockEntity.class, RedstoneProvider.INSTANCE);
++        blockDataProviders.register(HopperBlockEntity.class, RedstoneProvider.INSTANCE);
++        blockDataProviders.register(CalibratedSculkSensorBlockEntity.class, RedstoneProvider.INSTANCE);
++
++        blockDataProviders.register(AbstractFurnaceBlockEntity.class, FurnaceProvider.INSTANCE);
++        blockDataProviders.register(ChiseledBookShelfBlockEntity.class, ChiseledBookshelfProvider.INSTANCE);
++        blockDataProviders.register(TrialSpawnerBlockEntity.class, MobSpawnerCooldownProvider.INSTANCE);
++
++        itemStorageProviders.register(CampfireBlock.class, CampfireProvider.INSTANCE);
++    }
++
++    @ProtocolHandler.PlayerJoin
++    public static void onPlayerJoin(ServerPlayer player) {
++        if (HorizonConfig.jadeProtocol) {
++            ProtocolUtils.sendPayloadPacket(player, PACKET_SERVER_PING, buf -> buf.writeUtf(""));
++        }
++    }
++
++    @ProtocolHandler.PayloadReceiver(payload = RequestEntityPayload.class, payloadId = "request_entity")
++    public static void requestEntityData(ServerPlayer player, RequestEntityPayload payload) {
++        if (!HorizonConfig.jadeProtocol) {
++            return;
++        }
++
++        MinecraftServer server = MinecraftServer.getServer();
++        server.execute(() -> {
++            Level world = player.level();
++            boolean showDetails = payload.showDetails;
++            Entity entity = world.getEntity(payload.entityId);
++            double maxDistance = Mth.square(player.entityInteractionRange() + 21);
++
++            if (entity == null || player.distanceToSqr(entity) > maxDistance) {
++                return;
++            }
++
++            if (payload.partIndex >= 0 && entity instanceof EnderDragon dragon) {
++                EnderDragonPart[] parts = dragon.getSubEntities();
++                if (payload.partIndex < parts.length) {
++                    entity = parts[payload.partIndex];
++                }
++            }
++
++            var providers = entityDataProviders.get(entity);
++            if (providers.isEmpty()) {
++                return;
++            }
++
++            DataAccessor tag = new DataAccessor(world);
++            EntityAccessor accessor = new EntityAccessor(player, world, entity, payload.hitVec, showDetails);
++            for (IJadeDataProvider<EntityAccessor> provider : providers) {
++                try {
++                    provider.saveData(tag, accessor);
++                } catch (Exception e) {
++                    HorizonLogger.LOGGER.warning("Error while saving data for entity " + entity);
++                }
++            }
++            tag.putInt("EntityId", entity.getId());
++
++            ProtocolUtils.sendPayloadPacket(player, PACKET_RECEIVE_DATA, buf -> buf.writeNbt(tag));
++        });
++    }
++
++    @ProtocolHandler.PayloadReceiver(payload = RequestBlockPayload.class, payloadId = "request_block")
++    public static void requestBlockData(ServerPlayer player, RequestBlockPayload payload) {
++        if (!HorizonConfig.jadeProtocol) {
++            return;
++        }
++
++        MinecraftServer server = MinecraftServer.getServer();
++        server.execute(() -> {
++            Level world = player.level();
++            BlockState blockState = payload.blockState;
++            Block block = blockState.getBlock();
++            BlockHitResult result = payload.hitResult;
++            BlockPos pos = result.getBlockPos();
++            boolean showDetails = payload.showDetails;
++
++            double maxDistance = Mth.square(player.blockInteractionRange() + 21);
++            if (pos.distSqr(player.blockPosition()) > maxDistance || !world.isLoaded(pos)) {
++                return;
++            }
++
++            BlockEntity blockEntity = null;
++            if (blockState.hasBlockEntity()) {
++                blockEntity = world.getBlockEntity(pos);
++            }
++
++            List<IJadeDataProvider<BlockAccessor>> providers;
++            if (blockEntity != null) {
++                providers = blockDataProviders.getMerged(block, blockEntity);
++            } else {
++                providers = blockDataProviders.first.get(block);
++            }
++
++            if (providers.isEmpty()) {
++                return;
++            }
++
++            DataAccessor tag = new DataAccessor(world);
++            BlockAccessor accessor = new BlockAccessor(player, world, blockEntity, result, block, blockState, pos, showDetails);
++            for (IJadeDataProvider<BlockAccessor> provider : providers) {
++                try {
++                    provider.saveData(tag, accessor);
++                } catch (Exception e) {
++                    HorizonLogger.LOGGER.warning("Error while saving data for block " + blockState);
++                }
++            }
++            tag.putInt("x", pos.getX());
++            tag.putInt("y", pos.getY());
++            tag.putInt("z", pos.getZ());
++            tag.putString("BlockId", BuiltInRegistries.BLOCK.getKey(block).toString());
++
++            ProtocolUtils.sendPayloadPacket(player, PACKET_RECEIVE_DATA, buf -> buf.writeNbt(tag));
++        });
++    }
++
++    @ProtocolHandler.ReloadServer
++    public static void onServerReload() {
++        if (HorizonConfig.jadeProtocol) {
++            enableAllPlayer();
++        }
++    }
++
++    public static void enableAllPlayer() {
++        for (ServerPlayer player : MinecraftServer.getServer().getPlayerList().players) {
++            onPlayerJoin(player);
++        }
++    }
++
++    public record RequestEntityPayload(boolean showDetails, int entityId, int partIndex,
++                                       Vec3 hitVec) implements HorizonCustomPayload<RequestEntityPayload> {
++
++        private static final ResourceLocation PACKET_REQUEST_ENTITY = JadeProtocol.id("request_entity");
++
++        @New
++        public RequestEntityPayload(ResourceLocation id, FriendlyByteBuf buf) {
++            this(buf.readBoolean(), buf.readVarInt(), buf.readVarInt(), new Vec3(buf.readVector3f()));
++        }
++
++        @Override
++        public void write(FriendlyByteBuf buf) {
++            buf.writeBoolean(showDetails);
++            buf.writeVarInt(entityId);
++            buf.writeVarInt(partIndex);
++            buf.writeVector3f(hitVec.toVector3f());
++        }
++
++        @Override
++        @NotNull
++        public ResourceLocation id() {
++            return PACKET_REQUEST_ENTITY;
++        }
++    }
++
++    public record RequestBlockPayload(boolean showDetails, BlockHitResult hitResult, BlockState blockState,
++                                      ItemStack fakeBlock) implements HorizonCustomPayload<RequestBlockPayload> {
++        private static final StreamCodec<RegistryFriendlyByteBuf, ItemStack> ITEM_STACK_CODEC = ItemStack.OPTIONAL_STREAM_CODEC;
++        private static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE_CODEC = ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY);
++        private static final ResourceLocation PACKET_REQUEST_BLOCK = JadeProtocol.id("request_block");
++
++        @New
++        public RequestBlockPayload(ResourceLocation id, FriendlyByteBuf buf) {
++            this(buf.readBoolean(), buf.readBlockHitResult(), BLOCK_STATE_CODEC.decode(buf), ITEM_STACK_CODEC.decode(ProtocolUtils.decorate(buf)));
++        }
++
++        @Override
++        public void write(FriendlyByteBuf buf) {
++            buf.writeBoolean(showDetails);
++            buf.writeBlockHitResult(hitResult);
++            BLOCK_STATE_CODEC.encode(buf, blockState);
++            ITEM_STACK_CODEC.encode(ProtocolUtils.decorate(buf), fakeBlock);
++        }
++
++        @Override
++        @NotNull
++        public ResourceLocation id() {
++            return PACKET_REQUEST_BLOCK;
++        }
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/BlockAccessor.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/BlockAccessor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..c5d1a5395813e41c251bcd71a5cc20b83df7c159
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/BlockAccessor.java
+@@ -0,0 +1,14 @@
++package dev.horizonmc.horizon.protocol.jade.accessor;
++
++import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.entity.BlockEntity;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.phys.BlockHitResult;
++
++public record BlockAccessor(ServerPlayer player, Level world, BlockEntity target, BlockHitResult hitResult,
++                            Block block, BlockState blockState, BlockPos pos,
++                            boolean showDetails) implements RequestAccessor<BlockEntity> {
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/DataAccessor.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/DataAccessor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4b31ecb73eed1490b46cac5a23469a6968640c35
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/DataAccessor.java
+@@ -0,0 +1,32 @@
++package dev.horizonmc.horizon.protocol.jade.accessor;
++
++import com.mojang.serialization.DynamicOps;
++import com.mojang.serialization.MapEncoder;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.NbtOps;
++import net.minecraft.nbt.Tag;
++import net.minecraft.resources.RegistryOps;
++import net.minecraft.world.level.Level;
++
++public class DataAccessor extends CompoundTag {
++
++    private final Level level;
++    private DynamicOps<Tag> ops;
++
++    public DataAccessor(Level level) {
++        this.level = level;
++    }
++
++    public DynamicOps<Tag> nbtOps() {
++        if (ops == null) {
++            ops = RegistryOps.create(NbtOps.INSTANCE, level.registryAccess());
++        }
++
++        return ops;
++    }
++
++    public <D> void writeMapData(MapEncoder<D> codec, D value) {
++        Tag tag = codec.encode(value, nbtOps(), nbtOps().mapBuilder()).build(new CompoundTag()).getOrThrow();
++        this.merge((CompoundTag) tag);
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/EntityAccessor.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/EntityAccessor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..afb34b9401cd6f1c99e50acc45dc163f4d03cbe4
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/EntityAccessor.java
+@@ -0,0 +1,10 @@
++package dev.horizonmc.horizon.protocol.jade.accessor;
++
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.phys.Vec3;
++
++public record EntityAccessor(ServerPlayer player, Level world, Entity target, Vec3 hitVec3,
++                             boolean showDetails) implements RequestAccessor<Entity> {
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/RequestAccessor.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/RequestAccessor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ccba7e2f22fdfa351628360e7a6b58b7e881baa0
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/accessor/RequestAccessor.java
+@@ -0,0 +1,15 @@
++package dev.horizonmc.horizon.protocol.jade.accessor;
++
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.level.Level;
++
++public interface RequestAccessor<T> {
++
++    ServerPlayer player();
++
++    Level world();
++
++    T target();
++
++    boolean showDetails();
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeDataProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeDataProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..7ae7193927aea6bfe150e9f55b4e1338c03fc26a
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeDataProvider.java
+@@ -0,0 +1,8 @@
++package dev.horizonmc.horizon.protocol.jade.provider;
++
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.RequestAccessor;
++
++public interface IJadeDataProvider<T extends RequestAccessor<?>> extends IJadeProvider {
++    void saveData(DataAccessor data, T request);
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b45877458724469340c5e2c065d28550d4d370c0
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IJadeProvider.java
+@@ -0,0 +1,12 @@
++package dev.horizonmc.horizon.protocol.jade.provider;
++
++import net.minecraft.resources.ResourceLocation;
++
++public interface IJadeProvider {
++
++    ResourceLocation getUid();
++
++    default int getDefaultPriority() {
++        return 0;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IServerExtensionProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IServerExtensionProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..1133a7da4f95548c11bd01eb38ab7bd1c86401ef
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/IServerExtensionProvider.java
+@@ -0,0 +1,10 @@
++package dev.horizonmc.horizon.protocol.jade.provider;
++
++import dev.horizonmc.horizon.protocol.jade.accessor.RequestAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ViewGroup;
++
++import java.util.List;
++
++public interface IServerExtensionProvider<T> extends IJadeProvider {
++    List<ViewGroup<T>> getGroups(RequestAccessor<?> request);
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/ItemStorageExtensionProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/ItemStorageExtensionProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..566e033532b9355a9bcf8d72f89413796cf40aea
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/ItemStorageExtensionProvider.java
+@@ -0,0 +1,142 @@
++package dev.horizonmc.horizon.protocol.jade.provider;
++
++import com.google.common.cache.Cache;
++import com.google.common.cache.CacheBuilder;
++import dev.horizonmc.horizon.HorizonLogger;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.RequestAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ItemCollector;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ItemIterator;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ViewGroup;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.Container;
++import net.minecraft.world.LockCode;
++import net.minecraft.world.RandomizableContainer;
++import net.minecraft.world.WorldlyContainer;
++import net.minecraft.world.WorldlyContainerHolder;
++import net.minecraft.world.entity.animal.horse.AbstractHorse;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.entity.vehicle.ContainerEntity;
++import net.minecraft.world.inventory.PlayerEnderChestContainer;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.block.ChestBlock;
++import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
++import net.minecraft.world.level.block.entity.ChestBlockEntity;
++import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
++
++import java.util.List;
++import java.util.concurrent.ExecutionException;
++import java.util.concurrent.TimeUnit;
++
++public enum ItemStorageExtensionProvider implements IServerExtensionProvider<ItemStack> {
++    INSTANCE;
++
++    public static final Cache<Object, ItemCollector<?>> targetCache = CacheBuilder.newBuilder().weakKeys().expireAfterAccess(60, TimeUnit.SECONDS).build();
++    public static final Cache<Object, ItemCollector<?>> containerCache = CacheBuilder.newBuilder().weakKeys().expireAfterAccess(120, TimeUnit.SECONDS).build();
++
++    private static final ResourceLocation UNIVERSAL_ITEM_STORAGE = JadeProtocol.mc_id("item_storage.default");
++
++    @Override
++    public List<ViewGroup<ItemStack>> getGroups(RequestAccessor<?> request) {
++        Object target = request.target();
++        if (target == null && request instanceof BlockAccessor blockAccessor && blockAccessor.block() instanceof WorldlyContainerHolder holder) {
++            WorldlyContainer container = holder.getContainer(blockAccessor.blockState(), request.world(), blockAccessor.pos());
++            return containerGroup(container, request);
++        }
++
++        switch (target) {
++            case null -> {
++                return List.of();
++            }
++            case RandomizableContainer te when te.getLootTable() != null -> {
++                return List.of();
++            }
++            case ContainerEntity containerEntity when containerEntity.getLootTable() != null -> {
++                return List.of();
++            }
++            default -> {
++            }
++        }
++
++        Player player = request.player();
++        if (!player.isCreative() && !player.isSpectator() && target instanceof BaseContainerBlockEntity te) {
++            if (te.lockKey != LockCode.NO_LOCK) {
++                return List.of();
++            }
++        }
++
++        if (target instanceof EnderChestBlockEntity) {
++            PlayerEnderChestContainer inventory = player.getEnderChestInventory();
++            return new ItemCollector<>(new ItemIterator.ContainerItemIterator(0)).update(inventory, request.world().getGameTime());
++        }
++
++        ItemCollector<?> itemCollector;
++        try {
++            itemCollector = targetCache.get(target, () -> createItemCollector(target));
++        } catch (ExecutionException e) {
++            HorizonLogger.LOGGER.severe("Failed to get item collector for " + target);
++            return null;
++        }
++
++        if (itemCollector == ItemCollector.EMPTY) {
++            return null;
++        }
++
++        return itemCollector.update(target, request.world().getGameTime());
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return UNIVERSAL_ITEM_STORAGE;
++    }
++
++    public static List<ViewGroup<ItemStack>> containerGroup(Container container, RequestAccessor<?> accessor) {
++        try {
++            return containerCache.get(container, () -> new ItemCollector<>(new ItemIterator.ContainerItemIterator(0))).update(container, accessor.world().getGameTime());
++        } catch (ExecutionException e) {
++            return null;
++        }
++    }
++
++    public static ItemCollector<?> createItemCollector(Object target) {
++        if (target instanceof AbstractHorse) {
++            return new ItemCollector<>(new ItemIterator.ContainerItemIterator(o -> {
++                if (o instanceof AbstractHorse horse) {
++                    return horse.inventory;
++                }
++                return null;
++            }, 2));
++        }
++
++        // TODO BlockEntity like fabric's ItemStorage
++
++        if (target instanceof Container) {
++            if (target instanceof ChestBlockEntity) {
++                return new ItemCollector<>(new ItemIterator.ContainerItemIterator(o -> {
++                    if (o instanceof ChestBlockEntity blockEntity) {
++                        if (blockEntity.getBlockState().getBlock() instanceof ChestBlock chestBlock) {
++                            Container compound = null;
++                            if (blockEntity.getLevel() != null) {
++                                compound = ChestBlock.getContainer(chestBlock, blockEntity.getBlockState(), blockEntity.getLevel(), blockEntity.getBlockPos(), false);
++                            }
++                            if (compound != null) {
++                                return compound;
++                            }
++                        }
++                        return blockEntity;
++                    }
++                    return null;
++                }, 0));
++            }
++            return new ItemCollector<>(new ItemIterator.ContainerItemIterator(0));
++        }
++
++        return ItemCollector.EMPTY;
++    }
++
++    @Override
++    public int getDefaultPriority() {
++        return IServerExtensionProvider.super.getDefaultPriority() + 1000;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BeehiveProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BeehiveProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..aff40bfb7fe716503cc78c6a8ee8f1e2316ce6da
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BeehiveProvider.java
+@@ -0,0 +1,27 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
++
++public enum BeehiveProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_BEEHIVE = JadeProtocol.mc_id("beehive");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof BeehiveBlockEntity beehive) {
++            data.putByte("Bees", (byte) beehive.getOccupantCount());
++            data.putBoolean("Full", beehive.isFull());
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_BEEHIVE;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BlockStorageProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BlockStorageProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8d7346343d94f39554e3870b8e6bc1cd26c9b0de
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BlockStorageProvider.java
+@@ -0,0 +1,64 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ViewGroup;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.LockCode;
++import net.minecraft.world.RandomizableContainer;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
++import net.minecraft.world.level.block.entity.BlockEntity;
++
++public enum BlockStorageProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation UNIVERSAL_ITEM_STORAGE = JadeProtocol.mc_id("item_storage.default");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        BlockEntity target = request.target();
++        Player player = request.player();
++        for (var provider : JadeProtocol.itemStorageProviders.get(request)) {
++            var groups = provider.getGroups(request);
++            if (groups == null) {
++                continue;
++            }
++
++            if (ViewGroup.saveList(data, "JadeItemStorage", groups, item -> {
++                int count = item.getCount();
++                if (count > item.getMaxStackSize()) {
++                    item.setCount(1);
++                }
++                CompoundTag itemTag = (CompoundTag) item.save(request.world().registryAccess());
++                if (count > item.getMaxStackSize()) {
++                    itemTag.putInt("NewCount", count);
++                    item.setCount(count);
++                }
++                return itemTag;
++            })) {
++                data.putString("JadeItemStorageUid", provider.getUid().toString());
++            } else if (target instanceof RandomizableContainer containerEntity && containerEntity.getLootTable() != null) {
++                data.putBoolean("Loot", true);
++            } else if (!player.isCreative() && !player.isSpectator() && target instanceof BaseContainerBlockEntity te) {
++                if (te.lockKey != LockCode.NO_LOCK) {
++                    data.putBoolean("Locked", true);
++                }
++            }
++            break;
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return UNIVERSAL_ITEM_STORAGE;
++    }
++
++    @Override
++    public int getDefaultPriority() {
++        return IJadeDataProvider.super.getDefaultPriority() + 1000;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BrewingStandProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BrewingStandProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fb26941bbcaeab40efcf7a210df87350a21fc4f7
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/BrewingStandProvider.java
+@@ -0,0 +1,30 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
++
++public enum BrewingStandProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_BREWING_STAND = JadeProtocol.mc_id("brewing_stand");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof BrewingStandBlockEntity brewingStand) {
++            CompoundTag compound = new CompoundTag();
++            compound.putInt("Time", brewingStand.brewTime);
++            compound.putInt("Fuel", brewingStand.fuel);
++            data.put("BrewingStand", compound);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_BREWING_STAND;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4a45ca5cbb84a94ceb16bfc7a55477e4816c6138
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java
+@@ -0,0 +1,52 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import com.google.common.collect.Lists;
++import com.mojang.serialization.Codec;
++import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.RequestAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IServerExtensionProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ViewGroup;
++import net.minecraft.core.component.DataComponents;
++import net.minecraft.nbt.NbtOps;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.item.component.CustomData;
++import net.minecraft.world.level.block.entity.CampfireBlockEntity;
++
++import java.util.List;
++
++public enum CampfireProvider implements IServerExtensionProvider<ItemStack> {
++    INSTANCE;
++
++    private static final MapCodec<Integer> COOKING_TIME_CODEC = Codec.INT.fieldOf("jade:cooking");
++    private static final ResourceLocation MC_CAMPFIRE = JadeProtocol.mc_id("campfire");
++
++    @Override
++    public List<ViewGroup<ItemStack>> getGroups(RequestAccessor<?> request) {
++        if (request.target() instanceof CampfireBlockEntity campfire) {
++            List<ItemStack> list = Lists.newArrayList();
++            for (int i = 0; i < campfire.cookingTime.length; i++) {
++                ItemStack stack = campfire.getItems().get(i);
++                if (stack.isEmpty()) {
++                    continue;
++                }
++                stack = stack.copy();
++
++                CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
++                        .update(COOKING_TIME_CODEC, campfire.cookingTime[i] - campfire.cookingProgress[i])
++                        .getOrThrow();
++                stack.set(DataComponents.CUSTOM_DATA, customData);
++
++                list.add(stack);
++            }
++            return List.of(new ViewGroup<>(list));
++        }
++        return null;
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_CAMPFIRE;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ChiseledBookshelfProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ChiseledBookshelfProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8f0d7acf72b00d39a4ae71b928df23db273bfe2a
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ChiseledBookshelfProvider.java
+@@ -0,0 +1,43 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.block.ChiseledBookShelfBlock;
++import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
++
++public enum ChiseledBookshelfProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    public static final MapCodec<ItemStack> BOOK_CODEC = ItemStack.CODEC.fieldOf("book");
++    private static final ResourceLocation MC_CHISELED_BOOKSHELF = JadeProtocol.mc_id("chiseled_bookshelf");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof ChiseledBookShelfBlockEntity bookshelf) {
++            int slot = ((ChiseledBookShelfBlock) request.block()).getHitSlot(request.hitResult(), request.blockState()).orElse(-1);
++            if (slot == -1) {
++                return;
++            }
++
++            ItemStack book = bookshelf.getItem(slot);
++            if (!book.isEmpty()) {
++                data.writeMapData(BOOK_CODEC, book);
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_CHISELED_BOOKSHELF;
++    }
++
++    @Override
++    public int getDefaultPriority() {
++        return BlockStorageProvider.INSTANCE.getDefaultPriority() + 1;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CommandBlockProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CommandBlockProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..092f9e104a1ae16a82bf9c05762c8c6d852f6b9a
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CommandBlockProvider.java
+@@ -0,0 +1,41 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.BaseCommandBlock;
++import net.minecraft.world.level.block.entity.CommandBlockEntity;
++
++public enum CommandBlockProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_COMMAND_BLOCK = JadeProtocol.mc_id("command_block");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor accessor) {
++        Player player = accessor.player();
++        if (!player.canUseGameMasterBlocks()) {
++            return;
++        }
++
++        if (accessor.target() instanceof CommandBlockEntity commandBlock) {
++            BaseCommandBlock logic = commandBlock.getCommandBlock();
++            String command = logic.getCommand();
++            if (command.isEmpty()) {
++                return;
++            }
++            if (command.length() > 40) {
++                command = command.substring(0, 37) + "...";
++            }
++            data.putString("Command", command);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_COMMAND_BLOCK;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/FurnaceProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/FurnaceProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..76317f42326b73367241007f27c9e6ce8dd04f23
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/FurnaceProvider.java
+@@ -0,0 +1,41 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.ListTag;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
++
++public enum FurnaceProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_FURNACE = JadeProtocol.mc_id("furnace");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (!(request.target() instanceof AbstractFurnaceBlockEntity furnace)) {
++            return;
++        }
++
++        if (furnace.isEmpty()) {
++            return;
++        }
++
++        ListTag items = new ListTag();
++        for (int i = 0; i < 3; i++) {
++            items.add(furnace.getItem(i).saveOptional(request.world().registryAccess()));
++        }
++        data.put("furnace", items);
++        CompoundTag furnaceTag = furnace.saveWithoutMetadata(request.world().registryAccess());
++        data.putInt("progress", furnaceTag.getInt("CookTime"));
++        data.putInt("total", furnaceTag.getInt("CookTimeTotal"));
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_FURNACE;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/JukeboxProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/JukeboxProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a6739b04819be8f6dd4be62719fda5a9862ccc14
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/JukeboxProvider.java
+@@ -0,0 +1,32 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
++
++public enum JukeboxProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final MapCodec<ItemStack> RECORD_CODEC = ItemStack.CODEC.fieldOf("record");
++    private static final ResourceLocation MC_JUKEBOX = JadeProtocol.mc_id("jukebox");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof JukeboxBlockEntity jukebox) {
++            ItemStack stack = jukebox.getTheItem();
++            if (!stack.isEmpty()) {
++                data.writeMapData(RECORD_CODEC, stack);
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_JUKEBOX;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/LecternProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/LecternProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..83f00609125456898e912b6d9bde7c2ad782b652
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/LecternProvider.java
+@@ -0,0 +1,34 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.core.component.DataComponents;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.item.Items;
++import net.minecraft.world.level.block.entity.LecternBlockEntity;
++
++public enum LecternProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_LECTERN = JadeProtocol.mc_id("lectern");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof LecternBlockEntity lectern) {
++            ItemStack stack = lectern.getBook();
++            if (!stack.isEmpty()) {
++                if (stack.has(DataComponents.CUSTOM_NAME) || stack.getItem() != Items.WRITABLE_BOOK) {
++                    data.writeMapData(ChiseledBookshelfProvider.BOOK_CODEC, stack);
++                }
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_LECTERN;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/MobSpawnerCooldownProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/MobSpawnerCooldownProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..165c49f229e6bb44b8bb94d5a5632dbbbe748a85
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/MobSpawnerCooldownProvider.java
+@@ -0,0 +1,32 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
++import net.minecraft.world.level.block.entity.trialspawner.TrialSpawnerData;
++
++public enum MobSpawnerCooldownProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_MOB_SPAWNER_COOLDOWN = JadeProtocol.mc_id("mob_spawner.cooldown");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        if (request.target() instanceof TrialSpawnerBlockEntity spawner) {
++            TrialSpawnerData spawnerData = spawner.getTrialSpawner().getData();
++            Level level = request.world();
++            if (spawner.getTrialSpawner().canSpawnInLevel(level) && level.getGameTime() < spawnerData.cooldownEndsAt) {
++                data.putInt("Cooldown", (int) (spawnerData.cooldownEndsAt - level.getGameTime()));
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_MOB_SPAWNER_COOLDOWN;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ObjectNameProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ObjectNameProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..00543022bb740536a02e567f01f582c76675e895
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/ObjectNameProvider.java
+@@ -0,0 +1,53 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.ComponentSerialization;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.MenuProvider;
++import net.minecraft.world.Nameable;
++import net.minecraft.world.level.block.ChestBlock;
++import net.minecraft.world.level.block.entity.BlockEntity;
++import net.minecraft.world.level.block.entity.ChestBlockEntity;
++
++public enum ObjectNameProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final MapCodec<Component> GIVEN_NAME_CODEC = ComponentSerialization.CODEC.fieldOf("given_name");
++    private static final ResourceLocation CORE_OBJECT_NAME = JadeProtocol.id("object_name");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        BlockEntity blockEntity = request.target();
++        if (blockEntity instanceof Nameable nameable) {
++            Component name = null;
++
++            if (blockEntity instanceof ChestBlockEntity && request.block() instanceof ChestBlock) {
++                MenuProvider menuProvider = request.blockState().getMenuProvider(request.world(), request.pos());
++                if (menuProvider != null) {
++                    name = menuProvider.getDisplayName();
++                }
++            } else if (nameable.hasCustomName()) {
++                name = nameable.getDisplayName();
++            }
++
++            if (name != null) {
++                data.writeMapData(GIVEN_NAME_CODEC, name);
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return CORE_OBJECT_NAME;
++    }
++
++    @Override
++    public int getDefaultPriority() {
++        return -10100;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/RedstoneProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/RedstoneProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..62d35097d7b1c7e33ad5b8720846594645ccc3d6
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/RedstoneProvider.java
+@@ -0,0 +1,43 @@
++package dev.horizonmc.horizon.protocol.jade.provider.block;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.core.Direction;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.CalibratedSculkSensorBlock;
++import net.minecraft.world.level.block.entity.BlockEntity;
++import net.minecraft.world.level.block.entity.CalibratedSculkSensorBlockEntity;
++import net.minecraft.world.level.block.entity.ComparatorBlockEntity;
++import net.minecraft.world.level.block.entity.HopperBlockEntity;
++import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.block.state.properties.BlockStateProperties;
++
++public enum RedstoneProvider implements IJadeDataProvider<BlockAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_REDSTONE = JadeProtocol.mc_id("redstone");
++
++    @Override
++    public void saveData(DataAccessor data, BlockAccessor request) {
++        BlockEntity blockEntity = request.target();
++        if (blockEntity instanceof ComparatorBlockEntity comparator) {
++            data.putInt("Signal", comparator.getOutputSignal());
++        } else if (blockEntity instanceof HopperBlockEntity) {
++            BlockState state = request.blockState();
++            if (state.hasProperty(BlockStateProperties.ENABLED) && !state.getValue(BlockStateProperties.ENABLED)) {
++                data.putBoolean("HopperLocked", true);
++            }
++        } else if (blockEntity instanceof CalibratedSculkSensorBlockEntity) {
++            Direction direction = request.blockState().getValue(CalibratedSculkSensorBlock.FACING).getOpposite();
++            int signal = request.world().getSignal(request.pos().relative(direction), direction);
++            data.putInt("Signal", signal);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_REDSTONE;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/AnimalOwnerProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/AnimalOwnerProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dd00bf6552b56a585a239403a9c5db55594f5405
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/AnimalOwnerProvider.java
+@@ -0,0 +1,39 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import com.mojang.authlib.GameProfile;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.players.GameProfileCache;
++import net.minecraft.world.entity.OwnableEntity;
++
++import java.util.UUID;
++
++public enum AnimalOwnerProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_ANIMAL_OWNER = JadeProtocol.mc_id("animal_owner");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        UUID ownerUUID = null;
++        if (request.target() instanceof OwnableEntity ownable) {
++            ownerUUID = ownable.getOwnerUUID();
++        }
++
++        if (ownerUUID != null) {
++            GameProfileCache cache = MinecraftServer.getServer().getProfileCache();
++            if (cache != null) {
++                cache.get(ownerUUID).map(GameProfile::getName).ifPresent(name -> data.putString("OwnerName", name));
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_ANIMAL_OWNER;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/EntityStorageProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/EntityStorageProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..5aa4182ebf03536ebb645487f0457c5890cfa69f
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/EntityStorageProvider.java
+@@ -0,0 +1,51 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import dev.horizonmc.horizon.protocol.jade.provider.util.ViewGroup;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.resources.ResourceLocation;
++
++public enum EntityStorageProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation UNIVERSAL_ITEM_STORAGE = JadeProtocol.mc_id("item_storage.default");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        for (var provider : JadeProtocol.itemStorageProviders.get(request)) {
++            var groups = provider.getGroups(request);
++            if (groups == null) {
++                continue;
++            }
++
++            if (ViewGroup.saveList(data, "JadeItemStorage", groups, item -> {
++                int count = item.getCount();
++                if (count > item.getMaxStackSize()) {
++                    item.setCount(1);
++                }
++                CompoundTag itemTag = (CompoundTag) item.save(request.world().registryAccess());
++                if (count > item.getMaxStackSize()) {
++                    itemTag.putInt("NewCount", count);
++                    item.setCount(count);
++                }
++                return itemTag;
++            })) {
++                data.putString("JadeItemStorageUid", provider.getUid().toString());
++            }
++            break;
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return UNIVERSAL_ITEM_STORAGE;
++    }
++
++    @Override
++    public int getDefaultPriority() {
++        return IJadeDataProvider.super.getDefaultPriority() + 1000;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobBreedingProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobBreedingProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..eb78c72afd32de4bc350107c8d8607cfec497d69
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobBreedingProvider.java
+@@ -0,0 +1,39 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.animal.Animal;
++import net.minecraft.world.entity.animal.allay.Allay;
++
++public enum MobBreedingProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_MOB_BREEDING = JadeProtocol.mc_id("mob_breeding");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        int time = 0;
++        Entity entity = request.target();
++
++        if (entity instanceof Allay allay) {
++            if (allay.duplicationCooldown > 0 && allay.duplicationCooldown < Integer.MAX_VALUE) {
++                time = (int) allay.duplicationCooldown;
++            }
++        } else if (entity instanceof Animal animal) {
++            time = animal.getAge();
++        }
++
++        if (time > 0) {
++            data.putInt("BreedingCD", time);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_MOB_BREEDING;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobGrowthProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobGrowthProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..9c776133e92cc652b302ae12b739fed5f7f63d90
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/MobGrowthProvider.java
+@@ -0,0 +1,37 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.entity.AgeableMob;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.animal.frog.Tadpole;
++
++public enum MobGrowthProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_MOB_GROWTH = JadeProtocol.mc_id("mob_growth");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        int time = -1;
++        Entity entity = request.target();
++
++        if (entity instanceof AgeableMob ageable) {
++            time = -ageable.getAge();
++        } else if (entity instanceof Tadpole tadpole) {
++            time = tadpole.getTicksLeftUntilAdult();
++        }
++
++        if (time > 0) {
++            data.putInt("GrowingTime", time);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_MOB_GROWTH;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/NextEntityDropProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/NextEntityDropProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..83ac409e0159cee66ccd25e655537481236dff08
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/NextEntityDropProvider.java
+@@ -0,0 +1,37 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.animal.Chicken;
++import net.minecraft.world.entity.animal.armadillo.Armadillo;
++
++public enum NextEntityDropProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_NEXT_ENTITY_DROP = JadeProtocol.mc_id("next_entity_drop");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        int max = 24000 * 2;
++        Entity entity = request.target();
++
++        if (entity instanceof Chicken chicken) {
++            if (!chicken.isBaby() && chicken.eggTime < max) {
++                data.putInt("NextEggIn", chicken.eggTime);
++            }
++        } else if (entity instanceof Armadillo armadillo) {
++            if (!armadillo.isBaby() && armadillo.scuteTime < max) {
++                data.putInt("NextScuteIn", armadillo.scuteTime);
++            }
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_NEXT_ENTITY_DROP;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/StatusEffectsProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/StatusEffectsProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..788feeed561a79237fb4b2a2992df49bfd7bc3a5
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/StatusEffectsProvider.java
+@@ -0,0 +1,41 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.effect.MobEffectInstance;
++import net.minecraft.world.entity.LivingEntity;
++
++import java.util.Collection;
++import java.util.List;
++
++public enum StatusEffectsProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final MapCodec<List<MobEffectInstance>> EFFECTS_CODEC = MobEffectInstance.CODEC.listOf().fieldOf("mob_effects");
++    private static final ResourceLocation MC_POTION_EFFECTS = JadeProtocol.mc_id("potion_effects");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        LivingEntity living = (LivingEntity) request.target();
++        Collection<MobEffectInstance> effects = living.getActiveEffects();
++        if (effects.isEmpty()) {
++            return;
++        }
++
++        List<MobEffectInstance> effectList = effects.stream().filter(MobEffectInstance::isVisible).toList();
++        if (effectList.isEmpty()) {
++            return;
++        }
++
++        data.writeMapData(EFFECTS_CODEC, effectList);
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_POTION_EFFECTS;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/ZombieVillagerProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/ZombieVillagerProvider.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..6b0c7e6c7c965f03fb4b1a703f90967952b95a5e
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/entity/ZombieVillagerProvider.java
+@@ -0,0 +1,27 @@
++package dev.horizonmc.horizon.protocol.jade.provider.entity;
++
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.accessor.DataAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.EntityAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeDataProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.entity.monster.ZombieVillager;
++
++public enum ZombieVillagerProvider implements IJadeDataProvider<EntityAccessor> {
++    INSTANCE;
++
++    private static final ResourceLocation MC_ZOMBIE_VILLAGER = JadeProtocol.mc_id("zombie_villager");
++
++    @Override
++    public void saveData(DataAccessor data, EntityAccessor request) {
++        ZombieVillager entity = (ZombieVillager) request.target();
++        if (entity.villagerConversionTime > 0) {
++            data.putInt("ConversionTime", entity.villagerConversionTime);
++        }
++    }
++
++    @Override
++    public ResourceLocation getUid() {
++        return MC_ZOMBIE_VILLAGER;
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/HierarchyLookup.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/HierarchyLookup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..f14e00537dde0ff12e2bbd2c660a8a9e2baee653
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/HierarchyLookup.java
+@@ -0,0 +1,119 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import com.google.common.base.Preconditions;
++import com.google.common.cache.Cache;
++import com.google.common.cache.CacheBuilder;
++import com.google.common.collect.ArrayListMultimap;
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.ImmutableListMultimap;
++import com.google.common.collect.ListMultimap;
++import com.google.common.collect.Lists;
++import com.google.common.collect.Sets;
++import dev.horizonmc.horizon.HorizonLogger;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeProvider;
++import net.minecraft.resources.ResourceLocation;
++import java.util.Collection;
++import java.util.Comparator;
++import java.util.List;
++import java.util.Map;
++import java.util.Objects;
++import java.util.Set;
++import java.util.concurrent.ExecutionException;
++import java.util.stream.Stream;
++
++public class HierarchyLookup<T extends IJadeProvider> implements IHierarchyLookup<T> {
++
++
++    private final Class<?> baseClass;
++    private final Cache<Class<?>, List<T>> resultCache = CacheBuilder.newBuilder().build();
++    private final boolean singleton;
++    private ListMultimap<Class<?>, T> objects = ArrayListMultimap.create();
++
++    public HierarchyLookup(Class<?> baseClass) {
++        this(baseClass, false);
++    }
++
++    public HierarchyLookup(Class<?> baseClass, boolean singleton) {
++        this.baseClass = baseClass;
++        this.singleton = singleton;
++    }
++
++    @Override
++    public void register(Class<?> clazz, T provider) {
++        Preconditions.checkArgument(isClassAcceptable(clazz), "Class %s is not acceptable", clazz);
++        Objects.requireNonNull(provider.getUid());
++        JadeProtocol.priorities.put(provider);
++        objects.put(clazz, provider);
++    }
++
++    @Override
++    public boolean isClassAcceptable(Class<?> clazz) {
++        return baseClass.isAssignableFrom(clazz);
++    }
++
++    @Override
++    public List<T> get(Class<?> clazz) {
++        try {
++            return resultCache.get(clazz, () -> {
++                List<T> list = Lists.newArrayList();
++                getInternal(clazz, list);
++                list = ImmutableList.sortedCopyOf(Comparator.comparingInt(JadeProtocol.priorities::byValue), list);
++                if (singleton && !list.isEmpty()) {
++                    return ImmutableList.of(list.getFirst());
++                }
++                return list;
++            });
++        } catch (ExecutionException e) {
++            HorizonLogger.LOGGER.severe(e.getMessage());
++        }
++        return List.of();
++    }
++
++    private void getInternal(Class<?> clazz, List<T> list) {
++        if (clazz != baseClass && clazz != Object.class) {
++            getInternal(clazz.getSuperclass(), list);
++        }
++        list.addAll(objects.get(clazz));
++    }
++
++    @Override
++    public boolean isEmpty() {
++        return objects.isEmpty();
++    }
++
++    @Override
++    public Stream<Map.Entry<Class<?>, Collection<T>>> entries() {
++        return objects.asMap().entrySet().stream();
++    }
++
++    @Override
++    public void invalidate() {
++        resultCache.invalidateAll();
++    }
++
++    @Override
++    public void loadComplete(PriorityStore<ResourceLocation, IJadeProvider> priorityStore) {
++        objects.asMap().forEach((clazz, list) -> {
++            if (list.size() < 2) {
++                return;
++            }
++            Set<ResourceLocation> set = Sets.newHashSetWithExpectedSize(list.size());
++            for (T provider : list) {
++                if (set.contains(provider.getUid())) {
++                    throw new IllegalStateException("Duplicate UID: %s for %s".formatted(provider.getUid(), list.stream()
++                            .filter(p -> p.getUid().equals(provider.getUid()))
++                            .map(p -> p.getClass().getName())
++                            .toList()
++                    ));
++                }
++                set.add(provider.getUid());
++            }
++        });
++
++        objects = ImmutableListMultimap.<Class<?>, T>builder()
++                .orderValuesBy(Comparator.comparingInt(priorityStore::byValue))
++                .putAll(objects)
++                .build();
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/IHierarchyLookup.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/IHierarchyLookup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..e748f71dc08fc7324b6711f0c7222706bfb63a56
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/IHierarchyLookup.java
+@@ -0,0 +1,36 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeProvider;
++import net.minecraft.resources.ResourceLocation;
++
++import java.util.Collection;
++import java.util.List;
++import java.util.Map;
++import java.util.stream.Stream;
++
++public interface IHierarchyLookup<T extends IJadeProvider> {
++    default IHierarchyLookup<? extends T> cast() {
++        return this;
++    }
++
++    void register(Class<?> clazz, T provider);
++
++    boolean isClassAcceptable(Class<?> clazz);
++
++    default List<T> get(Object obj) {
++        if (obj == null) {
++            return List.of();
++        }
++        return get(obj.getClass());
++    }
++
++    List<T> get(Class<?> clazz);
++
++    boolean isEmpty();
++
++    Stream<Map.Entry<Class<?>, Collection<T>>> entries();
++
++    void invalidate();
++
++    void loadComplete(PriorityStore<ResourceLocation, IJadeProvider> priorityStore);
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemCollector.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemCollector.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..59b0d9f20ff07800c3667e0f75399378ad61c441
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemCollector.java
+@@ -0,0 +1,114 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
++import net.minecraft.core.component.DataComponentPatch;
++import net.minecraft.core.component.DataComponents;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.world.item.Item;
++import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.item.component.CustomData;
++
++import java.util.List;
++import java.util.Locale;
++import java.util.concurrent.atomic.AtomicInteger;
++import java.util.function.Predicate;
++
++public class ItemCollector<T> {
++    public static final int MAX_SIZE = 54;
++    public static final ItemCollector<?> EMPTY = new ItemCollector<>(null);
++    private static final Predicate<ItemStack> NON_EMPTY = stack -> {
++        if (stack.isEmpty()) {
++            return false;
++        }
++        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
++        if (customData.contains("CustomModelData")) {
++            CompoundTag tag = customData.getUnsafe();
++            for (String key : tag.getAllKeys()) {
++                if (key.toLowerCase(Locale.ENGLISH).endsWith("clear") && tag.getBoolean(key)) {
++                    return false;
++                }
++            }
++        }
++        return true;
++    };
++    private final Object2IntLinkedOpenHashMap<ItemDefinition> items = new Object2IntLinkedOpenHashMap<>();
++    private final ItemIterator<T> iterator;
++    public long version;
++    public long lastTimeFinished;
++    public List<ViewGroup<ItemStack>> mergedResult;
++
++    public ItemCollector(ItemIterator<T> iterator) {
++        this.iterator = iterator;
++    }
++
++    public List<ViewGroup<ItemStack>> update(Object target, long gameTime) {
++        if (iterator == null) {
++            return null;
++        }
++        T container = iterator.find(target);
++        if (container == null) {
++            return null;
++        }
++        long currentVersion = iterator.getVersion(container);
++        if (mergedResult != null && iterator.isFinished()) {
++            if (version == currentVersion) {
++                return mergedResult; // content not changed
++            }
++            if (lastTimeFinished + 5 > gameTime){
++                return mergedResult; // avoid update too frequently
++            }
++            iterator.reset();
++        }
++        AtomicInteger count = new AtomicInteger();
++        iterator.populate(container).forEach(stack -> {
++            count.incrementAndGet();
++            if (NON_EMPTY.test(stack)) {
++                ItemDefinition def = new ItemDefinition(stack);
++                items.addTo(def, stack.getCount());
++            }
++        });
++        iterator.afterPopulate(count.get());
++        if (mergedResult != null && !iterator.isFinished()) {
++            updateCollectingProgress(mergedResult.getFirst());
++            return mergedResult;
++        }
++        List<ItemStack> partialResult = items.object2IntEntrySet().stream().limit(54).map(entry -> {
++            ItemDefinition def = entry.getKey();
++            return def.toStack(entry.getIntValue());
++        }).toList();
++        List<ViewGroup<ItemStack>> groups = List.of(updateCollectingProgress(new ViewGroup<>(partialResult)));
++        if (iterator.isFinished()) {
++            mergedResult = groups;
++            version = currentVersion;
++            lastTimeFinished = gameTime;
++            items.clear();
++        }
++        return groups;
++    }
++
++    protected ViewGroup<ItemStack> updateCollectingProgress(ViewGroup<ItemStack> group) {
++        float progress = iterator.getCollectingProgress();
++        CompoundTag data = group.getExtraData();
++        if (Float.isNaN(progress)) {
++            progress = 0;
++        }
++        if (progress >= 1) {
++            data.remove("Collecting");
++        } else {
++            data.putFloat("Collecting", progress);
++        }
++        return group;
++    }
++
++    public record ItemDefinition(Item item, DataComponentPatch components) {
++        ItemDefinition(ItemStack stack) {
++            this(stack.getItem(), stack.getComponentsPatch());
++        }
++
++        public ItemStack toStack(int count) {
++            ItemStack itemStack = new ItemStack(item, count);
++            itemStack.applyComponents(components);
++            return itemStack;
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemIterator.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemIterator.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..fe192e19a8059922a8020f476e1e9bbdb4d2aad6
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ItemIterator.java
+@@ -0,0 +1,102 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import net.minecraft.world.Container;
++import net.minecraft.world.item.ItemStack;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.concurrent.atomic.AtomicLong;
++import java.util.function.Function;
++import java.util.stream.IntStream;
++import java.util.stream.Stream;
++
++public abstract class ItemIterator<T> {
++    public static final AtomicLong version = new AtomicLong();
++    protected final Function<Object, @Nullable T> containerFinder;
++    protected final int fromIndex;
++    protected boolean finished;
++    protected int currentIndex;
++
++    protected ItemIterator(Function<Object, @Nullable T> containerFinder, int fromIndex) {
++        this.containerFinder = containerFinder;
++        this.currentIndex = this.fromIndex = fromIndex;
++    }
++
++    public @Nullable T find(Object target) {
++        return containerFinder.apply(target);
++    }
++
++    public final boolean isFinished() {
++        return finished;
++    }
++
++    public long getVersion(T container) {
++        return version.getAndIncrement();
++    }
++
++    public abstract Stream<ItemStack> populate(T container);
++
++    public void reset() {
++        currentIndex = fromIndex;
++        finished = false;
++    }
++
++    public void afterPopulate(int count) {
++        currentIndex = count;
++        if (count == 0 || currentIndex >= 10000) {
++            finished = true;
++        }
++    }
++
++    public float getCollectingProgress() {
++        return Float.NaN;
++    }
++
++    public static abstract class SlottedItemIterator<T> extends ItemIterator<T> {
++        protected float progress;
++
++        public SlottedItemIterator(Function<Object, @Nullable T> containerFinder, int fromIndex) {
++            super(containerFinder, fromIndex);
++        }
++
++        protected abstract int getSlotCount(T container);
++
++        protected abstract ItemStack getItemInSlot(T container, int slot);
++
++        @Override
++        public Stream<ItemStack> populate(T container) {
++            int slotCount = getSlotCount(container);
++            int toIndex = currentIndex + ItemCollector.MAX_SIZE * 2;
++            if (toIndex >= slotCount) {
++                toIndex = slotCount;
++                finished = true;
++            }
++            progress = (float) (currentIndex - fromIndex) / (slotCount - fromIndex);
++            return IntStream.range(currentIndex, toIndex).mapToObj(slot -> getItemInSlot(container, slot));
++        }
++
++        @Override
++        public float getCollectingProgress() {
++            return progress;
++        }
++    }
++
++    public static class ContainerItemIterator extends SlottedItemIterator<Container> {
++        public ContainerItemIterator(int fromIndex) {
++            this(Container.class::cast, fromIndex);
++        }
++
++        public ContainerItemIterator(Function<Object, @Nullable Container> containerFinder, int fromIndex) {
++            super(containerFinder, fromIndex);
++        }
++
++        @Override
++        protected int getSlotCount(Container container) {
++            return container.getContainerSize();
++        }
++
++        @Override
++        protected ItemStack getItemInSlot(Container container, int slot) {
++            return container.getItem(slot);
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PairHierarchyLookup.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PairHierarchyLookup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d428737e53ac721553237db26f89c9e5a6d71194
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PairHierarchyLookup.java
+@@ -0,0 +1,100 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import com.google.common.cache.Cache;
++import com.google.common.cache.CacheBuilder;
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.Iterables;
++import dev.horizonmc.horizon.HorizonLogger;
++import dev.horizonmc.horizon.protocol.jade.JadeProtocol;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeProvider;
++import net.minecraft.resources.ResourceLocation;
++import org.apache.commons.lang3.tuple.Pair;
++
++import java.util.Collection;
++import java.util.Comparator;
++import java.util.List;
++import java.util.Map;
++import java.util.Objects;
++import java.util.concurrent.ExecutionException;
++import java.util.stream.Stream;
++
++public class PairHierarchyLookup<T extends IJadeProvider> implements IHierarchyLookup<T> {
++
++    public final IHierarchyLookup<T> first;
++    public final IHierarchyLookup<T> second;
++    private final Cache<Pair<Class<?>, Class<?>>, List<T>> mergedCache = CacheBuilder.newBuilder().build();
++
++    public PairHierarchyLookup(IHierarchyLookup<T> first, IHierarchyLookup<T> second) {
++        this.first = first;
++        this.second = second;
++    }
++
++    @SuppressWarnings("unchecked")
++    public <ANY> List<ANY> getMerged(Object first, Object second) {
++        Objects.requireNonNull(first);
++        Objects.requireNonNull(second);
++        try {
++            return (List<ANY>) mergedCache.get(Pair.of(first.getClass(), second.getClass()), () -> {
++                List<T> firstList = this.first.get(first);
++                List<T> secondList = this.second.get(second);
++                if (firstList.isEmpty()) {
++                    return secondList;
++                } else if (secondList.isEmpty()) {
++                    return firstList;
++                }
++                return ImmutableList.sortedCopyOf(Comparator.comparingInt(JadeProtocol.priorities::byValue), Iterables.concat(firstList, secondList));
++            });
++        } catch (ExecutionException e) {
++            HorizonLogger.LOGGER.severe(e.getMessage());
++        }
++        return List.of();
++    }
++
++    @Override
++    public void register(Class<?> clazz, T provider) {
++        if (first.isClassAcceptable(clazz)) {
++            first.register(clazz, provider);
++        } else if (second.isClassAcceptable(clazz)) {
++            second.register(clazz, provider);
++        } else {
++            throw new IllegalArgumentException("Class " + clazz + " is not acceptable");
++        }
++    }
++
++    @Override
++    public boolean isClassAcceptable(Class<?> clazz) {
++        return first.isClassAcceptable(clazz) || second.isClassAcceptable(clazz);
++    }
++
++    @Override
++    public List<T> get(Class<?> clazz) {
++        List<T> result = first.get(clazz);
++        if (result.isEmpty()) {
++            result = second.get(clazz);
++        }
++        return result;
++    }
++
++    @Override
++    public boolean isEmpty() {
++        return first.isEmpty() && second.isEmpty();
++    }
++
++    @Override
++    public Stream<Map.Entry<Class<?>, Collection<T>>> entries() {
++        return Stream.concat(first.entries(), second.entries());
++    }
++
++    @Override
++    public void invalidate() {
++        first.invalidate();
++        second.invalidate();
++        mergedCache.invalidateAll();
++    }
++
++    @Override
++    public void loadComplete(PriorityStore<ResourceLocation, IJadeProvider> priorityStore) {
++        first.loadComplete(priorityStore);
++        second.loadComplete(priorityStore);
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PriorityStore.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PriorityStore.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..88d2eadaad1260bf0f9d57475e990dd8fee3ee0a
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/PriorityStore.java
+@@ -0,0 +1,73 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.Sets;
++import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
++import it.unimi.dsi.fastutil.objects.Object2IntMap;
++
++import java.util.Collection;
++import java.util.Comparator;
++import java.util.List;
++import java.util.Objects;
++import java.util.Set;
++import java.util.function.BiFunction;
++import java.util.function.Function;
++import java.util.function.ToIntFunction;
++
++public class PriorityStore<K, V> {
++
++    private final Object2IntMap<K> priorities = new Object2IntLinkedOpenHashMap<>();
++    private final Function<V, K> keyGetter;
++    private final ToIntFunction<V> defaultPriorityGetter;
++    private ImmutableList<K> sortedList = ImmutableList.of();
++    private BiFunction<PriorityStore<K, V>, Collection<K>, List<K>> sortingFunction = (store, allKeys) -> allKeys.stream()
++            .sorted(Comparator.comparingInt(store::byKey))
++            .toList();
++
++    public PriorityStore(ToIntFunction<V> defaultPriorityGetter, Function<V, K> keyGetter) {
++        this.defaultPriorityGetter = defaultPriorityGetter;
++        this.keyGetter = keyGetter;
++    }
++
++    public void setSortingFunction(BiFunction<PriorityStore<K, V>, Collection<K>, List<K>> sortingFunction) {
++        this.sortingFunction = sortingFunction;
++    }
++
++    public void put(V provider) {
++        Objects.requireNonNull(provider);
++        put(provider, defaultPriorityGetter.applyAsInt(provider));
++    }
++
++    public void put(V provider, int priority) {
++        Objects.requireNonNull(provider);
++        K uid = keyGetter.apply(provider);
++        Objects.requireNonNull(uid);
++        priorities.put(uid, priority);
++    }
++
++    public void putUnsafe(K key, int priority) {
++        Objects.requireNonNull(key);
++        priorities.put(key, priority);
++    }
++
++    public void sort(Set<K> extraKeys) {
++        Set<K> allKeys = priorities.keySet();
++        if (!extraKeys.isEmpty()) {
++            allKeys = Sets.union(priorities.keySet(), extraKeys);
++        }
++
++        sortedList = ImmutableList.copyOf(sortingFunction.apply(this, allKeys));
++    }
++
++    public int byValue(V value) {
++        return byKey(keyGetter.apply(value));
++    }
++
++    public int byKey(K id) {
++        return priorities.getInt(id);
++    }
++
++    public ImmutableList<K> getSortedList() {
++        return sortedList;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ViewGroup.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ViewGroup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a5c47418ec6c5b2daced358cb28697869fcde96
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/ViewGroup.java
+@@ -0,0 +1,63 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.ListTag;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.List;
++import java.util.function.Function;
++
++public class ViewGroup<T> {
++
++    public final List<T> views;
++    @Nullable
++    public String id;
++    @Nullable
++    protected CompoundTag extraData;
++
++    public ViewGroup(List<T> views) {
++        this.views = views;
++    }
++
++    public void save(CompoundTag tag, Function<T, CompoundTag> writer) {
++        ListTag list = new ListTag();
++        for (var view : views) {
++            list.add(writer.apply(view));
++        }
++        tag.put("Views", list);
++        if (id != null) {
++            tag.putString("Id", id);
++        }
++        if (extraData != null) {
++            tag.put("Data", extraData);
++        }
++    }
++
++    public static <T> boolean saveList(CompoundTag tag, String key, List<ViewGroup<T>> groups, Function<T, CompoundTag> writer) {
++        if (groups == null || groups.isEmpty()) {
++            return false;
++        }
++
++        ListTag groupList = new ListTag();
++        for (ViewGroup<T> group : groups) {
++            if (group.views.isEmpty()) {
++                continue;
++            }
++            CompoundTag groupTag = new CompoundTag();
++            group.save(groupTag, writer);
++            groupList.add(groupTag);
++        }
++        if (!groupList.isEmpty()) {
++            tag.put(key, groupList);
++            return true;
++        }
++        return false;
++    }
++
++    public CompoundTag getExtraData() {
++        if (extraData == null) {
++            extraData = new CompoundTag();
++        }
++        return extraData;
++    }
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/WrappedHierarchyLookup.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/WrappedHierarchyLookup.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..dc590a92320007f0326ffa20c9007dcbb0a97cf1
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/util/WrappedHierarchyLookup.java
+@@ -0,0 +1,97 @@
++package dev.horizonmc.horizon.protocol.jade.provider.util;
++
++import com.google.common.collect.Lists;
++import dev.horizonmc.horizon.protocol.jade.accessor.BlockAccessor;
++import dev.horizonmc.horizon.protocol.jade.accessor.RequestAccessor;
++import dev.horizonmc.horizon.protocol.jade.provider.IJadeProvider;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.world.level.block.Block;
++import org.apache.commons.lang3.tuple.Pair;
++import org.jetbrains.annotations.Nullable;
++
++import java.util.Collection;
++import java.util.List;
++import java.util.Map;
++import java.util.function.Function;
++import java.util.stream.Stream;
++
++public class WrappedHierarchyLookup<T extends IJadeProvider> extends HierarchyLookup<T> {
++
++    public final List<Pair<IHierarchyLookup<T>, Function<RequestAccessor<?>, @Nullable Object>>> overrides = Lists.newArrayList();
++    private boolean empty = true;
++
++    public WrappedHierarchyLookup() {
++        super(Object.class, true);
++        overrides.add(Pair.of(new HierarchyLookup<>(Block.class, true), accessor -> {
++            if (accessor instanceof BlockAccessor blockAccessor) {
++                return blockAccessor.block();
++            }
++            return null;
++        }));
++    }
++
++    public List<T> get(RequestAccessor<?> accessor) {
++        List<T> list = Lists.newArrayList();
++        for (var override : overrides) {
++            Object o = override.getRight().apply(accessor);
++            if (o != null) {
++                list.addAll(override.getLeft().get(o));
++            }
++        }
++        list.addAll(get(accessor.target()));
++        return list;
++    }
++
++    @Override
++    public void register(Class<?> clazz, T provider) {
++        for (var override : overrides) {
++            if (override.getLeft().isClassAcceptable(clazz)) {
++                override.getLeft().register(clazz, provider);
++                empty = false;
++                return;
++            }
++        }
++        super.register(clazz, provider);
++        empty = false;
++    }
++
++    @Override
++    public boolean isClassAcceptable(Class<?> clazz) {
++        for (var override : overrides) {
++            if (override.getLeft().isClassAcceptable(clazz)) {
++                return true;
++            }
++        }
++        return super.isClassAcceptable(clazz);
++    }
++
++    @Override
++    public void invalidate() {
++        for (var override : overrides) {
++            override.getLeft().invalidate();
++        }
++        super.invalidate();
++    }
++
++    @Override
++    public void loadComplete(PriorityStore<ResourceLocation, IJadeProvider> priorityStore) {
++        for (var override : overrides) {
++            override.getLeft().loadComplete(priorityStore);
++        }
++        super.loadComplete(priorityStore);
++    }
++
++    @Override
++    public boolean isEmpty() {
++        return empty;
++    }
++
++    @Override
++    public Stream<Map.Entry<Class<?>, Collection<T>>> entries() {
++        Stream<Map.Entry<Class<?>, Collection<T>>> stream = super.entries();
++        for (var override : overrides) {
++            stream = Stream.concat(stream, override.getLeft().entries());
++        }
++        return stream;
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
+index f8790ab5b7c1279719271ee57c00f4f2d6ce9714..65554bda5f339834a01589c7d245ac0d03de0d58 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
++++ b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
+@@ -58,7 +58,7 @@ public class Armadillo extends Animal {
+     public final AnimationState rollOutAnimationState = new AnimationState();
+     public final AnimationState rollUpAnimationState = new AnimationState();
+     public final AnimationState peekAnimationState = new AnimationState();
+-    private int scuteTime;
++    public int scuteTime; // Horizon - private -> public
+     private boolean peekReceivedClient = false;
+ 
+     public Armadillo(EntityType<? extends Animal> type, Level world) {
+diff --git a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
+index 09c4cf772df4644413e40055fedcdf42ee8064fd..680bd1bf7950d1df9993bfef692681f229cd0c08 100644
+--- a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
++++ b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
+@@ -293,7 +293,7 @@ public class Tadpole extends AbstractFish {
+ 
+     }
+ 
+-    private int getTicksLeftUntilAdult() {
++    public int getTicksLeftUntilAdult() { // Horizon - private -> public
+         return Math.max(0, Tadpole.ticksToBeFrog - this.age);
+     }
+ 
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java b/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
+index fca0131b9a90ac026a24cf579b17928c19173f3f..525e9a3a11debe55f864cb39c4d0612eb3e62a7d 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
+@@ -68,7 +68,7 @@ public class TrialSpawnerData {
+     });
+     public final Set<UUID> detectedPlayers;
+     public final Set<UUID> currentMobs;
+-    protected long cooldownEndsAt;
++    public long cooldownEndsAt; // Horizon - protected -> public
+     protected long nextMobSpawnsAt;
+     protected int totalMobsSpawned;
+     public Optional<SpawnData> nextSpawnData;

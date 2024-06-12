@@ -1,0 +1,131 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 12 Jun 2024 15:05:39 +0400
+Subject: [PATCH] AppleSkin Protocol
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index b3a2272cac44f4b4645d412fd74a9f65f99427b4..b8dde788f4570c6d0c97150ab4f1b1a58b9f23de 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -207,4 +207,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "horizon-carpet-support", category = {"protocols"})
+     public static boolean horizonCarpetSupport = false;
+ 
++    @GlobalConfig(name = "appleskin-protocol", category = {"protocols"})
++    public static boolean appleskinProtocol = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/AppleSkinProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/AppleSkinProtocol.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..27785cf733c3ec9c0ea654e6041abca91e0b404a
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/AppleSkinProtocol.java
+@@ -0,0 +1,106 @@
++package dev.horizonmc.horizon.protocol;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.protocol.core.HorizonProtocol;
++import dev.horizonmc.horizon.protocol.core.ProtocolHandler;
++import dev.horizonmc.horizon.protocol.core.ProtocolUtils;
++import net.minecraft.resources.ResourceLocation;
++import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ServerPlayer;
++import net.minecraft.world.food.FoodData;
++import org.jetbrains.annotations.Contract;
++import org.jetbrains.annotations.NotNull;
++
++import java.util.HashMap;
++import java.util.HashSet;
++import java.util.Map;
++import java.util.Set;
++import java.util.UUID;
++
++@HorizonProtocol(namespace = "appleskin")
++public class AppleSkinProtocol {
++
++    public static final String PROTOCOL_ID = "appleskin";
++
++    private static final ResourceLocation SATURATION_KEY = id("saturation_sync");
++    private static final ResourceLocation EXHAUSTION_KEY = id("exhaustion_sync");
++
++    private static final Map<UUID, Float> previousSaturationLevels = new HashMap<>();
++    private static final Map<UUID, Float> previousExhaustionLevels = new HashMap<>();
++
++    private static final float MINIMUM_EXHAUSTION_CHANGE_THRESHOLD = 0.01F;
++
++    private static final Set<ServerPlayer> players = new HashSet<>();
++
++    @Contract("_ -> new")
++    public static @NotNull ResourceLocation id(String path) {
++        return new ResourceLocation(PROTOCOL_ID, path);
++    }
++
++    @ProtocolHandler.PlayerJoin
++    public static void onPlayerLoggedIn(@NotNull ServerPlayer player) {
++        if (HorizonConfig.appleskinProtocol) {
++            resetPlayerData(player);
++        }
++    }
++
++    @ProtocolHandler.PlayerLeave
++    public static void onPlayerLoggedOut(@NotNull ServerPlayer player) {
++        if (HorizonConfig.appleskinProtocol) {
++            players.remove(player);
++            resetPlayerData(player);
++        }
++    }
++
++    @ProtocolHandler.MinecraftRegister(ignoreId = true)
++    public static void onPlayerSubscribed(@NotNull ServerPlayer player) {
++        if (HorizonConfig.appleskinProtocol) {
++            players.add(player);
++        }
++    }
++
++    @ProtocolHandler.Ticker
++    public static void tick() {
++        if (HorizonConfig.appleskinProtocol) {
++            for (ServerPlayer player : players) {
++                FoodData data = player.getFoodData();
++
++                float saturation = data.getSaturationLevel();
++                Float previousSaturation = previousSaturationLevels.get(player.getUUID());
++                if (previousSaturation == null || saturation != previousSaturation) {
++                    ProtocolUtils.sendPayloadPacket(player, SATURATION_KEY, buf -> {
++                        buf.writeFloat(saturation);
++                    });
++                    previousSaturationLevels.put(player.getUUID(), saturation);
++                }
++
++                float exhaustion = data.getExhaustionLevel();
++                Float previousExhaustion = previousExhaustionLevels.get(player.getUUID());
++                if (previousExhaustion == null || Math.abs(exhaustion - previousExhaustion) >= MINIMUM_EXHAUSTION_CHANGE_THRESHOLD) {
++                    ProtocolUtils.sendPayloadPacket(player, EXHAUSTION_KEY, buf -> {
++                        buf.writeFloat(exhaustion);
++                    });
++                    previousExhaustionLevels.put(player.getUUID(), exhaustion);
++                }
++            }
++        }
++    }
++
++    @ProtocolHandler.ReloadServer
++    public static void onServerReload() {
++        if (!HorizonConfig.appleskinProtocol) {
++            disableAllPlayer();
++        }
++    }
++
++    public static void disableAllPlayer() {
++        for (ServerPlayer player : MinecraftServer.getServer().getPlayerList().getPlayers()) {
++            onPlayerLoggedOut(player);
++        }
++    }
++
++    private static void resetPlayerData(@NotNull ServerPlayer player) {
++        previousExhaustionLevels.remove(player.getUUID());
++        previousSaturationLevels.remove(player.getUUID());
++    }
++}

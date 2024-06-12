@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 12 Jun 2024 16:33:00 +0400
+Subject: [PATCH] Stick can change ArmorStand arm status
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 8ccc13bfcca60422b2403ab12aa528eca06d1b59..1c647cd4b67771c0a26c74b2c6f1dbf552359008 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -213,4 +213,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "jade-protocol", category = {"protocols"})
+     public static boolean jadeProtocol = false;
+ 
++    @GlobalConfig(name = "stick-change-armorstand-arm-status", category = {"utils"})
++    public static boolean stickChangeArmorStandArmStatus = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+index 92521cbedcf89a855f10a3401933acaf84bc3f98..9c52433d6a54198ae15f12dc0fa095cf20ef13ae 100644
+--- a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
++++ b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+@@ -396,6 +396,12 @@ public class ArmorStand extends LivingEntity {
+                         return InteractionResult.SUCCESS;
+                     }
+                 } else {
++                    // Horizon start - stick can change ArmorStand arm status
++                    if (dev.horizonmc.horizon.HorizonConfig.stickChangeArmorStandArmStatus && itemstack.is(Items.STICK) && player.isShiftKeyDown()) {
++                        setShowArms(!isShowArms());
++                    }
++                    // Horizon end - stick can change ArmorStand arm status
++
+                     if (this.isDisabled(enumitemslot)) {
+                         return InteractionResult.FAIL;
+                     }
