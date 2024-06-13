@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index d23ecfabf6bf1e355fb2efe5abd80236259ce3c4..1f0fd3cbd45e3d246d44f0861e6851cc30c1559b 100644
+index d23ecfabf6bf1e355fb2efe5abd80236259ce3c4..6368a1420681f3eefb828329d2c01f3b4afb16ab 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -31,7 +31,7 @@ index d23ecfabf6bf1e355fb2efe5abd80236259ce3c4..1f0fd3cbd45e3d246d44f0861e6851cc
 -            "Specification-Vendor" to "Purpur Team", // Purpur
 -            "Brand-Id" to "purpurmc:purpur", // Purpur
 -            "Brand-Name" to "Purpur", // Purpur
-+            "Specification-Vendor" to "Horizon Team", // Purpur // Horizon
++            "Specification-Vendor" to "GideonWhite1029", // Purpur // Horizon
 +            "Brand-Id" to "horizonmc:horizon", // Purpur // Horizon
 +            "Brand-Name" to "Horizon", // Purpur
              "Build-Number" to (build ?: ""),
@@ -50,16 +50,47 @@ index d23ecfabf6bf1e355fb2efe5abd80236259ce3c4..1f0fd3cbd45e3d246d44f0861e6851cc
  }
  
  tasks.registerRunTask("runBundler") {
+diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
+index 8cde30544e14f8fc2dac32966ae3c21f8cf3a551..efa0346123579c81f8da6276f38caac2b0b58002 100644
+--- a/src/main/java/com/destroystokyo/paper/Metrics.java
++++ b/src/main/java/com/destroystokyo/paper/Metrics.java
+@@ -593,7 +593,7 @@ public class Metrics {
+             boolean logFailedRequests = config.getBoolean("logFailedRequests", false);
+             // Only start Metrics, if it's enabled in the config
+             if (config.getBoolean("enabled", true)) {
+-                Metrics metrics = new Metrics("Purpur", serverUUID, logFailedRequests, Bukkit.getLogger()); // Pufferfish // Purpur
++                Metrics metrics = new Metrics("Horizon", serverUUID, logFailedRequests, Bukkit.getLogger()); // Pufferfish // Purpur // Horizon
+ 
+                 metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
+                     String minecraftVersion = Bukkit.getVersion();
+@@ -603,7 +603,7 @@ public class Metrics {
+ 
+                 metrics.addCustomChart(new Metrics.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
+                 metrics.addCustomChart(new Metrics.SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode() ? "bungee" : "offline"))); // Purpur
+-                metrics.addCustomChart(new Metrics.SimplePie("purpur_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur
++                metrics.addCustomChart(new Metrics.SimplePie("horizon_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur // Horizon
+ 
+                 metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
+                     Map<String, Map<String, Integer>> map = new HashMap<>();
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
-index 6d36fc6d8e22d9b68dea3830f6ecc8763184c343..015a5253d3b8d93ee15c1808f12a527522f1df72 100644
+index 6d36fc6d8e22d9b68dea3830f6ecc8763184c343..69720b6a5ef268430ac248ac4c97ee698d433f4f 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 +++ b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
+@@ -36,7 +36,7 @@ public class PaperVersionFetcher implements VersionFetcher {
+     private static final int DISTANCE_ERROR = -1;
+     private static final int DISTANCE_UNKNOWN = -2;
+     // Purpur start
+-    private static final String DOWNLOAD_PAGE = "https://purpurmc.org/downloads";
++    private static final String DOWNLOAD_PAGE = "https://github.com/GideonWhite1029/Horizon";
+     private static int distance = DISTANCE_UNKNOWN; public int distance() { return distance; }
+     // Purpur end
+ 
 @@ -52,7 +52,7 @@ public class PaperVersionFetcher implements VersionFetcher {
          if (build.buildNumber().isEmpty() && build.gitCommit().isEmpty()) {
              updateMessage = text("You are running a development version without access to version information", color(0xFF5300));
          } else {
 -            updateMessage = getUpdateStatusMessage("PurpurMC/Purpur", build); // Purpur
-+            updateMessage = getUpdateStatusMessage("HorizonMC/Horizon", build); // Purpur // Horizon
++            updateMessage = getUpdateStatusMessage("GideonWhite1029/Horizon", build); // Purpur // Horizon
          }
          final @Nullable Component history = this.getHistory();
  
@@ -76,6 +107,30 @@ index 3cb56595822799926a8141e60a42f5d1edfc6de5..665e6ea074ddc95ebb6f6e58820ec525
                  .variable(LineReader.HISTORY_FILE, java.nio.file.Paths.get(".console_history"))
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
+diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..016ee7e8109102751c9449c79e38d381bddef720 100644
+--- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
+@@ -32,6 +32,7 @@ public record ServerBuildInfoImpl(
+ 
+     private static final String BRAND_PAPER_NAME = "Paper";
+     private static final String BRAND_PURPUR_NAME = "Purpur"; // Purpur
++    private static final String BRAND_HORIZON_NAME = "Horizon"; // Horizon
+ 
+     private static final String BUILD_DEV = "DEV";
+ 
+@@ -43,9 +44,9 @@ public record ServerBuildInfoImpl(
+         this(
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_ID)
+                 .map(Key::key)
+-                .orElse(BRAND_PURPUR_ID), // Purpur
++                .orElse(BRAND_HORIZON_ID), // Purpur // Horizon
+             getManifestAttribute(manifest, ATTRIBUTE_BRAND_NAME)
+-                .orElse(BRAND_PURPUR_NAME), // Purpur
++                .orElse(BRAND_HORIZON_NAME), // Purpur // Horizon
+             SharedConstants.getCurrentVersion().getId(),
+             SharedConstants.getCurrentVersion().getName(),
+             getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/CrashReport.java b/src/main/java/net/minecraft/CrashReport.java
 index c366d84518979e842a6f10f969a5951539ecac93..297d3ddae5e6709e686ec1f025ddf3388cddcb30 100644
 --- a/src/main/java/net/minecraft/CrashReport.java
@@ -119,7 +174,7 @@ index 330bae815c0a332e3dc9fa7b224c9f92098199b9..00667d64aa5e45490502580760e0e8fc
              // Purpur start
              if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 6e78500a6265b0192095379704b1d661ef56ba32..339efe4eb44861b316ad67ff5a4fd5ae5bacb35f 100644
+index f6b6d0d753e81d58cd21ba41d1e2f3e63267b743..76f3ec2524ed380a137df4e986793e5c3a897b78 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
@@ -158,7 +213,7 @@ index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..207400ecf514a1609979c363ddf28c05
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index b5092184076946b7169b67086b9542a9685c15f3..11c6b8b4de03629cb46ae7b5939dc1335ab764e3 100644
+index cac4500adee80168823aa4454d6da9a7cb096186..4ed53c27502a18baad6c91503a7c4b7e0db9122e 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -230,8 +230,7 @@ public class PurpurConfig {

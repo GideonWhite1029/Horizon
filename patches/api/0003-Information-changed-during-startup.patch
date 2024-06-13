@@ -4,8 +4,26 @@ Date: Thu, 28 Mar 2024 16:57:54 +0400
 Subject: [PATCH] Information changed during startup
 
 
+diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+index 7107eabf02d9d9b69d97c978ba421ad52031ec3f..f4dbe9daf6521a20a0aa57a110836fb976cffffb 100644
+--- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
++++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
+@@ -25,6 +25,13 @@ public interface ServerBuildInfo {
+     Key BRAND_PURPUR_ID = Key.key("purpurmc", "purpur");
+     // Purpur end
+ 
++    // Horizon start
++    /**
++     * The brand id for Horizon.
++     */
++    Key BRAND_HORIZON_ID = Key.key("gideonwhite1029", "horizon");
++    // Horizon end
++
+     /**
+      * Gets the {@code ServerBuildInfo}.
+      *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 75fe3bdbd44440c7cbea45dbd248e260f322dbb2..bf161f9bb61b381a464debb8ca8e389fe294b418 100644
+index bb09c468ab1261ea4eaf59012d30a2e45199caf7..fe0ecdae1b4e09c48ad09806bdd9676b9d77b219 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -119,8 +119,18 @@ public final class Bukkit {
