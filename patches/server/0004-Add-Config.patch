@@ -907,7 +907,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index d59af67ac01992b940c008b8ca4493d5c52e6928..5c16847ebbb76670e0c3c19a33ef581bf689eb4a 100644
+index 75eae949dbf6a844411f37fc8919684351ca2e6a..8c607d0cb682665e26d432183daea5442b2ff179 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -927,7 +927,7 @@ index d59af67ac01992b940c008b8ca4493d5c52e6928..5c16847ebbb76670e0c3c19a33ef581b
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              Arrays.fill( this.recentTps, 20 );
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index c552031986f2945f410e34af48812eeb90ce3c57..64d8f194895d279a9357048084aa02383eca3955 100644
+index 4ba91271fef01351267e56f75ea7352263dbb28d..289be5e52a846d397413605947203ff9ff9a2105 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -243,6 +243,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
@@ -940,10 +940,10 @@ index c552031986f2945f410e34af48812eeb90ce3c57..64d8f194895d279a9357048084aa0238
          this.setFlightAllowed(dedicatedserverproperties.allowFlight);
          this.setMotd(dedicatedserverproperties.motd);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 76f3ec2524ed380a137df4e986793e5c3a897b78..a3e5253eb3bcb2ea7aad161748ebf9ed1502a42a 100644
+index f4eb8923a6b975a8c967414c5d203da290dcedb8..932f341cc6e7691469efeb8f7ebcf226f9ca0354 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1077,6 +1077,7 @@ public final class CraftServer implements Server {
+@@ -1100,6 +1100,7 @@ public final class CraftServer implements Server {
              playerMetadata.removeAll(plugin);
          }
          // Paper end
@@ -951,7 +951,7 @@ index 76f3ec2524ed380a137df4e986793e5c3a897b78..a3e5253eb3bcb2ea7aad161748ebf9ed
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3096,6 +3097,13 @@ public final class CraftServer implements Server {
+@@ -3119,6 +3120,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
@@ -966,7 +966,7 @@ index 76f3ec2524ed380a137df4e986793e5c3a897b78..a3e5253eb3bcb2ea7aad161748ebf9ed
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 7c94342926590bbf83a4775fe77eb9dd1321f186..1569ba32f78c2fb28300e5a9982eb3e64c46e09b 100644
+index 14c8819b9be45b23832a51342fc814356c336b43..e1a4311fd33e366b39673a0aa0c1928b374f18de 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -184,6 +184,14 @@ public class Main {

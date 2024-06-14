@@ -727,11 +727,10 @@ index 199789d56d22fcb1b77ebd56805cc28aa5a5ab0a..00000000000000000000000000000000
 -    }
 -}
 diff --git a/src/main/java/co/aikar/timings/TimingHistory.java b/src/main/java/co/aikar/timings/TimingHistory.java
-deleted file mode 100644
-index 02e88db63be2d5e31da6b65157ba7b971b1f10f3..0000000000000000000000000000000000000000
+index 2d87237ea99d42c6ce896d52a1b2e5c3ec4d4568..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 100644
 --- a/src/main/java/co/aikar/timings/TimingHistory.java
-+++ /dev/null
-@@ -1,355 +0,0 @@
++++ b/src/main/java/co/aikar/timings/TimingHistory.java
+@@ -1,352 +0,0 @@
 -/*
 - * This file is licensed under the MIT License (MIT).
 - *
@@ -885,17 +884,14 @@ index 02e88db63be2d5e31da6b65157ba7b971b1f10f3..00000000000000000000000000000000
 -                                        }
 -                                    }
 -                                ),
--                                toObjectMapper(input.tileEntityCounts.entrySet(),
--                                    new Function<Map.Entry<Material, Counter>, JSONPair>() {
--                                        @NotNull
--                                        @Override
--                                        public JSONPair apply(Map.Entry<Material, Counter> entry) {
--                                            tileEntityTypeSet.add(entry.getKey());
--                                            return pair(
--                                                    String.valueOf(entry.getKey().ordinal()),
--                                                    entry.getValue().count()
--                                            );
--                                        }
+-                                toObjectMapper(
+-                                    input.tileEntityCounts.entrySet(),
+-                                    entry -> {
+-                                        tileEntityTypeSet.add(entry.getKey());
+-                                        return pair(
+-                                            String.valueOf(entry.getKey().ordinal()),
+-                                            entry.getValue().count()
+-                                        );
 -                                    }
 -                                )
 -                            );
@@ -2127,10 +2123,10 @@ index abe256e1e45ce28036da4aa1586715bc8a1a3414..b359306500e640f4b0761ae9aa996cf6
      }
  
 diff --git a/src/main/java/org/bukkit/command/SimpleCommandMap.java b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-index fdedac32544be6534288c8ba28abe7f5c4c56f3b..d750d59ba9c6b0bcc3d0b897c69cc0b3e3ee27c7 100644
+index 7740ad53796d08584bb0110f99af5639993e4d71..7eacc974a4f5da9e10e153d502fa794ea43319a2 100644
 --- a/src/main/java/org/bukkit/command/SimpleCommandMap.java
 +++ b/src/main/java/org/bukkit/command/SimpleCommandMap.java
-@@ -38,7 +38,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -39,7 +39,6 @@ public class SimpleCommandMap implements CommandMap {
          register("bukkit", new VersionCommand("version"));
          register("bukkit", new ReloadCommand("reload"));
          //register("bukkit", new PluginsCommand("plugins")); // Paper
@@ -2138,15 +2134,19 @@ index fdedac32544be6534288c8ba28abe7f5c4c56f3b..d750d59ba9c6b0bcc3d0b897c69cc0b3
      }
  
      public void setFallbackCommands() {
-@@ -70,7 +69,6 @@ public class SimpleCommandMap implements CommandMap {
+@@ -71,9 +70,10 @@ public class SimpleCommandMap implements CommandMap {
       */
      @Override
      public boolean register(@NotNull String label, @NotNull String fallbackPrefix, @NotNull Command command) {
 -        command.timings = co.aikar.timings.TimingsManager.getCommandTiming(fallbackPrefix, command); // Paper
-         label = label.toLowerCase(java.util.Locale.ENGLISH).trim();
-         fallbackPrefix = fallbackPrefix.toLowerCase(java.util.Locale.ENGLISH).trim();
++
+         label = label.toLowerCase(Locale.ROOT).trim();
+         fallbackPrefix = fallbackPrefix.toLowerCase(Locale.ROOT).trim();
++
          boolean registered = register(label, command, false, fallbackPrefix);
-@@ -165,12 +163,6 @@ public class SimpleCommandMap implements CommandMap {
+ 
+         Iterator<String> iterator = command.getAliases().iterator();
+@@ -166,12 +166,6 @@ public class SimpleCommandMap implements CommandMap {
          parsedArgs = event.getArgs();
          // Purpur end
  
@@ -2160,10 +2160,10 @@ index fdedac32544be6534288c8ba28abe7f5c4c56f3b..d750d59ba9c6b0bcc3d0b897c69cc0b3
              //try (co.aikar.timings.Timing ignored = target.timings.startTiming()) { // Paper - use try with resources // Purpur
              // Note: we don't return the result of target.execute as thats success / failure, we return handled (true) or not handled (false)
 diff --git a/src/main/java/org/bukkit/plugin/SimplePluginManager.java b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-index 07a9c9e254188c251165ca84c8e961fccda01175..95b66384a8115787288dc7e67cfa317dfc590022 100644
+index 003bece642b682985625db93cad93026352bfc66..cf8d9cf4a8246c8eee419be056276851cbb257e1 100644
 --- a/src/main/java/org/bukkit/plugin/SimplePluginManager.java
 +++ b/src/main/java/org/bukkit/plugin/SimplePluginManager.java
-@@ -719,12 +719,7 @@ public final class SimplePluginManager implements PluginManager {
+@@ -720,12 +720,7 @@ public final class SimplePluginManager implements PluginManager {
              throw new IllegalPluginAccessException("Plugin attempted to register " + event + " while not enabled");
          }
  
@@ -2177,7 +2177,7 @@ index 07a9c9e254188c251165ca84c8e961fccda01175..95b66384a8115787288dc7e67cfa317d
      }
  
      @NotNull
-@@ -954,8 +949,7 @@ public final class SimplePluginManager implements PluginManager {
+@@ -955,8 +950,7 @@ public final class SimplePluginManager implements PluginManager {
  
      @Override
      public boolean useTimings() {
@@ -2187,7 +2187,7 @@ index 07a9c9e254188c251165ca84c8e961fccda01175..95b66384a8115787288dc7e67cfa317d
      }
  
      /**
-@@ -964,7 +958,6 @@ public final class SimplePluginManager implements PluginManager {
+@@ -965,7 +959,6 @@ public final class SimplePluginManager implements PluginManager {
       * @param use True if per event timing code should be used
       */
      public void useTimings(boolean use) {

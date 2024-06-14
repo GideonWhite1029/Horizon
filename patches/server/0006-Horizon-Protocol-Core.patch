@@ -577,7 +577,7 @@ index bc885d2cc95572ec68f1df62555fdba7998b1d93..add1addd7972e7d2c07a5f825af64039
          };
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 5c16847ebbb76670e0c3c19a33ef581bf689eb4a..153550ee259e59e16f4a26b27a3d2d56d86983e9 100644
+index 8c607d0cb682665e26d432183daea5442b2ff179..bbd97cd2e7c95f4b8dbfeb90bee4b889d5172d2e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1835,6 +1835,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -590,7 +590,7 @@ index 5c16847ebbb76670e0c3c19a33ef581bf689eb4a..153550ee259e59e16f4a26b27a3d2d56
          for (int i = 0; i < this.tickables.size(); ++i) {
              ((Runnable) this.tickables.get(i)).run();
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 72c6bd5cda4d2c7ce5747d34db8cb2a68b6b0cea..ec1744790dbe0c9d80a899579b8f559fe17ca20c 100644
+index 82bb6c9c0cc26d13080dbd66a6f495fcb33f2cd6..df640a92475bac8ba7b69c3ea6d1b5922288f817 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -162,6 +162,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -635,10 +635,10 @@ index 5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5..ce86e1a3d8956557475ec070b478816d
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
          ServerLevel worldserver = entityplayer.serverLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index f65d51beb5b8d45d96073a21e2ff8a8158306944..d5c2bf709de7f8ffe950a1d56ad13deaac864cdc 100644
+index 932f341cc6e7691469efeb8f7ebcf226f9ca0354..4210fe3053b04d99476577ac0f8bdef04cade8f5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -482,6 +482,7 @@ public final class CraftServer implements Server {
+@@ -485,6 +485,7 @@ public final class CraftServer implements Server {
          }
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
@@ -646,7 +646,7 @@ index f65d51beb5b8d45d96073a21e2ff8a8158306944..d5c2bf709de7f8ffe950a1d56ad13dea
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1084,6 +1085,7 @@ public final class CraftServer implements Server {
+@@ -1107,6 +1108,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

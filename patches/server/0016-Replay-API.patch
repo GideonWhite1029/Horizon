@@ -117,7 +117,7 @@ index 2a0d54f06de7b959055459349365c85c67c11a3f..4c28daa79b50612d219df86501c0365f
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 36d7d39a69ed3bd340f2f61dd2ce4626e85712a3..7adda1eccc411f6bc983ee07fe90a96d1290f081 100644
+index 55fc1f2edcf5284a7eae7b7a8202c0c59971b2c7..dfef530e9bfb275497ba5d75fc10054a3bf6bc2c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1699,7 +1699,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -379,10 +379,10 @@ index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 8e8aa436e24a0ef87dc0da5ece83fd77eb1fff97..7be0efab103c1ac198ff0fd11130bcdcea16a113 100644
+index b0e04505fbe78018e1a6c813a66b929a056a3e25..ed744f3fef08f4ef543ec3d33f957eea3343db91 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -306,6 +306,7 @@ public final class CraftServer implements Server {
+@@ -308,6 +308,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher(); // Paper
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer; // Paper - Custom Potion Mixes
      private final org.leavesmc.leaves.entity.CraftBotManager botManager = new org.leavesmc.leaves.entity.CraftBotManager(); // Leaves
@@ -390,7 +390,7 @@ index 8e8aa436e24a0ef87dc0da5ece83fd77eb1fff97..7be0efab103c1ac198ff0fd11130bcdc
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -388,7 +389,7 @@ public final class CraftServer implements Server {
+@@ -390,7 +391,7 @@ public final class CraftServer implements Server {
      public CraftServer(DedicatedServer console, PlayerList playerList) {
          this.console = console;
          this.playerList = (DedicatedPlayerList) playerList;
@@ -399,7 +399,7 @@ index 8e8aa436e24a0ef87dc0da5ece83fd77eb1fff97..7be0efab103c1ac198ff0fd11130bcdc
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3366,4 +3367,11 @@ public final class CraftServer implements Server {
+@@ -3389,4 +3390,11 @@ public final class CraftServer implements Server {
          return botManager;
      }
      // Leaves end - Bot API
@@ -433,7 +433,7 @@ index 3c80296e430845c3a7b482738992f02a4ef0a181..3fd954fdcfd2aec5a8bc66630a5628ea
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 241340a6d66f17f2a31fb03ff0dfab121b856368..9f558602a80ec4ff9f9db0d0c1d78bdad715afb4 100644
+index 8211ec2c701687d8e5334156772cf435b89f3cb3..c5f48f50c506faa8d6b31704ded2bd7a9c039fe9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2232,7 +2232,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

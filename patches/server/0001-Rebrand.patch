@@ -145,7 +145,7 @@ index c366d84518979e842a6f10f969a5951539ecac93..297d3ddae5e6709e686ec1f025ddf338
          stringbuilder.append("// ");
          stringbuilder.append(CrashReport.getErrorComment());
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 330bae815c0a332e3dc9fa7b224c9f92098199b9..00667d64aa5e45490502580760e0e8fca2063b02 100644
+index 678a448edb5e167d5d2d3d162034312b8a0bf468..42406b43cfc2d18238c874f7519ea82bfddf3a1a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -959,7 +959,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -174,10 +174,10 @@ index 330bae815c0a332e3dc9fa7b224c9f92098199b9..00667d64aa5e45490502580760e0e8fc
              // Purpur start
              if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index f6b6d0d753e81d58cd21ba41d1e2f3e63267b743..76f3ec2524ed380a137df4e986793e5c3a897b78 100644
+index 07a04dcbd48430102268f8f44e9bce437214a00f..f4eb8923a6b975a8c967414c5d203da290dcedb8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
+@@ -265,7 +265,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
