@@ -28,10 +28,10 @@ index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 0c02fcbf76506bf2fc1ca2a16f361947ff6365b7..68f665e6ed7984fe95a45624180695d7e7af46c3 100644
+index c1d6b00c2e74cd19df9dd074a021024e0c9ac442..4c652eadd256b9171313d31f72700173abfbdc60 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -426,6 +426,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -430,6 +430,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private UUID originWorld;
      public boolean freezeLocked = false; // Paper - Freeze Tick Lock API
      public boolean fixedPose = false; // Paper - Expand Pose API
@@ -39,7 +39,7 @@ index 0c02fcbf76506bf2fc1ca2a16f361947ff6365b7..68f665e6ed7984fe95a45624180695d7
      public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
  
      public void setOrigin(@javax.annotation.Nonnull Location location) {
-@@ -2581,6 +2582,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2482,6 +2483,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end
@@ -47,7 +47,7 @@ index 0c02fcbf76506bf2fc1ca2a16f361947ff6365b7..68f665e6ed7984fe95a45624180695d7
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2733,6 +2735,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2634,6 +2636,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  immuneToFire = nbt.getBoolean("Purpur.FireImmune");
              }
              // Purpur end

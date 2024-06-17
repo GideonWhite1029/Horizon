@@ -19,7 +19,7 @@ index 9ca2fbf31f686e252b06a550d0bbd5e1a07dd3d6..07d91160b1d3a01ba63255481eb27bb2
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index ef520d1dd00ae9473c1f34e2df4d8b064fe4d6ea..88eaf7eecef1cad28210d23170f2c049b3833e6f 100644
+index fc87e3cfff1221a6cbaf3463ce972870f17c776a..6fc0098634bbe9ea07b61bdc7d4971745066c0c1 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
 @@ -26,6 +26,8 @@ import java.util.Map.Entry;

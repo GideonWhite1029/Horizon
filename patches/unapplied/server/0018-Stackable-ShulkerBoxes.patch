@@ -5,18 +5,18 @@ Subject: [PATCH] Stackable ShulkerBoxes
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 1c647cd4b67771c0a26c74b2c6f1dbf552359008..e9e00ffd148d3cee1580225da6d887d377765faa 100644
+index 67c047e2914a668729f5b94cb460579925bca18a..e4b30e13930f8bfe9d4c0f46679f3f82aafc2c3b 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -5,6 +5,7 @@ import dev.horizonmc.horizon.commands.HorizonCommand;
- import dev.horizonmc.horizon.config.ConfigVerify;
+@@ -4,6 +4,7 @@ import com.destroystokyo.paper.util.SneakyThrow;
+ import dev.horizonmc.horizon.commands.HorizonCommand;
  import dev.horizonmc.horizon.config.GlobalConfig;
  import dev.horizonmc.horizon.config.GlobalConfigManager;
 +import dev.horizonmc.horizon.util.MathUtils;
  import net.minecraft.server.MinecraftServer;
  import org.bukkit.Bukkit;
  import org.bukkit.command.Command;
-@@ -216,4 +217,17 @@ public final class HorizonConfig {
+@@ -121,4 +122,17 @@ public final class HorizonConfig {
      @GlobalConfig(name = "stick-change-armorstand-arm-status", category = {"utils"})
      public static boolean stickChangeArmorStandArmStatus = false;
  
@@ -121,7 +121,7 @@ index 0000000000000000000000000000000000000000..572077e10c78eaa9de65a0d54aebb4c6
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
-index 0db854f70332d3a256d3190155ac1aaa7523ed6f..348823ef983a2a3229750b82631baa0bbb76fc66 100644
+index 8b4f31e6039b2b21e049df01aff8c94e04e8063e..4d7b2d31cfe95b58ba862a1ca47adb421b4a7370 100644
 --- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
 @@ -24,10 +24,12 @@ import net.minecraft.world.entity.EntityType;
@@ -135,9 +135,9 @@ index 0db854f70332d3a256d3190155ac1aaa7523ed6f..348823ef983a2a3229750b82631baa0b
  import net.minecraft.world.level.Level;
 +import net.minecraft.world.level.block.ShulkerBoxBlock;
  import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.level.portal.DimensionTransition;
  import net.minecraft.world.phys.Vec3;
- // CraftBukkit start
-@@ -92,6 +94,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -93,6 +95,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
          // Horizon end
          this.setItem(stack);
          // Paper end - Don't use level random in entity constructors
@@ -151,7 +151,7 @@ index 0db854f70332d3a256d3190155ac1aaa7523ed6f..348823ef983a2a3229750b82631baa0b
      }
  
      public ItemEntity(Level world, double x, double y, double z, ItemStack stack, double velocityX, double velocityY, double velocityZ) {
-@@ -328,10 +337,48 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -329,10 +338,48 @@ public class ItemEntity extends Entity implements TraceableEntity {
      private boolean isMergable() {
          ItemStack itemstack = this.getItem();
  
@@ -202,7 +202,7 @@ index 0db854f70332d3a256d3190155ac1aaa7523ed6f..348823ef983a2a3229750b82631baa0b
          ItemStack itemstack1 = other.getItem();
  
 diff --git a/src/main/java/net/minecraft/world/entity/player/Inventory.java b/src/main/java/net/minecraft/world/entity/player/Inventory.java
-index ca7fbe4f8c1e1d2fb90095aa35be4dda3029c23e..e560cd41f2d4b908b9718ad170bce6f3667c48d8 100644
+index 6e66141dca61f777b354854b5d0bac2570b8bf3b..47e29dd230b3fa4889744af5bcbcf37fa4634b08 100644
 --- a/src/main/java/net/minecraft/world/entity/player/Inventory.java
 +++ b/src/main/java/net/minecraft/world/entity/player/Inventory.java
 @@ -111,7 +111,7 @@ public class Inventory implements Container, Nameable {
@@ -235,10 +235,10 @@ index ca7fbe4f8c1e1d2fb90095aa35be4dda3029c23e..e560cd41f2d4b908b9718ad170bce6f3
                      if (this.add(i, stack.split(j)) && notifiesClient && this.player instanceof ServerPlayer) {
                          ((ServerPlayer) this.player).connection.send(new ClientboundContainerSetSlotPacket(-2, 0, i, this.getItem(i)));
 diff --git a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
-index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e15966142bd0f 100644
+index c491291b522aebf34c7d990d2b485d1a0d19cdcd..9716ef6d8a381a52f0c1f00085fe31d32affef58 100644
 --- a/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/src/main/java/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -457,7 +457,7 @@ public abstract class AbstractContainerMenu {
+@@ -455,7 +455,7 @@ public abstract class AbstractContainerMenu {
  
                          if (slot1 != null && AbstractContainerMenu.canItemQuickReplace(slot1, itemstack2, true) && slot1.mayPlace(itemstack2) && (this.quickcraftType == 2 || itemstack2.getCount() >= this.quickcraftSlots.size()) && this.canDragTo(slot1)) {
                              int j1 = slot1.hasItem() ? slot1.getItem().getCount() : 0;
@@ -247,7 +247,7 @@ index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e1596
                              int l1 = Math.min(AbstractContainerMenu.getQuickCraftPlaceCount(this.quickcraftSlots, this.quickcraftType, itemstack1) + j1, k1);
  
                              l -= l1 - j1;
-@@ -576,7 +576,7 @@ public abstract class AbstractContainerMenu {
+@@ -574,7 +574,7 @@ public abstract class AbstractContainerMenu {
                                      slot.setByPlayer(itemstack3);
                                  }
                              } else if (ItemStack.isSameItemSameComponents(itemstack, itemstack3)) {
@@ -256,7 +256,7 @@ index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e1596
  
                                  optional1.ifPresent((itemstack4) -> {
                                      itemstack3.grow(itemstack4.getCount());
-@@ -646,7 +646,7 @@ public abstract class AbstractContainerMenu {
+@@ -644,7 +644,7 @@ public abstract class AbstractContainerMenu {
                          slot2 = (Slot) this.slots.get(slotIndex);
                          if (slot2.hasItem()) {
                              itemstack1 = slot2.getItem();
@@ -265,7 +265,7 @@ index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e1596
                          }
                      } else if (actionType == ClickType.THROW && this.getCarried().isEmpty() && slotIndex >= 0) {
                          slot2 = (Slot) this.slots.get(slotIndex);
-@@ -661,13 +661,13 @@ public abstract class AbstractContainerMenu {
+@@ -659,13 +659,13 @@ public abstract class AbstractContainerMenu {
                              j2 = button == 0 ? 1 : -1;
  
                              for (i2 = 0; i2 < 2; ++i2) {
@@ -281,7 +281,7 @@ index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e1596
                                              ItemStack itemstack6 = slot3.safeTake(itemstack5.getCount(), itemstack1.getMaxStackSize() - itemstack1.getCount(), player);
  
                                              itemstack1.grow(itemstack6.getCount());
-@@ -806,7 +806,7 @@ public abstract class AbstractContainerMenu {
+@@ -788,7 +788,7 @@ public abstract class AbstractContainerMenu {
          ItemStack itemstack1;
          int l;
  
@@ -290,7 +290,7 @@ index aa9c40471853a8bfb5170219b922d7041ace8220..98d80777884c96b5e273398f7f9e1596
              while (!stack.isEmpty()) {
                  if (fromLast) {
                      if (k < startIndex) {
-@@ -825,7 +825,7 @@ public abstract class AbstractContainerMenu {
+@@ -807,7 +807,7 @@ public abstract class AbstractContainerMenu {
                  // Paper end - Add PlayerTradeEvent and PlayerPurchaseEvent
                  if (!itemstack1.isEmpty() && ItemStack.isSameItemSameComponents(stack, itemstack1)) {
                      l = itemstack1.getCount() + stack.getCount();
@@ -313,10 +313,10 @@ index c39c773112fb8b534b926f2f2b47fe6fbb69fcb2..73f7bcf1c4c8456f543a37ab0630da40
  
      @Nullable
 diff --git a/src/main/java/net/minecraft/world/item/ItemStack.java b/src/main/java/net/minecraft/world/item/ItemStack.java
-index 88153ea23d63b24473483b5a9f5d40304dfd9e80..0da3b9430f28a3c6e70addca4dd170615253db48 100644
+index 14de84d5ee742d1136c90831d5cf1b64b59a333a..60f1138de03f42759b67fff8f4cac6b6f7dd6d03 100644
 --- a/src/main/java/net/minecraft/world/item/ItemStack.java
 +++ b/src/main/java/net/minecraft/world/item/ItemStack.java
-@@ -228,7 +228,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -225,7 +225,7 @@ public final class ItemStack implements DataComponentHolder {
      @Deprecated
      @Nullable
      private Item item;

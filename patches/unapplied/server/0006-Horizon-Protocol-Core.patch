@@ -541,7 +541,7 @@ index 0000000000000000000000000000000000000000..def75ee76799958df0bb0d2478094dfb
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/src/main/java/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-index bc885d2cc95572ec68f1df62555fdba7998b1d93..add1addd7972e7d2c07a5f825af64039d97af59e 100644
+index b2a4ae4388758f89fcd0dc3b0c4c03bf46fa5470..ac69756357bec1bdf963a30f8b3da1dfbbfbe2f9 100644
 --- a/src/main/java/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/src/main/java/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 @@ -34,19 +34,29 @@ public interface CustomPacketPayload {
@@ -577,10 +577,10 @@ index bc885d2cc95572ec68f1df62555fdba7998b1d93..add1addd7972e7d2c07a5f825af64039
          };
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8c607d0cb682665e26d432183daea5442b2ff179..bbd97cd2e7c95f4b8dbfeb90bee4b889d5172d2e 100644
+index 2f97d69c4a23edc16270e34c8e45d2e8de4d4909..307909b9effa4f2239823103e803967c52b7f2ec 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1835,6 +1835,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1738,6 +1738,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          //this.profiler.popPush("server gui refresh"); // Purpur
  
@@ -590,10 +590,10 @@ index 8c607d0cb682665e26d432183daea5442b2ff179..bbd97cd2e7c95f4b8dbfeb90bee4b889
          for (int i = 0; i < this.tickables.size(); ++i) {
              ((Runnable) this.tickables.get(i)).run();
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 82bb6c9c0cc26d13080dbd66a6f495fcb33f2cd6..df640a92475bac8ba7b69c3ea6d1b5922288f817 100644
+index 4299e075dc87804ae894053cc122e533f3d5399c..4a66cb6fb7a7e06be8684f39683ac8bb83f293c4 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -162,6 +162,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -163,6 +163,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      @Override
      public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
@@ -605,7 +605,7 @@ index 82bb6c9c0cc26d13080dbd66a6f495fcb33f2cd6..df640a92475bac8ba7b69c3ea6d1b592
          // Paper start - Brand support
          if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload brandPayload) {
              this.player.clientBrandName = brandPayload.brand();
-@@ -179,6 +184,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -180,6 +185,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
                  String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
                  for (String channel : channels.split("\0")) {
                      this.getCraftPlayer().addChannel(channel);
@@ -614,7 +614,7 @@ index 82bb6c9c0cc26d13080dbd66a6f495fcb33f2cd6..df640a92475bac8ba7b69c3ea6d1b592
              } catch (Exception ex) {
                  ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t register custom payload", ex);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5..ce86e1a3d8956557475ec070b478816d227185b2 100644
+index 2c09cd11693b4e8d3a90bef8506cd23d85a4e5a6..fa889942d0244fb7030f15a9d895af4aea620343 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -351,6 +351,8 @@ public abstract class PlayerList {
@@ -626,7 +626,7 @@ index 5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5..ce86e1a3d8956557475ec070b478816d
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -598,6 +600,7 @@ public abstract class PlayerList {
+@@ -591,6 +593,7 @@ public abstract class PlayerList {
          return this.remove(entityplayer, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())));
      }
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer, net.kyori.adventure.text.Component leaveMessage) {
@@ -635,10 +635,10 @@ index 5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5..ce86e1a3d8956557475ec070b478816d
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
          ServerLevel worldserver = entityplayer.serverLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 932f341cc6e7691469efeb8f7ebcf226f9ca0354..4210fe3053b04d99476577ac0f8bdef04cade8f5 100644
+index 1a51468961eedd85121f50b94d75dcaa0cf08738..bd320ed030073da13debf96f5c5a640628917d80 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -485,6 +485,7 @@ public final class CraftServer implements Server {
+@@ -488,6 +488,7 @@ public final class CraftServer implements Server {
          }
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
@@ -646,7 +646,7 @@ index 932f341cc6e7691469efeb8f7ebcf226f9ca0354..4210fe3053b04d99476577ac0f8bdef0
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1107,6 +1108,7 @@ public final class CraftServer implements Server {
+@@ -1110,6 +1111,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

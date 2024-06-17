@@ -6,10 +6,10 @@ Subject: [PATCH] Virtual Thread for async scheduler
 Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 3df5cef1f6067c36424b15a2b283b5b71346ea8f..63e034bd6294ef75c07cfe86d92ea64c479852c9 100644
+index 0d865a779cb0fef88cfe58c436b076bf3ae03363..0da98a4278f923f829a4e16679e33716e2b4ebff 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -192,4 +192,7 @@ public final class HorizonConfig {
+@@ -103,4 +103,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "hopper-counter", category = {"utils"})
      public static boolean hopperCounter = false;
  
@@ -19,10 +19,10 @@ index 3df5cef1f6067c36424b15a2b283b5b71346ea8f..63e034bd6294ef75c07cfe86d92ea64c
  }
 \ No newline at end of file
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 1569ba32f78c2fb28300e5a9982eb3e64c46e09b..f75817800f401d4bcc8f7c5e8153203ba0f6d357 100644
+index ea1870f99d7d31bf350f89ddc01254d2176ead9a..c951265075c6ee996297743dc356f01e81cc4fc4 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -340,6 +340,8 @@ public class Main {
+@@ -310,6 +310,8 @@ public class Main {
                  }
                  // Paper end - Log Java and OS versioning to help with debugging plugin issues
  

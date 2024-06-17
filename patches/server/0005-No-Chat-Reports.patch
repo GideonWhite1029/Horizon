@@ -27,7 +27,7 @@ index 1f2984d87abeea7645018409e530f7130eafb2e0..c3be1a5df5bae0309b9c669167098814
  }
 \ No newline at end of file
 diff --git a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
-index e83f9517b31c5171b8dc75ab63a5bfe654221c84..36bf2cdd5f84ad55495282c9d334dee08f18a98b 100644
+index 14e412ebf75b0e06ab53a1c8f9dd1be6ad1e2680..dfc165fc1e49d4cb60d85df74f0531f9a66ece15 100644
 --- a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 +++ b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 @@ -1,5 +1,6 @@
@@ -78,7 +78,7 @@ index 479e6e2aa88a22ef7f8fccb06add6806f5b71d9d..666547af77b9d2bbdccb9ea4c380458e
      public void write(FriendlyByteBuf buf) {
          buf.writeCollection(this.entries, (buf2, entry) -> entry.write(buf2));
 diff --git a/src/main/java/net/minecraft/network/FriendlyByteBuf.java b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
-index aafeb9c61ddba6a8671f0238eda47b227619f1af..90cd7bd128d0715b939c2c90b35a75e8574accef 100644
+index 0cd6a50837efce87ca052a0e1e24db2b75761196..e0b8f9f371cf23c2a699d019e06d422a52c9500d 100644
 --- a/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 +++ b/src/main/java/net/minecraft/network/FriendlyByteBuf.java
 @@ -8,6 +8,7 @@ import com.mojang.serialization.Codec;
@@ -162,10 +162,10 @@ index 5705cb920084b775cce4b361683b32c6b6e003ed..a325899b6dffce1fec13c811575c1e37
      }
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 3e811e0f3a2f9aaa45948bb026184e8f54e051bd..05e2b6c7908d2c09308b266b0fec86cb79fe4a5a 100644
+index aa01c8bfdc3caab966d53c6f63d07638fd5c1ad8..fc928bd7330174b8fc9c42ca03a92e14051d45ae 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -19,6 +19,8 @@ import java.util.Locale;
+@@ -20,6 +20,8 @@ import java.util.Locale;
  import java.util.Optional;
  import java.util.function.BooleanSupplier;
  import javax.annotation.Nullable;
@@ -174,7 +174,7 @@ index 3e811e0f3a2f9aaa45948bb026184e8f54e051bd..05e2b6c7908d2c09308b266b0fec86cb
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -699,7 +701,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -675,7 +677,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return dedicatedserverproperties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -184,7 +184,7 @@ index 3e811e0f3a2f9aaa45948bb026184e8f54e051bd..05e2b6c7908d2c09308b266b0fec86cb
      }
  
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index b82a72775f9de5ad65ae46a8b97f93a7ef852265..72c6bd5cda4d2c7ce5747d34db8cb2a68b6b0cea 100644
+index fac2fb82c381d245f77b7288c34920660ac2c3af..4299e075dc87804ae894053cc122e533f3d5399c 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
@@ -196,7 +196,7 @@ index b82a72775f9de5ad65ae46a8b97f93a7ef852265..72c6bd5cda4d2c7ce5747d34db8cb2a6
  import net.minecraft.ChatFormatting;
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
-@@ -323,10 +325,25 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -324,10 +326,25 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -223,7 +223,7 @@ index b82a72775f9de5ad65ae46a8b97f93a7ef852265..72c6bd5cda4d2c7ce5747d34db8cb2a6
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 001e9b77a30d0c807f869e321fc406fc0284b423..5f24d9f6ff25dd056f6f77c7e89c8aa602b9dbd5 100644
+index df0471ca95bec71c9682e382d4c9bb7c91d14ed5..2c09cd11693b4e8d3a90bef8506cd23d85a4e5a6 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;
@@ -235,7 +235,7 @@ index 001e9b77a30d0c807f869e321fc406fc0284b423..5f24d9f6ff25dd056f6f77c7e89c8aa6
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -1496,7 +1498,7 @@ public abstract class PlayerList {
+@@ -1436,7 +1438,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public

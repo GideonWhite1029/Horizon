@@ -6,10 +6,10 @@ Subject: [PATCH] Replay API
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index d117923938129e618ae4672663881addbe230a45..2890ad7c25bc6934b1b6206c6332a67eb452cc9e 100644
+index bf02bc9e6ee23977ec39bb1a3ae60a7bb420c929..094d3d712c5192bcba32fb0fad36867a3919aa08 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2929,6 +2929,11 @@ public final class Bukkit {
+@@ -2923,6 +2923,11 @@ public final class Bukkit {
          return server.getBotManager();
      }
      // Leaves end - Bot API
@@ -22,10 +22,10 @@ index d117923938129e618ae4672663881addbe230a45..2890ad7c25bc6934b1b6206c6332a67e
      @NotNull
      public static Server.Spigot spigot() {
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 8c5a33e16566ea04f0d15aee5af4826662b5707e..c8c18f961a43d251c96706f75a5d3dd365eefc03 100644
+index 7cdda653a4b5e7639fa6ae51395e8fd06b8be453..60cc1abf7ef5dc9c3ca6da3d1f3294328a79cefd 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -62,6 +62,7 @@ import org.jetbrains.annotations.Contract;
+@@ -63,6 +63,7 @@ import org.jetbrains.annotations.Contract;
  import org.jetbrains.annotations.NotNull;
  import org.jetbrains.annotations.Nullable;
  import org.leavesmc.leaves.entity.BotManager;
@@ -33,7 +33,7 @@ index 8c5a33e16566ea04f0d15aee5af4826662b5707e..c8c18f961a43d251c96706f75a5d3dd3
  
  /**
   * Represents a server implementation.
-@@ -2576,6 +2577,10 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2570,6 +2571,10 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      @NotNull
      BotManager getBotManager();
      // Leaves end - Bot API

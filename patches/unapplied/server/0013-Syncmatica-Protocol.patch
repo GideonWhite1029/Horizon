@@ -2034,7 +2034,7 @@ index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df871990
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 0c3768bb183451e9dfe94bbc9b203bd79e474b99..425484e2f6f6a6c49b5ac137629903fd6e1f46fc 100644
+index 1c41ad915ad5f1ef63fea96fefe53fd037174ac3..47a9d58fa527c68f661fbc95cf2a743b96e406c9 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -314,6 +314,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl

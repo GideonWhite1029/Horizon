@@ -19,7 +19,7 @@ index c3be1a5df5bae0309b9c6691670988148a43ee47..6b34b88f0da416b4bfedd338a92cbc74
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 68f665e6ed7984fe95a45624180695d7e7af46c3..2c16c01d3149863286cabf0b904261c2a389f1d8 100644
+index 4c652eadd256b9171313d31f72700173abfbdc60..48fb1694881c8ce15e99297605b1ee3523decff2 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
@@ -27,10 +27,10 @@ index 68f665e6ed7984fe95a45624180695d7e7af46c3..2c16c01d3149863286cabf0b904261c2
  import com.google.common.collect.UnmodifiableIterator;
  import com.mojang.logging.LogUtils;
 +import dev.horizonmc.horizon.HorizonConfig;
- import it.unimi.dsi.fastutil.objects.Object2DoubleArrayMap;
- import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
- import java.util.Arrays;
-@@ -598,7 +599,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+ import it.unimi.dsi.fastutil.doubles.DoubleList;
+ import it.unimi.dsi.fastutil.doubles.DoubleListIterator;
+ import it.unimi.dsi.fastutil.floats.FloatArraySet;
+@@ -561,7 +562,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          this.bb = Entity.INITIAL_AABB;
          this.stuckSpeedMultiplier = Vec3.ZERO;
          this.nextStep = 1.0F;
@@ -40,7 +40,7 @@ index 68f665e6ed7984fe95a45624180695d7e7af46c3..2c16c01d3149863286cabf0b904261c2
          this.fluidHeight = new Object2DoubleArrayMap(2);
          this.fluidOnEyes = new HashSet();
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-index 539170813921de2dfcd7ef84dd7512d73cd27e68..81e602d43ac3380ed5dbad0405e05e23c165daca 100644
+index 0422c4184c4823b8572afd398ef96fc6054e8485..91c59229c20385922be8fd56ee0d837197d36b3e 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
 @@ -12,6 +12,8 @@ import java.util.function.Predicate;
@@ -52,7 +52,7 @@ index 539170813921de2dfcd7ef84dd7512d73cd27e68..81e602d43ac3380ed5dbad0405e05e23
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.particles.ParticleOptions;
  import net.minecraft.core.particles.ParticleTypes;
-@@ -1092,7 +1094,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1103,7 +1105,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          BeeGoToHiveGoal() {
              super();
@@ -62,7 +62,7 @@ index 539170813921de2dfcd7ef84dd7512d73cd27e68..81e602d43ac3380ed5dbad0405e05e23
              this.setFlags(EnumSet.of(Goal.Flag.MOVE));
          }
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Squid.java b/src/main/java/net/minecraft/world/entity/animal/Squid.java
-index cb950ba3ee3bdfe0ff7acdb94c7ee233d73ab22e..9e67d54731ae842098283998eafd5740dfb08769 100644
+index e6244d8c7745570099638d96fafa6b4971c4beb8..4f56227f48af11396d545771c52e1a46fdc57c28 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Squid.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Squid.java
 @@ -1,5 +1,6 @@
@@ -72,7 +72,7 @@ index cb950ba3ee3bdfe0ff7acdb94c7ee233d73ab22e..9e67d54731ae842098283998eafd5740
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.particles.ParticleOptions;
  import net.minecraft.core.particles.ParticleTypes;
-@@ -42,7 +43,7 @@ public class Squid extends WaterAnimal {
+@@ -41,7 +42,7 @@ public class Squid extends WaterAnimal {
  
      public Squid(EntityType<? extends Squid> type, Level world) {
          super(type, world);
@@ -82,7 +82,7 @@ index cb950ba3ee3bdfe0ff7acdb94c7ee233d73ab22e..9e67d54731ae842098283998eafd5740
      }
  
 diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
-index 7dae2a7c759fc3e004f806c59e083f52c3a460b2..0db854f70332d3a256d3190155ac1aaa7523ed6f 100644
+index 499646ad26d148953abf241d90e053870fedb708..8b4f31e6039b2b21e049df01aff8c94e04e8063e 100644
 --- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
 @@ -5,6 +5,8 @@ import java.util.List;
@@ -94,7 +94,7 @@ index 7dae2a7c759fc3e004f806c59e083f52c3a460b2..0db854f70332d3a256d3190155ac1aaa
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.component.DataComponents;
  import net.minecraft.nbt.CompoundTag;
-@@ -81,7 +83,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -82,7 +84,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
          // Paper start - Don't use level random in entity constructors (to make them thread-safe)
          this(EntityType.ITEM, world);
          this.setPos(x, y, z);
@@ -110,19 +110,19 @@ index 7dae2a7c759fc3e004f806c59e083f52c3a460b2..0db854f70332d3a256d3190155ac1aaa
          // Paper end - Don't use level random in entity constructors
      }
 diff --git a/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java b/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
-index dff0e7b08b973a1b29f916e63d3e4778d6c56cdc..a2c8f4312be781322dcd1c4750b91a75303a8852 100644
+index 2a4425d04917b32c7ae5af3e7422c0bafc2aa1c2..5d3da701b9ccca8793f193f2789bf054d36c7db8 100644
 --- a/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
 +++ b/src/main/java/net/minecraft/world/entity/item/PrimedTnt.java
-@@ -1,6 +1,8 @@
- package net.minecraft.world.entity.item;
+@@ -2,6 +2,8 @@ package net.minecraft.world.entity.item;
  
+ import java.util.Optional;
  import javax.annotation.Nullable;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
  import net.minecraft.core.particles.ParticleTypes;
  import net.minecraft.core.registries.Registries;
- import net.minecraft.nbt.CompoundTag;
-@@ -42,7 +44,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
+@@ -62,7 +64,7 @@ public class PrimedTnt extends Entity implements TraceableEntity {
      public PrimedTnt(Level world, double x, double y, double z, @Nullable LivingEntity igniter) {
          this(EntityType.TNT, world);
          this.setPos(x, y, z);

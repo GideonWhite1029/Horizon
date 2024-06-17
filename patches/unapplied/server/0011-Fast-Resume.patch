@@ -5,6 +5,67 @@ Subject: [PATCH] Fast Resume
 
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
+diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
+index a7e7569b9d4160e7d92422ca5c1cce7f46b78f2e..1ad9130a5e31712b07ee818cdc167f6d5fdfc5ac 100644
+--- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
++++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
+@@ -581,6 +581,56 @@ public final class ChunkHolderManager {
+         }
+     }
+ 
++    // Horizon start
++    public <T> boolean addTicketAtLevelCustom(final Ticket<T> ticket, final long chunk, final boolean lock) {
++        final long removeDelay = ticket.removeDelay;
++        if (ticket.getTicketLevel() > MAX_TICKET_LEVEL) {
++            return false;
++        }
++
++        final int chunkX = CoordinateUtils.getChunkX(chunk);
++        final int chunkZ = CoordinateUtils.getChunkZ(chunk);
++        final RegionFileIOThread.ChunkCoordinate chunkCoord = new RegionFileIOThread.ChunkCoordinate(chunk);
++
++        final ReentrantAreaLock.Node ticketLock = lock ? this.ticketLockArea.lock(chunkX, chunkZ) : null;
++        try {
++            final SortedArraySet<Ticket<?>> ticketsAtChunk = this.tickets.computeIfAbsent(chunkCoord, (final RegionFileIOThread.ChunkCoordinate keyInMap) -> {
++                return SortedArraySet.create(4);
++            });
++
++            final int levelBefore = getTicketLevelAt(ticketsAtChunk);
++            final Ticket<T> current = (Ticket<T>) ticketsAtChunk.replace(ticket);
++            final int levelAfter = getTicketLevelAt(ticketsAtChunk);
++
++            if (current != ticket) {
++                final long oldRemoveDelay = current.removeDelay;
++                if (removeDelay != oldRemoveDelay) {
++                    if (oldRemoveDelay != NO_TIMEOUT_MARKER && removeDelay == NO_TIMEOUT_MARKER) {
++                        this.removeExpireCount(chunkX, chunkZ);
++                    } else if (oldRemoveDelay == NO_TIMEOUT_MARKER) {
++                        // since old != new, we have that NO_TIMEOUT_MARKER != new
++                        this.addExpireCount(chunkX, chunkZ);
++                    }
++                }
++            } else {
++                if (removeDelay != NO_TIMEOUT_MARKER) {
++                    this.addExpireCount(chunkX, chunkZ);
++                }
++            }
++
++            if (levelBefore != levelAfter) {
++                this.updateTicketLevel(chunk, levelAfter);
++            }
++
++            return current == ticket;
++        } finally {
++            if (ticketLock != null) {
++                this.ticketLockArea.unlock(ticketLock);
++            }
++        }
++    }
++    // Horizon end
++
+     public <T> boolean removeTicketAtLevel(final TicketType<T> type, final ChunkPos chunkPos, final int level, final T identifier) {
+         return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
+     }
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 07d91160b1d3a01ba63255481eb27bb2113f798d..e172ca0dcefa6df737bcd37e855076a07374ca30 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
@@ -203,72 +264,11 @@ index 0000000000000000000000000000000000000000..1dda7ce4db36235f18f6692b0c48d983
 +        return new Ticket<T>((TicketType<T>) ticketType, ticketLevel, (T) key, removeDelay);
 +    }
 +}
-diff --git a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
-index e1ffd62f4ebceecb9bc5471df3da406cffea0483..dd9ef4ed10c2df344c33f24e3c39ab083afaec85 100644
---- a/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
-+++ b/src/main/java/io/papermc/paper/chunk/system/scheduling/ChunkHolderManager.java
-@@ -566,6 +566,56 @@ public final class ChunkHolderManager {
-         }
-     }
- 
-+    // Horizon start
-+    public <T> boolean addTicketAtLevelCustom(final Ticket<T> ticket, final long chunk, final boolean lock) {
-+        final long removeDelay = ticket.removeDelay;
-+        if (ticket.getTicketLevel() > MAX_TICKET_LEVEL) {
-+            return false;
-+        }
-+
-+        final int chunkX = CoordinateUtils.getChunkX(chunk);
-+        final int chunkZ = CoordinateUtils.getChunkZ(chunk);
-+        final RegionFileIOThread.ChunkCoordinate chunkCoord = new RegionFileIOThread.ChunkCoordinate(chunk);
-+
-+        final ReentrantAreaLock.Node ticketLock = lock ? this.ticketLockArea.lock(chunkX, chunkZ) : null;
-+        try {
-+            final SortedArraySet<Ticket<?>> ticketsAtChunk = this.tickets.computeIfAbsent(chunkCoord, (final RegionFileIOThread.ChunkCoordinate keyInMap) -> {
-+                return SortedArraySet.create(4);
-+            });
-+
-+            final int levelBefore = getTicketLevelAt(ticketsAtChunk);
-+            final Ticket<T> current = (Ticket<T>) ticketsAtChunk.replace(ticket);
-+            final int levelAfter = getTicketLevelAt(ticketsAtChunk);
-+
-+            if (current != ticket) {
-+                final long oldRemoveDelay = current.removeDelay;
-+                if (removeDelay != oldRemoveDelay) {
-+                    if (oldRemoveDelay != NO_TIMEOUT_MARKER && removeDelay == NO_TIMEOUT_MARKER) {
-+                        this.removeExpireCount(chunkX, chunkZ);
-+                    } else if (oldRemoveDelay == NO_TIMEOUT_MARKER) {
-+                        // since old != new, we have that NO_TIMEOUT_MARKER != new
-+                        this.addExpireCount(chunkX, chunkZ);
-+                    }
-+                }
-+            } else {
-+                if (removeDelay != NO_TIMEOUT_MARKER) {
-+                    this.addExpireCount(chunkX, chunkZ);
-+                }
-+            }
-+
-+            if (levelBefore != levelAfter) {
-+                this.updateTicketLevel(chunk, levelAfter);
-+            }
-+
-+            return current == ticket;
-+        } finally {
-+            if (ticketLock != null) {
-+                this.ticketLockArea.unlock(ticketLock);
-+            }
-+        }
-+    }
-+    // Horizon end
-+
-     public <T> boolean removeTicketAtLevel(final TicketType<T> type, final ChunkPos chunkPos, final int level, final T identifier) {
-         return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
-     }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 153550ee259e59e16f4a26b27a3d2d56d86983e9..df5d1fb8b53303bf5badc60f70ba9e4c163ff0cc 100644
+index 307909b9effa4f2239823103e803967c52b7f2ec..a7ab594f30ecee0fc93941d0743434d9951a62ca 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -673,6 +673,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -686,6 +686,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Paper end - Configurable player collision
  
@@ -277,7 +277,7 @@ index 153550ee259e59e16f4a26b27a3d2d56d86983e9..df5d1fb8b53303bf5badc60f70ba9e4c
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
          io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // Paper - reset invalid state for event fire below
-@@ -947,6 +949,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -954,6 +956,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // CraftBukkit end
  
      public void stopServer() {

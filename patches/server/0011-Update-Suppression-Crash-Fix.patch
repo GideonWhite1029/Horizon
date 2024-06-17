@@ -6,10 +6,10 @@ Subject: [PATCH] Update Suppression Crash Fix
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 8fddce4a0d873160ede3d11563e72e7254179c40..162ba6f3495054d88e9220fcdd30b22e34ccf41c 100644
+index 1abbee88f6b7f092f62df36840517549d6061015..8cda9aa402e70d5eed0a7a97f9155d5e7d95d4da 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -97,4 +97,10 @@ public final class HorizonConfig {
+@@ -94,4 +94,10 @@ public final class HorizonConfig {
      @GlobalConfig(name = "disable-packet-limit", category = {"features"})
      public static boolean disablePacketLimit = true;
  
@@ -62,10 +62,10 @@ index 0000000000000000000000000000000000000000..f30e535767b44e1feadfafa001774b67
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/network/protocol/PacketUtils.java b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-index 9f78020aff6da660541253b2f056a4a354ad287a..a291f9f2634ad83602dee2b7971ef3fbf755dc31 100644
+index b705bc22966b7e7a3ae04b1b90c774b60414c62a..7f41d19c11c3a7cdcc74214e977cc7f8d7fbd7da 100644
 --- a/src/main/java/net/minecraft/network/protocol/PacketUtils.java
 +++ b/src/main/java/net/minecraft/network/protocol/PacketUtils.java
-@@ -52,6 +52,10 @@ public class PacketUtils {
+@@ -33,6 +33,10 @@ public class PacketUtils {
                  if (listener.shouldHandleMessage(packet)) {
                      try { // Paper - timings // Purpur
                          packet.handle(listener);
@@ -77,10 +77,10 @@ index 9f78020aff6da660541253b2f056a4a354ad287a..a291f9f2634ad83602dee2b7971ef3fb
                          if (exception instanceof ReportedException) {
                              ReportedException reportedexception = (ReportedException) exception;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index df5d1fb8b53303bf5badc60f70ba9e4c163ff0cc..3904bcf3600415f5b952fe66d57d1c8665cc550a 100644
+index 2f97d69c4a23edc16270e34c8e45d2e8de4d4909..bd73b97cef81031c2fd836598f2e4deac2da4fc5 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1804,7 +1804,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1704,7 +1704,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
@@ -96,7 +96,7 @@ index df5d1fb8b53303bf5badc60f70ba9e4c163ff0cc..3904bcf3600415f5b952fe66d57d1c86
                  for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
                      regionManager.recalculateRegions();
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index 68431244432a4342041e63218cf7d1eb4eb7ebc0..7e7a1c5d5fe73f880311d4aee9d32dbfd4691393 100644
+index 40518b1a58494525223e47845b4cb57c92a22d5e..3b7afd36069a03ec76559383892ed772f3c7b698 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -7,6 +7,8 @@ import java.util.List;

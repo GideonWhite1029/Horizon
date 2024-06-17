@@ -907,7 +907,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 75eae949dbf6a844411f37fc8919684351ca2e6a..8c607d0cb682665e26d432183daea5442b2ff179 100644
+index d17305fd81ac140ecb5c3d5199c1e65689df4d59..2f97d69c4a23edc16270e34c8e45d2e8de4d4909 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -918,19 +918,19 @@ index 75eae949dbf6a844411f37fc8919684351ca2e6a..8c607d0cb682665e26d432183daea544
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1163,6 +1164,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-             LOGGER.info("Done ({})! For help, type \"help\"", doneTime);
-             // Paper end
+@@ -1146,6 +1147,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             this.status = this.buildServerStatus();
  
+             // Spigot start
 +            HorizonConfig.createWorldSections = false; // Horizon
-             org.spigotmc.WatchdogThread.tick(); // Paper
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              Arrays.fill( this.recentTps, 20 );
+             // Paper start - further improve server tick loop
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 4ba91271fef01351267e56f75ea7352263dbb28d..289be5e52a846d397413605947203ff9ff9a2105 100644
+index c88b20120fb695390932c1eb89441dabf45e2570..aa01c8bfdc3caab966d53c6f63d07638fd5c1ad8 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -243,6 +243,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -247,6 +247,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Purpur end
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
@@ -940,10 +940,10 @@ index 4ba91271fef01351267e56f75ea7352263dbb28d..289be5e52a846d397413605947203ff9
          this.setFlightAllowed(dedicatedserverproperties.allowFlight);
          this.setMotd(dedicatedserverproperties.motd);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index f4eb8923a6b975a8c967414c5d203da290dcedb8..932f341cc6e7691469efeb8f7ebcf226f9ca0354 100644
+index 8b903417148d4e26eb974e43d73bac7c127e1315..1a51468961eedd85121f50b94d75dcaa0cf08738 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1100,6 +1100,7 @@ public final class CraftServer implements Server {
+@@ -1103,6 +1103,7 @@ public final class CraftServer implements Server {
              playerMetadata.removeAll(plugin);
          }
          // Paper end
@@ -951,7 +951,7 @@ index f4eb8923a6b975a8c967414c5d203da290dcedb8..932f341cc6e7691469efeb8f7ebcf226
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3119,6 +3120,13 @@ public final class CraftServer implements Server {
+@@ -3044,6 +3045,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
@@ -966,7 +966,7 @@ index f4eb8923a6b975a8c967414c5d203da290dcedb8..932f341cc6e7691469efeb8f7ebcf226
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 14c8819b9be45b23832a51342fc814356c336b43..e1a4311fd33e366b39673a0aa0c1928b374f18de 100644
+index 930614ebfd3d6b6e011a58bbd5310620c02582db..ea1870f99d7d31bf350f89ddc01254d2176ead9a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -184,6 +184,14 @@ public class Main {

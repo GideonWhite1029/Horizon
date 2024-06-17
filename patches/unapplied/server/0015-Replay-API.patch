@@ -41,64 +41,66 @@ index 7976885b902a6ce7d80f31e49448c99452eb9765..6bed90ec5effafbad4aaf82878fe2463
                              collection.add(player.getGameProfile().getName());
                          }
 diff --git a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
-index 2a0d54f06de7b959055459349365c85c67c11a3f..4c28daa79b50612d219df86501c0365f99408c4f 100644
+index b455c7e9d18bac3654daa8510f85cc21202e254b..c10a426a8fc20cc87ae4bf3a35feb5935f9e221c 100644
 --- a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
-@@ -122,6 +122,7 @@ public class EntitySelector {
+@@ -117,6 +117,7 @@ public class EntitySelector {
              return this.findPlayers(source);
          } else if (this.playerName != null) {
              ServerPlayer entityplayer = source.getServer().getPlayerList().getPlayerByName(this.playerName);
 +            entityplayer = entityplayer instanceof org.leavesmc.leaves.replay.ServerPhotographer ? null : entityplayer; // Leaves - skip photographer
  
-             return (List) (entityplayer == null ? Collections.emptyList() : Lists.newArrayList(new ServerPlayer[]{entityplayer}));
+             return entityplayer == null ? List.of() : List.of(entityplayer);
          } else if (this.entityUUID != null) {
-@@ -137,6 +138,7 @@ public class EntitySelector {
+@@ -125,7 +126,7 @@ public class EntitySelector {
+             while (iterator.hasNext()) {
                  ServerLevel worldserver = (ServerLevel) iterator.next();
- 
-                 entity = worldserver.getEntity(this.entityUUID);
+                 Entity entity = worldserver.getEntity(this.entityUUID);
+-
 +                entity = entity instanceof org.leavesmc.leaves.replay.ServerPhotographer ? null : entity; // Leaves - skip photographer
-             } while (entity == null);
- 
-             return Lists.newArrayList(new Entity[]{entity});
-@@ -145,7 +147,7 @@ public class EntitySelector {
-             Predicate<Entity> predicate = this.getPredicate(vec3d);
+                 if (entity != null) {
+                     if (entity.getType().isEnabled(source.enabledFeatures())) {
+                         return List.of(entity);
+@@ -142,7 +143,7 @@ public class EntitySelector {
  
              if (this.currentEntity) {
--                return (List) (source.getEntity() != null && predicate.test(source.getEntity()) ? Lists.newArrayList(new Entity[]{source.getEntity()}) : Collections.emptyList());
-+                return (List) (source.getEntity() != null && !(source.getEntity() instanceof org.leavesmc.leaves.replay.ServerPhotographer) && predicate.test(source.getEntity()) ? Lists.newArrayList(new Entity[]{source.getEntity()}) : Collections.emptyList()); // Leaves - skip photographer
+                 predicate = this.getPredicate(vec3d, axisalignedbb, (FeatureFlagSet) null);
+-                return source.getEntity() != null && predicate.test(source.getEntity()) ? List.of(source.getEntity()) : List.of();
++                return source.getEntity() != null && predicate.test(source.getEntity() instanceof org.leavesmc.leaves.replay.ServerPhotographer) ? List.of(source.getEntity()) : List.of(); // Horizon
              } else {
-                 List<Entity> list = Lists.newArrayList();
- 
-@@ -160,6 +162,7 @@ public class EntitySelector {
-                         this.addEntities(list, worldserver1, vec3d, predicate);
+                 predicate = this.getPredicate(vec3d, axisalignedbb, source.enabledFeatures());
+                 List<Entity> list = new ObjectArrayList();
+@@ -158,6 +159,7 @@ public class EntitySelector {
+                         this.addEntities(list, worldserver1, axisalignedbb, predicate);
                      }
                  }
 +                list.removeIf(entity -> entity instanceof org.leavesmc.leaves.replay.ServerPhotographer); // Leaves - skip photographer
  
                  return this.sortAndLimit(vec3d, list);
              }
-@@ -200,9 +203,11 @@ public class EntitySelector {
+@@ -198,9 +200,11 @@ public class EntitySelector {
  
          if (this.playerName != null) {
              entityplayer = source.getServer().getPlayerList().getPlayerByName(this.playerName);
 +            entityplayer = entityplayer instanceof org.leavesmc.leaves.replay.ServerPhotographer ? null : entityplayer; // Leaves - skip photographer
-             return entityplayer == null || !canSee(source, entityplayer) ? Collections.emptyList() : Lists.newArrayList(entityplayer); // Purpur
+             return entityplayer == null || !canSee(source, entityplayer) ? List.of() : List.of(entityplayer); // Purpur
          } else if (this.entityUUID != null) {
              entityplayer = source.getServer().getPlayerList().getPlayer(this.entityUUID);
 +            entityplayer = entityplayer instanceof org.leavesmc.leaves.replay.ServerPhotographer ? null : entityplayer; // Leaves - skip photographer
-             return entityplayer == null || !canSee(source, entityplayer) ? Collections.emptyList() : Lists.newArrayList(entityplayer); // Purpur
+             return entityplayer == null || !canSee(source, entityplayer) ? List.of() : List.of(entityplayer); // Purpur
          } else {
              Vec3 vec3d = (Vec3) this.position.apply(source.getPosition());
-@@ -214,7 +219,7 @@ public class EntitySelector {
+@@ -212,8 +216,7 @@ public class EntitySelector {
+ 
                  if (entity instanceof ServerPlayer) {
                      ServerPlayer entityplayer1 = (ServerPlayer) entity;
- 
+-
 -                    if (predicate.test(entityplayer1)) {
-+                    if (predicate.test(entityplayer1) && !(entityplayer1 instanceof org.leavesmc.leaves.replay.ServerPhotographer)) { // Leaves - skip photographer
-                         return !canSee(source, entityplayer1) ? Collections.emptyList() : Lists.newArrayList(entityplayer1); // Purpur
++                    if (predicate.test(entityplayer1) && !(entityplayer1 instanceof org.leavesmc.leaves.replay.ServerPhotographer)) { // Horizon - skip photographer
+                         return !canSee(source, entityplayer1) ? List.of() : List.of(entityplayer1); // Purpur
                      }
                  }
-@@ -225,7 +230,7 @@ public class EntitySelector {
+@@ -224,7 +227,7 @@ public class EntitySelector {
                  Object object;
  
                  if (this.isWorldLimited()) {
@@ -106,8 +108,8 @@ index 2a0d54f06de7b959055459349365c85c67c11a3f..4c28daa79b50612d219df86501c0365f
 +                    object = source.getLevel().getPlayers((entityplayer3 -> !(entityplayer3 instanceof org.leavesmc.leaves.replay.ServerPhotographer) && predicate.test(entityplayer3)), i); // Leaves - skip photographer
                      ((List) object).removeIf(entityplayer3 -> !canSee(source, (ServerPlayer) entityplayer3)); // Purpur
                  } else {
-                     object = Lists.newArrayList();
-@@ -234,7 +239,7 @@ public class EntitySelector {
+                     object = new ObjectArrayList();
+@@ -233,7 +236,7 @@ public class EntitySelector {
                      while (iterator.hasNext()) {
                          ServerPlayer entityplayer2 = (ServerPlayer) iterator.next();
  
@@ -117,10 +119,10 @@ index 2a0d54f06de7b959055459349365c85c67c11a3f..4c28daa79b50612d219df86501c0365f
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 55fc1f2edcf5284a7eae7b7a8202c0c59971b2c7..dfef530e9bfb275497ba5d75fc10054a3bf6bc2c 100644
+index 2fd9cc80d1de2b37e6fd42e357029e26e4ac353b..7b738896ca011638bf9aff4c69f581c903ca91e4 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1699,7 +1699,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1601,7 +1601,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -130,7 +132,7 @@ index 55fc1f2edcf5284a7eae7b7a8202c0c59971b2c7..dfef530e9bfb275497ba5d75fc10054a
  
          if (this.hidesOnlinePlayers()) {
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index 4b54fdcd83a60b5bab488be285065e4170364fae..214e98fa58ca86fb6bb6c0191c34081424fb9e4e 100644
+index 9fe798c493c8b6c051ec4f2dbd728a5394f0aefd..0fcfe34d5a8617a18dc96edd3e58c5130c44bfe6 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
 @@ -226,7 +226,7 @@ public class PlayerAdvancements {
@@ -156,7 +158,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3010ec7f4 100644
+index d67fd663834d688f2d215a184d5076e6bf7d2f06..46dc9f545582d5d2dea438725b89bf1f15b98aa8 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -317,7 +319,7 @@ index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3
              onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
          }
          // Paper start - Use single player info update packet on join
-@@ -611,6 +734,43 @@ public abstract class PlayerList {
+@@ -604,6 +727,43 @@ public abstract class PlayerList {
  
      }
  
@@ -361,7 +363,7 @@ index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(entityplayer, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())));
-@@ -680,6 +840,7 @@ public abstract class PlayerList {
+@@ -673,6 +833,7 @@ public abstract class PlayerList {
          entityplayer.retireScheduler(); // Paper - Folia schedulers
          entityplayer.getAdvancements().stopListening();
          this.players.remove(entityplayer);
@@ -369,7 +371,7 @@ index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3
          this.playersByName.remove(entityplayer.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(entityplayer);
          UUID uuid = entityplayer.getUUID();
-@@ -774,7 +935,7 @@ public abstract class PlayerList {
+@@ -767,7 +928,7 @@ public abstract class PlayerList {
              event.disallow(PlayerLoginEvent.Result.KICK_BANNED, io.papermc.paper.adventure.PaperAdventure.asAdventure(ichatmutablecomponent)); // Paper - Adventure
          } else {
              // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameprofile) ? IChatBaseComponent.translatable("multiplayer.disconnect.server_full") : null;
@@ -379,10 +381,10 @@ index 5fc01661c3f0c67ad64b864765c217fd0470ea22..dcf88dd70c42afbeefd131b1698b21d3
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b0e04505fbe78018e1a6c813a66b929a056a3e25..ed744f3fef08f4ef543ec3d33f957eea3343db91 100644
+index 8f44331b9875e837e22e75d2456d050b5b6281da..4a04925b786f3baeb50ed993e23623b20f7a2479 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -308,6 +308,7 @@ public final class CraftServer implements Server {
+@@ -310,6 +310,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher(); // Paper
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer; // Paper - Custom Potion Mixes
      private final org.leavesmc.leaves.entity.CraftBotManager botManager = new org.leavesmc.leaves.entity.CraftBotManager(); // Leaves
@@ -390,7 +392,7 @@ index b0e04505fbe78018e1a6c813a66b929a056a3e25..ed744f3fef08f4ef543ec3d33f957eea
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -390,7 +391,7 @@ public final class CraftServer implements Server {
+@@ -392,7 +393,7 @@ public final class CraftServer implements Server {
      public CraftServer(DedicatedServer console, PlayerList playerList) {
          this.console = console;
          this.playerList = (DedicatedPlayerList) playerList;
@@ -399,7 +401,7 @@ index b0e04505fbe78018e1a6c813a66b929a056a3e25..ed744f3fef08f4ef543ec3d33f957eea
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3389,4 +3390,11 @@ public final class CraftServer implements Server {
+@@ -3314,4 +3315,11 @@ public final class CraftServer implements Server {
          return botManager;
      }
      // Leaves end - Bot API
@@ -412,10 +414,10 @@ index b0e04505fbe78018e1a6c813a66b929a056a3e25..ed744f3fef08f4ef543ec3d33f957eea
 +    // Leaves end - replay mod api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 3c80296e430845c3a7b482738992f02a4ef0a181..3fd954fdcfd2aec5a8bc66630a5628eaf2be407d 100644
+index 61191508f173df5f20ecb4e71dd5045d1a37ff2d..50dd918b541358e1a78409d265a5e3bf59258e70 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -59,6 +59,8 @@ import org.bukkit.util.Vector;
+@@ -61,6 +61,8 @@ import org.bukkit.util.Vector;
  import net.md_5.bungee.api.chat.BaseComponent; // Spigot
  import org.leavesmc.leaves.bot.ServerBot;
  import org.leavesmc.leaves.entity.CraftBot;
@@ -424,7 +426,7 @@ index 3c80296e430845c3a7b482738992f02a4ef0a181..3fd954fdcfd2aec5a8bc66630a5628ea
  
  public abstract class CraftEntity implements org.bukkit.entity.Entity {
      private static PermissibleBase perm;
-@@ -110,6 +112,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+@@ -114,6 +116,7 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
          }
  
          if (entity instanceof ServerBot) { return new CraftBot(server, (ServerBot) entity); }
@@ -433,10 +435,10 @@ index 3c80296e430845c3a7b482738992f02a4ef0a181..3fd954fdcfd2aec5a8bc66630a5628ea
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 8211ec2c701687d8e5334156772cf435b89f3cb3..c5f48f50c506faa8d6b31704ded2bd7a9c039fe9 100644
+index 61ae7f9d871bb2747c928e91eb07496b862a4975..86d70c477e2e792d08c037ab0e624b2400ce79ad 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2232,7 +2232,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2247,7 +2247,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

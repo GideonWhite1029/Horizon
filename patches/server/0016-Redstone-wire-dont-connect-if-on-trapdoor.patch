@@ -6,10 +6,10 @@ Subject: [PATCH] Redstone wire dont connect if on trapdoor
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 4853123f86957ca915f929662292174511e0a92e..77e2a44bfce4dbad192a8a1ee93520ada0607eeb 100644
+index f84793a3f0a2f1199006f04346c0e7f27b5ea53c..fb78f1ce413c557aafa908d74e2c4136d8f9c8e2 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -201,4 +201,7 @@ public final class HorizonConfig {
+@@ -112,4 +112,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "instant-block-updater-reintroduced", category = {"features"})
      public static boolean instantBlockUpdaterReintroduced = false;
  

@@ -6,12 +6,21 @@ Subject: [PATCH] Hopper Counter
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index d1a756b97df31398333fc9f9ad14dac6d7841c85..3df5cef1f6067c36424b15a2b283b5b71346ea8f 100644
+index 8cda9aa402e70d5eed0a7a97f9155d5e7d95d4da..0d865a779cb0fef88cfe58c436b076bf3ae03363 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -189,4 +189,7 @@ public final class HorizonConfig {
+@@ -19,7 +19,7 @@ public final class HorizonConfig {
+                         + "# \n"
+                         + "# Created by GideonWhite1029\n"
+                         + "# Boosty: https://boosty.to/gideonwhite1029\n";
+-    public static final int CURRENT_CONFIG_VERSION = 2;
++    public static final int CURRENT_CONFIG_VERSION = 3;
  
-     // Leaves end - modify - fakeplayer
+     private static File configFile;
+     public static YamlConfiguration config;
+@@ -100,4 +100,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "cce-update-suppression", category = {"features"})
+     public static boolean cceUpdateSuppression = false;
  
 +    @GlobalConfig(name = "hopper-counter", category = {"utils"})
 +    public static boolean hopperCounter = false;
@@ -563,15 +572,15 @@ index 21dfb8e91c5427ac12133de2c05d923d87adf5ba..0e8fb4a0c7c95697333882ac74dbe2ca
      public ItemStack[] itemStacks;
      @Nullable
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index a31326e24cb68472c81cd781c5e3041772712862..f0422a70ef79c837405284fd42a74af6c57959de 100644
+index de7c77c1b25680ecc65f0f43f2391aff269a974f..8f4cb328d5ceb7b69df1d21c97336c94de802911 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -45,7 +45,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
      private static final Logger LOGGER = LogUtils.getLogger();
      private final HolderLookup.Provider registries;
      public Multimap<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.of();
--    private Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of();
-+    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of(); // Leaves - hopper counter
+-    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of();
++    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of(); // Horizon
      private boolean hasErrors;
  
      public RecipeManager(HolderLookup.Provider registryLookup) {

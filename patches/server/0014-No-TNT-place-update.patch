@@ -6,10 +6,10 @@ Subject: [PATCH] No TNT place update
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 63e034bd6294ef75c07cfe86d92ea64c479852c9..c36b5514b0387fe50e0610125f06392fcaeb91d7 100644
+index 0da98a4278f923f829a4e16679e33716e2b4ebff..56d9a4e89369725aa5d13c5058262805ffa6ed06 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -195,4 +195,7 @@ public final class HorizonConfig {
+@@ -106,4 +106,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "use_virtual_thread_for_async_scheduler", category = {"utils"})
      public static boolean useVirtualThreadForAsyncScheduler = false;
  
@@ -19,7 +19,7 @@ index 63e034bd6294ef75c07cfe86d92ea64c479852c9..c36b5514b0387fe50e0610125f06392f
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/block/TntBlock.java b/src/main/java/net/minecraft/world/level/block/TntBlock.java
-index a5e1813ba4fee55f469d5c4884124fccecd908d2..4ec0421363fc7890e02176397fbfbefa6941d81c 100644
+index a3525ae6d83591664e1456f20d9732a8de0ec326..17fcb89c65dd487a4bd7ac3062f2ea889f1244e6 100644
 --- a/src/main/java/net/minecraft/world/level/block/TntBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/TntBlock.java
 @@ -49,7 +49,7 @@ public class TntBlock extends Block {

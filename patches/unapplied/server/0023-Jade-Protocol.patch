@@ -2323,10 +2323,10 @@ index 0000000000000000000000000000000000000000..dc590a92320007f0326ffa20c9007dcb
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-index f8790ab5b7c1279719271ee57c00f4f2d6ce9714..65554bda5f339834a01589c7d245ac0d03de0d58 100644
+index ef69b630d93b4e630083b852b126b6d939cb5f07..4a02ae912533e07b3570cad69226c8f6928fce99 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-@@ -58,7 +58,7 @@ public class Armadillo extends Animal {
+@@ -59,7 +59,7 @@ public class Armadillo extends Animal {
      public final AnimationState rollOutAnimationState = new AnimationState();
      public final AnimationState rollUpAnimationState = new AnimationState();
      public final AnimationState peekAnimationState = new AnimationState();
@@ -2336,10 +2336,10 @@ index f8790ab5b7c1279719271ee57c00f4f2d6ce9714..65554bda5f339834a01589c7d245ac0d
  
      public Armadillo(EntityType<? extends Animal> type, Level world) {
 diff --git a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
-index 09c4cf772df4644413e40055fedcdf42ee8064fd..680bd1bf7950d1df9993bfef692681f229cd0c08 100644
+index 0656e03bdd71f5d81853e817e136c8f11667c76e..ffdd768bb2df8593168a2cf58c90d1aaf08c4f5a 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -293,7 +293,7 @@ public class Tadpole extends AbstractFish {
+@@ -294,7 +294,7 @@ public class Tadpole extends AbstractFish {
  
      }
  
@@ -2349,10 +2349,10 @@ index 09c4cf772df4644413e40055fedcdf42ee8064fd..680bd1bf7950d1df9993bfef692681f2
      }
  
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java b/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
-index fca0131b9a90ac026a24cf579b17928c19173f3f..525e9a3a11debe55f864cb39c4d0612eb3e62a7d 100644
+index 055f4b87c01ee7ecf7d2a111b72cc5aa85d9fbe8..14d91638aa9c7e46eee2cc819abe41fcf2e64aac 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerData.java
-@@ -68,7 +68,7 @@ public class TrialSpawnerData {
+@@ -72,7 +72,7 @@ public class TrialSpawnerData {
      });
      public final Set<UUID> detectedPlayers;
      public final Set<UUID> currentMobs;
