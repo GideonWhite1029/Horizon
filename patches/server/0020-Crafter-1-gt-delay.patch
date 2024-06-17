@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 17 Jun 2024 11:32:00 +0400
+Subject: [PATCH] Crafter 1 gt delay
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 31f78918de3559851e51705c0793c483a544bb6d..1639ee96062b461305ecf8dfddac8bc1588edf9a 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -124,4 +124,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "copper-bulb-1-gt-delay", category = {"features"})
+     public static boolean copperBulb1gt = false;
+ 
++    @GlobalConfig(name = "crafter-1-gt-delay", category = {"features"})
++    public static boolean crafter1gt = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
+index 6c24b25a7c8ce6e34aceb5702f1a0a6732ebca44..cf48902a77329d8de77c3cf95e4ab3b2f43ec1cd 100644
+--- a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
+@@ -3,6 +3,7 @@ package net.minecraft.world.level.block;
+ import com.mojang.serialization.MapCodec;
+ import java.util.Optional;
+ import javax.annotation.Nullable;
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+@@ -80,7 +81,7 @@ public class CrafterBlock extends BaseEntityBlock {
+         boolean bl2 = state.getValue(TRIGGERED);
+         BlockEntity blockEntity = world.getBlockEntity(pos);
+         if (bl && !bl2) {
+-            world.scheduleTick(pos, this, 4);
++            world.scheduleTick(pos, this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
+             world.setBlock(pos, state.setValue(TRIGGERED, Boolean.valueOf(true)), 2);
+             this.setBlockEntityTriggered(blockEntity, true);
+         } else if (!bl && bl2) {
+@@ -130,7 +131,7 @@ public class CrafterBlock extends BaseEntityBlock {
+     @Override
+     public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+         if (state.getValue(TRIGGERED)) {
+-            world.scheduleTick(pos, this, 4);
++            world.scheduleTick(pos, this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
+         }
+     }
+ 

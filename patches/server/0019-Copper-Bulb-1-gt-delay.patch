@@ -1,0 +1,76 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 17 Jun 2024 11:25:35 +0400
+Subject: [PATCH] Copper Bulb 1 gt delay
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index a088003c0ec9dbf1a15e2fbffc4539b4c95dfcde..31f78918de3559851e51705c0793c483a544bb6d 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -121,4 +121,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "optimized-powered-rails", category = {"features"})
+     public static boolean OptimizedPoweredRails = false;
+ 
++    @GlobalConfig(name = "copper-bulb-1-gt-delay", category = {"features"})
++    public static boolean copperBulb1gt = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/block/CopperBulbBlock.java b/src/main/java/net/minecraft/world/level/block/CopperBulbBlock.java
+index b4250059a9068124b76268913f675babac379670..3e3960f9ab8ff8289312206f740b206fc672af2d 100644
+--- a/src/main/java/net/minecraft/world/level/block/CopperBulbBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/CopperBulbBlock.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.world.level.block;
+ 
+ import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.sounds.SoundEvents;
+@@ -30,14 +31,26 @@ public class CopperBulbBlock extends Block {
+     @Override
+     protected void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+         if (oldState.getBlock() != state.getBlock() && world instanceof ServerLevel serverLevel) {
+-            this.checkAndFlip(state, serverLevel, pos);
++            // Horizon start - copper bulb 1 gt delay
++            if (!HorizonConfig.copperBulb1gt) {
++                this.checkAndFlip(state, serverLevel, pos);
++            } else {
++                world.scheduleTick(pos, this, 1);
++            }
++            // Horizon end - copper bulb 1 gt delay
+         }
+     }
+ 
+     @Override
+     protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+         if (world instanceof ServerLevel serverLevel) {
+-            this.checkAndFlip(state, serverLevel, pos);
++            // Horizon start - copper bulb 1 gt
++            if (!HorizonConfig.copperBulb1gt) {
++                this.checkAndFlip(state, serverLevel, pos);
++            } else {
++                world.scheduleTick(pos, this, 1);
++            }
++            // Horizon end - copper bulb 1 gt delay
+         }
+     }
+ 
+@@ -54,6 +67,15 @@ public class CopperBulbBlock extends Block {
+         }
+     }
+ 
++    // Horizon start - copper bulb 1 gt delay
++    @Override
++    public void tick(BlockState state, ServerLevel world, BlockPos pos, net.minecraft.util.RandomSource random) {
++        if (HorizonConfig.copperBulb1gt) {
++            checkAndFlip(state, world, pos);
++        }
++    }
++    // Horizon end - copper bulb 1 gt delay
++
+     @Override
+     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+         builder.add(LIT, POWERED);
