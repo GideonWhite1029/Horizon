@@ -19,7 +19,7 @@ index c3be1a5df5bae0309b9c6691670988148a43ee47..6b34b88f0da416b4bfedd338a92cbc74
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 4c652eadd256b9171313d31f72700173abfbdc60..48fb1694881c8ce15e99297605b1ee3523decff2 100644
+index c181f9c2a35566c6fab39cd704a47dd93a91bf7c..34cdd74d1fef572d2dafcbdd1f8ac573489ed459 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
@@ -40,7 +40,7 @@ index 4c652eadd256b9171313d31f72700173abfbdc60..48fb1694881c8ce15e99297605b1ee35
          this.fluidHeight = new Object2DoubleArrayMap(2);
          this.fluidOnEyes = new HashSet();
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Bee.java b/src/main/java/net/minecraft/world/entity/animal/Bee.java
-index 0422c4184c4823b8572afd398ef96fc6054e8485..91c59229c20385922be8fd56ee0d837197d36b3e 100644
+index 9a6ec5e465684be7f0d54b1f7e66bdf52603e442..80972076cf548a0f16064f802533e94b397bda28 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Bee.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Bee.java
 @@ -12,6 +12,8 @@ import java.util.function.Predicate;
@@ -52,7 +52,7 @@ index 0422c4184c4823b8572afd398ef96fc6054e8485..91c59229c20385922be8fd56ee0d8371
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.particles.ParticleOptions;
  import net.minecraft.core.particles.ParticleTypes;
-@@ -1103,7 +1105,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
+@@ -1104,7 +1106,7 @@ public class Bee extends Animal implements NeutralMob, FlyingAnimal {
  
          BeeGoToHiveGoal() {
              super();
@@ -62,7 +62,7 @@ index 0422c4184c4823b8572afd398ef96fc6054e8485..91c59229c20385922be8fd56ee0d8371
              this.setFlags(EnumSet.of(Goal.Flag.MOVE));
          }
 diff --git a/src/main/java/net/minecraft/world/entity/animal/Squid.java b/src/main/java/net/minecraft/world/entity/animal/Squid.java
-index e6244d8c7745570099638d96fafa6b4971c4beb8..4f56227f48af11396d545771c52e1a46fdc57c28 100644
+index 3ca9a7f289d8c3f0b0df8f1cd4a5ca1254653c50..56b7222f5eff4ed6298041e47a1836ac26443104 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/Squid.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/Squid.java
 @@ -1,5 +1,6 @@

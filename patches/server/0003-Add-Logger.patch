@@ -28,7 +28,7 @@ index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index c1d6b00c2e74cd19df9dd074a021024e0c9ac442..4c652eadd256b9171313d31f72700173abfbdc60 100644
+index d6d992e4bc756acf649dba11c2fc16064ea3d5bc..c181f9c2a35566c6fab39cd704a47dd93a91bf7c 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -430,6 +430,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -39,7 +39,7 @@ index c1d6b00c2e74cd19df9dd074a021024e0c9ac442..4c652eadd256b9171313d31f72700173
      public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
  
      public void setOrigin(@javax.annotation.Nonnull Location location) {
-@@ -2482,6 +2483,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2481,6 +2482,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end
@@ -47,7 +47,7 @@ index c1d6b00c2e74cd19df9dd074a021024e0c9ac442..4c652eadd256b9171313d31f72700173
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2634,6 +2636,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2633,6 +2635,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  immuneToFire = nbt.getBoolean("Purpur.FireImmune");
              }
              // Purpur end

@@ -162,7 +162,7 @@ index 5705cb920084b775cce4b361683b32c6b6e003ed..a325899b6dffce1fec13c811575c1e37
      }
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index aa01c8bfdc3caab966d53c6f63d07638fd5c1ad8..fc928bd7330174b8fc9c42ca03a92e14051d45ae 100644
+index f80548eb7fe29585ba3209514b7d506b0f177ca4..4ba4a501bedf65c8a361ed85c42c7e83310ca85a 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -20,6 +20,8 @@ import java.util.Locale;
@@ -174,7 +174,7 @@ index aa01c8bfdc3caab966d53c6f63d07638fd5c1ad8..fc928bd7330174b8fc9c42ca03a92e14
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -675,7 +677,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -702,7 +704,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return dedicatedserverproperties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -223,7 +223,7 @@ index fac2fb82c381d245f77b7288c34920660ac2c3af..4299e075dc87804ae894053cc122e533
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index df0471ca95bec71c9682e382d4c9bb7c91d14ed5..2c09cd11693b4e8d3a90bef8506cd23d85a4e5a6 100644
+index 969a5461316401950c8fba6ed6347164235a5af9..ceceafd737f678b42196a0079b75d3f4051ddfc3 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;

@@ -77,10 +77,10 @@ index b705bc22966b7e7a3ae04b1b90c774b60414c62a..7f41d19c11c3a7cdcc74214e977cc7f8
                          if (exception instanceof ReportedException) {
                              ReportedException reportedexception = (ReportedException) exception;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 2f97d69c4a23edc16270e34c8e45d2e8de4d4909..bd73b97cef81031c2fd836598f2e4deac2da4fc5 100644
+index a255660d9de9219f117a0a55919d561cb3a97d9b..c39fe26a86b23f1935c0049b37609f1d48957167 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1704,7 +1704,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1758,7 +1758,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur
@@ -92,9 +92,9 @@ index 2f97d69c4a23edc16270e34c8e45d2e8de4d4909..bd73b97cef81031c2fd836598f2e4dea
 +                    dev.horizonmc.horizon.HorizonLogger.LOGGER.info(e.getMessage());
 +                }
 +                // Horizon end
-                 // Paper start
-                 for (final io.papermc.paper.chunk.SingleThreadChunkRegionManager regionManager : worldserver.getChunkSource().chunkMap.regionManagers) {
-                     regionManager.recalculateRegions();
+                 //worldserver.timings.doTick.stopTiming(); // Spigot // Purpur
+             } catch (Throwable throwable) {
+                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 index 40518b1a58494525223e47845b4cb57c92a22d5e..3b7afd36069a03ec76559383892ed772f3c7b698 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
