@@ -563,15 +563,15 @@ index 21dfb8e91c5427ac12133de2c05d923d87adf5ba..0e8fb4a0c7c95697333882ac74dbe2ca
      public ItemStack[] itemStacks;
      @Nullable
 diff --git a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
-index a31326e24cb68472c81cd781c5e3041772712862..f0422a70ef79c837405284fd42a74af6c57959de 100644
+index 9d0ac3fb52a76a97bf954fbc5175cea90d385d8c..1b28900d8c356c3c9bd903e1fa715996e554c403 100644
 --- a/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/src/main/java/net/minecraft/world/item/crafting/RecipeManager.java
 @@ -45,7 +45,7 @@ public class RecipeManager extends SimpleJsonResourceReloadListener {
      private static final Logger LOGGER = LogUtils.getLogger();
      private final HolderLookup.Provider registries;
      public Multimap<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.of();
--    private Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of();
-+    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of(); // Leaves - hopper counter
+-    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of();
++    public Map<ResourceLocation, RecipeHolder<?>> byName = ImmutableMap.of(); // Horizon - hopper counter
      private boolean hasErrors;
  
      public RecipeManager(HolderLookup.Provider registryLookup) {

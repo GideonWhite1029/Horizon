@@ -433,10 +433,10 @@ index 3c80296e430845c3a7b482738992f02a4ef0a181..3fd954fdcfd2aec5a8bc66630a5628ea
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 8211ec2c701687d8e5334156772cf435b89f3cb3..c5f48f50c506faa8d6b31704ded2bd7a9c039fe9 100644
+index aac21ff5418f76b0d06b6a49a4021bde194cf1da..97e6dd5c46c27155a4fe827e4b16a8f56f50214b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2232,7 +2232,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2233,7 +2233,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {
