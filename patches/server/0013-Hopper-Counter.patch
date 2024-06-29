@@ -6,7 +6,7 @@ Subject: [PATCH] Hopper Counter
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 8cda9aa402e70d5eed0a7a97f9155d5e7d95d4da..0d865a779cb0fef88cfe58c436b076bf3ae03363 100644
+index bd70a2da9fc70979475f7cc4923efb2b321ed2d5..ae693ccea2d44f14272eeff19c1f6506f871bf2c 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -19,7 +19,7 @@ public final class HorizonConfig {

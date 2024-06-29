@@ -5,7 +5,7 @@ Subject: [PATCH] Copper Bulb 1 gt delay
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index a088003c0ec9dbf1a15e2fbffc4539b4c95dfcde..31f78918de3559851e51705c0793c483a544bb6d 100644
+index 4ac055aa686b0a27224ef1f3fc16656a009761da..072f998e46b8ee663b668a4fdb5195677f996fdd 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -121,4 +121,7 @@ public final class HorizonConfig {

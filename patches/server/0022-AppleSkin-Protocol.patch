@@ -5,12 +5,12 @@ Subject: [PATCH] AppleSkin Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index b3a2272cac44f4b4645d412fd74a9f65f99427b4..b8dde788f4570c6d0c97150ab4f1b1a58b9f23de 100644
+index e97c75e30dc1d4f5fa71cfbee2dd43087f4d4be6..dd051aca08ce2dc6a6b94ad5389e99c317b9eeeb 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -207,4 +207,7 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "horizon-carpet-support", category = {"protocols"})
-     public static boolean horizonCarpetSupport = false;
+@@ -127,4 +127,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "crafter-1-gt-delay", category = {"features"})
+     public static boolean crafter1gt = false;
  
 +    @GlobalConfig(name = "appleskin-protocol", category = {"protocols"})
 +    public static boolean appleskinProtocol = false;
@@ -129,3 +129,16 @@ index 0000000000000000000000000000000000000000..27785cf733c3ec9c0ea654e6041abca9
 +        previousSaturationLevels.remove(player.getUUID());
 +    }
 +}
+diff --git a/src/main/java/net/minecraft/resources/ResourceLocation.java b/src/main/java/net/minecraft/resources/ResourceLocation.java
+index 1967c43ee3a12e63365cc40ee6565307e2fd73cf..6010cc9985baf9e0aefe0a0ccdd1721f754406a6 100644
+--- a/src/main/java/net/minecraft/resources/ResourceLocation.java
++++ b/src/main/java/net/minecraft/resources/ResourceLocation.java
+@@ -36,7 +36,7 @@ public final class ResourceLocation implements Comparable<ResourceLocation> {
+     private final String namespace;
+     private final String path;
+ 
+-    private ResourceLocation(String namespace, String path) {
++    public ResourceLocation(String namespace, String path) {
+         assert isValidNamespace(namespace);
+ 
+         assert isValidPath(path);

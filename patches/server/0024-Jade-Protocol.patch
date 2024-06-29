@@ -5,12 +5,12 @@ Subject: [PATCH] Jade Protocol
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index b8dde788f4570c6d0c97150ab4f1b1a58b9f23de..8ccc13bfcca60422b2403ab12aa528eca06d1b59 100644
+index 331d609f84bc2597e7eb328d8dc5b9904c6225a9..36feef0c4418a556fd4cc88b7234f0662a4f13bc 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -210,4 +210,7 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "appleskin-protocol", category = {"protocols"})
-     public static boolean appleskinProtocol = false;
+@@ -133,4 +133,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "disable-packet-limit", category = {"features"})
+     public static boolean disablePacketLimit = true;
  
 +    @GlobalConfig(name = "jade-protocol", category = {"protocols"})
 +    public static boolean jadeProtocol = false;
@@ -55,7 +55,7 @@ index def75ee76799958df0bb0d2478094dfba0dd9364..b1a2ac4ecfbc6e08dd2b8e546bfbfeaf
  }
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a2e93032618a0338695ef20f5b1b09adaa97b7a9
+index 0000000000000000000000000000000000000000..bf882b188cba947d3b0d4aa4d9254a0b7b3c53f4
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
 @@ -0,0 +1,328 @@
@@ -152,7 +152,7 @@ index 0000000000000000000000000000000000000000..a2e93032618a0338695ef20f5b1b09ad
 +
 +    @Contract("_ -> new")
 +    public static @NotNull ResourceLocation mc_id(String path) {
-+        return new ResourceLocation(path);
++        return ResourceLocation.withDefaultNamespace(path);
 +    }
 +
 +    private static boolean isPrimaryKey(ResourceLocation key) {
@@ -821,7 +821,7 @@ index 0000000000000000000000000000000000000000..fb26941bbcaeab40efcf7a210df87350
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a45ca5cbb84a94ceb16bfc7a55477e4816c6138
+index 0000000000000000000000000000000000000000..55ddf2f8049b769e65c75bc1c0ddcea7d9a216b8
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/provider/block/CampfireProvider.java
 @@ -0,0 +1,52 @@
@@ -861,7 +861,7 @@ index 0000000000000000000000000000000000000000..4a45ca5cbb84a94ceb16bfc7a55477e4
 +                stack = stack.copy();
 +
 +                CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
-+                        .update(COOKING_TIME_CODEC, campfire.cookingTime[i] - campfire.cookingProgress[i])
++                        .update(NbtOps.INSTANCE, COOKING_TIME_CODEC, campfire.cookingTime[i] - campfire.cookingProgress[i])
 +                        .getOrThrow();
 +                stack.set(DataComponents.CUSTOM_DATA, customData);
 +
@@ -2323,7 +2323,7 @@ index 0000000000000000000000000000000000000000..dc590a92320007f0326ffa20c9007dcb
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-index ef69b630d93b4e630083b852b126b6d939cb5f07..4a02ae912533e07b3570cad69226c8f6928fce99 100644
+index 3c4c654a4c7c7ed7b4c967f768b55921e8a8690e..549f17e2ed8d9a418f4a190c7fdd0cda6a285d85 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 @@ -59,7 +59,7 @@ public class Armadillo extends Animal {

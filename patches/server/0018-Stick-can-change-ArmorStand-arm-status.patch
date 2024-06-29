@@ -5,7 +5,7 @@ Subject: [PATCH] Stick can change ArmorStand arm status
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index fb78f1ce413c557aafa908d74e2c4136d8f9c8e2..ef0cab5678e11f5d784563f9a6a4152073cfb647 100644
+index 33702c249963ed46407587df6e4859f1a07e5ec7..2b853477e032712fde71a24258b2e87c86019ff1 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -115,4 +115,7 @@ public final class HorizonConfig {

@@ -6,10 +6,18 @@ Subject: [PATCH] Fakeplayer support
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index fff45708dde3e8c3d339854061e647bf44351a9b..d1a756b97df31398333fc9f9ad14dac6d7841c85 100644
+index 36feef0c4418a556fd4cc88b7234f0662a4f13bc..06eb6ea6d82f56dffb11206e20baa7fbac138cf7 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
+@@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
+ 
+ import com.destroystokyo.paper.util.SneakyThrow;
+ import dev.horizonmc.horizon.commands.HorizonCommand;
++import dev.horizonmc.horizon.config.ConfigVerify;
+ import dev.horizonmc.horizon.config.GlobalConfig;
+ import dev.horizonmc.horizon.config.GlobalConfigManager;
+ import net.minecraft.server.MinecraftServer;
+@@ -12,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
  import java.io.File;
  import java.io.IOException;
  import java.util.Collections;
@@ -17,9 +25,9 @@ index fff45708dde3e8c3d339854061e647bf44351a9b..d1a756b97df31398333fc9f9ad14dac6
  import java.util.logging.Level;
  
  public final class HorizonConfig {
-@@ -125,4 +126,67 @@ public final class HorizonConfig {
-     }
-     // Horizon end - Syncmatic Protocol
+@@ -136,4 +138,67 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "jade-protocol", category = {"protocols"})
+     public static boolean jadeProtocol = false;
  
 +    // Leaves start - modify - fakeplayer
 +
@@ -233,19 +241,18 @@ index f37857eb3973a0cf1a02041effd5491d711c2eb7..d8a089e9d3fb93cdc88585f9af6398d2
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7f13db821ec71d178197296074426a0f0a40a0e2..2fd9cc80d1de2b37e6fd42e357029e26e4ac353b 100644
+index 92f998a973b2adde8fee01cc88ebecdc4cc98922..9310808cae81804a4d7ae6db0707422f19f523d8 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -686,6 +686,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         }
+@@ -690,6 +690,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - Configurable player collision
  
+         dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
 +        org.leavesmc.leaves.bot.ServerBot.loadAllBot(); // Leaves - load resident bot
-+
+ 
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
-         io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // Paper - reset invalid state for event fire below
-@@ -967,6 +969,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -987,6 +988,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -270,10 +277,10 @@ index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a53
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 6b5b9c8e5bab5477ef1d9298cfbb955941b1d084..94bfd5351be6c384d8f0cbb865e35daf94f45eef 100644
+index f258c356972ac07e6f4bd094220c05ab97d879a5..d709a8e5d941fa3f5a5d94aeb5c2f464e47a7e8f 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1176,6 +1176,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1149,6 +1149,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
              if (this.seenBy.remove(player.connection)) {
                  this.serverEntity.removePairing(player);
@@ -288,7 +295,7 @@ index 6b5b9c8e5bab5477ef1d9298cfbb955941b1d084..94bfd5351be6c384d8f0cbb865e35daf
  
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 7cb982a651bd73d0f5763925499107c0e85b1b8f..d3bae647ae36cb53f64fbd493f20c351d5a91a0e 100644
+index d9fbc5c1f4c6317165d8daa104d3d0896b52c240..ca8c8757de2884fcc617d3075a7822f08e0ed74e 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -161,6 +161,7 @@ import net.minecraft.world.phys.Vec3;
@@ -371,7 +378,7 @@ index 7cb982a651bd73d0f5763925499107c0e85b1b8f..d3bae647ae36cb53f64fbd493f20c351
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index fa889942d0244fb7030f15a9d895af4aea620343..d67fd663834d688f2d215a184d5076e6bf7d2f06 100644
+index dffe241cdfeafaafefb2da0472bad0079b9b1180..248a5e10860bf74ab3a2c945d4901a5f1b966b7c 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -103,6 +103,7 @@ import net.minecraft.world.phys.Vec3;
@@ -454,7 +461,7 @@ index fa889942d0244fb7030f15a9d895af4aea620343..d67fd663834d688f2d215a184d5076e6
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 48fb1694881c8ce15e99297605b1ee3523decff2..1241f071fbe51ba724602c9f4ff64d1560655fbc 100644
+index 05750f8611c90bd403516a02ff2cd5ff82e02879..3af1c794371e0e9caf8b151a2291a9757fd35b9b 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1417,7 +1417,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -556,7 +563,7 @@ index bd320ed030073da13debf96f5c5a640628917d80..8f44331b9875e837e22e75d2456d050b
 +    // Leaves end - Bot API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index becc6768857e0968b76988deb8a42b32eb3a6190..61191508f173df5f20ecb4e71dd5045d1a37ff2d 100644
+index 4b7d38a5ac6247c6e9d71ac7f3b65765ed3cf3ee..4b61a8bdfebc76820abc498ad2eb497007c129e9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -59,6 +59,8 @@ import org.bukkit.util.NumberConversions;
@@ -1481,10 +1488,10 @@ index 0000000000000000000000000000000000000000..ce6f6d3e05c962871b4c1daf15db0978
 +}
 diff --git a/src/main/java/org/leavesmc/leaves/bot/ServerBot.java b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c37362822a11201
+index 0000000000000000000000000000000000000000..4f0ae63b48c30f5e767fdf9386a1af8a54cf1d52
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/bot/ServerBot.java
-@@ -0,0 +1,715 @@
+@@ -0,0 +1,724 @@
 +package org.leavesmc.leaves.bot;
 +
 +import com.google.common.collect.Lists;
@@ -1494,6 +1501,7 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +import com.mojang.authlib.GameProfile;
 +import com.mojang.authlib.properties.Property;
 +import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.HorizonLogger;
 +import dev.horizonmc.horizon.util.MathUtils;
 +import io.papermc.paper.event.entity.EntityKnockbackEvent;
 +import net.minecraft.Util;
@@ -1502,7 +1510,6 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +import net.minecraft.network.PacketSendListener;
 +import net.minecraft.network.protocol.Packet;
 +import net.minecraft.network.protocol.PacketFlow;
-+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 +import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 +import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 +import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -1510,6 +1517,7 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +import net.minecraft.network.syncher.EntityDataAccessor;
 +import net.minecraft.network.syncher.EntityDataSerializers;
 +import net.minecraft.server.MinecraftServer;
++import net.minecraft.server.level.ChunkMap;
 +import net.minecraft.server.level.ClientInformation;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.server.level.ServerPlayer;
@@ -1530,6 +1538,7 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +import net.minecraft.world.inventory.ChestMenu;
 +import net.minecraft.world.level.block.state.BlockState;
 +import net.minecraft.world.level.gameevent.GameEvent;
++import net.minecraft.world.level.portal.DimensionTransition;
 +import net.minecraft.world.level.storage.LevelResource;
 +import net.minecraft.world.phys.AABB;
 +import net.minecraft.world.phys.Vec3;
@@ -1711,13 +1720,20 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +    }
 +
 +    public void sendFakeData(ServerPlayerConnection playerConnection, boolean login) {
-+        playerConnection.send(new ClientboundAddEntityPacket(this));
++        ChunkMap.TrackedEntity entityTracker = ((ServerLevel) this.level()).getChunkSource().chunkMap.entityMap.get(this.getId());
++
++        if (entityTracker == null) {
++            HorizonLogger.LOGGER.warning("Fakeplayer cant get entity tracker for " + this.getId());
++            return;
++        }
++
++        playerConnection.send(this.getAddEntityPacket(entityTracker.serverEntity));
 +        if (login) {
 +            Bukkit.getScheduler().runTaskLater(CraftScheduler.MINECRAFT, () -> {
-+                connection.send(new ClientboundRotateHeadPacket(this, (byte) ((getYRot() * 256f) / 360f)));
++                playerConnection.send(new ClientboundRotateHeadPacket(this, (byte) ((getYRot() * 256f) / 360f)));
 +            }, 10);
 +        } else {
-+            connection.send(new ClientboundRotateHeadPacket(this, (byte) ((getYRot() * 256f) / 360f)));
++            playerConnection.send(new ClientboundRotateHeadPacket(this, (byte) ((getYRot() * 256f) / 360f)));
 +        }
 +    }
 +
@@ -1760,7 +1776,7 @@ index 0000000000000000000000000000000000000000..4bae73dd88634deac4bbbadf3c373628
 +
 +    @Nullable
 +    @Override
-+    public Entity changeDimension(@NotNull ServerLevel destination) {
++    public Entity changeDimension(@NotNull DimensionTransition teleportTarget) {
 +        return null; // disable dimension change
 +    }
 +

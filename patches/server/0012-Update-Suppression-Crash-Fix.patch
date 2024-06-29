@@ -6,12 +6,12 @@ Subject: [PATCH] Update Suppression Crash Fix
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 1abbee88f6b7f092f62df36840517549d6061015..8cda9aa402e70d5eed0a7a97f9155d5e7d95d4da 100644
+index e172ca0dcefa6df737bcd37e855076a07374ca30..bd70a2da9fc70979475f7cc4923efb2b321ed2d5 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -94,4 +94,10 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "disable-packet-limit", category = {"features"})
-     public static boolean disablePacketLimit = true;
+     @GlobalConfig(name = "fast-resume", category = {"features"})
+     public static boolean fastResume = true;
  
 +    @GlobalConfig(name = "update-suppression-crash-fix", category = {"features"})
 +    public static boolean updateSuppressionCrashFix = false;
@@ -77,10 +77,10 @@ index b705bc22966b7e7a3ae04b1b90c774b60414c62a..7f41d19c11c3a7cdcc74214e977cc7f8
                          if (exception instanceof ReportedException) {
                              ReportedException reportedexception = (ReportedException) exception;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index a255660d9de9219f117a0a55919d561cb3a97d9b..c39fe26a86b23f1935c0049b37609f1d48957167 100644
+index 803e379dc3fe854cf038a1ff64df9db5a10d928c..92f998a973b2adde8fee01cc88ebecdc4cc98922 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1758,7 +1758,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1761,7 +1761,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur

@@ -19,7 +19,7 @@ index c3be1a5df5bae0309b9c6691670988148a43ee47..6b34b88f0da416b4bfedd338a92cbc74
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index c181f9c2a35566c6fab39cd704a47dd93a91bf7c..34cdd74d1fef572d2dafcbdd1f8ac573489ed459 100644
+index dc8fcde8a6a394ad9275e15f31e1a40f319cb2d6..05750f8611c90bd403516a02ff2cd5ff82e02879 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Lists;

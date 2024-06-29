@@ -6,7 +6,7 @@ Subject: [PATCH] InstantBlockUpdater Reintroduced
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 56d9a4e89369725aa5d13c5058262805ffa6ed06..f84793a3f0a2f1199006f04346c0e7f27b5ea53c 100644
+index 64d88eca763b26e0c230c5b2c1836668b914c5d1..a2b16fdce1a86377fdd3e4b29f31e1578b9cf748 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 @@ -109,4 +109,7 @@ public final class HorizonConfig {
@@ -19,7 +19,7 @@ index 56d9a4e89369725aa5d13c5058262805ffa6ed06..f84793a3f0a2f1199006f04346c0e7f2
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index e8ded1ad4891efddf9b81953e416adba8458e284..cbbeb37c4dcaddb0304dd2214973fcb607c647e5 100644
+index cb3575360ef0d238300b6cd33566d642ac69c4db..7470101ee04542e8e3f78dd388307a5ab2ac9da9 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -74,6 +74,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
