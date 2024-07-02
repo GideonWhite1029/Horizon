@@ -58,7 +58,7 @@ index 0000000000000000000000000000000000000000..3cd7a8e15f9162f9b49e308884541d1b
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/core/HorizonProtocolManager.java b/src/main/java/dev/horizonmc/horizon/protocol/core/HorizonProtocolManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b1730143e2077d
+index 0000000000000000000000000000000000000000..46223bb11ccb15dc6f1374a65d230e7927615fd0
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/core/HorizonProtocolManager.java
 @@ -0,0 +1,368 @@
@@ -121,7 +121,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    Collections.addAll(methods, publicMethods);
 +                    Collections.addAll(methods, privateMethods);
 +                } catch (NoClassDefFoundError error) {
-+                    LOGGER.severe("Failed to load class " + clazz.getName() + " due to missing dependencies, " + error.getMessage());
++                    LOGGER.severe("Failed to load class " + clazz.getName() + " due to missing dependencies, " + error.getCause() + ": " + error.getMessage());
 +                    return;
 +                }
 +
@@ -138,7 +138,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                        try {
 +                            method.invoke(null);
 +                        } catch (InvocationTargetException | IllegalAccessException exception) {
-+                            LOGGER.severe("Failed to invoke init method " + method.getName() + " in " + clazz.getName() + ", " + exception.getMessage());
++                            LOGGER.severe("Failed to invoke init method " + method.getName() + " in " + clazz.getName() + ", " + exception.getCause() + ": " + exception.getMessage());
 +                        }
 +                        continue;
 +                    }
@@ -155,7 +155,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +
 +                            map.put(receiver, constructor);
 +                        } catch (NoSuchMethodException exception) {
-+                            LOGGER.severe("Failed to find constructor for " + receiver.payload().getName() + ", " + exception.getMessage());
++                            LOGGER.severe("Failed to find constructor for " + receiver.payload().getName() + ", " + exception.getCause() + ": " + exception.getMessage());
 +                            continue;
 +                        }
 +
@@ -217,7 +217,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    try {
 +                        return map.get(receiver).newInstance(id, buf);
 +                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException exception) {
-+                        LOGGER.warning("Failed to create payload for " + id + " in " + ArrayUtils.toString(protocol.namespace()) + ", " + exception.getMessage());
++                        LOGGER.warning("Failed to create payload for " + id + " in " + ArrayUtils.toString(protocol.namespace()) + ", " + exception.getCause() + ": " + exception.getMessage());
 +                        buf.readBytes(buf.readableBytes());
 +                        return new ErrorPayload(id, protocol.namespace(), receiver.payloadId());
 +                    }
@@ -245,7 +245,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                        try {
 +                            map.get(receiver).invoke(null, player, payload);
 +                        } catch (InvocationTargetException | IllegalAccessException exception) {
-+                            LOGGER.warning("Failed to handle payload " + payload.type().id() + " in " + ArrayUtils.toString(protocol.namespace()) + ", " + exception.getMessage());
++                            LOGGER.warning("Failed to handle payload " + payload.type().id() + " in " + ArrayUtils.toString(protocol.namespace()) + ", " + exception.getCause() + ": " + exception.getMessage());
 +                        }
 +                    }
 +                }
@@ -260,7 +260,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    method.invoke(null);
 +                }
 +            } catch (InvocationTargetException | IllegalAccessException exception) {
-+                LOGGER.warning("Failed to tick, " + exception.getMessage());
++                LOGGER.warning("Failed to tick, " + exception.getCause() + ": " + exception.getMessage());
 +            }
 +        }
 +    }
@@ -272,7 +272,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    method.invoke(null, player);
 +                }
 +            } catch (InvocationTargetException | IllegalAccessException exception) {
-+                LOGGER.warning("Failed to handle player join, " + exception.getMessage());
++                LOGGER.warning("Failed to handle player join, " + exception.getCause() + ": " + exception.getMessage());
 +            }
 +        }
 +    }
@@ -284,7 +284,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    method.invoke(null, player);
 +                }
 +            } catch (InvocationTargetException | IllegalAccessException exception) {
-+                LOGGER.warning("Failed to handle player leave, " + exception.getMessage());
++                LOGGER.warning("Failed to handle player leave, " + exception.getCause() + ": " + exception.getMessage());
 +            }
 +        }
 +    }
@@ -296,7 +296,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    method.invoke(null);
 +                }
 +            } catch (InvocationTargetException | IllegalAccessException exception) {
-+                LOGGER.warning("Failed to handle server reload, " + exception.getMessage());
++                LOGGER.warning("Failed to handle server reload, " + exception.getCause() + ": " + exception.getMessage());
 +            }
 +        }
 +    }
@@ -315,7 +315,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    try {
 +                        map.get(register).invoke(null, player);
 +                    } catch (InvocationTargetException | IllegalAccessException exception) {
-+                        LOGGER.warning("Failed to handle minecraft register, " + exception.getMessage());
++                        LOGGER.warning("Failed to handle minecraft register, " + exception.getCause() + ": " + exception.getMessage());
 +                    }
 +                }
 +            }
@@ -341,12 +341,12 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                        Enumeration<JarEntry> entries = jar.entries();
 +                        findClassesInPackageByJar(pack, entries, packageDirName, classes);
 +                    } catch (IOException exception) {
-+                        LOGGER.warning("Failed to load jar file, " + exception.getMessage());
++                        LOGGER.warning("Failed to load jar file, " + exception.getCause() + ": " + exception.getMessage());
 +                    }
 +                }
 +            }
 +        } catch (IOException exception) {
-+            LOGGER.warning("Failed to load classes, " + exception.getMessage());
++            LOGGER.warning("Failed to load classes, " + exception.getCause() + ": " + exception.getMessage());
 +        }
 +        return classes;
 +    }
@@ -366,7 +366,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    try {
 +                        classes.add(Class.forName(packageName + '.' + className));
 +                    } catch (ClassNotFoundException exception) {
-+                        LOGGER.warning("Failed to load class " + className + ", " + exception.getMessage());
++                        LOGGER.warning("Failed to load class " + className + ", " + exception.getCause() + ": " + exception.getMessage());
 +                    }
 +                }
 +            }
@@ -390,7 +390,7 @@ index 0000000000000000000000000000000000000000..405c3320a14120d50220e8c709b17301
 +                    try {
 +                        classes.add(Class.forName(packageName + '.' + className));
 +                    } catch (ClassNotFoundException exception) {
-+                        LOGGER.warning("Failed to load class " + className + ", " + exception.getMessage());
++                        LOGGER.warning("Failed to load class " + className + ", " + exception.getCause() + ": " + exception.getMessage());
 +                    }
 +                }
 +            }

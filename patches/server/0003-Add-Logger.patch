@@ -7,10 +7,10 @@ Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonLogger.java b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd41f02a82
+index 0000000000000000000000000000000000000000..c3d002305a973c59a2649c5736706dfec978eca2
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,25 @@
 +package dev.horizonmc.horizon;
 +
 +import org.bukkit.Bukkit;
@@ -26,9 +26,18 @@ index 0000000000000000000000000000000000000000..1cb0198de00244f30bb09d1398ef3acd
 +        setParent(Bukkit.getLogger());
 +        setLevel(Level.ALL);
 +    }
++
++    public void severe(String msg, Exception exception) {
++        this.severe(msg + ", " + exception.getCause() + ": " + exception.getMessage());
++    }
++
++    public void warning(String msg, Exception exception) {
++        this.warning(msg + ", " + exception.getCause() + ": " + exception.getMessage());
++    }
++
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index d6d992e4bc756acf649dba11c2fc16064ea3d5bc..c181f9c2a35566c6fab39cd704a47dd93a91bf7c 100644
+index 4a3a05324d1c732abc344c17242368a3cbaf81f3..235864652fe3d56933f4bcb2f5156b0d4664e00e 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -430,6 +430,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -59,3 +68,17 @@ index d6d992e4bc756acf649dba11c2fc16064ea3d5bc..c181f9c2a35566c6fab39cd704a47dd9
  
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
+@@ -4893,6 +4900,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
+     }
+     // Paper end - Expose entity id counter
++
++    // Horizon start - horizon ex data
++    public CompoundTag getHorizonData() {
++        return horizonData;
++    }
++    // Horizon end - horizon ex data
++
+     // Purpur start
+     @Nullable
+     private Player rider = null;

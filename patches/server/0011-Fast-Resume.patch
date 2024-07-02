@@ -73,7 +73,7 @@ index 07d91160b1d3a01ba63255481eb27bb2113f798d..e172ca0dcefa6df737bcd37e855076a0
  }
 \ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonLogger.java b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
-index 1cb0198de00244f30bb09d1398ef3acd41f02a82..6d2a28d9e9666a2214cc5b747c078e9fc1272f8a 100644
+index c3d002305a973c59a2649c5736706dfec978eca2..2a19bcba37587e232cae47c415070c7eed14a801 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonLogger.java
 @@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
@@ -84,16 +84,6 @@ index 1cb0198de00244f30bb09d1398ef3acd41f02a82..6d2a28d9e9666a2214cc5b747c078e9f
  import java.util.logging.Level;
  import java.util.logging.Logger;
  
-@@ -13,4 +14,9 @@ public class HorizonLogger extends Logger {
-         setParent(Bukkit.getLogger());
-         setLevel(Level.ALL);
-     }
-+
-+    public void severe(String msg, Exception exception) {
-+        this.severe(msg + ", " + exception.getCause() + ": " + exception.getMessage());
-+    }
-+
- }
 diff --git a/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java b/src/main/java/dev/horizonmc/horizon/util/TicketHelper.java
 new file mode 100644
 index 0000000000000000000000000000000000000000..023cabb09786da78892a27eb5134e99d9f33cbbc
