@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 0635aacceec1ba9c753b4dde057876b91336d416..6b11dd70ec129b4207fb407d70015d2c45dbee9c 100644
+index 42fa7df2badca3fe26258ce0db934ba33f9cec80..efc294afbf87f2956f87d3556bc1a530f7f809a6 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -51,7 +51,7 @@ index 0635aacceec1ba9c753b4dde057876b91336d416..6b11dd70ec129b4207fb407d70015d2c
  
  tasks.registerRunTask("runBundler") {
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index 8cde30544e14f8fc2dac32966ae3c21f8cf3a551..efa0346123579c81f8da6276f38caac2b0b58002 100644
+index 8cde30544e14f8fc2dac32966ae3c21f8cf3a551..d25168aece9e64c83c2416749f591fb81b2b9b70 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,7 @@ public class Metrics {
@@ -63,15 +63,62 @@ index 8cde30544e14f8fc2dac32966ae3c21f8cf3a551..efa0346123579c81f8da6276f38caac2
  
                  metrics.addCustomChart(new Metrics.SimplePie("minecraft_version", () -> {
                      String minecraftVersion = Bukkit.getVersion();
-@@ -603,7 +603,7 @@ public class Metrics {
+@@ -603,7 +603,14 @@ public class Metrics {
  
                  metrics.addCustomChart(new Metrics.SingleLineChart("players", () -> Bukkit.getOnlinePlayers().size()));
                  metrics.addCustomChart(new Metrics.SimplePie("online_mode", () -> Bukkit.getOnlineMode() ? "online" : (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode() ? "bungee" : "offline"))); // Purpur
 -                metrics.addCustomChart(new Metrics.SimplePie("purpur_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur
-+                metrics.addCustomChart(new Metrics.SimplePie("horizon_version", () -> (org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() != null) ? org.bukkit.craftbukkit.Main.class.getPackage().getImplementationVersion() : "unknown")); // Purpur // Horizon
++                metrics.addCustomChart(new Metrics.SimplePie("horizon_version", () -> {
++                    String serverVersion = Bukkit.getVersion();
++                    if (!serverVersion.startsWith("null")) {
++                        String gitHash = serverVersion.substring("git-Horizon-".length()).split("[-\\s]")[0].replaceAll("\"", "");
++                        return "git-Horizon-" + Bukkit.getMinecraftVersion() + "-" + gitHash;
++                    }
++                    return "unknown";
++                }));
  
                  metrics.addCustomChart(new Metrics.DrilldownPie("java_version", () -> {
                      Map<String, Map<String, Integer>> map = new HashMap<>();
+@@ -635,39 +642,6 @@ public class Metrics {
+ 
+                     return map;
+                 }));
+-
+-                metrics.addCustomChart(new Metrics.DrilldownPie("legacy_plugins", () -> {
+-                    Map<String, Map<String, Integer>> map = new HashMap<>();
+-
+-                    // count legacy plugins
+-                    int legacy = 0;
+-                    for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+-                        if (CraftMagicNumbers.isLegacy(plugin.getDescription())) {
+-                            legacy++;
+-                        }
+-                    }
+-
+-                    // insert real value as lower dimension
+-                    Map<String, Integer> entry = new HashMap<>();
+-                    entry.put(String.valueOf(legacy), 1);
+-
+-                    // create buckets as higher dimension
+-                    if (legacy == 0) {
+-                        map.put("0 \uD83D\uDE0E", entry); // :sunglasses:
+-                    } else if (legacy <= 5) {
+-                        map.put("1-5", entry);
+-                    } else if (legacy <= 10) {
+-                        map.put("6-10", entry);
+-                    } else if (legacy <= 25) {
+-                        map.put("11-25", entry);
+-                    } else if (legacy <= 50) {
+-                        map.put("26-50", entry);
+-                    } else {
+-                        map.put("50+ \uD83D\uDE2D", entry); // :cry:
+-                    }
+-
+-                    return map;
+-                }));
+             }
+ 
+         }
 diff --git a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java b/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
 index 6d36fc6d8e22d9b68dea3830f6ecc8763184c343..69720b6a5ef268430ac248ac4c97ee698d433f4f 100644
 --- a/src/main/java/com/destroystokyo/paper/PaperVersionFetcher.java
@@ -108,12 +155,15 @@ index 3cb56595822799926a8141e60a42f5d1edfc6de5..665e6ea074ddc95ebb6f6e58820ec525
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
-index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..016ee7e8109102751c9449c79e38d381bddef720 100644
+index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..5a852fb6b12d3bfff3630e5908d60dfbbc4f2d24 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
-@@ -32,6 +32,7 @@ public record ServerBuildInfoImpl(
+@@ -30,8 +30,9 @@ public record ServerBuildInfoImpl(
+     private static final String ATTRIBUTE_GIT_BRANCH = "Git-Branch";
+     private static final String ATTRIBUTE_GIT_COMMIT = "Git-Commit";
  
-     private static final String BRAND_PAPER_NAME = "Paper";
+-    private static final String BRAND_PAPER_NAME = "Paper";
++    private static final String BRAND_PAPER_NAME = "Horizon";
      private static final String BRAND_PURPUR_NAME = "Purpur"; // Purpur
 +    private static final String BRAND_HORIZON_NAME = "Horizon"; // Horizon
  
@@ -132,10 +182,10 @@ index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..016ee7e8109102751c9449c79e38d381
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 6dbea75748021ecc950888213a431ab2495c4a18..12e0b87c9b742a74f5e1e58dc0aaca888f1e7957 100644
+index e6a23507b69a128aabf4f811d6099281b24583fd..a5c19f19a0f85afcd92cbf679679df86f5602d5e 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1195,15 +1195,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1257,15 +1257,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop
@@ -191,7 +241,7 @@ index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..207400ecf514a1609979c363ddf28c05
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index aea73061f4bd47c7307d6fdf0929765f5258cafc..b72ed47942cc1c7b4c54bc610e1e4711df273d1f 100644
+index 54abd6874a64c669fc22448849febc9ef7c0f95e..dc32312dfa94b96ea9d88bfe05e1319a874b70c7 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -232,8 +232,7 @@ public class PurpurConfig {

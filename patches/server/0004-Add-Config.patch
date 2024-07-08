@@ -907,7 +907,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 5ea6f3084fdc7a3d640746d7232600c08cffbe45..a255660d9de9219f117a0a55919d561cb3a97d9b 100644
+index b622df521416c574f7db1f080ff5145dfbffd639..b2b096c6a814598d89b17bbba75d6d97a99bc268 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -918,7 +918,7 @@ index 5ea6f3084fdc7a3d640746d7232600c08cffbe45..a255660d9de9219f117a0a55919d561c
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1174,6 +1175,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1236,6 +1237,9 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              this.status = this.buildServerStatus();
  
              // Spigot start
@@ -968,7 +968,7 @@ index 8b903417148d4e26eb974e43d73bac7c127e1315..1a51468961eedd85121f50b94d75dcaa
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 930614ebfd3d6b6e011a58bbd5310620c02582db..ea1870f99d7d31bf350f89ddc01254d2176ead9a 100644
+index f0e7f729e58fa1b297ae07edcf808f6211262189..e380f2f9eb441faa61ba552afc41f888af62ac71 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -184,6 +184,14 @@ public class Main {

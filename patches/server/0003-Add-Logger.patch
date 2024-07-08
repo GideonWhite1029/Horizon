@@ -37,10 +37,10 @@ index 0000000000000000000000000000000000000000..c3d002305a973c59a2649c5736706dfe
 +
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 4a3a05324d1c732abc344c17242368a3cbaf81f3..235864652fe3d56933f4bcb2f5156b0d4664e00e 100644
+index 2b93f9b006ec01a77354d6571563fe3bf3d774c8..8322846244e759d9b198474f8104acea51c4fe2b 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -430,6 +430,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -431,6 +431,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private UUID originWorld;
      public boolean freezeLocked = false; // Paper - Freeze Tick Lock API
      public boolean fixedPose = false; // Paper - Expand Pose API
@@ -48,7 +48,7 @@ index 4a3a05324d1c732abc344c17242368a3cbaf81f3..235864652fe3d56933f4bcb2f5156b0d
      public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
  
      public void setOrigin(@javax.annotation.Nonnull Location location) {
-@@ -2481,6 +2482,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2482,6 +2483,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end
@@ -56,7 +56,7 @@ index 4a3a05324d1c732abc344c17242368a3cbaf81f3..235864652fe3d56933f4bcb2f5156b0d
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2633,6 +2635,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2634,6 +2636,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  immuneToFire = nbt.getBoolean("Purpur.FireImmune");
              }
              // Purpur end
@@ -68,7 +68,7 @@ index 4a3a05324d1c732abc344c17242368a3cbaf81f3..235864652fe3d56933f4bcb2f5156b0d
  
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
-@@ -4893,6 +4900,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4894,6 +4901,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end - Expose entity id counter

@@ -19,7 +19,7 @@ index c3be1a5df5bae0309b9c6691670988148a43ee47..6b34b88f0da416b4bfedd338a92cbc74
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index dc8fcde8a6a394ad9275e15f31e1a40f319cb2d6..05750f8611c90bd403516a02ff2cd5ff82e02879 100644
+index 8322846244e759d9b198474f8104acea51c4fe2b..ebfba9a0c615d7e77e360fde02f726859fbfcc92 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
@@ -30,7 +30,7 @@ index dc8fcde8a6a394ad9275e15f31e1a40f319cb2d6..05750f8611c90bd403516a02ff2cd5ff
  import it.unimi.dsi.fastutil.doubles.DoubleList;
  import it.unimi.dsi.fastutil.doubles.DoubleListIterator;
  import it.unimi.dsi.fastutil.floats.FloatArraySet;
-@@ -561,7 +562,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -562,7 +563,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          this.bb = Entity.INITIAL_AABB;
          this.stuckSpeedMultiplier = Vec3.ZERO;
          this.nextStep = 1.0F;

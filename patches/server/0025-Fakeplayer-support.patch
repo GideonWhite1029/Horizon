@@ -241,10 +241,10 @@ index f37857eb3973a0cf1a02041effd5491d711c2eb7..d8a089e9d3fb93cdc88585f9af6398d2
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 92f998a973b2adde8fee01cc88ebecdc4cc98922..9310808cae81804a4d7ae6db0707422f19f523d8 100644
+index 982d12ad8e0138fd9fbae8933f53ef595bd0ae97..c306d0ebbd5796106bf118a0d6036b2509d7b8ad 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -690,6 +690,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -752,6 +752,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - Configurable player collision
  
          dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
@@ -252,7 +252,7 @@ index 92f998a973b2adde8fee01cc88ebecdc4cc98922..9310808cae81804a4d7ae6db0707422f
  
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
-@@ -987,6 +988,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1049,6 +1050,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -295,7 +295,7 @@ index f258c356972ac07e6f4bd094220c05ab97d879a5..d709a8e5d941fa3f5a5d94aeb5c2f464
  
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index d9fbc5c1f4c6317165d8daa104d3d0896b52c240..ca8c8757de2884fcc617d3075a7822f08e0ed74e 100644
+index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6efead540 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -161,6 +161,7 @@ import net.minecraft.world.phys.Vec3;
@@ -363,7 +363,7 @@ index d9fbc5c1f4c6317165d8daa104d3d0896b52c240..ca8c8757de2884fcc617d3075a7822f0
              for (ItemStack item : this.getInventory().getContents()) {
                  if (!item.isEmpty() && !EnchantmentHelper.has(item, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
                      loot.add(new DefaultDrop(item, stack -> this.drop(stack, true, false, false))); // Paper - Restore vanilla drops behavior; drop function taken from Inventory#dropAll (don't fire drop event)
-@@ -1447,6 +1452,13 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -1449,6 +1454,13 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                  this.lastSentHealth = -1.0F;
                  this.lastSentFood = -1;
  
@@ -378,7 +378,7 @@ index d9fbc5c1f4c6317165d8daa104d3d0896b52c240..ca8c8757de2884fcc617d3075a7822f0
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index dffe241cdfeafaafefb2da0472bad0079b9b1180..248a5e10860bf74ab3a2c945d4901a5f1b966b7c 100644
+index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a0e43f119 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -103,6 +103,7 @@ import net.minecraft.world.phys.Vec3;
@@ -425,7 +425,7 @@ index dffe241cdfeafaafefb2da0472bad0079b9b1180..248a5e10860bf74ab3a2c945d4901a5f
          // CraftBukkit start - fire PlayerRespawnEvent
          DimensionTransition dimensiontransition;
          if (location == null) {
-@@ -1085,11 +1108,16 @@ public abstract class PlayerList {
+@@ -1086,11 +1109,16 @@ public abstract class PlayerList {
      }
  
      public String[] getPlayerNamesArray() {
@@ -443,7 +443,7 @@ index dffe241cdfeafaafefb2da0472bad0079b9b1180..248a5e10860bf74ab3a2c945d4901a5f
  
          return astring;
      }
-@@ -1580,4 +1608,16 @@ public abstract class PlayerList {
+@@ -1581,4 +1609,16 @@ public abstract class PlayerList {
      public boolean isAllowCommandsForAllPlayers() {
          return this.allowCommandsForAllPlayers;
      }
@@ -461,10 +461,10 @@ index dffe241cdfeafaafefb2da0472bad0079b9b1180..248a5e10860bf74ab3a2c945d4901a5f
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 05750f8611c90bd403516a02ff2cd5ff82e02879..3af1c794371e0e9caf8b151a2291a9757fd35b9b 100644
+index ebfba9a0c615d7e77e360fde02f726859fbfcc92..8b158f1fe54b1b60dfbb8540a0fc6ce1588bf4fd 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1417,7 +1417,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1418,7 +1418,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return offsetFactor;
      }
  
