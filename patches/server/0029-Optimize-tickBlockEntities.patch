@@ -1,0 +1,121 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 10 Jul 2024 17:42:56 +0400
+Subject: [PATCH] Optimize tickBlockEntities
+
+
+diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
+index 8c472245b736401ee790caa50a27ced39b014f0f..ca9c73df99634a628137d59076b491f426bd703d 100644
+--- a/src/main/java/net/minecraft/world/level/Level.java
++++ b/src/main/java/net/minecraft/world/level/Level.java
+@@ -1011,6 +1011,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         int tickedEntities = 0; // Paper - rewrite chunk system
+ 
+         int tilesThisCycle = 0;
++        // Horizon start - optimize tickBlockEntities
++        int shouldTickBlocksAtLastResult = -1; // -1 = undefined
++        long shouldTickBlocksAtChunkPos = 0L;
++        // Horizon end
+         var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
+         toRemove.add(null); // Paper - Fix MC-117075
+         for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
+@@ -1023,8 +1027,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+                 tilesThisCycle--;
+                 toRemove.add(tickingblockentity); // Paper - Fix MC-117075; use removeAll
+                 // Spigot end
+-            } else if (flag && this.shouldTickBlocksAt(tickingblockentity.getPos())) {
+-                tickingblockentity.tick();
++                // Horizon start - optimize tickBlockEntities
++            } else if (flag) {
++                long chunkPos = tickingblockentity.getChunkCoordinateKey();
++                boolean shouldTick;
++                if (shouldTickBlocksAtChunkPos == chunkPos && shouldTickBlocksAtLastResult != -1) {
++                    shouldTick = shouldTickBlocksAtLastResult == 1;
++                } else {
++                    shouldTick = this.shouldTickBlocksAt(chunkPos);
++                    shouldTickBlocksAtLastResult = shouldTick ? 1 : 0;
++                    shouldTickBlocksAtChunkPos = chunkPos;
++                }
++                if (shouldTick) {
++                    tickingblockentity.tick();
++                } // Horizon end
+                 // Paper start - rewrite chunk system
+                 if ((++tickedEntities & 7) == 0) {
+                     ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevel)(Level)(Object)this).moonrise$midTickTasks();
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+index 28e3b73507b988f7234cbf29c4024c88180d0aef..10294b8764c5c96fe2dd9e5611119e9548d7b1c3 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TickingBlockEntity.java
+@@ -10,4 +10,6 @@ public interface TickingBlockEntity {
+     BlockPos getPos();
+ 
+     String getType();
++
++    long getChunkCoordinateKey(); // Horizon - optimize tickBlockEntities
+ }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+index 7238f28b7d4b40359a28970a7a53018c242af6e2..e1ead27736b28d5182e201d3b4bad75fa3008479 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
++++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
+@@ -74,6 +74,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+         public String getType() {
+             return "<null>";
+         }
++        // Horizon start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return 0;
++        }
++        // Horizon end
+     };
+     private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
+     public boolean loaded;
+@@ -914,7 +920,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+     }
+ 
+     private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
+-        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker);
++        return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, blockEntityTicker, this.coordinateKey); // Horizon - optimize tickBlockEntities
+     }
+ 
+     @FunctionalInterface
+@@ -965,6 +971,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+         public String toString() {
+             return String.valueOf(this.ticker) + " <wrapped>";
+         }
++
++        // Horizon start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.ticker.getChunkCoordinateKey();
++        }
++        // Horizon end
+     }
+ 
+     private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
+@@ -972,10 +985,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+         private final T blockEntity;
+         private final BlockEntityTicker<T> ticker;
+         private boolean loggedInvalidBlockState;
++        private final long chunkCoordinateKey; // Horizon - optimize tickBlockEntities
+ 
+-        BoundTickingBlockEntity(final BlockEntity tileentity, final BlockEntityTicker blockentityticker) {
++        BoundTickingBlockEntity(final BlockEntity tileentity, final BlockEntityTicker blockentityticker, long chunkCoordinateKey) { // Horizon - optimize tickBlockEntities
+             this.blockEntity = (T) tileentity; // CraftBukkit - decompile error
+             this.ticker = blockentityticker;
++            this.chunkCoordinateKey = chunkCoordinateKey; // Horizon - optimize tickBlockEntities
+         }
+ 
+         @Override
+@@ -1043,5 +1058,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+ 
+             return "Level ticker for " + s + "@" + String.valueOf(this.getPos());
+         }
++        // Horizon start - optimize tickBlockEntities
++        @Override
++        public long getChunkCoordinateKey() {
++            return this.chunkCoordinateKey;
++        }
++        // Horizon end
+     }
+ }
