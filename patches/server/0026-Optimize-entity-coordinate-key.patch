@@ -1,0 +1,59 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 10 Jul 2024 09:38:39 +0400
+Subject: [PATCH] Optimize entity coordinate key
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 06eb6ea6d82f56dffb11206e20baa7fbac138cf7..addc408e04047383974933897863aecc879a4e6d 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -201,4 +201,7 @@ public final class HorizonConfig {
+ 
+     // Leaves end - modify - fakeplayer
+ 
++    @GlobalConfig(name = "optimizeEntityCoordinateKey", category = {"optimization"})
++    public static boolean optimizeEntityCoordinateKey = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/io/papermc/paper/util/MCUtil.java b/src/main/java/io/papermc/paper/util/MCUtil.java
+index 02d6c98b7a2212b13ffd9859ebfdc0a8357ebe65..00bc679eb7c8776436123a399d5c255682cc3174 100644
+--- a/src/main/java/io/papermc/paper/util/MCUtil.java
++++ b/src/main/java/io/papermc/paper/util/MCUtil.java
+@@ -4,6 +4,7 @@ import com.destroystokyo.paper.profile.CraftPlayerProfile;
+ import com.destroystokyo.paper.profile.PlayerProfile;
+ import com.google.common.collect.ImmutableList;
+ import com.google.common.util.concurrent.ThreadFactoryBuilder;
++import dev.horizonmc.horizon.HorizonConfig;
+ import io.papermc.paper.math.BlockPosition;
+ import io.papermc.paper.math.FinePosition;
+ import io.papermc.paper.math.Position;
+@@ -199,7 +200,13 @@ public final class MCUtil {
+     }
+ 
+     public static long getCoordinateKey(final Entity entity) {
+-        return ((long)(MCUtil.fastFloor(entity.getZ()) >> 4) << 32) | ((MCUtil.fastFloor(entity.getX()) >> 4) & 0xFFFFFFFFL);
++        // Horizon start - eliminate double -> long cast in hotpath
++        if (HorizonConfig.optimizeEntityCoordinateKey) {
++            return ((long) (entity.blockPosition.getZ() >> 4) << 32) | ((entity.blockPosition.getX() >> 4) & 0xFFFFFFFFL);
++        } else {
++            return ((long) (MCUtil.fastFloor(entity.getZ()) >> 4) << 32) | ((MCUtil.fastFloor(entity.getX()) >> 4) & 0xFFFFFFFFL);
++        }
++        // Horizon end - eliminate double -> long cast in hotpath
+     }
+ 
+     public static long getCoordinateKey(final ChunkPos pair) {
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 8b158f1fe54b1b60dfbb8540a0fc6ce1588bf4fd..074f2ffa6be415ddf8f11bac2741cc19ea86667f 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -317,7 +317,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     public double yo;
+     public double zo;
+     private Vec3 position;
+-    private BlockPos blockPosition;
++    public BlockPos blockPosition; // Horizon
+     private ChunkPos chunkPosition;
+     private Vec3 deltaMovement;
+     private float yRot;

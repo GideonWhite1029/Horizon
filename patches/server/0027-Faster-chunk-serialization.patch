@@ -1,0 +1,504 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 10 Jul 2024 10:25:34 +0400
+Subject: [PATCH] Faster chunk serialization
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index addc408e04047383974933897863aecc879a4e6d..397b5c51bc38bc1b519d47972a415293442f051c 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -204,4 +204,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "optimizeEntityCoordinateKey", category = {"optimization"})
+     public static boolean optimizeEntityCoordinateKey = false;
+ 
++    @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
++    public static boolean fasterChunkSerialization = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/lithium/common/world/chunk/LithiumHashPalette.java b/src/main/java/dev/horizonmc/horizon/lithium/common/world/chunk/LithiumHashPalette.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..3bd5d4a4c01b1ac401cbf00f69d705691f0fe4dc
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/lithium/common/world/chunk/LithiumHashPalette.java
+@@ -0,0 +1,196 @@
++package dev.horizonmc.horizon.lithium.common.world.chunk;
++
++import com.google.common.collect.ImmutableList;
++import it.unimi.dsi.fastutil.HashCommon;
++import it.unimi.dsi.fastutil.objects.Reference2IntMap;
++import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
++
++import java.util.Arrays;
++import java.util.List;
++import java.util.function.Predicate;
++
++import net.minecraft.core.IdMap;
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.network.VarInt;
++import net.minecraft.world.level.chunk.Palette;
++import net.minecraft.world.level.chunk.PaletteResize;
++import org.jetbrains.annotations.NotNull;
++
++import static it.unimi.dsi.fastutil.Hash.FAST_LOAD_FACTOR;
++
++// Powered by Gale(https://github.com/GaleMC/Gale)
++
++/**
++ * Generally provides better performance over the vanilla {@link net.minecraft.world.level.chunk.HashMapPalette} when calling
++ * {@link LithiumHashPalette#idFor(Object)} through using a faster backing map and reducing pointer chasing.
++ */
++public class LithiumHashPalette<T> implements Palette<T> {
++    private static final int ABSENT_VALUE = -1;
++
++    private final IdMap<T> idList;
++    private final PaletteResize<T> resizeHandler;
++    private final int indexBits;
++
++    private final Reference2IntMap<T> table;
++    private T[] entries;
++    private int size = 0;
++
++    public LithiumHashPalette(IdMap<T> idList, PaletteResize<T> resizeHandler, int indexBits, T[] entries, Reference2IntMap<T> table, int size) {
++        this.idList = idList;
++        this.resizeHandler = resizeHandler;
++        this.indexBits = indexBits;
++        this.entries = entries;
++        this.table = table;
++        this.size = size;
++    }
++
++    public LithiumHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler, @NotNull List<T> list) {
++        this(idList, bits, resizeHandler);
++
++        for (T t : list) {
++            this.addEntry(t);
++        }
++    }
++
++    @SuppressWarnings("unchecked")
++    public LithiumHashPalette(IdMap<T> idList, int bits, PaletteResize<T> resizeHandler) {
++        this.idList = idList;
++        this.indexBits = bits;
++        this.resizeHandler = resizeHandler;
++
++        int capacity = 1 << bits;
++
++        this.entries = (T[]) new Object[capacity];
++        this.table = new Reference2IntOpenHashMap<>(capacity, FAST_LOAD_FACTOR);
++        this.table.defaultReturnValue(ABSENT_VALUE);
++    }
++
++    @Override
++    public int idFor(@NotNull T obj) {
++        int id = this.table.getInt(obj);
++
++        if (id == ABSENT_VALUE) {
++            id = this.computeEntry(obj);
++        }
++
++        return id;
++    }
++
++    @Override
++    public boolean maybeHas(@NotNull Predicate<T> predicate) {
++        for (int i = 0; i < this.size; ++i) {
++            if (predicate.test(this.entries[i])) {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    private int computeEntry(T obj) {
++        int id = this.addEntry(obj);
++
++        if (id >= 1 << this.indexBits) {
++            if (this.resizeHandler == null) {
++                throw new IllegalStateException("Cannot grow");
++            } else {
++                id = this.resizeHandler.onResize(this.indexBits + 1, obj);
++            }
++        }
++
++        return id;
++    }
++
++    private int addEntry(T obj) {
++        int nextId = this.size;
++
++        if (nextId >= this.entries.length) {
++            this.resize(this.size);
++        }
++
++        this.table.put(obj, nextId);
++        this.entries[nextId] = obj;
++
++        this.size++;
++
++        return nextId;
++    }
++
++    private void resize(int neededCapacity) {
++        this.entries = Arrays.copyOf(this.entries, HashCommon.nextPowerOfTwo(neededCapacity + 1));
++    }
++
++    @Override
++    public T valueFor(int id) {
++        T[] entries = this.entries;
++
++        if (id >= 0 && id < entries.length) {
++            return entries[id];
++        }
++
++        return null;
++    }
++
++    @Override
++    public void read(FriendlyByteBuf buf) {
++        this.clear();
++
++        int entryCount = buf.readVarInt();
++
++        for (int i = 0; i < entryCount; ++i) {
++            this.addEntry(this.idList.byId(buf.readVarInt()));
++        }
++    }
++
++    @Override
++    public void write(FriendlyByteBuf buf) {
++        int size = this.size;
++        buf.writeVarInt(size);
++
++        for (int i = 0; i < size; ++i) {
++            buf.writeVarInt(this.idList.getId(this.valueFor(i)));
++        }
++    }
++
++    @Override
++    public int getSerializedSize() {
++        int size = VarInt.getByteSize(this.size);
++
++        for (int i = 0; i < this.size; ++i) {
++            size = VarInt.getByteSize(this.idList.getId(this.valueFor(i)));
++        }
++
++        return size;
++    }
++
++    @Override
++    public int getSize() {
++        return this.size;
++    }
++
++    @NotNull
++    @Override
++    public Palette<T> copy() {
++        return new LithiumHashPalette<>(this.idList, this.resizeHandler, this.indexBits, this.entries.clone(), new Reference2IntOpenHashMap<>(this.table), this.size);
++    }
++
++    private void clear() {
++        Arrays.fill(this.entries, null);
++        this.table.clear();
++        this.size = 0;
++    }
++
++    public List<T> getElements() {
++        ImmutableList.Builder<T> builder = new ImmutableList.Builder<>();
++        for (T entry : this.entries) {
++            if (entry != null) {
++                builder.add(entry);
++            }
++        }
++        return builder.build();
++    }
++
++    public static <A> Palette<A> create(int bits, IdMap<A> idList, PaletteResize<A> listener, List<A> list) {
++        return new LithiumHashPalette<>(idList, bits, listener, list);
++    }
++}
+diff --git a/src/main/java/net/minecraft/util/BitStorage.java b/src/main/java/net/minecraft/util/BitStorage.java
+index 8bafd5fd7499ba4a04bf706cfd1e156073716e21..1c67552fee82c33eee64cfb393b3142f491127f9 100644
+--- a/src/main/java/net/minecraft/util/BitStorage.java
++++ b/src/main/java/net/minecraft/util/BitStorage.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import net.minecraft.world.level.chunk.Palette;
++
+ import java.util.function.IntConsumer;
+ 
+ public interface BitStorage {
+@@ -31,4 +33,6 @@ public interface BitStorage {
+ 
+     }
+     // Paper end
++
++    <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out); // Horizon - faster chunk serialization
+ }
+diff --git a/src/main/java/net/minecraft/util/SimpleBitStorage.java b/src/main/java/net/minecraft/util/SimpleBitStorage.java
+index 8d7d763bf51cac556057645e6169c9447993189b..06c582933573573168f5e2a8d3b80c7a8fd73ed3 100644
+--- a/src/main/java/net/minecraft/util/SimpleBitStorage.java
++++ b/src/main/java/net/minecraft/util/SimpleBitStorage.java
+@@ -2,6 +2,8 @@ package net.minecraft.util;
+ 
+ import java.util.function.IntConsumer;
+ import javax.annotation.Nullable;
++
++import net.minecraft.world.level.chunk.Palette;
+ import org.apache.commons.lang3.Validate;
+ 
+ public class SimpleBitStorage implements BitStorage {
+@@ -389,4 +391,44 @@ public class SimpleBitStorage implements BitStorage {
+             super(message);
+         }
+     }
++
++    // Horizon start - faster chunk serialization
++    @Override
++    public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {
++        if (this.size >= Short.MAX_VALUE) {
++            throw new IllegalStateException("Array too large");
++        }
++
++        if (this.size != out.length) {
++            throw new IllegalStateException("Array size mismatch");
++        }
++
++        short[] mappings = new short[(int) (this.mask + 1)];
++
++        int idx = 0;
++
++        for (long word : this.data) {
++            long bits = word;
++
++            for (int elementIdx = 0; elementIdx < this.valuesPerLong; ++elementIdx) {
++                int value = (int) (bits & this.mask);
++                int remappedId = mappings[value];
++
++                if (remappedId == 0) {
++                    remappedId = dstPalette.idFor(srcPalette.valueFor(value)) + 1;
++                    mappings[value] = (short) remappedId;
++                }
++
++                out[idx] = (short) (remappedId - 1);
++                bits >>= this.bits;
++
++                ++idx;
++
++                if (idx >= this.size) {
++                    return;
++                }
++            }
++        }
++    }
++    // Horizon end - faster chunk serialization
+ }
+diff --git a/src/main/java/net/minecraft/util/ZeroBitStorage.java b/src/main/java/net/minecraft/util/ZeroBitStorage.java
+index 01f5b946fabbe34f31110e75973dab9f39897346..cd567a28a89d0402e2938be4a4d991b663955165 100644
+--- a/src/main/java/net/minecraft/util/ZeroBitStorage.java
++++ b/src/main/java/net/minecraft/util/ZeroBitStorage.java
+@@ -2,6 +2,8 @@ package net.minecraft.util;
+ 
+ import java.util.Arrays;
+ import java.util.function.IntConsumer;
++
++import net.minecraft.world.level.chunk.Palette;
+ import org.apache.commons.lang3.Validate;
+ 
+ public class ZeroBitStorage implements BitStorage {
+@@ -71,4 +73,6 @@ public class ZeroBitStorage implements BitStorage {
+     public BitStorage copy() {
+         return this;
+     }
++
++    @Override public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {}  // Horizon - faster chunk serialization
+ }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/PaletteResize.java b/src/main/java/net/minecraft/world/level/chunk/PaletteResize.java
+index acae3eb30e0689048937f479dc3070f0688abdad..01ac18ae49fd6a4402a929e167da6c7748e01f9b 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/PaletteResize.java
++++ b/src/main/java/net/minecraft/world/level/chunk/PaletteResize.java
+@@ -1,5 +1,5 @@
+ package net.minecraft.world.level.chunk;
+ 
+-interface PaletteResize<T> {
++public interface PaletteResize<T> { // Horizon - package -> public
+     int onResize(int newBits, T object);
+ }
+diff --git a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
+index 81368bf186365878db2e1ed305bb7bf36c26f61f..883804b25471ab712cbc403e6bc1333e4831f3b5 100644
+--- a/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
++++ b/src/main/java/net/minecraft/world/level/chunk/PalettedContainer.java
+@@ -3,6 +3,8 @@ package net.minecraft.world.level.chunk;
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
++import dev.horizonmc.horizon.HorizonConfig;
++import dev.horizonmc.horizon.lithium.common.world.chunk.LithiumHashPalette;
+ import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+ import it.unimi.dsi.fastutil.ints.IntArraySet;
+ import it.unimi.dsi.fastutil.ints.IntSet;
+@@ -25,6 +27,24 @@ import net.minecraft.util.ThreadingDetector;
+ import net.minecraft.util.ZeroBitStorage;
+ 
+ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainerRO<T> {
++
++    // Horizon start - faster chunk serialization
++    private static final ThreadLocal<short[]> CACHED_ARRAY_4096 = ThreadLocal.withInitial(() -> new short[4096]);
++    private static final ThreadLocal<short[]> CACHED_ARRAY_64 = ThreadLocal.withInitial(() -> new short[64]);
++
++    private Optional<LongStream> asOptional(long[] data) {
++        return Optional.of(Arrays.stream(data));
++    }
++
++    private short[] getOrCreate(int size) {
++        return switch (size) {
++            case 64 -> CACHED_ARRAY_64.get();
++            case 4096 -> CACHED_ARRAY_4096.get();
++            default -> new short[size];
++        };
++    }
++    // Horizon end - faster chunk serialization
++    
+     private static final int MIN_PALETTE_BITS = 0;
+     private final PaletteResize<T> dummyPaletteResize = (newSize, added) -> 0;
+     public final IdMap<T> registry;
+@@ -304,28 +324,76 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+     public synchronized PalettedContainerRO.PackedData<T> pack(IdMap<T> idList, PalettedContainer.Strategy paletteProvider) { // Paper - synchronize
+         this.acquire();
+ 
+-        PalettedContainerRO.PackedData var12;
+-        try {
+-            HashMapPalette<T> hashMapPalette = new HashMapPalette<>(idList, this.data.storage.getBits(), this.dummyPaletteResize);
+-            int i = paletteProvider.size();
+-            int[] is = new int[i];
+-            this.data.storage.unpack(is);
+-            swapPalette(is, id -> hashMapPalette.idFor(this.data.palette.valueFor(id)));
+-            int j = paletteProvider.calculateBitsForSerialization(idList, hashMapPalette.getSize());
+-            Optional<LongStream> optional;
+-            if (j != 0) {
+-                SimpleBitStorage simpleBitStorage = new SimpleBitStorage(j, i, is);
+-                optional = Optional.of(Arrays.stream(simpleBitStorage.getRaw()));
+-            } else {
+-                optional = Optional.empty();
+-            }
++        // Horizon start - faster chunk serialization
++        if (!HorizonConfig.fasterChunkSerialization) {
++            PalettedContainerRO.PackedData var12;
++            try {
++                HashMapPalette<T> hashMapPalette = new HashMapPalette<>(idList, this.data.storage.getBits(), this.dummyPaletteResize);
++                int i = paletteProvider.size();
++                int[] is = new int[i];
++                this.data.storage.unpack(is);
++                swapPalette(is, (id) -> {
++                    return hashMapPalette.idFor(this.data.palette.valueFor(id));
++                });
++                int j = paletteProvider.calculateBitsForSerialization(idList, hashMapPalette.getSize());
++                Optional<LongStream> optional;
++                if (j != 0) {
++                    SimpleBitStorage simpleBitStorage = new SimpleBitStorage(j, i, is);
++                    optional = Optional.of(Arrays.stream(simpleBitStorage.getRaw()));
++                } else {
++                    optional = Optional.empty();
++                }
+ 
+-            var12 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional);
+-        } finally {
+-            this.release();
++                var12 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional);
++            } finally {
++                this.release();
++            }
++            return var12;
++        } else {
++            Optional<LongStream> data = Optional.empty();
++            List<T> elements = null;
++            try {
++                // The palette that will be serialized
++                LithiumHashPalette<T> hashPalette = null;
++
++                final Palette<T> palette = this.data.palette();
++                final BitStorage storage = this.data.storage();
++                if (storage instanceof ZeroBitStorage || palette.getSize() == 1) {
++                    // If the palette only contains one entry, don't attempt to repack it.
++                    elements = List.of(palette.valueFor(0));
++                } else if (palette instanceof LithiumHashPalette<T> lithiumHashPalette) {
++                    hashPalette = lithiumHashPalette;
++                }
++                if (elements == null) {
++                    LithiumHashPalette<T> compactedPalette = new LithiumHashPalette<>(idList, storage.getBits(), this.dummyPaletteResize);
++                    short[] array = this.getOrCreate(paletteProvider.size());
++
++                    storage.compact(this.data.palette(), compactedPalette, array);
++
++                    // If the palette didn't change during compaction, do a simple copy of the data array
++                    if (hashPalette != null && hashPalette.getSize() == compactedPalette.getSize() && storage.getBits() == paletteProvider.calculateBitsForSerialization(idList, hashPalette.getSize())) { // paletteSize can de-sync from palette - see https://github.com/CaffeineMC/lithium-fabric/issues/279
++                        data = this.asOptional(storage.getRaw().clone());
++                        elements = hashPalette.getElements();
++                    } else {
++                        int bits = paletteProvider.calculateBitsForSerialization(idList, compactedPalette.getSize());
++                        if (bits != 0) {
++                            // Re-pack the integer array as the palette has changed size
++                            SimpleBitStorage copy = new SimpleBitStorage(bits, array.length);
++                            for (int i = 0; i < array.length; ++i) {
++                                copy.set(i, array[i]);
++                            }
++                            // We don't need to clone the data array as we are the sole owner of it
++                            data = this.asOptional(copy.getRaw());
++                        }
++                    }
++                    elements = compactedPalette.getElements();
++                }
++            } finally {
++                this.release();
++            }
++            return new PalettedContainerRO.PackedData<>(elements, data);
+         }
+-
+-        return var12;
++        // Horizon end - faster chunk serialization
+     }
+ 
+     private static <T> void swapPalette(int[] is, IntUnaryOperator applier) {
+@@ -364,8 +432,37 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+ 
+     @Override
+     public void count(PalettedContainer.CountConsumer<T> counter) {
+-        if (this.data.palette.getSize() == 1) {
+-            counter.accept(this.data.palette.valueFor(0), this.data.storage.getSize());
++        // Horizon start - faster chunk serialization
++        if (!HorizonConfig.fasterChunkSerialization) {
++            if (this.data.palette.getSize() == 1) {
++                counter.accept(this.data.palette.valueFor(0), this.data.storage.getSize());
++            } else {
++                int len = this.data.palette().getSize();
++                // Do not allocate huge arrays if we're using a large palette
++                if (len > 4096) {
++                    if (this.data.palette.getSize() == 1) {
++                        counter.accept(this.data.palette.valueFor(0), this.data.storage.getSize());
++                    } else {
++                        Int2IntOpenHashMap int2IntOpenHashMap = new Int2IntOpenHashMap();
++                        this.data.storage.getAll((key) -> {
++                            int2IntOpenHashMap.addTo(key, 1);
++                        });
++                        int2IntOpenHashMap.int2IntEntrySet().forEach((entry) -> {
++                            counter.accept(this.data.palette.valueFor(entry.getIntKey()), entry.getIntValue());
++                        });
++                    }
++                }
++
++                short[] counts = new short[len];
++                this.data.storage().getAll(i -> counts[i]++);
++                for (int i = 0; i < counts.length; i++) {
++                    T obj = this.data.palette().valueFor(i);
++                    if (obj != null) {
++                        counter.accept(obj, counts[i]);
++                    }
++                }
++            }
++            // Horizon end - faster chunk serialization
+         } else {
+             Int2IntOpenHashMap int2IntOpenHashMap = new Int2IntOpenHashMap();
+             this.data.storage.getAll(key -> int2IntOpenHashMap.addTo(key, 1));
