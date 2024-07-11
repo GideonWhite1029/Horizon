@@ -28,6 +28,19 @@ index 0000000000000000000000000000000000000000..509e644a97a4e326cbbac08b1debd601
 +        return new JsonPrimitive(src.toString());
 +    }
 +}
+diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
+index 182a43ae9e7b28b4bf0993ad7f8486aa72d01e68..54f7d370aded6e3844408634b2477080b4954e4b 100644
+--- a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
++++ b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
+@@ -42,7 +42,7 @@ class PaperEventManager {
+         }
+ 
+         // Leaves start - skip bot
+-        if (event instanceof org.bukkit.event.player.PlayerEvent playerEvent && playerEvent.getPlayer() instanceof org.leavesmc.leaves.entity.Bot) {
++        if (event instanceof org.bukkit.event.player.PlayerEvent playerEvent && (playerEvent.getPlayer() instanceof org.leavesmc.leaves.entity.Bot || playerEvent.getPlayer() instanceof org.leavesmc.leaves.entity.Photographer)) { // Leaves - and photographer
+             return;
+         }
+         // Leaves end - skip bot
 diff --git a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
 index 7976885b902a6ce7d80f31e49448c99452eb9765..6bed90ec5effafbad4aaf82878fe24633891e4e5 100644
 --- a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
@@ -41,7 +54,7 @@ index 7976885b902a6ce7d80f31e49448c99452eb9765..6bed90ec5effafbad4aaf82878fe2463
                              collection.add(player.getGameProfile().getName());
                          }
 diff --git a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
-index b455c7e9d18bac3654daa8510f85cc21202e254b..c10a426a8fc20cc87ae4bf3a35feb5935f9e221c 100644
+index b455c7e9d18bac3654daa8510f85cc21202e254b..ddb5952c49f841f3a17cf31ad33daeade14fa6df 100644
 --- a/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/src/main/java/net/minecraft/commands/arguments/selector/EntitySelector.java
 @@ -117,6 +117,7 @@ public class EntitySelector {
@@ -52,21 +65,23 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..c10a426a8fc20cc87ae4bf3a35feb593
  
              return entityplayer == null ? List.of() : List.of(entityplayer);
          } else if (this.entityUUID != null) {
-@@ -125,7 +126,7 @@ public class EntitySelector {
+@@ -125,8 +126,8 @@ public class EntitySelector {
              while (iterator.hasNext()) {
                  ServerLevel worldserver = (ServerLevel) iterator.next();
                  Entity entity = worldserver.getEntity(this.entityUUID);
 -
+-                if (entity != null) {
 +                entity = entity instanceof org.leavesmc.leaves.replay.ServerPhotographer ? null : entity; // Leaves - skip photographer
-                 if (entity != null) {
++                if (entity != null && !(entity instanceof org.leavesmc.leaves.replay.ServerPhotographer)) {
                      if (entity.getType().isEnabled(source.enabledFeatures())) {
                          return List.of(entity);
+                     }
 @@ -142,7 +143,7 @@ public class EntitySelector {
  
              if (this.currentEntity) {
                  predicate = this.getPredicate(vec3d, axisalignedbb, (FeatureFlagSet) null);
 -                return source.getEntity() != null && predicate.test(source.getEntity()) ? List.of(source.getEntity()) : List.of();
-+                return source.getEntity() != null && predicate.test(source.getEntity() instanceof org.leavesmc.leaves.replay.ServerPhotographer) ? List.of(source.getEntity()) : List.of(); // Horizon
++                return source.getEntity() != null && !(source.getEntity() instanceof org.leavesmc.leaves.replay.ServerPhotographer) && predicate.test(source.getEntity()) ? List.of(source.getEntity()) : List.of(); // Leaves - skip photographer
              } else {
                  predicate = this.getPredicate(vec3d, axisalignedbb, source.enabledFeatures());
                  List<Entity> list = new ObjectArrayList();
@@ -119,10 +134,10 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..c10a426a8fc20cc87ae4bf3a35feb593
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 2fd9cc80d1de2b37e6fd42e357029e26e4ac353b..7b738896ca011638bf9aff4c69f581c903ca91e4 100644
+index c306d0ebbd5796106bf118a0d6036b2509d7b8ad..ab04ba760d65f4a645b67eb584b3f386e30db8fc 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1601,7 +1601,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1720,7 +1720,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -158,7 +173,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index d67fd663834d688f2d215a184d5076e6bf7d2f06..46dc9f545582d5d2dea438725b89bf1f15b98aa8 100644
+index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca545d8feac7 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -414,7 +429,7 @@ index 8f44331b9875e837e22e75d2456d050b5b6281da..4a04925b786f3baeb50ed993e23623b2
 +    // Leaves end - replay mod api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 61191508f173df5f20ecb4e71dd5045d1a37ff2d..50dd918b541358e1a78409d265a5e3bf59258e70 100644
+index 4b61a8bdfebc76820abc498ad2eb497007c129e9..eafe58f655995697610972f0cd20675612650ed7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -61,6 +61,8 @@ import org.bukkit.util.Vector;
@@ -435,10 +450,10 @@ index 61191508f173df5f20ecb4e71dd5045d1a37ff2d..50dd918b541358e1a78409d265a5e3bf
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 61ae7f9d871bb2747c928e91eb07496b862a4975..86d70c477e2e792d08c037ab0e624b2400ce79ad 100644
+index 6a3b023b0f60dbb350943bdd7f0bfead9e8e3ce0..c0af4e7a9aaf10bd1f8d13bd0940866aa151a644 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2247,7 +2247,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {
@@ -1059,7 +1074,7 @@ index 0000000000000000000000000000000000000000..cbc4b752a3770f2549db2808d653de0b
 +}
 diff --git a/src/main/java/org/leavesmc/leaves/replay/ReplayFile.java b/src/main/java/org/leavesmc/leaves/replay/ReplayFile.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..1fd315bd4757e34562046f9dd8ab2f6d884a9e8a
+index 0000000000000000000000000000000000000000..4b6db1b0a1f2d9dc72c5ef7ab0b46ab713b653d1
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/replay/ReplayFile.java
 @@ -0,0 +1,199 @@
@@ -1146,7 +1161,7 @@ index 0000000000000000000000000000000000000000..1fd315bd4757e34562046f9dd8ab2f6d
 +                ConnectionProtocol.STATUS, StatusProtocols.CLIENTBOUND,
 +                ConnectionProtocol.LOGIN, LoginProtocols.CLIENTBOUND,
 +                ConnectionProtocol.CONFIGURATION, ConfigurationProtocols.CLIENTBOUND,
-+                ConnectionProtocol.PLAY, GameProtocols.CLIENTBOUND.bind(RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess()))
++                ConnectionProtocol.PLAY, GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess()))
 +        );
 +    }
 +
