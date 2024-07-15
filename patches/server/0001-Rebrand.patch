@@ -182,10 +182,10 @@ index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..5a852fb6b12d3bfff3630e5908d60dfb
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index e6a23507b69a128aabf4f811d6099281b24583fd..a5c19f19a0f85afcd92cbf679679df86f5602d5e 100644
+index 7115c04cacfd373b2d9ce0e34460aa695bb65bcd..b9e096b444620f7ee1d6f0813944b7a324177f6a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1257,15 +1257,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1258,15 +1258,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop
@@ -255,10 +255,10 @@ index 54abd6874a64c669fc22448849febc9ef7c0f95e..dc32312dfa94b96ea9d88bfe05e1319a
          serverModName = getString("settings.server-mod-name", serverModName);
      }
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 71777757fc00dfb2f91abecc4443b65782e78300..0163347719f9b6243e92de9e2131ba8bf206c3b4 100644
+index 08230ef6a705904440a677fba4c65386a3f540ed..d7dc4d2142b5fc4de2bc48e412223b89689a0dde 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
-@@ -83,12 +83,12 @@ public class WatchdogThread extends Thread
+@@ -155,12 +155,12 @@ public class WatchdogThread extends io.papermc.paper.util.TickThread // Paper -
                  if (isLongTimeout) {
                  // Paper end
                  log.log( Level.SEVERE, "------------------------------" );
@@ -273,7 +273,7 @@ index 71777757fc00dfb2f91abecc4443b65782e78300..0163347719f9b6243e92de9e2131ba8b
                  log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
                  log.log( Level.SEVERE, "Purpur version: " + Bukkit.getServer().getVersion() ); // Purpur
                  //
-@@ -112,12 +112,12 @@ public class WatchdogThread extends Thread
+@@ -184,12 +184,12 @@ public class WatchdogThread extends io.papermc.paper.util.TickThread // Paper -
                  // Paper end
                  } else
                  {
@@ -286,9 +286,9 @@ index 71777757fc00dfb2f91abecc4443b65782e78300..0163347719f9b6243e92de9e2131ba8b
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Purpur!):" ); // Paper // Purpur
 +                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Horizon!):" ); // Paper // Purpur // Horizon
                  ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler.dumpAllChunkLoadInfo(MinecraftServer.getServer(), isLongTimeout); // Paper - rewrite chunk system
+                 this.dumpTickingInfo(); // Paper - log detailed tick information
                  WatchdogThread.dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().serverThread.getId(), Integer.MAX_VALUE ), log );
-                 log.log( Level.SEVERE, "------------------------------" );
-@@ -132,7 +132,7 @@ public class WatchdogThread extends Thread
+@@ -205,7 +205,7 @@ public class WatchdogThread extends io.papermc.paper.util.TickThread // Paper -
                      WatchdogThread.dumpThread( thread, log );
                  }
                  } else {

@@ -19,7 +19,7 @@ index 64d88eca763b26e0c230c5b2c1836668b914c5d1..a2b16fdce1a86377fdd3e4b29f31e157
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 93b9f8e64ea13c7c70ca1f8a3405c96cc5b7891b..8c472245b736401ee790caa50a27ced39b014f0f 100644
+index fc3cc88629f395cb47162dece48d316b8194b887..7f513cb9543023a2e51810fc76a88b75b4472b83 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -74,6 +74,7 @@ import net.minecraft.world.level.lighting.LevelLightEngine;
@@ -30,7 +30,7 @@ index 93b9f8e64ea13c7c70ca1f8a3405c96cc5b7891b..8c472245b736401ee790caa50a27ced3
  import net.minecraft.world.level.redstone.NeighborUpdater;
  import net.minecraft.world.level.saveddata.maps.MapId;
  import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
-@@ -348,7 +349,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -727,7 +728,13 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
          this.thread = Thread.currentThread();
          this.biomeManager = new BiomeManager(this, i);
          this.isDebug = flag1;

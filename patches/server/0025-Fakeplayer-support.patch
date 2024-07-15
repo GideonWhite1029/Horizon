@@ -222,7 +222,7 @@ index 35772110e9318df46a2729dbc0b5879b290011b7..f26989a44cdda9baabf337d573436c6c
          Set<CriterionTrigger.Listener<T>> set = (Set) playerAdvancements.criterionData.get(this); // Paper - fix AdvancementDataPlayer leak
          if (set != null && !set.isEmpty()) {
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index f37857eb3973a0cf1a02041effd5491d711c2eb7..d8a089e9d3fb93cdc88585f9af6398d263443acf 100644
+index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137f3223222 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -400,6 +400,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -241,10 +241,10 @@ index f37857eb3973a0cf1a02041effd5491d711c2eb7..d8a089e9d3fb93cdc88585f9af6398d2
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 982d12ad8e0138fd9fbae8933f53ef595bd0ae97..c306d0ebbd5796106bf118a0d6036b2509d7b8ad 100644
+index 71c1bec42bb1e575ae45cc5ba4f61a686a9e4127..17fa84a43a96f9c45fff7e5608076b1612cc0f5d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -752,6 +752,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -753,6 +753,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - Configurable player collision
  
          dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
@@ -252,7 +252,7 @@ index 982d12ad8e0138fd9fbae8933f53ef595bd0ae97..c306d0ebbd5796106bf118a0d6036b25
  
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
-@@ -1049,6 +1050,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1050,6 +1051,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -277,10 +277,10 @@ index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a53
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index f258c356972ac07e6f4bd094220c05ab97d879a5..d709a8e5d941fa3f5a5d94aeb5c2f464e47a7e8f 100644
+index cfccc3cf0058592b3248b0f6cfb3744255a81e12..80966a4797065bca629476f714cded5d7713919d 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1149,6 +1149,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1262,6 +1262,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
              if (this.seenBy.remove(player.connection)) {
                  this.serverEntity.removePairing(player);
@@ -461,18 +461,18 @@ index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index ebfba9a0c615d7e77e360fde02f726859fbfcc92..8b158f1fe54b1b60dfbb8540a0fc6ce1588bf4fd 100644
+index 920d486f1bbe70cf4c2e18194496cd79481a11a1..ca86877d64e9a60ae2dbfa8bdc2286ddc83798c8 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1418,7 +1418,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1480,7 +1480,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return offsetFactor;
      }
  
 -    private Vec3 collide(Vec3 movement) {
 +    public Vec3 collide(Vec3 movement) { // Horizon: private -> public
-         AABB axisalignedbb = this.getBoundingBox();
-         List<VoxelShape> list = this.level().getEntityCollisions(this, axisalignedbb.expandTowards(movement));
-         Vec3 vec3d1 = movement.lengthSqr() == 0.0D ? movement : Entity.collideBoundingBox(this, movement, axisalignedbb, this.level(), list);
+         // Paper start - optimise collisions
+         final boolean xZero = movement.x == 0.0;
+         final boolean yZero = movement.y == 0.0;
 diff --git a/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java b/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java
 index 1223c5d23d0ea6aed068bdf0f5725e2ad49fc82c..0e00f59a8962dd6356d483ef5be3209a3a410008 100644
 --- a/src/main/java/net/minecraft/world/entity/projectile/FishingHook.java

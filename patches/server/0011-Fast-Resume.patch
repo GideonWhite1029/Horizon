@@ -6,7 +6,7 @@ Subject: [PATCH] Fast Resume
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-index 3d902f382977a194e09986419391c3ca1568885c..de0b49eb5b394c15f952f39558bd809ef08558ea 100644
+index 1030e1b059f7ccdedd9c00527c3dd20c9cb81f42..696716d275ff4afb65d918a6c89af57e41272e5c 100644
 --- a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 @@ -581,6 +581,49 @@ public final class ChunkHolderManager {
@@ -266,10 +266,10 @@ index 0000000000000000000000000000000000000000..0f4865a6b57eb16752ec0476005127b1
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 094246704e0e69db364f6fc074ca7bcfcdd7c8a5..2fb1e6d7c001cbeada4b657fd734081be5c3cb95 100644
+index 4376b1618c0af674f2d99846b8f2603cf186dfc6..79160eba1865f24234c33f16cbf12daba908b1e6 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -751,6 +751,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -752,6 +752,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Paper end - Configurable player collision
  
@@ -278,7 +278,7 @@ index 094246704e0e69db364f6fc074ca7bcfcdd7c8a5..2fb1e6d7c001cbeada4b657fd734081b
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
          io.papermc.paper.command.brigadier.PaperCommands.INSTANCE.setValid(); // Paper - reset invalid state for event fire below
-@@ -1020,6 +1022,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1021,6 +1023,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // CraftBukkit end
  
      public void stopServer() {
