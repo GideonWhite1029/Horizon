@@ -5,10 +5,10 @@ Subject: [PATCH] Optimize noise generation
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 397b5c51bc38bc1b519d47972a415293442f051c..ba6267143d9559a3e726fac51da46abc2fc7a6fe 100644
+index a4e8e4f956fa0dfd4e31474026d1705bbd60e986..c8e7577e6391090dd4f6daf5bbb6a26a996f8af5 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -207,4 +207,7 @@ public final class HorizonConfig {
+@@ -204,4 +204,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
      public static boolean fasterChunkSerialization = false;
  

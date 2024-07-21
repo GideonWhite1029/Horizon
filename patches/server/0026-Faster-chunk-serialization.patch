@@ -5,12 +5,12 @@ Subject: [PATCH] Faster chunk serialization
 
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index addc408e04047383974933897863aecc879a4e6d..397b5c51bc38bc1b519d47972a415293442f051c 100644
+index 06eb6ea6d82f56dffb11206e20baa7fbac138cf7..a4e8e4f956fa0dfd4e31474026d1705bbd60e986 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -204,4 +204,7 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "optimizeEntityCoordinateKey", category = {"optimization"})
-     public static boolean optimizeEntityCoordinateKey = false;
+@@ -201,4 +201,7 @@ public final class HorizonConfig {
+ 
+     // Leaves end - modify - fakeplayer
  
 +    @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
 +    public static boolean fasterChunkSerialization = false;
@@ -220,7 +220,7 @@ index 0000000000000000000000000000000000000000..3bd5d4a4c01b1ac401cbf00f69d70569
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/util/BitStorage.java b/src/main/java/net/minecraft/util/BitStorage.java
-index 68648c5a5e3ff079f832092af0f2f801c42d1ede..685e152347ded7c5e494c07f141588b4ecadea0e 100644
+index 19661e106612b8e4e152085fb398db7bd06acc23..43bbd14af184ada8739745b577c79ef4d4e359e8 100644
 --- a/src/main/java/net/minecraft/util/BitStorage.java
 +++ b/src/main/java/net/minecraft/util/BitStorage.java
 @@ -1,5 +1,7 @@
@@ -230,16 +230,16 @@ index 68648c5a5e3ff079f832092af0f2f801c42d1ede..685e152347ded7c5e494c07f141588b4
 +
  import java.util.function.IntConsumer;
  
- public interface BitStorage {
-@@ -20,4 +22,6 @@ public interface BitStorage {
-     void unpack(int[] out);
- 
-     BitStorage copy();
+ public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counting.BlockCountingBitStorage { // Paper - block counting
+@@ -38,4 +40,6 @@ public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counti
+         return ret;
+     }
+     // Paper end - block counting
 +
 +    <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out); // Horizon - faster chunk serialization
  }
 diff --git a/src/main/java/net/minecraft/util/SimpleBitStorage.java b/src/main/java/net/minecraft/util/SimpleBitStorage.java
-index 9f438d9c6eb05e43d24e4af68188a3d4c46a938c..ede67c44cf35d71b7334a26bac9c2885b12e819d 100644
+index 8acf2f2491a8d9d13392c5e89b2bd5c9918285e1..2f60c4dcac4ebe0b0eb135e2e2f026e33a1239dd 100644
 --- a/src/main/java/net/minecraft/util/SimpleBitStorage.java
 +++ b/src/main/java/net/minecraft/util/SimpleBitStorage.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -251,7 +251,7 @@ index 9f438d9c6eb05e43d24e4af68188a3d4c46a938c..ede67c44cf35d71b7334a26bac9c2885
  import org.apache.commons.lang3.Validate;
  
  public class SimpleBitStorage implements BitStorage {
-@@ -367,4 +369,44 @@ public class SimpleBitStorage implements BitStorage {
+@@ -401,4 +403,44 @@ public class SimpleBitStorage implements BitStorage {
              super(message);
          }
      }
@@ -297,7 +297,7 @@ index 9f438d9c6eb05e43d24e4af68188a3d4c46a938c..ede67c44cf35d71b7334a26bac9c2885
 +    // Horizon end - faster chunk serialization
  }
 diff --git a/src/main/java/net/minecraft/util/ZeroBitStorage.java b/src/main/java/net/minecraft/util/ZeroBitStorage.java
-index 50040c497a819cd1229042ab3cb057d34a32cacc..f24474bdad0472850f87e3be33c82fbd9e4856c5 100644
+index 15c5164d0ef41a978c16ee317fa73e97f2480207..2db0ee1f63e993b57187ee62724952de0ffb77c6 100644
 --- a/src/main/java/net/minecraft/util/ZeroBitStorage.java
 +++ b/src/main/java/net/minecraft/util/ZeroBitStorage.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -309,10 +309,10 @@ index 50040c497a819cd1229042ab3cb057d34a32cacc..f24474bdad0472850f87e3be33c82fbd
  import org.apache.commons.lang3.Validate;
  
  public class ZeroBitStorage implements BitStorage {
-@@ -62,4 +64,6 @@ public class ZeroBitStorage implements BitStorage {
-     public BitStorage copy() {
-         return this;
+@@ -80,4 +82,6 @@ public class ZeroBitStorage implements BitStorage {
+         return ret;
      }
+     // Paper end - block counting
 +
 +    @Override public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {}  // Horizon - faster chunk serialization
  }

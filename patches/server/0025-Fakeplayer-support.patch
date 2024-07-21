@@ -241,7 +241,7 @@ index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 71c1bec42bb1e575ae45cc5ba4f61a686a9e4127..17fa84a43a96f9c45fff7e5608076b1612cc0f5d 100644
+index 21c7197002b19e9bbc0a59b6a91ccc3dfa9a59f3..608e59b52d20e36279f76831cccba98a0b9f135b 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -753,6 +753,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -251,11 +251,11 @@ index 71c1bec42bb1e575ae45cc5ba4f61a686a9e4127..17fa84a43a96f9c45fff7e5608076b16
 +        org.leavesmc.leaves.bot.ServerBot.loadAllBot(); // Leaves - load resident bot
  
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
-         if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.pluginsEnabled(); // Paper - Remap plugins
-@@ -1050,6 +1051,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
- 
+         this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
+@@ -1044,6 +1045,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
+         this.server.spark.disable(); // Paper - spark
 +        org.leavesmc.leaves.bot.ServerBot.saveOrRemoveAllBot(); // Leaves - save or remove bot
          // Purpur start
          if (upnp) {
@@ -277,10 +277,10 @@ index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a53
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index cfccc3cf0058592b3248b0f6cfb3744255a81e12..80966a4797065bca629476f714cded5d7713919d 100644
+index f402d69115127242050876c7d0ddcf6ad6f3ebb2..6f7ba25f25caf71fdd797aae5b3fbfbc58ab4663 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1262,6 +1262,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1229,6 +1229,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
              if (this.seenBy.remove(player.connection)) {
                  this.serverEntity.removePairing(player);
@@ -295,7 +295,7 @@ index cfccc3cf0058592b3248b0f6cfb3744255a81e12..80966a4797065bca629476f714cded5d
  
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6efead540 100644
+index 21dfca344a7b98dfd4e20bebde6c743e5cd8c932..58fa04d0b28c49c9724dbab078765451a19abc41 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -161,6 +161,7 @@ import net.minecraft.world.phys.Vec3;
@@ -306,7 +306,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
  import org.slf4j.Logger;
  import net.minecraft.world.Container;
  import net.minecraft.world.InteractionHand;
-@@ -210,7 +211,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -212,7 +213,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
      private static final AttributeModifier CREATIVE_ENTITY_INTERACTION_RANGE_MODIFIER = new AttributeModifier(ResourceLocation.withDefaultNamespace("creative_mode_entity_range"), 2.0D, AttributeModifier.Operation.ADD_VALUE);
      public ServerGamePacketListenerImpl connection;
      public final MinecraftServer server;
@@ -315,7 +315,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
      private final PlayerAdvancements advancements;
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
-@@ -781,16 +782,20 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -780,16 +781,20 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              --this.invulnerableTime;
          }
  
@@ -345,7 +345,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
  
          Entity entity = this.getCamera();
  
-@@ -806,7 +811,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -805,7 +810,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
              }
          }
  
@@ -354,7 +354,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
          if (this.levitationStartPos != null) {
              CriteriaTriggers.LEVITATION.trigger(this, this.levitationStartPos, this.tickCount - this.levitationStartTime);
          }
-@@ -1035,7 +1040,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -1034,7 +1039,7 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
          List<DefaultDrop> loot = new java.util.ArrayList<>(this.getInventory().getContainerSize()); // Paper - Restore vanilla drops behavior
          boolean keepInventory = this.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) || this.isSpectator();
  
@@ -363,7 +363,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
              for (ItemStack item : this.getInventory().getContents()) {
                  if (!item.isEmpty() && !EnchantmentHelper.has(item, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) {
                      loot.add(new DefaultDrop(item, stack -> this.drop(stack, true, false, false))); // Paper - Restore vanilla drops behavior; drop function taken from Inventory#dropAll (don't fire drop event)
-@@ -1449,6 +1454,13 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
+@@ -1448,6 +1453,13 @@ public class ServerPlayer extends net.minecraft.world.entity.player.Player imple
                  this.lastSentHealth = -1.0F;
                  this.lastSentFood = -1;
  
@@ -378,7 +378,7 @@ index c8ccf4b847ba3803b48c26ad6e6acecb327c76c5..2a3f8bd18e39275b8e97ace9e9d403d6
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a0e43f119 100644
+index 6ad4be9d3dbe73e30ad83773969af075cec747c7..bfb86fa2dbd08f53b312ef7b231c734a567512ef 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -103,6 +103,7 @@ import net.minecraft.world.phys.Vec3;
@@ -411,7 +411,7 @@ index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -849,6 +865,13 @@ public abstract class PlayerList {
+@@ -850,6 +866,13 @@ public abstract class PlayerList {
          boolean isRespawn = false;
          // Paper end - Add PlayerPostRespawnEvent
  
@@ -425,7 +425,7 @@ index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a
          // CraftBukkit start - fire PlayerRespawnEvent
          DimensionTransition dimensiontransition;
          if (location == null) {
-@@ -1086,11 +1109,16 @@ public abstract class PlayerList {
+@@ -1087,11 +1110,16 @@ public abstract class PlayerList {
      }
  
      public String[] getPlayerNamesArray() {
@@ -443,7 +443,7 @@ index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a
  
          return astring;
      }
-@@ -1581,4 +1609,16 @@ public abstract class PlayerList {
+@@ -1595,4 +1623,16 @@ public abstract class PlayerList {
      public boolean isAllowCommandsForAllPlayers() {
          return this.allowCommandsForAllPlayers;
      }
@@ -461,7 +461,7 @@ index cc25ee8f1a9ba085fbf3bef5f8952a588f962554..b1a68f4818a9a0c0c5766b3c574acc9a
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 920d486f1bbe70cf4c2e18194496cd79481a11a1..ca86877d64e9a60ae2dbfa8bdc2286ddc83798c8 100644
+index da20ef4250b8222854ad6a6163f05e311b951e31..3068cdb0c2dbdefb8c069441c0a5b3a34be86ecf 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1480,7 +1480,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -539,18 +539,18 @@ index 04f67f7b43d2f461c776c76614dc3e5f060aea63..7f95dac24f73c702a87c0ecd27c9116b
                                      if (randomsource.nextInt(j) >= world.paperConfig().entities.behavior.playerInsomniaStartTicks) { // Paper - Ability to control player's insomnia and phantoms
                                          BlockPos blockposition1 = blockposition.above(20 + randomsource.nextInt(15)).east(-10 + randomsource.nextInt(21)).south(-10 + randomsource.nextInt(21));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index bd320ed030073da13debf96f5c5a640628917d80..8f44331b9875e837e22e75d2456d050b5b6281da 100644
+index 1246a2a185a349f892b27a11bd8fcac2543442a2..f327fcd0ed9d9b0d4d3f4130ce407da9ae7a8139 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -309,6 +309,7 @@ public final class CraftServer implements Server {
-     public static Exception excessiveVelEx; // Paper - Velocity warnings
+@@ -310,6 +310,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher(); // Paper
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer; // Paper - Custom Potion Mixes
+     public final io.papermc.paper.SparksFly spark; // Paper - spark
 +    private final org.leavesmc.leaves.entity.CraftBotManager botManager = new org.leavesmc.leaves.entity.CraftBotManager(); // Leaves
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -3306,4 +3307,11 @@ public final class CraftServer implements Server {
+@@ -3319,4 +3320,11 @@ public final class CraftServer implements Server {
          return getServer().lagging;
      }
      // Purpur end
@@ -585,14 +585,22 @@ index 4b7d38a5ac6247c6e9d71ac7f3b65765ed3cf3ee..4b61a8bdfebc76820abc498ad2eb4970
          if (entity instanceof EnderDragonPart complexPart) {
              if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-index c9ffab2a77f5a9428c94a7b755b73940d0d1ba9a..2ae420a10c85e8a065cbbd38e2cf3449bb6e2e32 100644
+index d25bd72ee271d04f27ae9cdfdf73f563172219dd..5d886cd5e3dac028d324fcd3ace1fb3b127339e7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-@@ -46,7 +46,7 @@ import org.bukkit.scheduler.BukkitWorker;
+@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
+ import org.bukkit.scheduler.BukkitScheduler;
+ import org.bukkit.scheduler.BukkitTask;
+ import org.bukkit.scheduler.BukkitWorker;
++import org.purpurmc.purpur.util.MinecraftInternalPlugin;
+ 
+ /**
+  * The fundamental concepts for this implementation:
+@@ -45,7 +46,7 @@ import org.bukkit.scheduler.BukkitWorker;
+  * </ul>
   */
  public class CraftScheduler implements BukkitScheduler {
- 
--    static Plugin MINECRAFT = new MinecraftInternalPlugin();
+-
 +    public static Plugin MINECRAFT = new MinecraftInternalPlugin(); // Leaves - package -> public
      /**
       * The start ID for the counter.

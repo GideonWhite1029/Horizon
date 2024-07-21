@@ -134,10 +134,10 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..ddb5952c49f841f3a17cf31ad33daead
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 17fa84a43a96f9c45fff7e5608076b1612cc0f5d..fcdf690ba80eee092c061fff443636e9f6ded45a 100644
+index 608e59b52d20e36279f76831cccba98a0b9f135b..330136a5a1e2f781c0cdd11019b4bac51d29444b 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1721,7 +1721,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1729,7 +1729,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -173,7 +173,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca545d8feac7 100644
+index bfb86fa2dbd08f53b312ef7b231c734a567512ef..16f64b11a0137553606542b40233a72fe176ac44 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -334,7 +334,7 @@ index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca54
              onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
          }
          // Paper start - Use single player info update packet on join
-@@ -604,6 +727,43 @@ public abstract class PlayerList {
+@@ -605,6 +728,43 @@ public abstract class PlayerList {
  
      }
  
@@ -378,7 +378,7 @@ index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca54
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(entityplayer, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())));
-@@ -673,6 +833,7 @@ public abstract class PlayerList {
+@@ -674,6 +834,7 @@ public abstract class PlayerList {
          entityplayer.retireScheduler(); // Paper - Folia schedulers
          entityplayer.getAdvancements().stopListening();
          this.players.remove(entityplayer);
@@ -386,7 +386,7 @@ index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca54
          this.playersByName.remove(entityplayer.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(entityplayer);
          UUID uuid = entityplayer.getUUID();
-@@ -767,7 +928,7 @@ public abstract class PlayerList {
+@@ -768,7 +929,7 @@ public abstract class PlayerList {
              event.disallow(PlayerLoginEvent.Result.KICK_BANNED, io.papermc.paper.adventure.PaperAdventure.asAdventure(ichatmutablecomponent)); // Paper - Adventure
          } else {
              // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameprofile) ? IChatBaseComponent.translatable("multiplayer.disconnect.server_full") : null;
@@ -396,18 +396,18 @@ index b1a68f4818a9a0c0c5766b3c574acc9a0e43f119..b7e535153183b3d7f9e9646a1374ca54
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 8f44331b9875e837e22e75d2456d050b5b6281da..4a04925b786f3baeb50ed993e23623b20f7a2479 100644
+index f327fcd0ed9d9b0d4d3f4130ce407da9ae7a8139..931d6b04aad977e6d7987c358520e599854a3c5f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -310,6 +310,7 @@ public final class CraftServer implements Server {
-     private final io.papermc.paper.logging.SysoutCatcher sysoutCatcher = new io.papermc.paper.logging.SysoutCatcher(); // Paper
+@@ -311,6 +311,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.potion.PaperPotionBrewer potionBrewer; // Paper - Custom Potion Mixes
+     public final io.papermc.paper.SparksFly spark; // Paper - spark
      private final org.leavesmc.leaves.entity.CraftBotManager botManager = new org.leavesmc.leaves.entity.CraftBotManager(); // Leaves
 +    private final org.leavesmc.leaves.entity.CraftPhotographerManager photographerManager = new org.leavesmc.leaves.entity.CraftPhotographerManager(); // Leaves
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -392,7 +393,7 @@ public final class CraftServer implements Server {
+@@ -393,7 +394,7 @@ public final class CraftServer implements Server {
      public CraftServer(DedicatedServer console, PlayerList playerList) {
          this.console = console;
          this.playerList = (DedicatedPlayerList) playerList;
@@ -416,7 +416,7 @@ index 8f44331b9875e837e22e75d2456d050b5b6281da..4a04925b786f3baeb50ed993e23623b2
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3314,4 +3315,11 @@ public final class CraftServer implements Server {
+@@ -3327,4 +3328,11 @@ public final class CraftServer implements Server {
          return botManager;
      }
      // Leaves end - Bot API
@@ -450,7 +450,7 @@ index 4b61a8bdfebc76820abc498ad2eb497007c129e9..eafe58f655995697610972f0cd206756
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 6a3b023b0f60dbb350943bdd7f0bfead9e8e3ce0..c0af4e7a9aaf10bd1f8d13bd0940866aa151a644 100644
+index b9130d040acff1e5cb7a475be93b03cdbe229683..84a3a606d92ec329cc1d4160e03e7481148c48e9 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

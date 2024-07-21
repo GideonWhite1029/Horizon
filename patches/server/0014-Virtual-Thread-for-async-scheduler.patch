@@ -19,18 +19,20 @@ index ae693ccea2d44f14272eeff19c1f6506f871bf2c..8e71e7a89bf51dbc3153f14c777dfe0b
  }
 \ No newline at end of file
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index ea1870f99d7d31bf350f89ddc01254d2176ead9a..c951265075c6ee996297743dc356f01e81cc4fc4 100644
+index efe093cf15a3e68e8f06df04bb38c4db39ddf4bd..7c523c73065104a97508043296baafcf5fe6dfcc 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -310,6 +310,8 @@ public class Main {
+@@ -295,9 +295,7 @@ public class Main {
+                         // Paper end
+                     }
                  }
-                 // Paper end - Log Java and OS versioning to help with debugging plugin issues
- 
+-
+-                System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
+-
 +                System.setProperty("org.jline.terminal.disableDeprecatedProviderWarning", "true"); // Horizon - Ignore terminal provider warning
-+
-                 System.out.println("Loading libraries, please wait...");
-                 net.minecraft.server.Main.main(options);
-             } catch (Throwable t) {
+                 //System.out.println("Loading libraries, please wait...");
+                 //net.minecraft.server.Main.main(options);
+                 io.papermc.paper.PaperBootstrap.boot(options);
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..f365e2d5f12b6f0f8a352a4386699ab077d7abae 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java

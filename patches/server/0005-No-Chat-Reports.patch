@@ -162,7 +162,7 @@ index 5705cb920084b775cce4b361683b32c6b6e003ed..a325899b6dffce1fec13c811575c1e37
      }
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index f80548eb7fe29585ba3209514b7d506b0f177ca4..4ba4a501bedf65c8a361ed85c42c7e83310ca85a 100644
+index ef37891cd5d56df47a9c2288ca16bb8d3ac139a1..4ea3baa45afb5472e078e14040769eb4afd6644d 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -20,6 +20,8 @@ import java.util.Locale;
@@ -174,7 +174,7 @@ index f80548eb7fe29585ba3209514b7d506b0f177ca4..4ba4a501bedf65c8a361ed85c42c7e83
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -702,7 +704,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -704,7 +706,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return dedicatedserverproperties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -223,7 +223,7 @@ index fac2fb82c381d245f77b7288c34920660ac2c3af..4299e075dc87804ae894053cc122e533
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 95dcf7743e69559bc99487f6b57986bbbb2512c6..ac58d31a82ea3dae2acc4a5f83856a62d49b4a58 100644
+index f31d71b2afa12676e56dd0d5c67bfb7a79961f25..e434ae69331e50bd6d3b17d6fa69013f6d1706a2 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;
@@ -235,7 +235,7 @@ index 95dcf7743e69559bc99487f6b57986bbbb2512c6..ac58d31a82ea3dae2acc4a5f83856a62
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -1437,7 +1439,7 @@ public abstract class PlayerList {
+@@ -1451,7 +1453,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public

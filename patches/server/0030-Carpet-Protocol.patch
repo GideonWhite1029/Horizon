@@ -6,10 +6,10 @@ Subject: [PATCH] Carpet Protocol
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index ba6267143d9559a3e726fac51da46abc2fc7a6fe..a126b61cdd3d63bcb3d0cc3bd61f1c6756010ef0 100644
+index c8e7577e6391090dd4f6daf5bbb6a26a996f8af5..54ecfda65b58b3c3703f468af2be5b817fbcc9a7 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -210,4 +210,7 @@ public final class HorizonConfig {
+@@ -207,4 +207,7 @@ public final class HorizonConfig {
      @GlobalConfig(name = "optimizeNoiseGeneration", category = {"optimization"})
      public static boolean optimizeNoiseGeneration = false;
  

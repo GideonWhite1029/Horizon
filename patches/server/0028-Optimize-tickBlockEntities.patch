@@ -5,10 +5,10 @@ Subject: [PATCH] Optimize tickBlockEntities
 
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 7f513cb9543023a2e51810fc76a88b75b4472b83..8d433c3b9627652e6cbdec3c5b2b3901c0547031 100644
+index fe64e03cc3b52a693a8c4aa79d707e962eb3d3d1..86eb3458532db6aeb62b32d9c48f447ab1ca4b89 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
-@@ -1394,6 +1394,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1436,6 +1436,10 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
          int tickedEntities = 0; // Paper - rewrite chunk system
  
          int tilesThisCycle = 0;
@@ -19,7 +19,7 @@ index 7f513cb9543023a2e51810fc76a88b75b4472b83..8d433c3b9627652e6cbdec3c5b2b3901
          var toRemove = new it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet<TickingBlockEntity>(); // Paper - Fix MC-117075; use removeAll
          toRemove.add(null); // Paper - Fix MC-117075
          for (tileTickPosition = 0; tileTickPosition < this.blockEntityTickers.size(); tileTickPosition++) { // Paper - Disable tick limiters
-@@ -1406,8 +1410,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1448,8 +1452,20 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
                  tilesThisCycle--;
                  toRemove.add(tickingblockentity); // Paper - Fix MC-117075; use removeAll
                  // Spigot end
@@ -54,7 +54,7 @@ index 28e3b73507b988f7234cbf29c4024c88180d0aef..10294b8764c5c96fe2dd9e5611119e95
 +    long getChunkCoordinateKey(); // Horizon - optimize tickBlockEntities
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 7411e3d132dddde4599c182384f317679de1f2bf..533e02ed0db04fc2184739a79cb8a20a7bd44b92 100644
+index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5ab803e9e 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -74,6 +74,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
@@ -70,7 +70,7 @@ index 7411e3d132dddde4599c182384f317679de1f2bf..533e02ed0db04fc2184739a79cb8a20a
      };
      private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
      public boolean loaded;
-@@ -936,7 +942,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -947,7 +953,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
      }
  
      private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
@@ -79,7 +79,7 @@ index 7411e3d132dddde4599c182384f317679de1f2bf..533e02ed0db04fc2184739a79cb8a20a
      }
  
      @FunctionalInterface
-@@ -987,6 +993,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -998,6 +1004,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          public String toString() {
              return String.valueOf(this.ticker) + " <wrapped>";
          }
@@ -93,7 +93,7 @@ index 7411e3d132dddde4599c182384f317679de1f2bf..533e02ed0db04fc2184739a79cb8a20a
      }
  
      private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
-@@ -994,10 +1007,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -1005,10 +1018,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          private final T blockEntity;
          private final BlockEntityTicker<T> ticker;
          private boolean loggedInvalidBlockState;
@@ -107,7 +107,7 @@ index 7411e3d132dddde4599c182384f317679de1f2bf..533e02ed0db04fc2184739a79cb8a20a
          }
  
          @Override
-@@ -1065,5 +1080,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -1076,5 +1091,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
  
              return "Level ticker for " + s + "@" + String.valueOf(this.getPos());
          }

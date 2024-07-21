@@ -599,10 +599,10 @@ index b2a4ae4388758f89fcd0dc3b0c4c03bf46fa5470..ac69756357bec1bdf963a30f8b3da1df
          };
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index b9560e02688b1692d2602ca2871ace0cb1aae598..4376b1618c0af674f2d99846b8f2603cf186dfc6 100644
+index f3f6baa77cb5429999f0a0fe2c8719abb4a4dbaa..84b0e384acb319ed32a6577d68309944ed126bf7 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1852,6 +1852,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1860,6 +1860,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          //this.profiler.popPush("server gui refresh"); // Purpur
  
@@ -636,7 +636,7 @@ index 4299e075dc87804ae894053cc122e533f3d5399c..255a0c49257e9bc09100567445a564da
              } catch (Exception ex) {
                  ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t register custom payload", ex);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index ac58d31a82ea3dae2acc4a5f83856a62d49b4a58..cc25ee8f1a9ba085fbf3bef5f8952a588f962554 100644
+index e434ae69331e50bd6d3b17d6fa69013f6d1706a2..6ad4be9d3dbe73e30ad83773969af075cec747c7 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -351,6 +351,8 @@ public abstract class PlayerList {
@@ -648,7 +648,7 @@ index ac58d31a82ea3dae2acc4a5f83856a62d49b4a58..cc25ee8f1a9ba085fbf3bef5f8952a58
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -591,6 +593,7 @@ public abstract class PlayerList {
+@@ -592,6 +594,7 @@ public abstract class PlayerList {
          return this.remove(entityplayer, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? entityplayer.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(entityplayer.getDisplayName())));
      }
      public net.kyori.adventure.text.Component remove(ServerPlayer entityplayer, net.kyori.adventure.text.Component leaveMessage) {
@@ -657,18 +657,18 @@ index ac58d31a82ea3dae2acc4a5f83856a62d49b4a58..cc25ee8f1a9ba085fbf3bef5f8952a58
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
          ServerLevel worldserver = entityplayer.serverLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1a51468961eedd85121f50b94d75dcaa0cf08738..bd320ed030073da13debf96f5c5a640628917d80 100644
+index 7270198a80ab94dd99637a2be67d2da9a16f5342..1246a2a185a349f892b27a11bd8fcac2543442a2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -488,6 +488,7 @@ public final class CraftServer implements Server {
-         }
+@@ -490,6 +490,7 @@ public final class CraftServer implements Server {
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
+         this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
 +        dev.horizonmc.horizon.protocol.core.HorizonProtocolManager.init(); // Horizon - protocol
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1110,6 +1111,7 @@ public final class CraftServer implements Server {
+@@ -1122,6 +1123,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
