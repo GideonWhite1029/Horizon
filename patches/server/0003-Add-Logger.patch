@@ -36,8 +36,163 @@ index 0000000000000000000000000000000000000000..c3d002305a973c59a2649c5736706dfe
 +    }
 +
 +}
+diff --git a/src/main/java/dev/horizonmc/horizon/util/AsyncExecutor.java b/src/main/java/dev/horizonmc/horizon/util/AsyncExecutor.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d58c006776340ec816d7b1c01b728bf06e5e03c6
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/AsyncExecutor.java
+@@ -0,0 +1,74 @@
++package dev.horizonmc.horizon.util;
++
++import com.google.common.collect.Queues;
++import dev.horizonmc.horizon.HorizonLogger;
++
++import java.util.Queue;
++import java.util.concurrent.locks.Condition;
++import java.util.concurrent.locks.Lock;
++import java.util.concurrent.locks.ReentrantLock;
++import java.util.logging.Level;
++
++public class AsyncExecutor implements Runnable {
++
++    private final Queue<Runnable> jobs = Queues.newArrayDeque();
++    private final Lock mutex = new ReentrantLock();
++    private final Condition cond = mutex.newCondition();
++    private final Thread thread;
++    private volatile boolean killswitch = false;
++
++    public AsyncExecutor(String threadName) {
++        this.thread = new Thread(this, threadName);
++    }
++
++    public void start() {
++        thread.start();
++    }
++
++    public void kill() {
++        killswitch = true;
++        cond.signalAll();
++    }
++
++    public void submit(Runnable runnable) {
++        mutex.lock();
++        try {
++            jobs.offer(runnable);
++            cond.signalAll();
++        } finally {
++            mutex.unlock();
++        }
++    }
++
++    @Override
++    public void run() {
++        while (!killswitch) {
++            try {
++                Runnable runnable = takeRunnable();
++                if (runnable != null) {
++                    runnable.run();
++                }
++            } catch (InterruptedException e) {
++                Thread.currentThread().interrupt();
++            } catch (Exception e) {
++                HorizonLogger.LOGGER.log(Level.SEVERE, e, () -> "Failed to execute async job for thread " + thread.getName());
++            }
++        }
++    }
++
++    private Runnable takeRunnable() throws InterruptedException {
++        mutex.lock();
++        try {
++            while (jobs.isEmpty() && !killswitch) {
++                cond.await();
++            }
++
++            if (jobs.isEmpty()) return null; // We've set killswitch
++
++            return jobs.remove();
++        } finally {
++            mutex.unlock();
++        }
++    }
++
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/util/IterableWrapper.java b/src/main/java/dev/horizonmc/horizon/util/IterableWrapper.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..79eb3db43ba13594ffd112470dfc81f134600f94
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/IterableWrapper.java
+@@ -0,0 +1,21 @@
++package dev.horizonmc.horizon.util;
++
++import java.util.Iterator;
++
++import org.jetbrains.annotations.NotNull;
++
++public class IterableWrapper<T> implements Iterable<T> {
++
++    private final Iterator<T> iterator;
++
++    public IterableWrapper(Iterator<T> iterator) {
++        this.iterator = iterator;
++    }
++
++    @NotNull
++    @Override
++    public Iterator<T> iterator() {
++        return iterator;
++    }
++
++}
+diff --git a/src/main/java/dev/horizonmc/horizon/util/Long2ObjectOpenHashMapWrapper.java b/src/main/java/dev/horizonmc/horizon/util/Long2ObjectOpenHashMapWrapper.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..460a3421dc7fa7ac786c43cf0edf1f85709d4811
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/Long2ObjectOpenHashMapWrapper.java
+@@ -0,0 +1,42 @@
++package dev.horizonmc.horizon.util;
++
++import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
++
++import java.util.Map;
++
++import org.jetbrains.annotations.Nullable;
++
++public class Long2ObjectOpenHashMapWrapper<V> extends Long2ObjectOpenHashMap<V> {
++
++    private final Map<Long, V> backingMap;
++
++    public Long2ObjectOpenHashMapWrapper(Map<Long, V> map) {
++        backingMap = map;
++    }
++
++    @Override
++    public V put(Long key, V value) {
++        return backingMap.put(key, value);
++    }
++
++    @Override
++    public V get(Object key) {
++        return backingMap.get(key);
++    }
++
++    @Override
++    public V remove(Object key) {
++        return backingMap.remove(key);
++    }
++
++    @Nullable
++    @Override
++    public V putIfAbsent(Long key, V value) {
++        return backingMap.putIfAbsent(key, value);
++    }
++
++    @Override
++    public int size() {
++        return backingMap.size();
++    }
++}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index a8124403002b88f1bdd3bf09d7858b3ea8e7106f..25f4e79a07c55db2b5981c7e5423f269facecc90 100644
+index 75d7ce413cc002f17e443ee9232531d894ec7f24..5162e1d0b7783bcae60cb45372254742ff9b95af 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -431,6 +431,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess

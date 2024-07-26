@@ -55,10 +55,10 @@ index def75ee76799958df0bb0d2478094dfba0dd9364..b1a2ac4ecfbc6e08dd2b8e546bfbfeaf
  }
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f3c8cb3961f9e6b896125acffa9000b1a70eca67
+index 0000000000000000000000000000000000000000..ff69872e75914583d5958781545f10db1daaf458
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/jade/JadeProtocol.java
-@@ -0,0 +1,381 @@
+@@ -0,0 +1,382 @@
 +package dev.horizonmc.horizon.protocol.jade;
 +
 +import dev.horizonmc.horizon.HorizonConfig;
@@ -138,7 +138,7 @@ index 0000000000000000000000000000000000000000..f3c8cb3961f9e6b896125acffa9000b1
 +@HorizonProtocol(namespace = "jade")
 +public class JadeProtocol {
 +    public static PriorityStore<ResourceLocation, IJadeProvider> priorities;
-+    private static List<Block> shearableBlocks = List.of();
++    private static List<Block> shearableBlocks = null;
 +
 +    public static final String PROTOCOL_ID = "jade";
 +
@@ -221,9 +221,10 @@ index 0000000000000000000000000000000000000000..f3c8cb3961f9e6b896125acffa9000b1
 +
 +        try {
 +            shearableBlocks = Collections.unmodifiableList(LootTableMineableCollector.execute(
-+                    MinecraftServer.getServer().registryAccess().registryOrThrow(Registries.LOOT_TABLE),
++                    MinecraftServer.getServer().reloadableRegistries().get().registryOrThrow(Registries.LOOT_TABLE),
 +                    Items.SHEARS.getDefaultInstance()));
 +        } catch (Throwable ignore) {
++            shearableBlocks = List.of();
 +            HorizonLogger.LOGGER.severe("Failed to collect shearable blocks");
 +        }
 +    }

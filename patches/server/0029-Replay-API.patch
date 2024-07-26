@@ -450,10 +450,10 @@ index 4b61a8bdfebc76820abc498ad2eb497007c129e9..eafe58f655995697610972f0cd206756
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b9130d040acff1e5cb7a475be93b03cdbe229683..84a3a606d92ec329cc1d4160e03e7481148c48e9 100644
+index e3100e65fea02374d4393bab48d63ddeaecef0ab..c6a3305a593bd5172501ad07739aa313d0ea3107 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2250,7 +2250,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {
@@ -1329,14 +1329,13 @@ index 0000000000000000000000000000000000000000..219b9ea88f8cebaf8aab73b123d3efd5
 \ No newline at end of file
 diff --git a/src/main/java/org/leavesmc/leaves/replay/ServerPhotographer.java b/src/main/java/org/leavesmc/leaves/replay/ServerPhotographer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e293710af54
+index 0000000000000000000000000000000000000000..92f44aa50098f154e5096ef84ffc1b64fb66781d
 --- /dev/null
 +++ b/src/main/java/org/leavesmc/leaves/replay/ServerPhotographer.java
-@@ -0,0 +1,217 @@
+@@ -0,0 +1,221 @@
 +package org.leavesmc.leaves.replay;
 +
 +import com.mojang.authlib.GameProfile;
-+import dev.horizonmc.horizon.HorizonConfig;
 +import dev.horizonmc.horizon.HorizonLogger;
 +import net.minecraft.server.MinecraftServer;
 +import net.minecraft.server.level.ClientInformation;
@@ -1344,8 +1343,8 @@ index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e29
 +import net.minecraft.server.level.ServerPlayer;
 +import net.minecraft.stats.ServerStatsCounter;
 +import net.minecraft.world.damagesource.DamageSource;
-+import net.minecraft.world.level.GameType;
 +import net.minecraft.world.phys.Vec3;
++import org.bukkit.Bukkit;
 +import org.bukkit.Location;
 +import org.bukkit.craftbukkit.CraftWorld;
 +import org.jetbrains.annotations.NotNull;
@@ -1359,8 +1358,6 @@ index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e29
 +import java.util.UUID;
 +import java.util.concurrent.CompletableFuture;
 +import java.util.concurrent.CopyOnWriteArrayList;
-+
-+import static org.leavesmc.leaves.bot.ServerBot.isCreateLegal;
 +
 +public class ServerPhotographer extends ServerPlayer {
 +
@@ -1384,7 +1381,7 @@ index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e29
 +
 +    public static ServerPhotographer createPhotographer(@NotNull PhotographerCreateState state) throws IOException {
 +        if (!isCreateLegal(state.id)) {
-+            return null;
++            throw new IllegalArgumentException(state.id + " is a invalid photographer id");
 +        }
 +
 +        MinecraftServer server = MinecraftServer.getServer();
@@ -1471,7 +1468,7 @@ index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e29
 +
 +        HorizonLogger.LOGGER.info("Photographer " + createState.id + " removed");
 +
-+        if (save && !recorder.isSaved()) {
++        if (!recorder.isSaved()) {
 +            CompletableFuture<Void> future = recorder.saveRecording(saveFile, save);
 +            if (!async) {
 +                future.join();
@@ -1526,6 +1523,13 @@ index 0000000000000000000000000000000000000000..cd9453b18b1937c852ecf9fb9c5e5e29
 +    @NotNull
 +    public CraftPhotographer getBukkitEntity() {
 +        return (CraftPhotographer) super.getBukkitEntity();
++    }
++
++    public static boolean isCreateLegal(@NotNull String name) {
++        if (!name.matches("^[a-zA-Z0-9_]{4,16}$")) {
++            return false;
++        }
++        return Bukkit.getPlayerExact(name) == null && ServerPhotographer.getPhotographer(name) == null;
 +    }
 +
 +    public static class PhotographerCreateState {

@@ -6,22 +6,14 @@ Subject: [PATCH] Syncmatica Protocol
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-index 162ba6f3495054d88e9220fcdd30b22e34ccf41c..fff45708dde3e8c3d339854061e647bf44351a9b 100644
+index 54ecfda65b58b3c3703f468af2be5b817fbcc9a7..ceb73ad3986745ef54b6b1e92cb9392aa02ee092 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 +++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
-@@ -2,6 +2,7 @@ package dev.horizonmc.horizon;
+@@ -210,4 +210,25 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "horizon-carpet-support", category = {"protocols"})
+     public static boolean horizonCarpetSupport = false;
  
- import com.destroystokyo.paper.util.SneakyThrow;
- import dev.horizonmc.horizon.commands.HorizonCommand;
-+import dev.horizonmc.horizon.config.ConfigVerify;
- import dev.horizonmc.horizon.config.GlobalConfig;
- import dev.horizonmc.horizon.config.GlobalConfigManager;
- import net.minecraft.server.MinecraftServer;
-@@ -103,4 +104,25 @@ public final class HorizonConfig {
-     @GlobalConfig(name = "cce-update-suppression", category = {"features"})
-     public static boolean cceUpdateSuppression = false;
- 
-+    // Horizon start - Syncmatic Protocol
++    // Horizon start - protocol - syncmatica
 +    @GlobalConfig(name = "enable", category = {"protocols", "syncmatica"}, verify = SyncmaticaVerify.class)
 +    public static boolean syncmaticaProtocol = false;
 +
@@ -40,13 +32,13 @@ index 162ba6f3495054d88e9220fcdd30b22e34ccf41c..fff45708dde3e8c3d339854061e647bf
 +            return null;
 +        }
 +    }
-+    // Horizon end - Syncmatic Protocol
++    // Horizon end - protocol - syncmatica
 +
  }
 \ No newline at end of file
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b7babce93aa9fecec79c737c66db2b75327603f4
+index 0000000000000000000000000000000000000000..33342902fcaa2215901441dca1df907cd13124e4
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/CommunicationManager.java
 @@ -0,0 +1,384 @@
@@ -135,9 +127,9 @@ index 0000000000000000000000000000000000000000..b7babce93aa9fecec79c737c66db2b75
 +        playerMap.remove(oldPlayer);
 +    }
 +
-+    @ProtocolHandler.PayloadReceiver(payload = HorizonProtocolManager.HorizonPayload.class, ignoreId = true, payloadId = "")
-+    public static void onPacketGet(ServerPlayer player, HorizonProtocolManager.HorizonPayload payload) {
-+        onPacket(player.connection.exchangeTarget, payload.id(), payload.data());
++    @ProtocolHandler.PayloadReceiver(payload = SyncmaticaPayload.class, payloadId = "main")
++    public static void onPacketGet(ServerPlayer player, SyncmaticaPayload payload) {
++        onPacket(player.connection.exchangeTarget, payload.packetType(), payload.data());
 +    }
 +
 +    public static void onPacket(final @NotNull ExchangeTarget source, final ResourceLocation id, final FriendlyByteBuf packetBuf) {
@@ -1309,9 +1301,42 @@ index 0000000000000000000000000000000000000000..a29cac1f666b3170a65c9a96d7b20315
 +        }
 +    }
 +}
+diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaPayload.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaPayload.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2c300b8d82ee48df70abe48071cf6e7b82b8e64d
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaPayload.java
+@@ -0,0 +1,27 @@
++package dev.horizonmc.horizon.protocol.syncmatica;
++
++import dev.horizonmc.horizon.protocol.core.HorizonCustomPayload;
++import net.minecraft.network.FriendlyByteBuf;
++import net.minecraft.resources.ResourceLocation;
++
++public record SyncmaticaPayload(ResourceLocation packetType,
++                                FriendlyByteBuf data) implements HorizonCustomPayload<SyncmaticaPayload> {
++
++    private static final ResourceLocation NETWORK_ID = new ResourceLocation(SyncmaticaProtocol.PROTOCOL_ID, "main");
++
++    @New
++    public static SyncmaticaPayload decode(ResourceLocation location, FriendlyByteBuf buf) {
++        return new SyncmaticaPayload(buf.readResourceLocation(), new FriendlyByteBuf(buf.readBytes(buf.readableBytes())));
++    }
++
++    @Override
++    public void write(FriendlyByteBuf buf) {
++        buf.writeResourceLocation(this.packetType);
++        buf.writeBytes(this.data.readBytes(this.data.readableBytes()));
++    }
++
++    @Override
++    public ResourceLocation id() {
++        return NETWORK_ID;
++    }
++}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaProtocol.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaProtocol.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..09ff3bc8cd82aa5722aca9174678a135807ad0e7
+index 0000000000000000000000000000000000000000..6bcf75abbbeda1a4fb86792a6392a09b2d4a209c
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/SyncmaticaProtocol.java
 @@ -0,0 +1,123 @@
@@ -1333,7 +1358,7 @@ index 0000000000000000000000000000000000000000..09ff3bc8cd82aa5722aca9174678a135
 +public class SyncmaticaProtocol {
 +
 +    public static final String PROTOCOL_ID = "syncmatica";
-+    public static final String PROTOCOL_VERSION = "horizon-syncmatica-1.0.0";
++    public static final String PROTOCOL_VERSION = "horizon-syncmatica-1.1.0";
 +
 +    private static final File litematicFolder = new File("." + File.separator + "syncmatics");
 +    private static final PlayerIdentifierProvider playerIdentifierProvider = new PlayerIdentifierProvider();
@@ -1669,14 +1694,15 @@ index 0000000000000000000000000000000000000000..b326398e51f2b5b54c906b3b7cf48188
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/ExchangeTarget.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/ExchangeTarget.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..07df3e87cd8504fe7282ea60938862aa55cd85f1
+index 0000000000000000000000000000000000000000..a26efb7f97af0e0509adcf9522c439b3347f1cb4
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/ExchangeTarget.java
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,39 @@
 +package dev.horizonmc.horizon.protocol.syncmatica.exchange;
 +
 +import dev.horizonmc.horizon.protocol.core.ProtocolUtils;
 +import dev.horizonmc.horizon.protocol.syncmatica.FeatureSet;
++import dev.horizonmc.horizon.protocol.syncmatica.SyncmaticaPayload;
 +import net.minecraft.network.FriendlyByteBuf;
 +import net.minecraft.resources.ResourceLocation;
 +import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -1696,9 +1722,7 @@ index 0000000000000000000000000000000000000000..07df3e87cd8504fe7282ea60938862aa
 +    }
 +
 +    public void sendPacket(final ResourceLocation id, final FriendlyByteBuf packetBuf) {
-+        ProtocolUtils.sendPayloadPacket(client.player, id, buf -> {
-+            buf.writeBytes(packetBuf);
-+        });
++        ProtocolUtils.sendPayloadPacket(client.player, new SyncmaticaPayload(id, packetBuf));
 +    }
 +
 +    public FeatureSet getFeatureSet() {
@@ -1963,16 +1987,13 @@ index 0000000000000000000000000000000000000000..e42606330f7029dbc4eaf851338fd588
 +}
 diff --git a/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df8719901875a4cb
+index 0000000000000000000000000000000000000000..387567a48cae70bc5f996a2b0cd21a7aa2891740
 --- /dev/null
 +++ b/src/main/java/dev/horizonmc/horizon/protocol/syncmatica/exchange/VersionHandshakeServer.java
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,62 @@
 +package dev.horizonmc.horizon.protocol.syncmatica.exchange;
 +
-+import dev.horizonmc.horizon.protocol.syncmatica.FeatureSet;
-+import dev.horizonmc.horizon.protocol.syncmatica.PacketType;
-+import dev.horizonmc.horizon.protocol.syncmatica.ServerPlacement;
-+import dev.horizonmc.horizon.protocol.syncmatica.SyncmaticaProtocol;
++import dev.horizonmc.horizon.protocol.syncmatica.*;
 +import io.netty.buffer.Unpooled;
 +import net.minecraft.network.FriendlyByteBuf;
 +import net.minecraft.resources.ResourceLocation;
@@ -1995,7 +2016,7 @@ index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df871990
 +    @Override
 +    public void handle(final @NotNull ResourceLocation id, final FriendlyByteBuf packetBuf) {
 +        if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
-+            String partnerVersion = packetBuf.readUtf(32767);
++            String partnerVersion = packetBuf.readUtf();
 +            if (partnerVersion.equals("0.0.1")) {
 +                close(false);
 +                return;
@@ -2019,7 +2040,7 @@ index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df871990
 +        final Collection<ServerPlacement> l = SyncmaticaProtocol.getSyncmaticManager().getAll();
 +        newBuf.writeInt(l.size());
 +        for (final ServerPlacement p : l) {
-+            getManager().putMetaData(p, newBuf, getPartner());
++            CommunicationManager.putMetaData(p, newBuf, getPartner());
 +        }
 +        getPartner().sendPacket(PacketType.CONFIRM_USER.identifier, newBuf);
 +        succeed();
@@ -2034,7 +2055,7 @@ index 0000000000000000000000000000000000000000..f55c66808a2d37889cb15168df871990
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 1c41ad915ad5f1ef63fea96fefe53fd037174ac3..47a9d58fa527c68f661fbc95cf2a743b96e406c9 100644
+index 29d69101326017f68b10329f51dd6b93c1bf1d60..af1d85d280398b5d9ed460d2a83d942e50ee6461 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -314,6 +314,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
