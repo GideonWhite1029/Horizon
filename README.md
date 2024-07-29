@@ -2,10 +2,9 @@
 
 ### Horizon is a Purpur fork with many useful optimizations, configurable vanilla features, and more API supports
 ## Features
-- **Linear region support** from [LinearPurpur](https://github.com/StupidCraft/LinearPurpur) to save disk space
 - **Fully compatible** with Bukkit, Spigot and Paper plugins
 - **Mod Protocols** support
-- **Replay API** support (soon)
+- **Replay API** support
 ## Build
 To build a paperclip jar, you need to run the following command. You can find the jar in build/libs(Note: JDK17 or JDK21 is needed)
 
