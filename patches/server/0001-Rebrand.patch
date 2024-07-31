@@ -182,10 +182,10 @@ index a6e5950b5875cafd734300cdfbf58f5d3736f3c8..5a852fb6b12d3bfff3630e5908d60dfb
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index d0c31849b67e19e9a14593b3907266a3759acb61..9cfad107bdc59ed9e31dd91a79524ccdeda91428 100644
+index c56ffd2307b9c92742f760a51e16e48f3205f793..84cb31e43ff3e1cf75a2caf59533d53cb0ac8e6a 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1253,15 +1253,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1254,15 +1254,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop

@@ -192,10 +192,10 @@ index 0000000000000000000000000000000000000000..460a3421dc7fa7ac786c43cf0edf1f85
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 75d7ce413cc002f17e443ee9232531d894ec7f24..5162e1d0b7783bcae60cb45372254742ff9b95af 100644
+index d447ee01c202a6aa24162033781147061eb2a057..76c5d3f0e7dd155976b56333ff9712d5a618c18d 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -431,6 +431,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -430,6 +430,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      private UUID originWorld;
      public boolean freezeLocked = false; // Paper - Freeze Tick Lock API
      public boolean fixedPose = false; // Paper - Expand Pose API

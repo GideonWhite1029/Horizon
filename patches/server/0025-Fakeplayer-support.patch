@@ -241,10 +241,10 @@ index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 21c7197002b19e9bbc0a59b6a91ccc3dfa9a59f3..608e59b52d20e36279f76831cccba98a0b9f135b 100644
+index e80fbdcda5de3183921cb2ca02cf9a55888dc8d4..67eb1aa85ce4d83f58b98fac3bcef65b4e615ae1 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -753,6 +753,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -754,6 +754,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - Configurable player collision
  
          dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
@@ -252,7 +252,7 @@ index 21c7197002b19e9bbc0a59b6a91ccc3dfa9a59f3..608e59b52d20e36279f76831cccba98a
  
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
-@@ -1044,6 +1045,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1045,6 +1046,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
          this.server.spark.disable(); // Paper - spark
@@ -277,10 +277,10 @@ index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a53
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index f402d69115127242050876c7d0ddcf6ad6f3ebb2..6f7ba25f25caf71fdd797aae5b3fbfbc58ab4663 100644
+index 67c5ef4b58afa59c97e2f71454e30442c1052a30..115efc2b261f1e862d999946b9c5288190b8a7db 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
-@@ -1229,6 +1229,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1228,6 +1228,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
              org.spigotmc.AsyncCatcher.catchOp("player tracker clear"); // Spigot
              if (this.seenBy.remove(player.connection)) {
                  this.serverEntity.removePairing(player);
@@ -461,7 +461,7 @@ index 6ad4be9d3dbe73e30ad83773969af075cec747c7..bfb86fa2dbd08f53b312ef7b231c734a
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index da20ef4250b8222854ad6a6163f05e311b951e31..3068cdb0c2dbdefb8c069441c0a5b3a34be86ecf 100644
+index dc5a9be28cd36660ab1989255aa7b0c0d85d1987..6b5ad4249e6ba4cded6096aef296371e1c354e93 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1480,7 +1480,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -563,7 +563,7 @@ index 1246a2a185a349f892b27a11bd8fcac2543442a2..f327fcd0ed9d9b0d4d3f4130ce407da9
 +    // Leaves end - Bot API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 4b7d38a5ac6247c6e9d71ac7f3b65765ed3cf3ee..4b61a8bdfebc76820abc498ad2eb497007c129e9 100644
+index bec40e26e17ba6fdefb68c79e2fa7a9593b0f4fe..52b0234ad6ce97405ee18280a8ef1dc07e184f95 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -59,6 +59,8 @@ import org.bukkit.util.NumberConversions;

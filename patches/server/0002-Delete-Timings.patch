@@ -802,7 +802,7 @@ index 01efbc507b3d58f13f78ee286f93df40cdc3f0cb..548798d1e40f8a1e1f38ca84f6680201
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 9cfad107bdc59ed9e31dd91a79524ccdeda91428..07f0c5dc078e01f532b0f2114c80f3c3c92a1f7e 100644
+index 84cb31e43ff3e1cf75a2caf59533d53cb0ac8e6a..83bd8d6937b84225577e125a196822bcfe5c8f21 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -821,7 +821,7 @@ index 9cfad107bdc59ed9e31dd91a79524ccdeda91428..07f0c5dc078e01f532b0f2114c80f3c3
  
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource, AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer { // Paper - rewrite chunk system
  
-@@ -1041,7 +1039,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1042,7 +1040,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -829,7 +829,7 @@ index 9cfad107bdc59ed9e31dd91a79524ccdeda91428..07f0c5dc078e01f532b0f2114c80f3c3
          this.server.spark.disable(); // Paper - spark
          // Purpur start
          if (upnp) {
-@@ -1610,11 +1607,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1611,11 +1608,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick
@@ -881,7 +881,7 @@ index 744cfc91fa8b78794f1edab1f81035b21bf0c83f..97b683be85d9e6be0f6b4cb8dd97e158
          // Paper start
          if (waitableArray[0] != null) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 92a831c59a4180e7a02249714950b52cee49d913..f402d69115127242050876c7d0ddcf6ad6f3ebb2 100644
+index 30137c5d6a5416e9ccd95934d162ebc72516f37d..67c5ef4b58afa59c97e2f71454e30442c1052a30 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -1,6 +1,5 @@

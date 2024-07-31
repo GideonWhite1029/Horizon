@@ -134,10 +134,10 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..ddb5952c49f841f3a17cf31ad33daead
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 608e59b52d20e36279f76831cccba98a0b9f135b..330136a5a1e2f781c0cdd11019b4bac51d29444b 100644
+index 67eb1aa85ce4d83f58b98fac3bcef65b4e615ae1..3d7fba7654ad20ca7f70652afda5f006038e6053 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1729,7 +1729,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1730,7 +1730,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -429,7 +429,7 @@ index f327fcd0ed9d9b0d4d3f4130ce407da9ae7a8139..931d6b04aad977e6d7987c358520e599
 +    // Leaves end - replay mod api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 4b61a8bdfebc76820abc498ad2eb497007c129e9..eafe58f655995697610972f0cd20675612650ed7 100644
+index 52b0234ad6ce97405ee18280a8ef1dc07e184f95..4c286c6fa5a7a85ba5a4d090757dd41a82c4170f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -61,6 +61,8 @@ import org.bukkit.util.Vector;
