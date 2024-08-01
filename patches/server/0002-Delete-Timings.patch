@@ -892,7 +892,7 @@ index 30137c5d6a5416e9ccd95934d162ebc72516f37d..67c5ef4b58afa59c97e2f71454e30442
  import com.google.common.collect.ImmutableList.Builder;
  import com.google.common.collect.Iterables;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index a4ea3eca166510e05bc53504d2f1040e3bead39a..87368cc8ed4746073a04521d221713f00ece4e6f 100644
+index 2c15fc6e4f46c5873cc5ce67edf10b730a4e922e..4f7975af6b8b7953732342c1883d7a03363cdcfd 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1,7 +1,6 @@
@@ -903,7 +903,7 @@ index a4ea3eca166510e05bc53504d2f1040e3bead39a..87368cc8ed4746073a04521d221713f0
  import com.google.common.collect.Lists;
  import com.mojang.datafixers.DataFixer;
  import com.mojang.datafixers.util.Pair;
-@@ -1330,9 +1329,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1287,9 +1286,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
                  currentlyTickingEntity.lazySet(entity);
              }
              // Paper end - log detailed entity tick information
@@ -913,7 +913,7 @@ index a4ea3eca166510e05bc53504d2f1040e3bead39a..87368cc8ed4746073a04521d221713f0
          /*if (!org.spigotmc.ActivationRange.checkIfActive(entity)) { // Paper - comment out - EAR 2, reimplement below
              entity.tickCount++;
              timer = entity.getType().inactiveTickTimer.startTiming(); try { // Paper - timings
-@@ -1355,7 +1352,6 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -1312,7 +1309,6 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
          });*/ // Purpur
          //gameprofilerfiller.incrementCounter("tickNonPassenger"); // Purpur
          if (isActive) { // Paper - EAR 2
