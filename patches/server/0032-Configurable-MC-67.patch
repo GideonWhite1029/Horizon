@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 31 Jul 2024 10:17:07 +0400
+Subject: [PATCH] Configurable MC-67
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index ceb73ad3986745ef54b6b1e92cb9392aa02ee092..06955b6f7bb147ab436f2421a02a33e2027b0119 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -231,4 +231,7 @@ public final class HorizonConfig {
+     }
+     // Horizon end - protocol - syncmatica
+ 
++    @GlobalConfig(name = "configurable-mc-67", category = {"optimization"})
++    public static boolean allowEntityPortalWithPassenger = true;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 6b5ad4249e6ba4cded6096aef296371e1c354e93..0bc5aa7cc186182b5ab33bd9a645959c5c3811b7 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -3932,7 +3932,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     }
+ 
+     public boolean canChangeDimensions(Level from, Level to) {
+-        return this.isAlive() && this.valid; // Paper - Fix item duplication and teleport issues
++        return !(!HorizonConfig.allowEntityPortalWithPassenger && (this.isPassenger() || this.isVehicle())) && this.isAlive() && this.valid; // Paper - Fix item duplication and teleport issues // Horizon - allowEntityPortalWithPassenger
+     }
+ 
+     public float getBlockExplosionResistance(Explosion explosion, BlockGetter world, BlockPos pos, BlockState blockState, FluidState fluidState, float max) {
