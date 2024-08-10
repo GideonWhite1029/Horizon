@@ -19,10 +19,10 @@ index ae693ccea2d44f14272eeff19c1f6506f871bf2c..8e71e7a89bf51dbc3153f14c777dfe0b
  }
 \ No newline at end of file
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index efe093cf15a3e68e8f06df04bb38c4db39ddf4bd..7c523c73065104a97508043296baafcf5fe6dfcc 100644
+index 46e5513576c7a6e161ca76fc3664507e53bf9974..8de2da07f9ad093609fb572bc37996242a718cee 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -295,9 +295,7 @@ public class Main {
+@@ -289,9 +289,7 @@ public class Main {
                          // Paper end
                      }
                  }

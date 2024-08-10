@@ -585,7 +585,7 @@ index de7c77c1b25680ecc65f0f43f2391aff269a974f..8f4cb328d5ceb7b69df1d21c97336c94
  
      public RecipeManager(HolderLookup.Provider registryLookup) {
 diff --git a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 4b1a944728cec4122132f21d5a77b8acb10a5bef..5f3ade1baac8153c6efaae86ce293a4f98bb16a4 100644
+index 9ab5f76f280307cd6701e3e19cbc9ae29c77d641..f414a4698871cd21072420764fcc24f765996c31 100644
 --- a/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/src/main/java/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -204,7 +204,7 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
@@ -610,7 +610,7 @@ index 4b1a944728cec4122132f21d5a77b8acb10a5bef..5f3ade1baac8153c6efaae86ce293a4f
          Container iinventory = HopperBlockEntity.getAttachedContainer(world, pos, blockEntity);
  
          if (iinventory == null) {
-@@ -506,6 +512,23 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -510,6 +516,23 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          }
      }
  

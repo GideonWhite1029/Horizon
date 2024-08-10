@@ -18,32 +18,32 @@ index 072f998e46b8ee663b668a4fdb5195677f996fdd..e97c75e30dc1d4f5fa71cfbee2dd4308
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-index 6c24b25a7c8ce6e34aceb5702f1a0a6732ebca44..cf48902a77329d8de77c3cf95e4ab3b2f43ec1cd 100644
+index deb5b4fab94618c08a51e432c33e49b1627bd717..128db0ffe5ebc2bff6fb407a943007ceb80a69e1 100644
 --- a/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/CrafterBlock.java
-@@ -3,6 +3,7 @@ package net.minecraft.world.level.block;
- import com.mojang.serialization.MapCodec;
+@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
+ import java.util.Iterator;
  import java.util.Optional;
  import javax.annotation.Nullable;
 +import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.advancements.CriteriaTriggers;
  import net.minecraft.core.BlockPos;
  import net.minecraft.core.Direction;
-@@ -80,7 +81,7 @@ public class CrafterBlock extends BaseEntityBlock {
-         boolean bl2 = state.getValue(TRIGGERED);
-         BlockEntity blockEntity = world.getBlockEntity(pos);
-         if (bl && !bl2) {
--            world.scheduleTick(pos, this, 4);
-+            world.scheduleTick(pos, this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
-             world.setBlock(pos, state.setValue(TRIGGERED, Boolean.valueOf(true)), 2);
-             this.setBlockEntityTriggered(blockEntity, true);
-         } else if (!bl && bl2) {
-@@ -130,7 +131,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -90,7 +91,7 @@ public class CrafterBlock extends BaseEntityBlock {
+         BlockEntity tileentity = world.getBlockEntity(pos);
+ 
+         if (flag1 && !flag2) {
+-            world.scheduleTick(pos, (Block) this, 4);
++            world.scheduleTick(pos, (Block) this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
+             world.setBlock(pos, (BlockState) state.setValue(CrafterBlock.TRIGGERED, true), 2);
+             this.setBlockEntityTriggered(tileentity, true);
+         } else if (!flag1 && flag2) {
+@@ -156,7 +157,7 @@ public class CrafterBlock extends BaseEntityBlock {
      @Override
      public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
-         if (state.getValue(TRIGGERED)) {
--            world.scheduleTick(pos, this, 4);
-+            world.scheduleTick(pos, this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
+         if ((Boolean) state.getValue(CrafterBlock.TRIGGERED)) {
+-            world.scheduleTick(pos, (Block) this, 4);
++            world.scheduleTick(pos, (Block) this, !HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
          }
-     }
  
+     }
