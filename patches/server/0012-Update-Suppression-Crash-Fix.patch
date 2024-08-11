@@ -96,7 +96,7 @@ index dc4f68c045035ec9cb7a1c5827842daddd668269..e80fbdcda5de3183921cb2ca02cf9a55
              } catch (Throwable throwable) {
                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Exception ticking world");
 diff --git a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
-index 40518b1a58494525223e47845b4cb57c92a22d5e..3b7afd36069a03ec76559383892ed772f3c7b698 100644
+index d85da0661096a3587917c6636728bfd2e3eb90a2..8cd3d4af343fcad0128a525e39558900d004674f 100644
 --- a/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 +++ b/src/main/java/net/minecraft/world/level/block/ShulkerBoxBlock.java
 @@ -7,6 +7,8 @@ import java.util.List;
@@ -108,7 +108,7 @@ index 40518b1a58494525223e47845b4cb57c92a22d5e..3b7afd36069a03ec76559383892ed772
  import net.minecraft.ChatFormatting;
  import net.minecraft.Util;
  import net.minecraft.core.BlockPos;
-@@ -231,7 +233,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
+@@ -230,7 +232,21 @@ public class ShulkerBoxBlock extends BaseEntityBlock {
  
      @Override
      protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos) {

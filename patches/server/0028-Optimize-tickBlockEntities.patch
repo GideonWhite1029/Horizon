@@ -54,7 +54,7 @@ index 28e3b73507b988f7234cbf29c4024c88180d0aef..10294b8764c5c96fe2dd9e5611119e95
 +    long getChunkCoordinateKey(); // Horizon - optimize tickBlockEntities
  }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
-index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5ab803e9e 100644
+index 4666b51278dbe65b8e4911bcf1dbb867110c146f..22e4c5930234753990269d1f4d596200c66f1bb7 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/LevelChunk.java
 @@ -74,6 +74,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
@@ -70,7 +70,7 @@ index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5
      };
      private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
      public boolean loaded;
-@@ -947,7 +953,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -952,7 +958,7 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
      }
  
      private <T extends BlockEntity> TickingBlockEntity createTicker(T blockEntity, BlockEntityTicker<T> blockEntityTicker) {
@@ -79,7 +79,7 @@ index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5
      }
  
      @FunctionalInterface
-@@ -998,6 +1004,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -1003,6 +1009,13 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          public String toString() {
              return String.valueOf(this.ticker) + " <wrapped>";
          }
@@ -93,7 +93,7 @@ index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5
      }
  
      private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
-@@ -1005,10 +1018,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -1010,10 +1023,12 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
          private final T blockEntity;
          private final BlockEntityTicker<T> ticker;
          private boolean loggedInvalidBlockState;
@@ -107,7 +107,7 @@ index 3ec4ba40f6ff44365eaa4b33ac447c191670f259..a14ca624d4fca5895648e2c4023d0ce5
          }
  
          @Override
-@@ -1076,5 +1091,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
+@@ -1081,5 +1096,11 @@ public class LevelChunk extends ChunkAccess implements ca.spottedleaf.moonrise.p
  
              return "Level ticker for " + s + "@" + String.valueOf(this.getPos());
          }

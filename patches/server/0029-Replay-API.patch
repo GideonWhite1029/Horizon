@@ -42,10 +42,10 @@ index 182a43ae9e7b28b4bf0993ad7f8486aa72d01e68..54f7d370aded6e3844408634b2477080
          }
          // Leaves end - skip bot
 diff --git a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
-index 7976885b902a6ce7d80f31e49448c99452eb9765..6bed90ec5effafbad4aaf82878fe24633891e4e5 100644
+index 208b56fff4925cad8d4e0bc843c07372fad034c8..4ab562d9fb6d255c5512ed097cae6fd7e0e706aa 100644
 --- a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
 +++ b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
-@@ -146,6 +146,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
+@@ -154,6 +154,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
                  if (icompletionprovider instanceof CommandSourceStack commandSourceStack && commandSourceStack.getEntity() instanceof ServerPlayer sourcePlayer) {
                      collection = new java.util.ArrayList<>();
                      for (final ServerPlayer player : commandSourceStack.getServer().getPlayerList().getPlayers()) {
@@ -396,7 +396,7 @@ index bfb86fa2dbd08f53b312ef7b231c734a567512ef..16f64b11a0137553606542b40233a72f
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index f327fcd0ed9d9b0d4d3f4130ce407da9ae7a8139..931d6b04aad977e6d7987c358520e599854a3c5f 100644
+index 064f0ae05f0ee5c65b9cbc1023ed9b405f445e16..0576896db04efcb34993379d260718ce4e0df4f6 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -311,6 +311,7 @@ public final class CraftServer implements Server {
