@@ -77,10 +77,10 @@ index 548798d1e40f8a1e1f38ca84f6680201fb522bb6..2dc439e3c81947bddc3f37ce39299dbb
                          if (exception instanceof ReportedException) {
                              ReportedException reportedexception = (ReportedException) exception;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index dc4f68c045035ec9cb7a1c5827842daddd668269..e80fbdcda5de3183921cb2ca02cf9a55888dc8d4 100644
+index 8d066528f11cdeda8bbb23726a8db2ed497553aa..4d6f08446d62a944be2c32e2c208d114054f5238 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1835,7 +1835,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1836,7 +1836,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  //worldserver.timings.doTick.startTiming(); // Spigot // Purpur

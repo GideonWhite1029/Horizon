@@ -267,10 +267,10 @@ index 0000000000000000000000000000000000000000..2e5ef6ed8ae20ba75df7fac972dabb29
 +}
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index f3c048f11333a513b1f6e1feaf9f7bd43aac8dc5..dc4f68c045035ec9cb7a1c5827842daddd668269 100644
+index f12b15bf5f1313c6ab7ec62991e9260023ac146d..8d066528f11cdeda8bbb23726a8db2ed497553aa 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -753,6 +753,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -754,6 +754,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          }
          // Paper end - Configurable player collision
  
@@ -279,7 +279,7 @@ index f3c048f11333a513b1f6e1feaf9f7bd43aac8dc5..dc4f68c045035ec9cb7a1c5827842dad
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
          this.server.spark.enableAfterPlugins(this.server); // Paper - spark
-@@ -1024,6 +1026,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1025,6 +1027,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      // CraftBukkit end
  
      public void stopServer() {

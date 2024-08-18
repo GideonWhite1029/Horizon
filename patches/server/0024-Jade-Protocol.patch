@@ -2645,10 +2645,10 @@ index 5b024bc6166a9034eeba729bf3a53236446a03de..1bc147c33cc8e85755c7b19eb405564b
  
      public Armadillo(EntityType<? extends Animal> type, Level world) {
 diff --git a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
-index 0656e03bdd71f5d81853e817e136c8f11667c76e..ffdd768bb2df8593168a2cf58c90d1aaf08c4f5a 100644
+index 5cd69dd546f42e80a3d3e3a674f65c2ac39f3af9..9ee79a458b4d658287c0d93c29a76d4be256da74 100644
 --- a/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/src/main/java/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -294,7 +294,7 @@ public class Tadpole extends AbstractFish {
+@@ -295,7 +295,7 @@ public class Tadpole extends AbstractFish {
  
      }
  

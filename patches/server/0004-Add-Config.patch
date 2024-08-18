@@ -907,7 +907,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 83bd8d6937b84225577e125a196822bcfe5c8f21..43604a95ae0f587147663569b67a11763a70b5ac 100644
+index 6bae091f98b425a9047bd6b3a964025b2b8102df..086e819654b8a77887f759ce61f97bb08c4b7e5c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -918,7 +918,7 @@ index 83bd8d6937b84225577e125a196822bcfe5c8f21..43604a95ae0f587147663569b67a1176
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1233,7 +1234,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1234,7 +1235,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              this.status = this.buildServerStatus();
  
              // Spigot start
@@ -931,12 +931,12 @@ index 83bd8d6937b84225577e125a196822bcfe5c8f21..43604a95ae0f587147663569b67a1176
              this.server.getScheduler().mainThreadHeartbeat(this.tickCount); // run all 1 tick delay tasks during init,
              // this is going to be the first thing the tick process does anyways, so move done and run it after
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 97b683be85d9e6be0f6b4cb8dd97e158a5fd22a1..ef37891cd5d56df47a9c2288ca16bb8d3ac139a1 100644
+index 70bccefb015da24d582641a87154bcf0a37915e8..0f15ab476f9fa07924178989d48825dcb6c4900b 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -249,6 +249,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
-         // Purpur end
-         com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
+@@ -252,6 +252,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         gg.pufferfish.pufferfish.PufferfishConfig.load(); // Pufferfish
+         gg.pufferfish.pufferfish.PufferfishCommand.init(); // Pufferfish
  
 +        dev.horizonmc.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config
 +
@@ -944,7 +944,7 @@ index 97b683be85d9e6be0f6b4cb8dd97e158a5fd22a1..ef37891cd5d56df47a9c2288ca16bb8d
          this.setFlightAllowed(dedicatedserverproperties.allowFlight);
          this.setMotd(dedicatedserverproperties.motd);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 41111077878b65458d9a50a8d15eb959d9a84891..7270198a80ab94dd99637a2be67d2da9a16f5342 100644
+index 5f1bf8d8a857365247322af2562459116a5e4e30..108825a77d6311df6eb8897ccf2a3348a8efd1a0 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1114,6 +1114,7 @@ public final class CraftServer implements Server {
@@ -970,11 +970,11 @@ index 41111077878b65458d9a50a8d15eb959d9a84891..7270198a80ab94dd99637a2be67d2da9
          @Override
          public YamlConfiguration getPurpurConfig() {
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 260f79affee997adbe8d08f2a2cb3aa68083f497..efe093cf15a3e68e8f06df04bb38c4db39ddf4bd 100644
+index e35a562eec4b65335723c50180fe1471f858ae60..e0ae05346c79e8f53c4c85cd61e6fbb68d780c27 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -184,6 +184,14 @@ public class Main {
-                     .describedAs("Yml file");
+@@ -190,6 +190,14 @@ public class Main {
+                         .describedAs("Yml file");
                  // Purpur end
  
 +                // Horizon start - Server Config

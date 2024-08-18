@@ -42,7 +42,7 @@ index 182a43ae9e7b28b4bf0993ad7f8486aa72d01e68..54f7d370aded6e3844408634b2477080
          }
          // Leaves end - skip bot
 diff --git a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
-index 208b56fff4925cad8d4e0bc843c07372fad034c8..4ab562d9fb6d255c5512ed097cae6fd7e0e706aa 100644
+index 716d37ea7c398c4f15f362c7759daca9d3fe32cb..2b586b222bdeddfb5a6a746fa4e60501fb73e847 100644
 --- a/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
 +++ b/src/main/java/net/minecraft/commands/arguments/EntityArgument.java
 @@ -154,6 +154,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
@@ -134,10 +134,10 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..ddb5952c49f841f3a17cf31ad33daead
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 67eb1aa85ce4d83f58b98fac3bcef65b4e615ae1..3d7fba7654ad20ca7f70652afda5f006038e6053 100644
+index 7e7ecdeeef9e1d89e8e2fa9dd7db9543b86b061b..9257eaadd8f0b20d1617bf9e8772d4327d55657c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1730,7 +1730,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1731,7 +1731,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -173,7 +173,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index bfb86fa2dbd08f53b312ef7b231c734a567512ef..16f64b11a0137553606542b40233a72fe176ac44 100644
+index 06fe70d46092ba5b655fae9c6ebdb5e6753604ca..134841b21e795a2d70c70419cfd94127d3057186 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -450,7 +450,7 @@ index 52b0234ad6ce97405ee18280a8ef1dc07e184f95..4c286c6fa5a7a85ba5a4d090757dd41a
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index e3100e65fea02374d4393bab48d63ddeaecef0ab..c6a3305a593bd5172501ad07739aa313d0ea3107 100644
+index 37fc08d04ff3514d27ad25c8d774a6e96b30c3b1..43cf7764b192006c47e5aa882d0a066d20d21d2d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -2250,7 +2250,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
