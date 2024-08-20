@@ -6,10 +6,10 @@ Subject: [PATCH] Fakeplayer Support
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 5e99b6cc15961b56d1e0aa6f60e36ba4ba7beafd..0ea60b5837ce751b2091026b2379d5a4a1bdc99e 100644
+index 31d8d4aaa4ca7cd433b38af559e6ca17c296881d..fcc59b6b9581d1894e4012150ba55a61f6d34304 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -2916,6 +2916,17 @@ public final class Bukkit {
+@@ -2927,6 +2927,17 @@ public final class Bukkit {
      }
      // Paper end - Folia region threading API
  
@@ -28,7 +28,7 @@ index 5e99b6cc15961b56d1e0aa6f60e36ba4ba7beafd..0ea60b5837ce751b2091026b2379d5a4
      public static Server.Spigot spigot() {
          return server.spigot();
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 878e0179f8694cb417788dff25bc96340bdb1976..9722c95dd11b477a63dcf52e280ab6a5706b67be 100644
+index 813f36d1e91167a6f3fe3002720bef52c3504cc7..605be463cc49e74bb1aa396fdd341be50ed516ef 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -62,6 +62,7 @@ import org.jetbrains.annotations.ApiStatus;
@@ -39,7 +39,7 @@ index 878e0179f8694cb417788dff25bc96340bdb1976..9722c95dd11b477a63dcf52e280ab6a5
  
  /**
   * Represents a server implementation.
-@@ -2563,6 +2564,16 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2574,6 +2575,16 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
      boolean isOwnedByCurrentRegion(@NotNull Entity entity);
      // Paper end - Folia region threading API
  

@@ -18,7 +18,7 @@ index 06955b6f7bb147ab436f2421a02a33e2027b0119..f92a4da0225c076b87adff62c24d4c81
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 2184667fdf5d003f3af38385fd4bf9a774ef6785..fad0bda2399be81ee6db1338d27c58530e5d4f30 100644
+index 7115232e82ca68a6c6c14a6498180825e38e1f3f..44cff484e616bb09236d80e800648a2f1c27fd79 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -7,6 +7,7 @@ import com.mojang.brigadier.ParseResults;
@@ -47,7 +47,7 @@ index 2184667fdf5d003f3af38385fd4bf9a774ef6785..fad0bda2399be81ee6db1338d27c5853
                      flag2 = true; // Paper - diff on change, this should be moved wrongly
                      ServerGamePacketListenerImpl.LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", new Object[]{entity.getName().getString(), this.player.getName().getString(), Math.sqrt(d10)});
                  }
-@@ -1470,7 +1471,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -1474,7 +1475,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_TOO_QUICKLY,
                                              toX, toY, toZ, toYaw, toPitch, true);
                                          if (!event.isAllowed()) {
@@ -56,7 +56,7 @@ index 2184667fdf5d003f3af38385fd4bf9a774ef6785..fad0bda2399be81ee6db1338d27c5853
                                                  ServerGamePacketListenerImpl.LOGGER.warn("{} moved too quickly! {},{},{}", new Object[]{this.player.getName().getString(), d6, d7, d8});
                                              this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
                                              return;
-@@ -1540,7 +1541,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
+@@ -1544,7 +1545,7 @@ public class ServerGamePacketListenerImpl extends ServerCommonPacketListenerImpl
                              d10 = d6 * d6 + d7 * d7 + d8 * d8;
                              boolean movedWrongly = false; // Paper - Add fail move event; rename
  

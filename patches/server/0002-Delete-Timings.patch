@@ -731,7 +731,7 @@ index 24121a43aeb5e9bce013f30c92dddd15f99736c6..64e192ee588d66499bb54b27644debcc
              String[] args = org.apache.commons.lang3.StringUtils.split(content, ' '); // fix adjacent spaces (from console/plugins) causing empty array elements
  
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 214ea75502d4abf9ebbc99a3811e4d2f8465227e..68c1fa35fccb98245dfb9f68ba14b1c16b13c5e1 100644
+index 690086adcb1f87adc0b3ab664fde735ad3e1093a..959160c5859733d4029278054d9c970130d93ab8 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 @@ -1,6 +1,5 @@
@@ -741,7 +741,7 @@ index 214ea75502d4abf9ebbc99a3811e4d2f8465227e..68c1fa35fccb98245dfb9f68ba14b1c1
  import com.mojang.logging.LogUtils;
  import io.papermc.paper.configuration.constraint.Constraints;
  import io.papermc.paper.configuration.type.number.DoubleOr;
-@@ -118,7 +117,6 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -119,7 +118,6 @@ public class GlobalConfiguration extends ConfigurationPart {
  
          @PostProcess
          private void postProcess() {
