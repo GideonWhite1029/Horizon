@@ -1,201 +1,203 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: GideonWhite1029 <gideonwhite1029@gmail.com>
-Date: Fri, 12 Jul 2024 15:20:14 +0400
-Subject: [PATCH] Matter Feature Secure Seed
+Date: Mon, 9 Sep 2024 22:12:57 +0300
+Subject: [PATCH] Matter Secure Seed
 
 
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index b9af2aef11be191611eacc74fc15c07bc1e6b743..18defab0bce5cf2d2f8e929dbd5881e33827e8c2 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -240,4 +240,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "async-player-data-saving", category = {"optimization"})
+     public static boolean asyncPlayerDataSaving = false;
+ 
++    @GlobalConfig(name = "secure-seed", category = {"features"})
++    public static boolean secureSeed = false;
++
+ }
+\ No newline at end of file
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-index 9ebe1f1797b5be562bc4f6d92b9a4d6022ca2151..1c4ba084ff642a41aabaa7e9428552caf4399539 100644
+index 9ebe1f1797b5be562bc4f6d92b9a4d6022ca2151..2e96a51366134d16a4b33d6ba3830fb5ee4d20c7 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServerProperties.java
-@@ -47,6 +47,10 @@ import org.slf4j.Logger;
- import joptsimple.OptionSet;
- // CraftBukkit end
- 
-+// Matter start - Feature Secure Seed
-+import su.plo.matter.Globals;
-+// Matter end - Feature Secure Seed
+@@ -20,6 +20,8 @@ import java.util.UUID;
+ import java.util.concurrent.TimeUnit;
+ import java.util.regex.Pattern;
+ import javax.annotation.Nullable;
 +
- public class DedicatedServerProperties extends Settings<DedicatedServerProperties> {
- 
-     static final Logger LOGGER = LogUtils.getLogger();
-@@ -165,7 +169,17 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.RegistryAccess;
+@@ -165,7 +167,17 @@ public class DedicatedServerProperties extends Settings<DedicatedServerPropertie
          boolean flag = this.get("generate-structures", true);
          long i = WorldOptions.parseSeed(s).orElse(WorldOptions.randomSeed());
  
 -        this.worldOptions = new WorldOptions(i, flag, false);
-+        // Matter start - Feature Secure Seed
-+        String featureSeedString = this.get("feature-level-seed", "");
-+        long[] featureSeed;
-+        if (featureSeedString.isEmpty()) {
-+            featureSeed = Globals.createRandomWorldSeed();
-+        } else {
-+            featureSeed = Globals.parseSeed(featureSeedString).orElseGet(Globals::createRandomWorldSeed);
-+        }
++        // Horizon start - Matter - Feature Secure Seed
++        if (HorizonConfig.secureSeed) {
++            String featureSeedStr = this.get("feature-level-seed", "");
++            long[] featureSeed = su.plo.matter.Globals.parseSeed(featureSeedStr)
++                    .orElse(su.plo.matter.Globals.createRandomWorldSeed());
 +
-+        this.worldOptions = new WorldOptions(i, featureSeed, flag, false);
-+        // Matter end - Feature Secure Seed
++            this.worldOptions = new WorldOptions(i, featureSeed, flag, false);
++        } else {
++            this.worldOptions = new WorldOptions(i, flag, false);
++        }
++        // Horizon end - Matter - Feature Secure Seed
          this.worldDimensionData = new DedicatedServerProperties.WorldDimensionData((JsonObject) this.get("generator-settings", (s1) -> {
              return GsonHelper.parse(!s1.isEmpty() ? s1 : "{}");
          }, new JsonObject()), (String) this.get("level-type", (s1) -> {
 diff --git a/src/main/java/net/minecraft/server/level/ServerChunkCache.java b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-index 74453c9f81f8c2c0dec96d25ccf2cb3449a73899..a29ff0c383b2a30d60647a1d9d3f0664c3a07c7d 100644
+index ebe872c4643038f0c99b289d4d5afdbedd76c6ef..ce4d57b4a5a396be096b16f110a615d902d390d5 100644
 --- a/src/main/java/net/minecraft/server/level/ServerChunkCache.java
 +++ b/src/main/java/net/minecraft/server/level/ServerChunkCache.java
-@@ -45,6 +45,7 @@ import net.minecraft.world.level.levelgen.RandomState;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
- import net.minecraft.world.level.storage.DimensionDataStorage;
- import net.minecraft.world.level.storage.LevelStorageSource;
-+import su.plo.matter.Globals;
- 
- public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moonrise.patches.chunk_system.world.ChunkSystemServerChunkCache { // Paper - rewrite chunk system
- 
-@@ -573,6 +574,8 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+@@ -617,6 +617,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
      }
  
      public ChunkGenerator getGenerator() {
-+        // Matter
-+        Globals.setupGlobals(level);
++        su.plo.matter.Globals.setupGlobals(level); // Horizon - Matter - Feature Secure Seed
          return this.chunkMap.generator();
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 87368cc8ed4746073a04521d221713f00ece4e6f..0152d98e1512e23f036b27dac61ce2d4b11b40d7 100644
+index ab0f96229a79e3832b19e9becbfaaceeab34254b..c77edc57b97c75e68cd924e3d764a3f95dbb0730 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
-@@ -180,6 +180,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
- import org.bukkit.event.server.MapInitializeEvent;
- import org.bukkit.event.weather.LightningStrikeEvent;
- import org.bukkit.event.world.TimeSkipEvent;
-+import su.plo.matter.Globals;
- // CraftBukkit end
- 
- public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel, ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemLevelReader { // Paper - rewrite chunk system
-@@ -600,6 +601,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
+@@ -557,6 +557,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
              chunkgenerator = new org.bukkit.craftbukkit.generator.CustomChunkGenerator(this, chunkgenerator, gen);
          }
          // CraftBukkit end
-+        Globals.setupGlobals(this); // Matter
++        su.plo.matter.Globals.setupGlobals(this); // Horizon - Matter - Feature Secure Seed
          boolean flag2 = minecraftserver.forceSynchronousWrites();
          DataFixer datafixer = minecraftserver.getFixerUpper();
          EntityPersistentStorage<Entity> entitypersistentstorage = new EntityStorage(new SimpleRegionStorage(new RegionStorageInfo(convertable_conversionsession.getLevelId(), resourcekey, "entities"), convertable_conversionsession.getDimensionPath(resourcekey).resolve("entities"), datafixer, flag2, DataFixTypes.ENTITY_CHUNK), this, minecraftserver);
 diff --git a/src/main/java/net/minecraft/world/entity/monster/Slime.java b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-index 40c00f73502be66f2a0f3cdb36b963fb25c60704..3ad17506eda402f53357e9ccc96dfa202fafb62b 100644
+index 40c00f73502be66f2a0f3cdb36b963fb25c60704..cf32895d6a91b6f81734fcb80936d9e853a91c2c 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/Slime.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/Slime.java
-@@ -439,7 +439,7 @@ public class Slime extends Mob implements Enemy {
+@@ -3,6 +3,8 @@ package net.minecraft.world.entity.monster;
+ import com.google.common.annotations.VisibleForTesting;
+ import java.util.EnumSet;
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.particles.ParticleOptions;
+ import net.minecraft.core.particles.ParticleTypes;
+@@ -439,7 +441,12 @@ public class Slime extends Mob implements Enemy {
                  }
  
                  ChunkPos chunkcoordintpair = new ChunkPos(pos);
 -                boolean flag = world.getMinecraftWorld().paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(chunkcoordintpair.x, chunkcoordintpair.z, ((WorldGenLevel) world).getSeed(), world.getMinecraftWorld().spigotConfig.slimeSeed).nextInt(10) == 0; // Spigot // Paper
-+                boolean flag = world.getMinecraftWorld().paperConfig().entities.spawning.allChunksAreSlimeChunks || world.getChunk(chunkcoordintpair.x, chunkcoordintpair.z).isSlimeChunk(); // Spigot // Paper // Matter
++                // Horizon start - Matter - Feature Secure Seed
++                boolean isSlimeChunk = HorizonConfig.secureSeed
++                        ? world.getChunk(chunkcoordintpair.x, chunkcoordintpair.z).isSlimeChunk()
++                        : WorldgenRandom.seedSlimeChunk(chunkcoordintpair.x, chunkcoordintpair.z, ((WorldGenLevel) world).getSeed(), world.getMinecraftWorld().spigotConfig.slimeSeed).nextInt(10) == 0; // Spigot // Paper
++                boolean flag = world.getMinecraftWorld().paperConfig().entities.spawning.allChunksAreSlimeChunks || isSlimeChunk;
++                // Horizon end - Matter - Feature Secure Seed
  
                  // Paper start - Replace rules for Height in Slime Chunks
                  final double maxHeightSlimeChunk = world.getMinecraftWorld().paperConfig().entities.spawning.slimeSpawnHeight.slimeChunk.maximum;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-index 75c8125e20b70433fe9d143a3193d821043327c3..da550dffc80ab9b1d7beaf9e8115e620e618eece 100644
+index 75c8125e20b70433fe9d143a3193d821043327c3..6debd19063586aaf7e8304d01beb35896aaac02b 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -56,6 +56,7 @@ import net.minecraft.world.level.material.Fluid;
- import net.minecraft.world.ticks.SerializableTickContainer;
- import net.minecraft.world.ticks.TickContainerAccess;
- import org.slf4j.Logger;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, LightChunk, StructureAccess, ca.spottedleaf.moonrise.patches.starlight.chunk.StarlightChunk { // Paper - rewrite chunk system
- 
-@@ -85,6 +86,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -85,6 +85,11 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
      protected final LevelHeightAccessor levelHeightAccessor;
      protected final LevelChunkSection[] sections;
  
-+    // Matter start
++    // Horizon start - Matter - Feature Secure Seed
 +    private boolean slimeChunk;
 +    private boolean hasComputedSlimeChunk;
-+    // Matter end
++    // Horizon end - Matter - Feature Secure Seed
 +
      // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
      private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
      public org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer = new org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer(ChunkAccess.DATA_TYPE_REGISTRY);
-@@ -189,6 +195,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
+@@ -189,6 +194,17 @@ public abstract class ChunkAccess implements BlockGetter, BiomeManager.NoiseBiom
          return GameEventListenerRegistry.NOOP;
      }
  
-+    // Matter start
++    // Horizon start - Matter - Feature Secure Seed
 +    public boolean isSlimeChunk() {
 +        if (!hasComputedSlimeChunk) {
 +            hasComputedSlimeChunk = true;
-+            slimeChunk = WorldgenCryptoRandom.seedSlimeChunk(chunkPos.x, chunkPos.z).nextInt(10) == 0;
++            slimeChunk = su.plo.matter.WorldgenCryptoRandom.seedSlimeChunk(chunkPos.x, chunkPos.z).nextInt(10) == 0;
 +        }
 +
 +        return slimeChunk;
 +    }
-+    // Matter end
++    // Horizon end - Matter - Feature Secure Seed
 +
      public abstract BlockState getBlockState(final int x, final int y, final int z); // Paper
      @Nullable
      public abstract BlockState setBlockState(BlockPos pos, BlockState state, boolean moved);
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-index 488938c32a48437721a71d294c77468f00c035b9..926547e0b8a9ef4b8890457b0b71564a9a13de1d 100644
+index 488938c32a48437721a71d294c77468f00c035b9..a78e983fa079a4394c2975f770f85425c075fe54 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGenerator.java
-@@ -77,6 +77,8 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStruct
- import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
- import org.apache.commons.lang3.mutable.MutableBoolean;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public abstract class ChunkGenerator {
- 
-@@ -344,7 +346,11 @@ public abstract class ChunkGenerator {
+@@ -4,6 +4,7 @@ import com.google.common.base.Suppliers;
+ import com.mojang.datafixers.util.Pair;
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.MapCodec;
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.ints.IntArraySet;
+ import it.unimi.dsi.fastutil.longs.LongSet;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+@@ -344,7 +345,11 @@ public abstract class ChunkGenerator {
                  return structure.step().ordinal();
              }));
              List<FeatureSorter.StepFeatureData> list = (List) this.featuresPerStep.get();
 -            WorldgenRandom seededrandom = new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.generateUniqueSeed()));
-+            // Matter start - Secure Seed
-+            WorldgenRandom seededrandom = new WorldgenCryptoRandom(
-+                    blockposition.getX(), blockposition.getZ(), Globals.Salt.UNDEFINED, 0
-+            );
-+            // Matter end
++            // Horizon start - Matter - Feature Secure Seed
++            WorldgenRandom seededrandom = HorizonConfig.secureSeed
++                    ? new su.plo.matter.WorldgenCryptoRandom(blockposition.getX(), blockposition.getZ(), su.plo.matter.Globals.Salt.UNDEFINED, 0)
++                    : new WorldgenRandom(new XoroshiroRandomSource(RandomSupport.generateUniqueSeed()));
++            // Horizon end - Matter - Feature Secure Seed
              long i = seededrandom.setDecorationSeed(generatoraccessseed.getSeed(), blockposition.getX(), blockposition.getZ());
              Set<Holder<Biome>> set = new ObjectArraySet();
  
-@@ -583,9 +589,11 @@ public abstract class ChunkGenerator {
+@@ -583,9 +588,17 @@ public abstract class ChunkGenerator {
                      ArrayList<StructureSet.StructureSelectionEntry> arraylist = new ArrayList(list.size());
  
                      arraylist.addAll(list);
 -                    WorldgenRandom seededrandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -
 -                    seededrandom.setLargeFeatureSeed(placementCalculator.getLevelSeed(), chunkcoordintpair.x, chunkcoordintpair.z);
-+                    // Matter start - Secure Seed
-+                    WorldgenRandom seededrandom = new WorldgenCryptoRandom(
-+                            chunkcoordintpair.x, chunkcoordintpair.z, Globals.Salt.GENERATE_FEATURE, 0
-+                    );
-+                    // Matter end
++                    // Horizon start - Matter - Feature Secure Seed
++                    WorldgenRandom seededrandom;
++                    if (HorizonConfig.secureSeed) {
++                        seededrandom = new su.plo.matter.WorldgenCryptoRandom(
++                                chunkcoordintpair.x, chunkcoordintpair.z, su.plo.matter.Globals.Salt.GENERATE_FEATURE, 0
++                        );
++                    } else {
++                        seededrandom = new WorldgenRandom(new LegacyRandomSource(0L));
++                        seededrandom.setLargeFeatureSeed(placementCalculator.getLevelSeed(), chunkcoordintpair.x, chunkcoordintpair.z);
++                    }
++                    // Horizon end - Matter - Feature Secure Seed
                      int i = 0;
  
                      StructureSet.StructureSelectionEntry structureset_a1;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java b/src/main/java/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
-index a6b6e5ea191c0e2cd7a2e4f01b89d8af40a83c1b..76b44badbf5d1ba3e423d7b428cefc46047140ed 100644
+index a6b6e5ea191c0e2cd7a2e4f01b89d8af40a83c1b..33c8972da77cbd50f2a6b407b0fba785b220f3db 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/ChunkGeneratorStructureState.java
-@@ -37,6 +37,8 @@ import org.slf4j.Logger;
- // Spigot start
- import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
- import org.spigotmc.SpigotWorldConfig;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- // Spigot end
- 
- public class ChunkGeneratorStructureState {
-@@ -224,15 +226,9 @@ public class ChunkGeneratorStructureState {
+@@ -4,6 +4,7 @@ package net.minecraft.world.level.chunk;
+ import com.google.common.base.Stopwatch;
+ import com.mojang.datafixers.util.Pair;
+ import com.mojang.logging.LogUtils;
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import java.util.ArrayList;
+@@ -224,15 +225,20 @@ public class ChunkGeneratorStructureState {
              List<CompletableFuture<ChunkPos>> list = new ArrayList(j);
              int k = placement.spread();
              HolderSet<Biome> holderset = placement.preferredBiomes();
 -            RandomSource randomsource = RandomSource.create();
-+            // Matter - Secure Seed
-+            RandomSource randomsource = new WorldgenCryptoRandom(0, 0, Globals.Salt.STRONGHOLDS, 0);
- 
+-
 -            // Paper start - Add missing structure set seed configs
 -            if (this.conf.strongholdSeed != null && structureSetEntry.is(net.minecraft.world.level.levelgen.structure.BuiltinStructureSets.STRONGHOLDS)) {
 -                randomsource.setSeed(this.conf.strongholdSeed);
@@ -203,336 +205,397 @@ index a6b6e5ea191c0e2cd7a2e4f01b89d8af40a83c1b..76b44badbf5d1ba3e423d7b428cefc46
 -            // Paper end - Add missing structure set seed configs
 -            randomsource.setSeed(this.concentricRingsSeed);
 -            } // Paper - Add missing structure set seed configs
++            // Horizon start - Matter - Feature Secure Seed
++            RandomSource randomsource = HorizonConfig.secureSeed
++                    ? new su.plo.matter.WorldgenCryptoRandom(0, 0, su.plo.matter.Globals.Salt.STRONGHOLDS, 0)
++                    : RandomSource.create();
++
++            if (!HorizonConfig.secureSeed) {
++                // Paper start - Add missing structure set seed configs
++                if (this.conf.strongholdSeed != null && structureSetEntry.is(net.minecraft.world.level.levelgen.structure.BuiltinStructureSets.STRONGHOLDS)) {
++                    randomsource.setSeed(this.conf.strongholdSeed);
++                } else {
++                    // Paper end - Add missing structure set seed configs
++                    randomsource.setSeed(this.concentricRingsSeed);
++                } // Paper - Add missing structure set seed configs
++            } // Horizon end - Matter - Feature Secure Seed
              double d0 = randomsource.nextDouble() * Math.PI * 2.0D;
              int l = 0;
              int i1 = 0;
 diff --git a/src/main/java/net/minecraft/world/level/chunk/status/ChunkStep.java b/src/main/java/net/minecraft/world/level/chunk/status/ChunkStep.java
-index 4e56398a6fb8b97199f4c74ebebc1055fb718dcf..8146f4bc617a22d47615e1e62c51f51e67631c59 100644
+index 4e56398a6fb8b97199f4c74ebebc1055fb718dcf..57cfdd3acf2337ae478dd62f81017e56bf6e3334 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/status/ChunkStep.java
 +++ b/src/main/java/net/minecraft/world/level/chunk/status/ChunkStep.java
-@@ -61,6 +61,7 @@ public final class ChunkStep implements ca.spottedleaf.moonrise.patches.chunk_sy
+@@ -60,6 +60,7 @@ public final class ChunkStep implements ca.spottedleaf.moonrise.patches.chunk_sy
+     }
  
      public CompletableFuture<ChunkAccess> apply(WorldGenContext context, StaticCache2D<GenerationChunkHolder> staticCache2D, ChunkAccess chunk) {
++        su.plo.matter.Globals.setupGlobals(context.level()); // Horizon - Matter - Feature Secure Seed
          if (chunk.getPersistedStatus().isBefore(this.targetStatus)) {
-+            su.plo.matter.Globals.setupGlobals(context.level()); // Matter - Secure Seed
              ProfiledDuration profiledDuration = JvmProfiler.INSTANCE.onChunkGenerate(chunk.getPos(), context.level().dimension(), this.targetStatus.getName());
              return this.task.doWork(context, this, staticCache2D, chunk).thenApply(generated -> this.completeChunkGeneration(generated, profiledDuration));
-         } else {
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/WorldOptions.java b/src/main/java/net/minecraft/world/level/levelgen/WorldOptions.java
-index 5ae04ec610a885e2ed73e942879a27fe8640471c..de3a2999f0289654489c759bba0207b0f5aa56b2 100644
+index 5ae04ec610a885e2ed73e942879a27fe8640471c..3326cee11e44a4435ca72580d60e133119133ee0 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/WorldOptions.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/WorldOptions.java
-@@ -8,31 +8,48 @@ import java.util.OptionalLong;
+@@ -5,31 +5,61 @@ import com.mojang.serialization.MapCodec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import java.util.Optional;
+ import java.util.OptionalLong;
++
++import dev.horizonmc.horizon.HorizonConfig;
  import net.minecraft.util.RandomSource;
  import org.apache.commons.lang3.StringUtils;
  
-+// Matter start - Feature Secure Seed
-+import java.util.stream.LongStream;
-+import su.plo.matter.Globals;
-+// Matter end - Feature Secure Seed
-+
  public class WorldOptions {
-+    // Matter start - Feature Secure Seed
++    // Horizon start - Matter - Feature Secure Seed
++    private static final boolean isSecureSeedEnabled = HorizonConfig.secureSeed;
      public static final MapCodec<WorldOptions> CODEC = RecordCodecBuilder.mapCodec(
-         instance -> instance.group(
+-        instance -> instance.group(
 -                    Codec.LONG.fieldOf("seed").stable().forGetter(WorldOptions::seed),
-+                    Codec.LONG.fieldOf("seed").stable().forGetter(WorldOptions::seed), 
-+                    Codec.LONG_STREAM.fieldOf("feature_seed").stable().forGetter(WorldOptions::featureSeedStream),
-                     Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldOptions::generateStructures),
-                     Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldOptions::generateBonusChest),
-                     Codec.STRING.lenientOptionalFieldOf("legacy_custom_options").stable().forGetter(generatorOptions -> generatorOptions.legacyCustomOptions)
-                 )
-                 .apply(instance, instance.stable(WorldOptions::new))
+-                    Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldOptions::generateStructures),
+-                    Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldOptions::generateBonusChest),
+-                    Codec.STRING.lenientOptionalFieldOf("legacy_custom_options").stable().forGetter(generatorOptions -> generatorOptions.legacyCustomOptions)
+-                )
+-                .apply(instance, instance.stable(WorldOptions::new))
++            instance -> isSecureSeedEnabled
++                    ? instance.group(
++                            Codec.LONG.fieldOf("seed").stable().forGetter(WorldOptions::seed),
++                            Codec.LONG_STREAM.fieldOf("feature_seed").stable().forGetter(WorldOptions::featureSeedStream),
++                            Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldOptions::generateStructures),
++                            Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldOptions::generateBonusChest),
++                            Codec.STRING.lenientOptionalFieldOf("legacy_custom_options").stable().forGetter(generatorOptions -> generatorOptions.legacyCustomOptions)
++                    )
++                    .apply(instance, instance.stable(WorldOptions::new))
++                    : instance.group(
++                            Codec.LONG.fieldOf("seed").stable().forGetter(WorldOptions::seed),
++                            Codec.BOOL.fieldOf("generate_features").orElse(true).stable().forGetter(WorldOptions::generateStructures),
++                            Codec.BOOL.fieldOf("bonus_chest").orElse(false).stable().forGetter(WorldOptions::generateBonusChest),
++                            Codec.STRING.lenientOptionalFieldOf("legacy_custom_options").stable().forGetter(generatorOptions -> generatorOptions.legacyCustomOptions)
++                    )
++                    .apply(instance, instance.stable(WorldOptions::new))
      );
 -    public static final WorldOptions DEMO_OPTIONS = new WorldOptions((long)"North Carolina".hashCode(), true, true);
-+    // Matter end - Feature Secure Seed
-+    public static final WorldOptions DEMO_OPTIONS = new WorldOptions((long) "North Carolina".hashCode(), Globals.createRandomWorldSeed(), true, true);
++    // Horizon end - Matter - Feature Secure Seed
++    // Horizon start - Matter - Feature Secure Seed
++    public static final WorldOptions DEMO_OPTIONS = isSecureSeedEnabled
++            ? new WorldOptions((long) "North Carolina".hashCode(), su.plo.matter.Globals.createRandomWorldSeed(), true, true)
++            : new WorldOptions("North Carolina".hashCode(), true, true);
++    // Horizon end - Matter - Feature Secure Seed
      private final long seed;
-+    // Matter - Feature Secure Seed
-+    private final long[] featureSeed;
++    private long[] featureSeed = su.plo.matter.Globals.createRandomWorldSeed(); // Horizon - Matter - Feature Secure Seed
      private final boolean generateStructures;
      private final boolean generateBonusChest;
      private final Optional<String> legacyCustomOptions;
  
--    public WorldOptions(long seed, boolean generateStructures, boolean bonusChest) {
--        this(seed, generateStructures, bonusChest, Optional.empty());
-+    public WorldOptions(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest) {
-+        this(seed, featureSeed, generateStructures, bonusChest, Optional.empty());
++    // Horizon start - Matter - Feature Secure Seed
+     public WorldOptions(long seed, boolean generateStructures, boolean bonusChest) {
+         this(seed, generateStructures, bonusChest, Optional.empty());
      }
  
-     public static WorldOptions defaultWithRandomSeed() {
--        return new WorldOptions(randomSeed(), true, false);
-+        return new WorldOptions(randomSeed(), Globals.createRandomWorldSeed(), true, false);
++    public WorldOptions(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest) {
++        this(seed, featureSeed, generateStructures, bonusChest, Optional.empty());
 +    }
 +
-+    // Matter start - Feature Secure Seed
-+    private WorldOptions(long seed, LongStream featureSeed, boolean generateStructures, boolean bonusChest, Optional<String> legacyCustomOptions) {
+     public static WorldOptions defaultWithRandomSeed() {
+-        return new WorldOptions(randomSeed(), true, false);
++        return isSecureSeedEnabled
++                ? new WorldOptions(randomSeed(), su.plo.matter.Globals.createRandomWorldSeed(), true, false)
++                : new WorldOptions(randomSeed(), true, false);
++    }
++
++    private WorldOptions(long seed, java.util.stream.LongStream featureSeed, boolean generateStructures, boolean bonusChest, Optional<String> legacyCustomOptions) {
 +        this(seed, featureSeed.toArray(), generateStructures, bonusChest, legacyCustomOptions);
      }
  
--    private WorldOptions(long seed, boolean generateStructures, boolean bonusChest, Optional<String> legacyCustomOptions) {
+     private WorldOptions(long seed, boolean generateStructures, boolean bonusChest, Optional<String> legacyCustomOptions) {
+@@ -39,10 +69,26 @@ public class WorldOptions {
+         this.legacyCustomOptions = legacyCustomOptions;
+     }
+ 
 +    private WorldOptions(long seed, long[] featureSeed, boolean generateStructures, boolean bonusChest, Optional<String> legacyCustomOptions) {
++        this(seed, generateStructures, bonusChest, legacyCustomOptions);
 +        this.featureSeed = featureSeed;
-+        // Matter end - Feature Secure Seed
-         this.seed = seed;
-         this.generateStructures = generateStructures;
-         this.generateBonusChest = bonusChest;
-@@ -43,6 +60,16 @@ public class WorldOptions {
++        // Horizon end - Matter - Feature Secure Seed
++    }
++
+     public long seed() {
          return this.seed;
      }
  
-+    // Matter start - Feature Secure Seed
++    // Horizon start - Matter - Feature Secure Seed
 +    public long[] featureSeed() {
 +        return this.featureSeed;
 +    }
 +
-+    public LongStream featureSeedStream() {
-+        return LongStream.of(this.featureSeed);
++    public java.util.stream.LongStream featureSeedStream() {
++        return java.util.stream.LongStream.of(this.featureSeed);
 +    }
-+    // Matter end - Feature Secure Seed
++    // Horizon end - Matter - Feature Secure Seed
 +
      public boolean generateStructures() {
          return this.generateStructures;
      }
-@@ -56,15 +83,18 @@ public class WorldOptions {
+@@ -55,17 +101,25 @@ public class WorldOptions {
+         return this.legacyCustomOptions.isPresent();
      }
  
++    // Horizon start - Matter - Feature Secure Seed
      public WorldOptions withBonusChest(boolean bonusChest) {
 -        return new WorldOptions(this.seed, this.generateStructures, bonusChest, this.legacyCustomOptions);
-+        // Matter - Feature Secure Seed
-+        return new WorldOptions(this.seed, this.featureSeed, this.generateStructures, bonusChest, this.legacyCustomOptions);
++        return isSecureSeedEnabled
++                ? new WorldOptions(this.seed, this.featureSeed, this.generateStructures, bonusChest, this.legacyCustomOptions)
++                : new WorldOptions(this.seed, this.generateStructures, bonusChest, this.legacyCustomOptions);
      }
  
      public WorldOptions withStructures(boolean structures) {
 -        return new WorldOptions(this.seed, structures, this.generateBonusChest, this.legacyCustomOptions);
-+        // Matter - Feature Secure Seed
-+        return new WorldOptions(this.seed, this.featureSeed, structures, this.generateBonusChest, this.legacyCustomOptions);
++        return isSecureSeedEnabled
++                ? new WorldOptions(this.seed, this.featureSeed, structures, this.generateBonusChest, this.legacyCustomOptions)
++                : new WorldOptions(this.seed, structures, this.generateBonusChest, this.legacyCustomOptions);
      }
  
      public WorldOptions withSeed(OptionalLong seed) {
 -        return new WorldOptions(seed.orElse(randomSeed()), this.generateStructures, this.generateBonusChest, this.legacyCustomOptions);
-+        // Matter - Feature Secure Seed
-+        return new WorldOptions(seed.orElse(randomSeed()), Globals.createRandomWorldSeed(), this.generateStructures, this.generateBonusChest, this.legacyCustomOptions);
++        return isSecureSeedEnabled
++                ? new WorldOptions(seed.orElse(randomSeed()), su.plo.matter.Globals.createRandomWorldSeed(), this.generateStructures, this.generateBonusChest, this.legacyCustomOptions)
++                : new WorldOptions(seed.orElse(randomSeed()), this.generateStructures, this.generateBonusChest, this.legacyCustomOptions);
      }
++    // Horizon end - Matter - Feature Secure Seed
  
      public static OptionalLong parseSeed(String seed) {
+         seed = seed.trim();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-index 17d2bb3f7d158ec1230a1ad7c52b9feeda586630..1be032e399898c617d1821c8324b8e4fe76d8210 100644
+index 17d2bb3f7d158ec1230a1ad7c52b9feeda586630..ea8e44d5fa173de5a79e83df31ebcfbeb202f81c 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/feature/GeodeFeature.java
-@@ -24,6 +24,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.feature.configurations.GeodeConfiguration;
- import net.minecraft.world.level.levelgen.synth.NormalNoise;
- import net.minecraft.world.level.material.FluidState;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class GeodeFeature extends Feature<GeodeConfiguration> {
-     private static final Direction[] DIRECTIONS = Direction.values();
-@@ -42,7 +44,8 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
+@@ -5,6 +5,8 @@ import com.mojang.datafixers.util.Pair;
+ import com.mojang.serialization.Codec;
+ import java.util.List;
+ import java.util.function.Predicate;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+@@ -42,7 +44,11 @@ public class GeodeFeature extends Feature<GeodeConfiguration> {
          int j = geodeConfiguration.maxGenOffset;
          List<Pair<BlockPos, Integer>> list = Lists.newLinkedList();
          int k = geodeConfiguration.distributionPoints.sample(randomSource);
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(worldGenLevel.getSeed()));
-+        // Matter - Feature Secure Seed
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(0, 0, Globals.Salt.GEODE_FEATURE, 0);
++        // Horizon start - Matter - Feature Secure Seed
++        WorldgenRandom worldgenRandom = HorizonConfig.secureSeed
++                ? new su.plo.matter.WorldgenCryptoRandom(0, 0, su.plo.matter.Globals.Salt.GEODE_FEATURE, 0)
++                : new WorldgenRandom(new LegacyRandomSource(worldGenLevel.getSeed()));
++        // Horizon end - Matter - Feature Secure Seed
          NormalNoise normalNoise = NormalNoise.create(worldgenRandom, -4, 1.0);
          List<BlockPos> list2 = Lists.newLinkedList();
          double d = (double)k / (double)geodeConfiguration.outerWallDistance.getMaxValue();
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
-index 3fbd6e8d23f2e6020532530ef8ad7e64b8047d4b..83bc0d53a3c581beee73bd37028a291e261741c1 100644
+index 3fbd6e8d23f2e6020532530ef8ad7e64b8047d4b..c1e3f81cd623dcc3d1252d25772cc6efdd566b47 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/Structure.java
-@@ -38,6 +38,8 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
- import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
- import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public abstract class Structure {
-     public static final Codec<Structure> DIRECT_CODEC = BuiltInRegistries.STRUCTURE_TYPE.byNameCodec().dispatch(Structure::type, StructureType::codec);
-@@ -233,9 +235,11 @@ public abstract class Structure {
+@@ -10,6 +10,8 @@ import java.util.Optional;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.HolderSet;
+@@ -233,6 +235,13 @@ public abstract class Structure {
          }
  
          private static WorldgenRandom makeRandom(long seed, ChunkPos chunkPos) {
--            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--            worldgenRandom.setLargeFeatureSeed(seed, chunkPos.x, chunkPos.z);
--            return worldgenRandom;
-+            // Matter start - Feature Secure Seed
-+            return new WorldgenCryptoRandom(
-+                    chunkPos.x, chunkPos.z, Globals.Salt.GENERATE_FEATURE, seed
-+            );
-+            // Matter end
-         }
-     }
- 
++            // Horizon start - Matter - Feature Secure Seed
++            if (HorizonConfig.secureSeed) {
++                return new su.plo.matter.WorldgenCryptoRandom(
++                        chunkPos.x, chunkPos.z, su.plo.matter.Globals.Salt.GENERATE_FEATURE, seed
++                );
++            }
++            // Horizon end - Matter - Feature Secure Seed
+             WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
+             worldgenRandom.setLargeFeatureSeed(seed, chunkPos.x, chunkPos.z);
+             return worldgenRandom;
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-index f873a0a0734b4fe74ba5b5f8ae0cc3c78fa76b9f..6d5a6318c0a23c22c43ae575bf9cc3d5d660c4de 100644
+index f873a0a0734b4fe74ba5b5f8ae0cc3c78fa76b9f..c80c99e90a675e4e0c1b9d5edb819777f248d0c4 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/RandomSpreadStructurePlacement.java
-@@ -10,6 +10,8 @@ import net.minecraft.world.level.ChunkPos;
+@@ -5,6 +5,8 @@ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.MapCodec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import java.util.Optional;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.Vec3i;
+ import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
- import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class RandomSpreadStructurePlacement extends StructurePlacement {
-     public static final MapCodec<RandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.<RandomSpreadStructurePlacement>mapCodec(
-@@ -71,8 +73,11 @@ public class RandomSpreadStructurePlacement extends StructurePlacement {
+@@ -71,8 +73,17 @@ public class RandomSpreadStructurePlacement extends StructurePlacement {
      public ChunkPos getPotentialStructureChunk(long seed, int chunkX, int chunkZ) {
          int i = Math.floorDiv(chunkX, this.spacing);
          int j = Math.floorDiv(chunkZ, this.spacing);
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        worldgenRandom.setLargeFeatureWithSalt(seed, i, j, this.salt());
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                i, j, Globals.Salt.POTENTIONAL_FEATURE, this.salt
-+        );
-+        // Matter end
++        // Horizon start - Matter - Feature Secure Seed
++        WorldgenRandom worldgenRandom;
++        if (HorizonConfig.secureSeed) {
++            worldgenRandom = new su.plo.matter.WorldgenCryptoRandom(
++                    i, j, su.plo.matter.Globals.Salt.POTENTIONAL_FEATURE, this.salt
++            );
++        } else {
++            worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
++            worldgenRandom.setLargeFeatureWithSalt(seed, i, j, this.salt());
++        }
++        // Horizon end - Matter - Feature Secure Seed
          int k = this.spacing - this.separation;
          int l = this.spreadType.evaluate(worldgenRandom, k);
          int m = this.spreadType.evaluate(worldgenRandom, k);
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
-index cbf13e4f2da6a27619e9bc9a7cd73bb6e69cad2a..2133b2d0e0116e701c424bf6c272d305d25ef969 100644
+index cbf13e4f2da6a27619e9bc9a7cd73bb6e69cad2a..9217fb04c46dc4d6a5403212ab95864a41f010fc 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/placement/StructurePlacement.java
-@@ -19,6 +19,8 @@ import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
- import net.minecraft.world.level.levelgen.LegacyRandomSource;
- import net.minecraft.world.level.levelgen.WorldgenRandom;
- import net.minecraft.world.level.levelgen.structure.StructureSet;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public abstract class StructurePlacement {
-     public static final Codec<StructurePlacement> CODEC = BuiltInRegistries.STRUCTURE_PLACEMENT
-@@ -118,34 +120,40 @@ public abstract class StructurePlacement {
+@@ -6,6 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import com.mojang.serialization.codecs.RecordCodecBuilder.Instance;
+ import com.mojang.serialization.codecs.RecordCodecBuilder.Mu;
+ import java.util.Optional;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.Vec3i;
+@@ -118,8 +120,17 @@ public abstract class StructurePlacement {
      public abstract StructurePlacementType<?> type();
  
      private static boolean probabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - Add missing structure set seed configs; ignore here
 -        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
 -        worldgenRandom.setLargeFeatureWithSalt(seed, salt, chunkX, chunkZ);
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                chunkX, chunkZ, Globals.Salt.UNDEFINED, salt
-+        );
-+        // Matter end
++        // Horizon start - Matter - Feature Secure Seed
++        WorldgenRandom worldgenRandom;
++        if (HorizonConfig.secureSeed) {
++            worldgenRandom = new su.plo.matter.WorldgenCryptoRandom(
++                    chunkX, chunkZ, su.plo.matter.Globals.Salt.UNDEFINED, salt
++            );
++        } else {
++            worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
++            worldgenRandom.setLargeFeatureWithSalt(seed, salt, chunkX, chunkZ);
++        }
++        // Horizon end - Matter - Feature Secure Seed
          return worldgenRandom.nextFloat() < frequency;
      }
  
-     private static boolean legacyProbabilityReducerWithDouble(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - Add missing structure set seed configs
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        if (saltOverride == null) { // Paper - Add missing structure set seed configs
--        worldgenRandom.setLargeFeatureSeed(seed, chunkX, chunkZ);
--        // Paper start - Add missing structure set seed configs
--        } else {
--            worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride);
--        }
--        // Paper end - Add missing structure set seed configs
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                chunkX, chunkZ, Globals.Salt.MINESHAFT_FEATURE, 0
-+        );
-+        // Matter end
-         return worldgenRandom.nextDouble() < (double)frequency;
-     }
- 
-     private static boolean legacyArbitrarySaltProbabilityReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - Add missing structure set seed configs
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setLargeFeatureWithSalt(seed, chunkX, chunkZ, saltOverride != null ? saltOverride : HIGHLY_ARBITRARY_RANDOM_SALT); // Paper - Add missing structure set seed configs
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                chunkX, chunkZ, Globals.Salt.BURIED_TREASURE_FEATURE, 0
-+        );
-+        // Matter end
-         return worldgenRandom.nextFloat() < frequency;
-     }
- 
-     private static boolean legacyPillagerOutpostReducer(long seed, int salt, int chunkX, int chunkZ, float frequency, @org.jetbrains.annotations.Nullable Integer saltOverride) { // Paper - Add missing structure set seed configs; ignore here
-         int i = chunkX >> 4;
-         int j = chunkZ >> 4;
--        WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(0L));
--        worldgenRandom.setSeed((long)(i ^ j << 4) ^ seed);
-+        // Matter - Secure Feature Seed
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                i, j, Globals.Salt.PILLAGER_OUTPOST_FEATURE, 0
-+        );
-+        // Matter end
-         worldgenRandom.nextInt();
-         return worldgenRandom.nextInt((int)(1.0F / frequency)) == 0;
-     }
 diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java b/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
-index 139c6d974e4d68c75406760f7d79034abefd7c28..0f2d5128d26c401adf0b8392b686e46ea22e7316 100644
+index 139c6d974e4d68c75406760f7d79034abefd7c28..25705b8c01c5c79f5cb77b399693840a68c72e93 100644
 --- a/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
 +++ b/src/main/java/net/minecraft/world/level/levelgen/structure/pools/JigsawPlacement.java
-@@ -44,6 +44,8 @@ import net.minecraft.world.phys.shapes.Shapes;
- import net.minecraft.world.phys.shapes.VoxelShape;
- import org.apache.commons.lang3.mutable.MutableObject;
- import org.slf4j.Logger;
-+import su.plo.matter.Globals;
-+import su.plo.matter.WorldgenCryptoRandom;
- 
- public class JigsawPlacement {
-     static final Logger LOGGER = LogUtils.getLogger();
+@@ -5,6 +5,8 @@ import com.mojang.logging.LogUtils;
+ import java.util.List;
+ import java.util.Objects;
+ import java.util.Optional;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.core.Holder;
 @@ -65,7 +67,11 @@ public class JigsawPlacement {
          ChunkGenerator chunkGenerator = context.chunkGenerator();
          StructureTemplateManager structureTemplateManager = context.structureTemplateManager();
          LevelHeightAccessor levelHeightAccessor = context.heightAccessor();
 -        WorldgenRandom worldgenRandom = context.random();
-+        // Matter start
-+        WorldgenRandom worldgenRandom = new WorldgenCryptoRandom(
-+                context.chunkPos().x, context.chunkPos().z, Globals.Salt.JIGSAW_PLACEMENT, 0
-+        );
-+        // Matter end
++        // Horizon start - Matter - Feature Secure Seed
++        WorldgenRandom worldgenRandom = HorizonConfig.secureSeed
++                ? new su.plo.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, su.plo.matter.Globals.Salt.JIGSAW_PLACEMENT, 0)
++                : context.random();
++        // Horizon end - Matter - Feature Secure Seed
          Registry<StructureTemplatePool> registry = registryAccess.registryOrThrow(Registries.TEMPLATE_POOL);
          Rotation rotation = Rotation.getRandom(worldgenRandom);
          StructureTemplatePool structureTemplatePool = structurePool.unwrapKey()
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
+index 712c6431d63e0b1a1edd9d7de9b13c46a1acb469..9fcb015e1801deac67c2775057db9d5d9ff4a086 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/EndCityStructure.java
+@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
+ import net.minecraft.world.level.levelgen.structure.StructurePiece;
+ import net.minecraft.world.level.levelgen.structure.StructureType;
+ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
++//import su.plo.matter.WorldgenCryptoRandom; // Horizon - Matter - Feature Secure Seed
+ 
+ public class EndCityStructure extends Structure {
+     public static final MapCodec<EndCityStructure> CODEC = simpleCodec(EndCityStructure::new);
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
+index 7f4c5e9355a6f562f668e9b8134bfe65dde35f90..adb3634cd360c813f9fe7dd96d32fd3820d5317f 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
+@@ -20,6 +20,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
+ import net.minecraft.world.level.levelgen.structure.Structure;
+ import net.minecraft.world.level.levelgen.structure.StructureType;
+ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder;
++//import su.plo.matter.WorldgenCryptoRandom; // Horizon - Matter - Feature Secure Seed
+ 
+ public class MineshaftStructure extends Structure {
+     public static final MapCodec<MineshaftStructure> CODEC = RecordCodecBuilder.mapCodec(
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 45e262308aebafa377a2353661acdd122933b99e..25e30ee71cc74042aeaac64392f91b4c283a0dcd 100644
+index 45e262308aebafa377a2353661acdd122933b99e..7eaa86a9cb056436cfb5b0f788761b9cc7e8eb3f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -205,7 +205,8 @@ public class CraftChunk implements Chunk {
+@@ -9,6 +9,8 @@ import java.util.Objects;
+ import java.util.concurrent.locks.LockSupport;
+ import java.util.function.BooleanSupplier;
+ import java.util.function.Predicate;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.Registry;
+@@ -205,7 +207,12 @@ public class CraftChunk implements Chunk {
      @Override
      public boolean isSlimeChunk() {
          // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
 -        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
-+        // Matter - Feature Secure Seed
-+        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk();
++        // Horizon start - Matter - Feature Secure Seed
++        boolean isSlimeChunk = HorizonConfig.secureSeed
++                ? worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk()
++                : WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || isSlimeChunk;
++        // Horizon end - Matter - Feature Secure Seed
      }
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 931d6b04aad977e6d7987c358520e599854a3c5f..5da6ffc7015df0d7aa512271e939bf3ccc4921d9 100644
+index c2f33af28a767578c157cba9fa5b33ed2050d25e..3a21b879435922efd4bdbb864b6991088addebb1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -261,6 +261,7 @@ import org.yaml.snakeyaml.constructor.SafeConstructor;
- import org.yaml.snakeyaml.error.MarkedYAMLException;
- 
- import net.md_5.bungee.api.chat.BaseComponent; // Spigot
-+import su.plo.matter.Globals;
- 
- import javax.annotation.Nullable; // Paper
- import javax.annotation.Nonnull; // Paper
-@@ -1394,7 +1395,8 @@ public final class CraftServer implements Server {
+@@ -13,6 +13,7 @@ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.Lifecycle;
++import dev.horizonmc.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+ import java.awt.image.BufferedImage;
+ import java.io.ByteArrayOutputStream;
+@@ -1394,7 +1395,11 @@ public final class CraftServer implements Server {
              iregistrycustom_dimension = leveldataanddimensions.dimensions().dimensionsRegistryAccess();
          } else {
              LevelSettings worldsettings;
 -            WorldOptions worldoptions = new WorldOptions(creator.seed(), creator.generateStructures(), false);
-+            // Matter - Feature Secure Seed
-+            WorldOptions worldoptions = new WorldOptions(creator.seed(), Globals.createRandomWorldSeed(), creator.generateStructures(), false);
++            // Horizon start - Matter - Feature Secure Seed
++            WorldOptions worldoptions = HorizonConfig.secureSeed
++                    ? new WorldOptions(creator.seed(), su.plo.matter.Globals.createRandomWorldSeed(), creator.generateStructures(), false)
++                    : new WorldOptions(creator.seed(), creator.generateStructures(), false);
++            // Horizon end - Matter - Feature Secure Seed
              WorldDimensions worlddimensions;
  
              DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(GsonHelper.parse((creator.generatorSettings().isEmpty()) ? "{}" : creator.generatorSettings()), creator.type().name().toLowerCase(Locale.ROOT));
 diff --git a/src/main/java/su/plo/matter/Globals.java b/src/main/java/su/plo/matter/Globals.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..a9a4049a69745ecf29af76b015fa227f53286de3
+index 0000000000000000000000000000000000000000..438d278d4e75323421eafe204f03980038763446
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/Globals.java
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,95 @@
 +package su.plo.matter;
 +
 +import com.google.common.collect.Iterables;
++import dev.horizonmc.horizon.HorizonConfig;
 +import net.minecraft.server.level.ServerLevel;
 +
 +import java.math.BigInteger;
@@ -568,6 +631,8 @@ index 0000000000000000000000000000000000000000..a9a4049a69745ecf29af76b015fa227f
 +    }
 +
 +    public static void setupGlobals(ServerLevel world) {
++        if (!HorizonConfig.secureSeed) return;
++
 +        long[] seed = world.getServer().getWorldData().worldGenOptions().featureSeed();
 +        System.arraycopy(seed, 0, worldSeed, 0, WORLD_SEED_LONGS);
 +        int worldIndex = Iterables.indexOf(world.getServer().levelKeys(), it -> it == world.dimension());
@@ -585,43 +650,46 @@ index 0000000000000000000000000000000000000000..a9a4049a69745ecf29af76b015fa227f
 +        return seed;
 +    }
 +
++    // 1024-bit string -> 16 * 64 long[]
 +    public static Optional<long[]> parseSeed(String seedStr) {
 +        if (seedStr.isEmpty()) return Optional.empty();
 +
-+        try {
-+            long[] seed = new long[WORLD_SEED_LONGS];
-+            BigInteger seedBigInt = new BigInteger(seedStr);
-+            if (seedBigInt.signum() < 0) {
-+                seedBigInt = seedBigInt.and(BigInteger.ONE.shiftLeft(WORLD_SEED_BITS).subtract(BigInteger.ONE));
-+            }
-+            for (int i = 0; i < WORLD_SEED_LONGS; i++) {
-+                BigInteger[] divRem = seedBigInt.divideAndRemainder(BigInteger.ONE.shiftLeft(64));
-+                seed[i] = divRem[1].longValue();
-+                seedBigInt = divRem[0];
-+            }
-+            return Optional.of(seed);
-+        } catch (NumberFormatException ignored) {
-+            return Optional.empty();
++        if (seedStr.length() != WORLD_SEED_BITS) {
++            throw new IllegalArgumentException("Secure seed length must be " + WORLD_SEED_BITS + "-bit but found " + seedStr.length() + "-bit.");
 +        }
++
++        long[] seed = new long[WORLD_SEED_LONGS];
++
++        for (int i = 0; i < WORLD_SEED_LONGS; i++) {
++            int start = i * 64;
++            int end = start + 64;
++            String seedSection = seedStr.substring(start, end);
++
++            BigInteger seedInDecimal = new BigInteger(seedSection, 2);
++            seed[i] = seedInDecimal.longValue();
++        }
++
++        return Optional.of(seed);
 +    }
 +
++    // 16 * 64 long[] -> 1024-bit string
 +    public static String seedToString(long[] seed) {
-+        BigInteger seedBigInt = BigInteger.ZERO;
-+        for (int i = WORLD_SEED_LONGS - 1; i >= 0; i--) {
-+            BigInteger val = BigInteger.valueOf(seed[i]);
-+            if (val.signum() < 0) {
-+                val = val.add(BigInteger.ONE.shiftLeft(64));
-+            }
-+            seedBigInt = seedBigInt.shiftLeft(64).add(val);
++        StringBuilder sb = new StringBuilder();
++
++        for (long longV : seed) {
++            // Convert to 64-bit binary string per long
++            // Use format to keep 64-bit length, and use 0 to complete space
++            String binaryStr = String.format("%64s", Long.toBinaryString(longV)).replace(' ', '0');
++
++            sb.append(binaryStr);
 +        }
 +
-+        return seedBigInt.toString();
++        return sb.toString();
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/su/plo/matter/Hashing.java b/src/main/java/su/plo/matter/Hashing.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..6f0fca108ac61566bda3c1ac16911ced86af47a1
+index 0000000000000000000000000000000000000000..ec7a57c6af5d5f4fd27a643d253c2ecce90c01ac
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/Hashing.java
 @@ -0,0 +1,73 @@
@@ -698,19 +766,19 @@ index 0000000000000000000000000000000000000000..6f0fca108ac61566bda3c1ac16911ced
 +        internalState[posB] = Long.rotateRight(internalState[posB] ^ internalState[posC], 63); // replaces 11 of BLAKE
 +    }
 +}
-\ No newline at end of file
 diff --git a/src/main/java/su/plo/matter/WorldgenCryptoRandom.java b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..56bae580b663d2e0843f1d86ab7173d34a2d0f6a
+index 0000000000000000000000000000000000000000..fab359afe44c573b8b315115810ddefd85b4d22b
 --- /dev/null
 +++ b/src/main/java/su/plo/matter/WorldgenCryptoRandom.java
-@@ -0,0 +1,158 @@
+@@ -0,0 +1,159 @@
 +package su.plo.matter;
 +
 +import net.minecraft.util.Mth;
 +import net.minecraft.util.RandomSource;
 +import net.minecraft.world.level.levelgen.LegacyRandomSource;
 +import net.minecraft.world.level.levelgen.WorldgenRandom;
++import org.jetbrains.annotations.NotNull;
 +
 +import java.util.Arrays;
 +
@@ -786,7 +854,7 @@ index 0000000000000000000000000000000000000000..56bae580b663d2e0843f1d86ab7173d3
 +    }
 +
 +    @Override
-+    public RandomSource fork() {
++    public @NotNull RandomSource fork() {
 +        WorldgenCryptoRandom fork = new WorldgenCryptoRandom(0, 0, null, 0);
 +
 +        System.arraycopy(Globals.worldSeed, 0, fork.worldSeed, 0, Globals.WORLD_SEED_LONGS);

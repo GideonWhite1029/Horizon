@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 9 Sep 2024 22:17:46 +0300
+Subject: [PATCH] Matter Seed Command
+
+
+diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
+index 0b500b19a99fa6c2740c0db350a166462668df9c..b7d2f8f7828f3452527e428760c7c53a2dcf8d8a 100644
+--- a/src/main/java/net/minecraft/server/commands/SeedCommand.java
++++ b/src/main/java/net/minecraft/server/commands/SeedCommand.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.server.commands;
+ 
+ import com.mojang.brigadier.CommandDispatcher;
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.commands.CommandSourceStack;
+ import net.minecraft.commands.Commands;
+ import net.minecraft.network.chat.Component;
+@@ -12,6 +13,15 @@ public class SeedCommand {
+             long l = context.getSource().getLevel().getSeed();
+             Component component = ComponentUtils.copyOnClickText(String.valueOf(l));
+             context.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
++            // Horizon start - Matter - SecureSeed Command
++            if (HorizonConfig.secureSeed) {
++                su.plo.matter.Globals.setupGlobals(context.getSource().getLevel());
++                String seedStr = su.plo.matter.Globals.seedToString(su.plo.matter.Globals.worldSeed);
++                Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
++
++                context.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
++            }
++            // Horizon end - Matter - SecureSeed Command
+             return (int)l;
+         }));
+     }

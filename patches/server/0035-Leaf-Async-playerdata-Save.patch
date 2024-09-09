@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sat, 7 Sep 2024 11:02:02 +0300
+Subject: [PATCH] Leaf: Async playerdata Save
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index f92a4da0225c076b87adff62c24d4c8143af17ee..b9af2aef11be191611eacc74fc15c07bc1e6b743 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -237,4 +237,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "disableMovedWronglyThreshold", category = {"features"})
+     public static boolean disableMovedWronglyThreshold = false;
+ 
++    @GlobalConfig(name = "async-player-data-saving", category = {"optimization"})
++    public static boolean asyncPlayerDataSaving = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/util/async/AsyncPlayerDataSaving.java b/src/main/java/dev/horizonmc/horizon/util/async/AsyncPlayerDataSaving.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..878fb73f85a72c4f3b760824895417c9dfe43f34
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/async/AsyncPlayerDataSaving.java
+@@ -0,0 +1,23 @@
++package dev.horizonmc.horizon.util.async;
++
++import dev.horizonmc.horizon.HorizonConfig;
++import net.minecraft.Util;
++
++import java.util.concurrent.CompletableFuture;
++import java.util.concurrent.ExecutorService;
++
++public class AsyncPlayerDataSaving {
++
++    private AsyncPlayerDataSaving() {
++    }
++
++    public static void saveAsync(Runnable runnable) {
++        if (!HorizonConfig.asyncPlayerDataSaving) {
++            runnable.run();
++            return;
++        }
++
++        ExecutorService ioExecutor = Util.backgroundExecutor();
++        CompletableFuture.runAsync(runnable, ioExecutor);
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/level/storage/LevelStorageSource.java b/src/main/java/net/minecraft/world/level/storage/LevelStorageSource.java
+index 85ba843ce7e1f62971e736fa2cc028c47b274ce4..e646c1fb2cfc3f3f0863f262db272cab99387ec9 100644
+--- a/src/main/java/net/minecraft/world/level/storage/LevelStorageSource.java
++++ b/src/main/java/net/minecraft/world/level/storage/LevelStorageSource.java
+@@ -605,7 +605,10 @@ public class LevelStorageSource {
+             CompoundTag nbttagcompound2 = new CompoundTag();
+ 
+             nbttagcompound2.put("Data", nbttagcompound1);
+-            this.saveLevelData(nbttagcompound2);
++            // Horizon start - Async playerdata save
++            Runnable runnable = () -> this.saveLevelData(nbttagcompound2);
++            dev.horizonmc.horizon.util.async.AsyncPlayerDataSaving.saveAsync(runnable);
++            // Horizon end - Async playerdata save
+         }
+ 
+         private void saveLevelData(CompoundTag nbt) {
+@@ -702,7 +705,10 @@ public class LevelStorageSource {
+             CompoundTag nbttagcompound = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
+ 
+             nbtProcessor.accept(nbttagcompound.getCompound("Data"));
+-            this.saveLevelData(nbttagcompound);
++            // Horizon start - Async playerdata save
++            Runnable runnable = () -> this.saveLevelData(nbttagcompound);
++            dev.horizonmc.horizon.util.async.AsyncPlayerDataSaving.saveAsync(runnable);
++            // Horizon end - Async playerdata save
+         }
+ 
+         public long makeWorldBackup() throws IOException {
+diff --git a/src/main/java/net/minecraft/world/level/storage/PlayerDataStorage.java b/src/main/java/net/minecraft/world/level/storage/PlayerDataStorage.java
+index b148cf247acdd36f856d0495cde4cc5ad32b5a2f..9686bd937705617df96479777edda7894bf37c00 100644
+--- a/src/main/java/net/minecraft/world/level/storage/PlayerDataStorage.java
++++ b/src/main/java/net/minecraft/world/level/storage/PlayerDataStorage.java
+@@ -36,6 +36,13 @@ public class PlayerDataStorage {
+ 
+     public void save(Player player) {
+         if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot
++        // Horizon start - Async playerdata save
++        Runnable runnable = () -> save0(player);
++        dev.horizonmc.horizon.util.async.AsyncPlayerDataSaving.saveAsync(runnable);
++    }
++
++    private void save0(Player player) {
++        // Horizon end - Async playerdata save
+         try {
+             CompoundTag nbttagcompound = player.saveWithoutId(new CompoundTag());
+             Path path = this.playerDir.toPath();
