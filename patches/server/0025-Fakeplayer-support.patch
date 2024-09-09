@@ -277,7 +277,7 @@ index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a53
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 5268c0f2a0376045a9f74343ee7d905bb103e4de..922e24763611fc50ac2e9c070553e092ff9ea3d7 100644
+index 580aa9930f01e5ec63bc6ec993cf4c941d0b80e7..58028082ab80bafc014444fe44b4820d9cc63ea8 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -1232,6 +1232,13 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
@@ -295,7 +295,7 @@ index 5268c0f2a0376045a9f74343ee7d905bb103e4de..922e24763611fc50ac2e9c070553e092
  
          }
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index ceb9c794345922772a69a867a96531167e881d24..a808884f6f390de1f7422c7897bd1d2a6f1ffadf 100644
+index 4f72ce384f4c0dbae98effa89aed5c3bb802e635..9060f92f2e3cf309c681eed0959f307cc1465541 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
 @@ -161,6 +161,7 @@ import net.minecraft.world.phys.Vec3;
@@ -378,7 +378,7 @@ index ceb9c794345922772a69a867a96531167e881d24..a808884f6f390de1f7422c7897bd1d2a
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 5c1830e5649326cea6f3adb3a5fa0d450305c810..06fe70d46092ba5b655fae9c6ebdb5e6753604ca 100644
+index 60289d4b4bb50f17e936fba63a79266f323f43c2..acc42e074708923d26305ffb012f4a40c6ba7afb 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -103,6 +103,7 @@ import net.minecraft.world.phys.Vec3;
@@ -425,7 +425,7 @@ index 5c1830e5649326cea6f3adb3a5fa0d450305c810..06fe70d46092ba5b655fae9c6ebdb5e6
          // CraftBukkit start - fire PlayerRespawnEvent
          DimensionTransition dimensiontransition;
          if (location == null) {
-@@ -1090,11 +1113,16 @@ public abstract class PlayerList {
+@@ -1091,11 +1114,16 @@ public abstract class PlayerList {
      }
  
      public String[] getPlayerNamesArray() {
@@ -443,7 +443,7 @@ index 5c1830e5649326cea6f3adb3a5fa0d450305c810..06fe70d46092ba5b655fae9c6ebdb5e6
  
          return astring;
      }
-@@ -1598,4 +1626,16 @@ public abstract class PlayerList {
+@@ -1599,4 +1627,16 @@ public abstract class PlayerList {
      public boolean isAllowCommandsForAllPlayers() {
          return this.allowCommandsForAllPlayers;
      }
@@ -461,7 +461,7 @@ index 5c1830e5649326cea6f3adb3a5fa0d450305c810..06fe70d46092ba5b655fae9c6ebdb5e6
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 0361e7f019146c24a5d1d3bbf3c2be9ffd0d2239..f627bba7079c819b33f78922216b8df123e80566 100644
+index 8811d27121efb0bcfb8b8ad0e711dd824e11fdbf..6854bc6548e16401b33fe537002858512335c8ee 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -1489,7 +1489,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -539,7 +539,7 @@ index 04f67f7b43d2f461c776c76614dc3e5f060aea63..7f95dac24f73c702a87c0ecd27c9116b
                                      if (randomsource.nextInt(j) >= world.paperConfig().entities.behavior.playerInsomniaStartTicks) { // Paper - Ability to control player's insomnia and phantoms
                                          BlockPos blockposition1 = blockposition.above(20 + randomsource.nextInt(15)).east(-10 + randomsource.nextInt(21)).south(-10 + randomsource.nextInt(21));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 5720249fa58d007c78fec37c3a02d2465a00b486..064f0ae05f0ee5c65b9cbc1023ed9b405f445e16 100644
+index 6900471efd5b3ed9f2fe1422bdb61b12fa993209..938cd9366e61eb45da35124aae1686622eb4ef2d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -310,6 +310,7 @@ public final class CraftServer implements Server {
