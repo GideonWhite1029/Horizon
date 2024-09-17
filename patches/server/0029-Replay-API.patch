@@ -173,7 +173,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 06fe70d46092ba5b655fae9c6ebdb5e6753604ca..134841b21e795a2d70c70419cfd94127d3057186 100644
+index 568fae1cfbeef315fd153ea3878fa6926855ba9b..3122001ac667583af0aaa0516169417100d4c7f8 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -396,7 +396,7 @@ index 06fe70d46092ba5b655fae9c6ebdb5e6753604ca..134841b21e795a2d70c70419cfd94127
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 064f0ae05f0ee5c65b9cbc1023ed9b405f445e16..0576896db04efcb34993379d260718ce4e0df4f6 100644
+index 2a4ff298e600cf7c76a395434ed0eedaf5e37cb9..7040eb8a56e43ccaa85463bfe49f07051a5a99d2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -311,6 +311,7 @@ public final class CraftServer implements Server {
@@ -416,7 +416,7 @@ index 064f0ae05f0ee5c65b9cbc1023ed9b405f445e16..0576896db04efcb34993379d260718ce
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3327,4 +3328,11 @@ public final class CraftServer implements Server {
+@@ -3324,4 +3325,11 @@ public final class CraftServer implements Server {
          return botManager;
      }
      // Leaves end - Bot API
@@ -450,10 +450,10 @@ index 52b0234ad6ce97405ee18280a8ef1dc07e184f95..4c286c6fa5a7a85ba5a4d090757dd41a
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 37fc08d04ff3514d27ad25c8d774a6e96b30c3b1..43cf7764b192006c47e5aa882d0a066d20d21d2d 100644
+index ceca8c1bb41a9c258f004863ea8ff76961e6b4f0..38bfaab8f38af020aa5a649e26b398d728ccda8d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2250,7 +2250,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

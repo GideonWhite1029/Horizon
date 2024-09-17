@@ -944,7 +944,7 @@ index 70bccefb015da24d582641a87154bcf0a37915e8..0f15ab476f9fa07924178989d48825dc
          this.setFlightAllowed(dedicatedserverproperties.allowFlight);
          this.setMotd(dedicatedserverproperties.motd);
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 5f1bf8d8a857365247322af2562459116a5e4e30..108825a77d6311df6eb8897ccf2a3348a8efd1a0 100644
+index 7d2bde8b166e794aa4eae5a711d91c4d4ff3a191..3a73c57001c03683ac0f2a0d70861492f5aac049 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1114,6 +1114,7 @@ public final class CraftServer implements Server {
@@ -955,7 +955,7 @@ index 5f1bf8d8a857365247322af2562459116a5e4e30..108825a77d6311df6eb8897ccf2a3348
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3057,6 +3058,13 @@ public final class CraftServer implements Server {
+@@ -3054,6 +3055,13 @@ public final class CraftServer implements Server {
              return CraftServer.this.console.paperConfigurations.createLegacyObject(CraftServer.this.console);
          }
  
