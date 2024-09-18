@@ -1,0 +1,129 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 17 Sep 2024 23:39:00 +0300
+Subject: [PATCH] Change max stack count
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index b45101b4f78db52425e169b9bf1bf7798568a108..93915b4844425b11c309d92065e69ab623acb840 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -281,4 +281,25 @@ public final class HorizonConfig {
+     }
+     // Horizon end - region
+ 
++    // Horizon start - max stack
++    @GlobalConfig(name = "max-item-stack-count", category = {"features", "stack"}, verify = StackVerify.class)
++    public static int maxItemStackCount = 0;
++
++    @GlobalConfig(name = "max-container-destroy-count", category = {"features", "stack"}, verify = StackVerify.class)
++    public static int maxContainerDestroyCount = 0;
++
++    private static class StackVerify extends ConfigVerify.IntConfigVerify {
++        @Override
++        public String check(Integer old, Integer value) throws IllegalArgumentException {
++            if (maxItemStackCount < 0) {
++                maxItemStackCount = 0;
++            }
++            if (maxContainerDestroyCount < 0) {
++                maxContainerDestroyCount = 0;
++            }
++            return null;
++        }
++    }
++    // Horizon end - max stack
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+index 89f80492e0b2251630aad3f39345228a6256fb45..d90ff99a9724135ecc7c869201329282690ae372 100644
+--- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
++++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
+@@ -329,7 +329,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+     private boolean isMergable() {
+         ItemStack itemstack = this.getItem();
+ 
+-        return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && itemstack.getCount() < itemstack.getMaxStackSize(); // Paper - Alternative item-despawn-rate
++        // Horizon start - Change max stack count
++        if (HorizonConfig.maxItemStackCount < 1) {
++            return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && itemstack.getCount() < itemstack.getMaxStackSize(); // Paper - Alternative item-despawn-rate
++        } else {
++            return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && itemstack.getCount() < HorizonConfig.maxItemStackCount; // Paper - Alternative item-despawn-rate
++        }
++        // Horizon end - Change max stack count
+     }
+ 
+     private void tryToMerge(ItemEntity other) {
+@@ -347,11 +353,24 @@ public class ItemEntity extends Entity implements TraceableEntity {
+     }
+ 
+     public static boolean areMergable(ItemStack stack1, ItemStack stack2) {
+-        return stack2.getCount() + stack1.getCount() > stack2.getMaxStackSize() ? false : ItemStack.isSameItemSameComponents(stack1, stack2);
++        // Horizon start - Change max stack count
++        if (HorizonConfig.maxItemStackCount == 0) {
++            return stack2.getCount() + stack1.getCount() > stack2.getMaxStackSize() ? false : ItemStack.isSameItemSameComponents(stack1, stack2);
++        } else {
++            return stack2.getCount() + stack1.getCount() > HorizonConfig.maxItemStackCount ? false : ItemStack.isSameItemSameComponents(stack1, stack2);
++        }
++        // Horizon end - Change max stack count
+     }
+ 
+     public static ItemStack merge(ItemStack stack1, ItemStack stack2, int maxCount) {
+-        int j = Math.min(Math.min(stack1.getMaxStackSize(), maxCount) - stack1.getCount(), stack2.getCount());
++        // Horizon start - Change max stack count
++        int j;
++        if (HorizonConfig.maxItemStackCount == 0) {
++            j = Math.min(Math.min(stack1.getMaxStackSize(), maxCount) - stack1.getCount(), stack2.getCount());
++        } else {
++            j = Math.min(Math.min(HorizonConfig.maxItemStackCount, maxCount) - stack1.getCount(), stack2.getCount());
++        }
++        // Horizon end - Change max stack count
+         ItemStack itemstack2 = stack1.copyWithCount(stack1.getCount() + j);
+ 
+         stack2.shrink(j);
+@@ -359,7 +378,14 @@ public class ItemEntity extends Entity implements TraceableEntity {
+     }
+ 
+     private static void merge(ItemEntity targetEntity, ItemStack stack1, ItemStack stack2) {
+-        ItemStack itemstack2 = ItemEntity.merge(stack1, stack2, 64);
++        // Horizon start - Change max stack count
++        ItemStack itemstack2;
++        if (HorizonConfig.maxItemStackCount < 1) {
++            itemstack2 = ItemEntity.merge(stack1, stack2, 64);
++        } else {
++            itemstack2 = ItemEntity.merge(stack1, stack2, HorizonConfig.maxItemStackCount);
++        }
++        // Horizon end - Change max stack count
+ 
+         targetEntity.setItem(itemstack2);
+     }
+diff --git a/src/main/java/net/minecraft/world/item/ItemUtils.java b/src/main/java/net/minecraft/world/item/ItemUtils.java
+index 66f88f44eb74dfbdafe0d6257dc1ef46238aaa92..6f7e7531b3cfe547d89b06217a84a492bdfc0545 100644
+--- a/src/main/java/net/minecraft/world/item/ItemUtils.java
++++ b/src/main/java/net/minecraft/world/item/ItemUtils.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.world.item;
+ 
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.world.InteractionHand;
+ import net.minecraft.world.InteractionResultHolder;
+ import net.minecraft.world.entity.item.ItemEntity;
+@@ -41,7 +42,17 @@ public class ItemUtils {
+     public static void onContainerDestroyed(ItemEntity itemEntity, Iterable<ItemStack> contents) {
+         Level level = itemEntity.level();
+         if (!level.isClientSide) {
+-            contents.forEach(stack -> level.addFreshEntity(new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), stack)));
++            // Horizon start - Change max stack count
++            if (HorizonConfig.maxContainerDestroyCount == 0)
++                contents.forEach(stack -> level.addFreshEntity(new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), stack)));
++            else
++                for (int count = Math.min(itemEntity.getItem().getCount(), HorizonConfig.maxContainerDestroyCount); count > 0; count--) {
++                    if (!contents.iterator().hasNext()) break;
++
++                    ItemStack stack = contents.iterator().next();
++                    level.addFreshEntity(new ItemEntity(level, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), stack));
++                }
++            // Horizon end - Change max stack count
+         }
+     }
+ }

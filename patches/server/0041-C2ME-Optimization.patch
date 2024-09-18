@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 18 Sep 2024 22:58:47 +0300
+Subject: [PATCH] C2ME Optimization
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/util/ObjectCachingUtils.java b/src/main/java/dev/horizonmc/horizon/util/ObjectCachingUtils.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..d3940d82bcf99c2595b093904e65b1762c7f4465
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/ObjectCachingUtils.java
+@@ -0,0 +1,20 @@
++package dev.horizonmc.horizon.util;
++
++import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
++
++import java.util.BitSet;
++import java.util.function.IntFunction;
++
++public class ObjectCachingUtils {
++    private static final IntFunction<BitSet> bitSetConstructor = BitSet::new;
++
++    public static ThreadLocal<Int2ObjectOpenHashMap<BitSet>> BITSETS = ThreadLocal.withInitial(Int2ObjectOpenHashMap::new);
++
++    private ObjectCachingUtils() {}
++
++    public static BitSet getCachedOrNewBitSet(int bits) {
++        final BitSet bitSet = BITSETS.get().computeIfAbsent(bits, bitSetConstructor);
++        bitSet.clear();
++        return bitSet;
++    }
++}
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/feature/OreFeature.java b/src/main/java/net/minecraft/world/level/levelgen/feature/OreFeature.java
+index 506b2afd099c9b7e9ac3f6f2fcea8e523fae396b..c8e677bb36fc3ffe89fb06267d7487019413f078 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/feature/OreFeature.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/feature/OreFeature.java
+@@ -3,6 +3,8 @@ package net.minecraft.world.level.levelgen.feature;
+ import com.mojang.serialization.Codec;
+ import java.util.BitSet;
+ import java.util.function.Function;
++
++import dev.horizonmc.horizon.util.ObjectCachingUtils;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.util.Mth;
+@@ -69,7 +71,7 @@ public class OreFeature extends Feature<OreConfiguration> {
+         int verticalSize
+     ) {
+         int i = 0;
+-        BitSet bitSet = new BitSet(horizontalSize * verticalSize * horizontalSize);
++        BitSet bitSet = ObjectCachingUtils.getCachedOrNewBitSet(horizontalSize * verticalSize * horizontalSize); // Horizon - C2ME
+         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+         int j = config.size;
+         double[] ds = new double[j * 4];

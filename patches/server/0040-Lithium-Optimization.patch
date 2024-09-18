@@ -1,0 +1,273 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 18 Sep 2024 22:37:06 +0300
+Subject: [PATCH] Lithium Optimization
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/util/CompactSineLUT.java b/src/main/java/dev/horizonmc/horizon/util/CompactSineLUT.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..ad9fd5c79e22453c231b456fdca2976a987a8b76
+--- /dev/null
++++ b/src/main/java/dev/horizonmc/horizon/util/CompactSineLUT.java
+@@ -0,0 +1,88 @@
++package dev.horizonmc.horizon.util;
++
++import net.minecraft.util.Mth;
++
++/**
++ * A replacement for the sine angle lookup table used in {@link Mth}, both reducing the size of LUT and improving
++ * the access patterns for common paired sin/cos operations.
++ * <p>
++ *  sin(-x) = -sin(x)
++ *    ... to eliminate negative angles from the LUT.
++ * <p>
++ *  sin(x) = sin(pi/2 - x)
++ *    ... to eliminate supplementary angles from the LUT.
++ * <p>
++ * Using these identities allows us to reduce the LUT from 64K entries (256 KB) to just 16K entries (64 KB), enabling
++ * it to better fit into the CPU's caches at the expense of some cycles on the fast path. The implementation has been
++ * tightly optimized to avoid branching where possible and to use very quick integer operations.
++ * <p>
++ * Generally speaking, reducing the size of a lookup table is always a good optimization, but since we need to spend
++ * extra CPU cycles trying to maintain parity with vanilla, there is the potential risk that this implementation ends
++ * up being slower than vanilla when the lookup table is able to be kept in cache memory.
++ * <p>
++ * Unlike other "fast math" implementations, the values returned by this class are *bit-for-bit identical* with those
++ * from {@link Mth}. Validation is performed during runtime to ensure that the table is correct.
++ *
++ * @author coderbot16   Author of the original (and very clever) <a href="https://gitlab.com/coderbot16/i73/-/tree/master/i73-trig/src">implementation</a> in Rust
++ * @author jellysquid3  Additional optimizations, port to Java
++ */
++public class CompactSineLUT {
++    private static final int[] SIN_INT = new int[16384 + 1];
++    private static final float SIN_MIDPOINT;
++
++    static {
++        // Copy the sine table, covering to raw int bits
++        for (int i = 0; i < SIN_INT.length; i++) {
++            SIN_INT[i] = Float.floatToRawIntBits(Mth.SIN[i]);
++        }
++
++        SIN_MIDPOINT = Mth.SIN[Mth.SIN.length / 2];
++
++        // Test that the lookup table is correct during runtime
++        for (int i = 0; i < Mth.SIN.length; i++) {
++            float expected = Mth.SIN[i];
++            float value = lookup(i);
++
++            if (expected != value) {
++                throw new IllegalArgumentException(String.format("LUT error at index %d (expected: %s, found: %s)", i, expected, value));
++            }
++        }
++    }
++
++    // [VanillaCopy] Mth#sin(float)
++    public static float sin(float f) {
++        return lookup((int) (f * 10430.378f) & 0xFFFF);
++    }
++
++    // [VanillaCopy] Mth#cos(float)
++    public static float cos(float f) {
++        return lookup((int) (f * 10430.378f + 16384.0f) & 0xFFFF);
++    }
++
++    private static float lookup(int index) {
++        // A special case... Is there some way to eliminate this?
++        if (index == 32768) {
++            return SIN_MIDPOINT;
++        }
++
++        // Trigonometric identity: sin(-x) = -sin(x)
++        // Given a domain of 0 <= x <= 2*pi, just negate the value if x > pi.
++        // This allows the sin table size to be halved.
++        int neg = (index & 0x8000) << 16;
++
++        // All bits set if (pi/2 <= x), none set otherwise
++        // Extracts the 15th bit from 'half'
++        int mask = (index << 17) >> 31;
++
++        // Trigonometric identity: sin(x) = sin(pi/2 - x)
++        int pos = (0x8001 & mask) + (index ^ mask);
++
++        // Wrap the position in the table. Moving this down to immediately before the array access
++        // seems to help the Hotspot compiler optimize the bit math better.
++        pos &= 0x7fff;
++
++        // Fetch the corresponding value from the LUT and invert the sign bit as needed
++        // This directly manipulate the sign bit on the float bits to simplify logic
++        return Float.intBitsToFloat(SIN_INT[pos] ^ neg);
++    }
++}
+diff --git a/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java b/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
+index 038710ba934a9a57815dfe9f414b98223b848385..f837e143789733efc25a12cd5e45779556a1e06e 100644
+--- a/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
++++ b/src/main/java/net/minecraft/util/ClassInstanceMultiMap.java
+@@ -11,10 +11,11 @@ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Map.Entry;
++import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+ import net.minecraft.Util;
+ 
+ public class ClassInstanceMultiMap<T> extends AbstractCollection<T> {
+-    private final Map<Class<?>, List<T>> byClass = Maps.newHashMap();
++    private final Map<Class<?>, List<T>> byClass = new Reference2ReferenceOpenHashMap<>(); // Horizon - Lithium
+     private final Class<T> baseClass;
+     private final List<T> allInstances = Lists.newArrayList();
+ 
+diff --git a/src/main/java/net/minecraft/util/Mth.java b/src/main/java/net/minecraft/util/Mth.java
+index f298cdfcf1539e467f57f9f7789de3cf2ca54665..0b00bf8d15d2838c2b810d53589f612a43be802b 100644
+--- a/src/main/java/net/minecraft/util/Mth.java
++++ b/src/main/java/net/minecraft/util/Mth.java
+@@ -4,6 +4,8 @@ import java.util.Locale;
+ import java.util.UUID;
+ import java.util.function.IntPredicate;
+ import java.util.stream.IntStream;
++
++import dev.horizonmc.horizon.util.CompactSineLUT;
+ import net.minecraft.Util;
+ import net.minecraft.core.Vec3i;
+ import net.minecraft.world.phys.AABB;
+@@ -29,7 +31,7 @@ public class Mth {
+     public static final Vector3f Y_AXIS = new Vector3f(0.0F, 1.0F, 0.0F);
+     public static final Vector3f X_AXIS = new Vector3f(1.0F, 0.0F, 0.0F);
+     public static final Vector3f Z_AXIS = new Vector3f(0.0F, 0.0F, 1.0F);
+-    private static final float[] SIN = Util.make(new float[65536], sineTable -> {
++    public static final float[] SIN = Util.make(new float[65536], sineTable -> {
+         for (int ix = 0; ix < sineTable.length; ix++) {
+             sineTable[ix] = (float)Math.sin((double)ix * Math.PI * 2.0 / 65536.0);
+         }
+@@ -46,11 +48,11 @@ public class Mth {
+     private static final double[] COS_TAB = new double[257];
+ 
+     public static float sin(float value) {
+-        return SIN[(int)(value * 10430.378F) & 65535];
++        return CompactSineLUT.sin(value); // Horizon - Lithium
+     }
+ 
+     public static float cos(float value) {
+-        return SIN[(int)(value * 10430.378F + 16384.0F) & 65535];
++        return CompactSineLUT.cos(value); // Horizon - Lithium
+     }
+ 
+     public static float sqrt(float value) {
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 8bf6d52259302d36518d6ec0689a4f057020bf1a..2d6d8cf1c2fc4672022a7383fe645367a0685dd1 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -2721,6 +2721,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     }
+ 
+     protected void updateSwingTime() {
++        if (!this.swinging && this.swingTime == 0) return; // Horizon - Lithium
+         int i = this.getCurrentSwingDuration();
+ 
+         if (this.swinging) {
+@@ -3715,6 +3716,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     }
+ 
+     private void updateFallFlying() {
++        if (!this.isFallFlying()) return; // Horizon - Lithium
+         boolean flag = this.getSharedFlag(7);
+ 
+         if (flag && !this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
+diff --git a/src/main/java/net/minecraft/world/entity/raid/Raid.java b/src/main/java/net/minecraft/world/entity/raid/Raid.java
+index dcbef04bbaab988096bf416163264833e84d1967..73b6cb2817793a34f1e6dba7ba764cff9c429621 100644
+--- a/src/main/java/net/minecraft/world/entity/raid/Raid.java
++++ b/src/main/java/net/minecraft/world/entity/raid/Raid.java
+@@ -107,6 +107,7 @@ public class Raid {
+     private Raid.RaidStatus status;
+     private int celebrationTicks;
+     private Optional<BlockPos> waveSpawnPos;
++    private boolean isBarDirty; // Horizon - Lithium
+     // Paper start
+     private static final String PDC_NBT_KEY = "BukkitValues";
+     private static final org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry PDC_TYPE_REGISTRY = new org.bukkit.craftbukkit.persistence.CraftPersistentDataTypeRegistry();
+@@ -292,6 +293,12 @@ public class Raid {
+ 
+     public void tick() {
+         if (!this.isStopped()) {
++            // Horizon start - Lithium
++            if (this.isBarDirty) {
++                this.updateBossbarInternal();
++                this.isBarDirty = false;
++            }
++            // Horizon end
+             if (this.status == Raid.RaidStatus.ONGOING) {
+                 boolean flag = this.active;
+ 
+@@ -660,9 +667,15 @@ public class Raid {
+ 
+     }
+ 
++    // Horizon start - Lithium
+     public void updateBossbar() {
++        this.isBarDirty = true;
++    }
++
++    private void updateBossbarInternal() {
+         this.raidEvent.setProgress(Mth.clamp(this.getHealthOfLivingRaiders() / this.totalHealth, 0.0F, 1.0F));
+     }
++    // Horizon end
+ 
+     public float getHealthOfLivingRaiders() {
+         float f = 0.0F;
+diff --git a/src/main/java/net/minecraft/world/level/GameRules.java b/src/main/java/net/minecraft/world/level/GameRules.java
+index 89e327bc3a45879fe68887c7aadb077f31a770eb..b4d4a129082aa97b56dd90894491bf4ff8d9f8ff 100644
+--- a/src/main/java/net/minecraft/world/level/GameRules.java
++++ b/src/main/java/net/minecraft/world/level/GameRules.java
+@@ -21,6 +21,8 @@ import java.util.function.BiConsumer;
+ import java.util.function.Function;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
++
++import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+ import net.minecraft.commands.CommandSourceStack;
+ import net.minecraft.commands.Commands;
+ import net.minecraft.nbt.CompoundTag;
+@@ -149,7 +151,7 @@ public class GameRules {
+     }
+ 
+     private GameRules(Map<GameRules.Key<?>, GameRules.Value<?>> rules) {
+-        this.rules = rules;
++        this.rules = new Object2ObjectOpenHashMap<>(rules); // Horizon - Lithium
+ 
+         // Paper start - Perf: Use array for gamerule storage
+         int arraySize = rules.keySet().stream().mapToInt(key -> key.gameRuleIndex).max().orElse(-1) + 1;
+diff --git a/src/main/java/net/minecraft/world/level/block/Block.java b/src/main/java/net/minecraft/world/level/block/Block.java
+index 01fbdcd81aaad7ce5c0e7501099c8787f5022c49..0ef1909b7bb742a11a8114bb4291581d316e0a9b 100644
+--- a/src/main/java/net/minecraft/world/level/block/Block.java
++++ b/src/main/java/net/minecraft/world/level/block/Block.java
+@@ -626,11 +626,19 @@ public class Block extends BlockBehaviour implements ItemLike {
+         private final BlockState first;
+         private final BlockState second;
+         private final Direction direction;
++        private final int hash; // Horizon - Lithium
+ 
+         public BlockStatePairKey(BlockState self, BlockState other, Direction facing) {
+             this.first = self;
+             this.second = other;
+             this.direction = facing;
++
++            // Horizon start - Lithium
++            int i = this.first.hashCode();
++            i = 31 * i + this.second.hashCode();
++            i = 31 * i + this.direction.hashCode();
++            this.hash = i;
++            // Horizon end
+         }
+ 
+         public boolean equals(Object object) {
+@@ -646,11 +654,7 @@ public class Block extends BlockBehaviour implements ItemLike {
+         }
+ 
+         public int hashCode() {
+-            int i = this.first.hashCode();
+-
+-            i = 31 * i + this.second.hashCode();
+-            i = 31 * i + this.direction.hashCode();
+-            return i;
++            return this.hash; // Horizon - Lithium
+         }
+     }
+ }
