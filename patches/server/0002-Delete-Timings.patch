@@ -803,7 +803,7 @@ index 01efbc507b3d58f13f78ee286f93df40cdc3f0cb..548798d1e40f8a1e1f38ca84f6680201
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 49ca3f19730b9c194a450203f6c5a2af2172737e..6bae091f98b425a9047bd6b3a964025b2b8102df 100644
+index 8dab7ade8aa64abb99ee436e794f4084b1ce503c..c6433160e7b1bfcd874171984e196d42781f4e74 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -822,7 +822,7 @@ index 49ca3f19730b9c194a450203f6c5a2af2172737e..6bae091f98b425a9047bd6b3a964025b
  
  public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements ServerInfo, ChunkIOErrorReporter, CommandSource, AutoCloseable, ca.spottedleaf.moonrise.patches.chunk_system.server.ChunkSystemMinecraftServer { // Paper - rewrite chunk system
  
-@@ -1043,7 +1041,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1042,7 +1040,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
@@ -830,7 +830,7 @@ index 49ca3f19730b9c194a450203f6c5a2af2172737e..6bae091f98b425a9047bd6b3a964025b
          this.server.spark.disable(); // Paper - spark
          // Purpur start
          if (upnp) {
-@@ -1612,11 +1609,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1610,11 +1607,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick
@@ -882,7 +882,7 @@ index 2762f54515b352271feb4b26f506b06cd0fb1909..70bccefb015da24d582641a87154bcf0
          // Paper start
          if (waitableArray[0] != null) {
 diff --git a/src/main/java/net/minecraft/server/level/ChunkMap.java b/src/main/java/net/minecraft/server/level/ChunkMap.java
-index 66ee6ca56897c9646605f5907ce895e54bc30d96..5268c0f2a0376045a9f74343ee7d905bb103e4de 100644
+index 1883abec14e05f8eb2e865446b4d81091b1aa5e0..580aa9930f01e5ec63bc6ec993cf4c941d0b80e7 100644
 --- a/src/main/java/net/minecraft/server/level/ChunkMap.java
 +++ b/src/main/java/net/minecraft/server/level/ChunkMap.java
 @@ -1,6 +1,5 @@
@@ -893,7 +893,7 @@ index 66ee6ca56897c9646605f5907ce895e54bc30d96..5268c0f2a0376045a9f74343ee7d905b
  import com.google.common.collect.ImmutableList.Builder;
  import com.google.common.collect.Iterables;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 29e31ed2d09aee3b668816a683ab0f89026fdf4f..657801f794bdf25c2401a1b81a5243063e2b7852 100644
+index c601061d1abb8f4a66dd5e478cf69a872a4d0f6f..ab0f96229a79e3832b19e9becbfaaceeab34254b 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1,7 +1,6 @@
@@ -923,7 +923,7 @@ index 29e31ed2d09aee3b668816a683ab0f89026fdf4f..657801f794bdf25c2401a1b81a524306
          entity.postTick(); // CraftBukkit
          } else { entity.inactiveTick(); } // Paper - EAR 2
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 1babe6756b904fd2e5b2d62f6adfa153e3b772f1..c4698cadb76164131a612c0906704b847ca7a0e8 100644
+index 6f4e471c45195996a1cdd93c7dfb64e68156212f..26ea6c68ed79f07c1fc17a248663c111780417ec 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -1,6 +1,5 @@
@@ -963,7 +963,7 @@ index d3de0362dd1ef3954d05c4d8fa56a25edfe1bb2b..bdc3042cd75958145d7f556f77fd748b
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 380d70851d764a636c2cf3c617f609073f3eeca6..be176bb71b872420f3944d17c5d7b91abfc7157c 100644
+index ee616c31b06bebaf5a27d7efa60bdd97ff12c1cb..8bf6d52259302d36518d6ec0689a4f057020bf1a 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -157,7 +157,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
@@ -1145,7 +1145,7 @@ index 8f181e03eda734b18f8c9ee80ee6e45f8689d178..f43561f7c8c4e63b5037d70bd1cde6d8
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index d6aae48a5920ccad0ee6c7ff2bacaa1ac7d8353b..6584942ed298ae4f88f337aad4aa57fedbc57b9b 100644
+index af7e7ad028b169bfc80adf32b0194b3988551b52..e777aed1a3dadb8fd9da06d9d7aec9bb5343c873 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -200,7 +200,6 @@ public final class CraftMagicNumbers implements UnsafeValues {

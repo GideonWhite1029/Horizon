@@ -241,10 +241,10 @@ index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 4d6f08446d62a944be2c32e2c208d114054f5238..7e7ecdeeef9e1d89e8e2fa9dd7db9543b86b061b 100644
+index 832d9fc2c523ef985632c2b4393a2d116468ea0e..ca37373833d9be3ddd991201168abb954dfddfef 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -755,6 +755,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -754,6 +754,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - Configurable player collision
  
          dev.horizonmc.horizon.util.TicketHelper.tryToLoadTickets(); // Horizon
@@ -252,7 +252,7 @@ index 4d6f08446d62a944be2c32e2c208d114054f5238..7e7ecdeeef9e1d89e8e2fa9dd7db9543
  
          this.server.enablePlugins(org.bukkit.plugin.PluginLoadOrder.POSTWORLD);
          this.server.spark.registerCommandBeforePlugins(this.server); // Paper - spark
-@@ -1046,6 +1047,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1045,6 +1046,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          MinecraftServer.LOGGER.info("Stopping server");
          Commands.COMMAND_SENDING_POOL.shutdownNow(); // Paper - Perf: Async command map building; Shutdown and don't bother finishing
          this.server.spark.disable(); // Paper - spark

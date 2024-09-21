@@ -907,7 +907,7 @@ index 0000000000000000000000000000000000000000..982f1e4ebb36212ecab65dc27419d52c
 +    Class<? extends ConfigConvert<?>> convert() default ConfigVerify.BooleanConfigVerify.class;
 +}
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 6bae091f98b425a9047bd6b3a964025b2b8102df..086e819654b8a77887f759ce61f97bb08c4b7e5c 100644
+index c6433160e7b1bfcd874171984e196d42781f4e74..94dfb29f3fcc6b1353418d437fabff23516bbbee 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.authlib.GameProfileRepository;
@@ -918,7 +918,7 @@ index 6bae091f98b425a9047bd6b3a964025b2b8102df..086e819654b8a77887f759ce61f97bb0
  import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1234,7 +1235,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1233,7 +1234,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              this.status = this.buildServerStatus();
  
              // Spigot start

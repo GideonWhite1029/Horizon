@@ -36,10 +36,10 @@ index b45101b4f78db52425e169b9bf1bf7798568a108..93915b4844425b11c309d92065e69ab6
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
-index 89f80492e0b2251630aad3f39345228a6256fb45..d90ff99a9724135ecc7c869201329282690ae372 100644
+index 6bc03c642dae5c09f930532f2d38c9ce68fb2372..2ed103fa03aeef613b5722ec9fdec86f7f71030a 100644
 --- a/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/item/ItemEntity.java
-@@ -329,7 +329,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -328,7 +328,13 @@ public class ItemEntity extends Entity implements TraceableEntity {
      private boolean isMergable() {
          ItemStack itemstack = this.getItem();
  
@@ -54,7 +54,7 @@ index 89f80492e0b2251630aad3f39345228a6256fb45..d90ff99a9724135ecc7c869201329282
      }
  
      private void tryToMerge(ItemEntity other) {
-@@ -347,11 +353,24 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -346,11 +352,24 @@ public class ItemEntity extends Entity implements TraceableEntity {
      }
  
      public static boolean areMergable(ItemStack stack1, ItemStack stack2) {
@@ -81,7 +81,7 @@ index 89f80492e0b2251630aad3f39345228a6256fb45..d90ff99a9724135ecc7c869201329282
          ItemStack itemstack2 = stack1.copyWithCount(stack1.getCount() + j);
  
          stack2.shrink(j);
-@@ -359,7 +378,14 @@ public class ItemEntity extends Entity implements TraceableEntity {
+@@ -358,7 +377,14 @@ public class ItemEntity extends Entity implements TraceableEntity {
      }
  
      private static void merge(ItemEntity targetEntity, ItemStack stack1, ItemStack stack2) {

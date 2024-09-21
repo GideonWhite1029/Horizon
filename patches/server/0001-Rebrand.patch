@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 299881d2c9fb7321f4b29c019e9088e024b64689..661b3552d995cd452babd854f88f1d5b396cb002 100644
+index b053160ee0faa550569a8b2273e38f48567ddbc7..a96169cac5decf9e9ec8d232443a13e6defaeb06 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -183,10 +183,10 @@ index 3099c21ee589acf6edff5903a23673adf489024f..7f93b811d80af4a22c2cf27e8fee4476
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 6fb35c36d964c96a42911b8a9e11590aaa5cca59..49ca3f19730b9c194a450203f6c5a2af2172737e 100644
+index 4bcb20cd6cd971f25327ec1322bb172f036a54a4..8dab7ade8aa64abb99ee436e794f4084b1ce503c 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1255,15 +1255,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1254,15 +1254,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop
@@ -216,7 +216,7 @@ index 4c178b234bc1118a577d0e016f4b986e9197e99d..3ca0aa8f01ab5bc4524f2ee7b324c736
  
      private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 7443279fd48bd1b9dc0135e996dbc6fa2d584b54..58573de21de2b2d6af4438415dceefe4e4ab6ef9 100644
+index 479a8422a6786a8ada8536d528e7f57a06c8107a..7d2bde8b166e794aa4eae5a711d91c4d4ff3a191 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -266,7 +266,7 @@ import javax.annotation.Nullable; // Paper
