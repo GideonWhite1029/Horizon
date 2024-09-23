@@ -19,10 +19,10 @@ index dd051aca08ce2dc6a6b94ad5389e99c317b9eeeb..331d609f84bc2597e7eb328d8dc5b990
  }
 \ No newline at end of file
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 959160c5859733d4029278054d9c970130d93ab8..c589947eb5c1bc669167c0f529a83909c6862c1d 100644
+index 53913dfa4d9b73862179dcdef080c7e3adfe3b0f..3f1412ae6de18c814e37a8a3d05079f416ac1c79 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -276,7 +276,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -283,7 +283,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {

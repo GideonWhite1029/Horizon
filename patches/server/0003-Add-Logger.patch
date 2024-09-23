@@ -192,7 +192,7 @@ index 0000000000000000000000000000000000000000..460a3421dc7fa7ac786c43cf0edf1f85
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index e3e71558d9d99fa878511f051d1d8592f8684ac0..115ab6481046a78d5fd46dc40a12770e2caa38df 100644
+index af17220dab41c6621c7c187f4fa633e2f048482e..610e21ffeaf9b914a94168e9c86fb02b8b13b5ee 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -433,6 +433,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -223,7 +223,7 @@ index e3e71558d9d99fa878511f051d1d8592f8684ac0..115ab6481046a78d5fd46dc40a12770e
  
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
-@@ -5122,6 +5129,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5124,6 +5131,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end - Expose entity id counter
