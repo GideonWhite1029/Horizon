@@ -5,10 +5,10 @@ Subject: [PATCH] Information changed during startup
 
 
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
-index 8c2c5ea14a839c8767bbf120ae5512f65475cbb0..5dd2684d9176f80ed9ab389895b1d880ee203b7c 100644
+index 7196594e07af19a14c320d77df893978525fe386..b770c4dcbccba80e493207b01dec2eddcf0e4172 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
-@@ -32,6 +32,13 @@ public interface ServerBuildInfo {
+@@ -33,6 +33,13 @@ public interface ServerBuildInfo {
      Key BRAND_PURPUR_ID = Key.key("purpurmc", "purpur");
      // Purpur end
  
@@ -23,7 +23,7 @@ index 8c2c5ea14a839c8767bbf120ae5512f65475cbb0..5dd2684d9176f80ed9ab389895b1d880
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 4a870c63cf240c4fa89534bf3ec1b06393efb967..5e99b6cc15961b56d1e0aa6f60e36ba4ba7beafd 100644
+index 3a71f8fe73a2309f57cb06dedf204d3e37b46b03..2b2f4a389699bc22cadaef3d189a036a610aa8f8 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -120,8 +120,18 @@ public final class Bukkit {
@@ -47,3 +47,16 @@ index 4a870c63cf240c4fa89534bf3ec1b06393efb967..5e99b6cc15961b56d1e0aa6f60e36ba4
          // Paper end
      }
  
+diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+index c880d0010849ab733ad13bbd18fab3c864d0cf61..3d5faae011ebab29ca38175df2821e8e993cd10a 100644
+--- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java
++++ b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
+@@ -259,7 +259,7 @@ public class VersionCommand extends BukkitCommand {
+         // Purpur start
+         int distance = getVersionFetcher().distance();
+         final Component message = Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.newline()),
+-            ChatColor.parseMM("<grey>Current Purpur Version: %s%s*", distance == 0 ? "<green>" : distance > 0 ? "<yellow>" : "<red>", Bukkit.getVersion()),
++            ChatColor.parseMM("<grey>Current Horizon Version: %s%s*", distance == 0 ? "<green>" : distance > 0 ? "<yellow>" : "<red>", Bukkit.getVersion()), // Horizon
+             // Purpur end
+             msg
+         );

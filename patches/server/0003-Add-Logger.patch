@@ -192,7 +192,7 @@ index 0000000000000000000000000000000000000000..460a3421dc7fa7ac786c43cf0edf1f85
 +    }
 +}
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index af17220dab41c6621c7c187f4fa633e2f048482e..610e21ffeaf9b914a94168e9c86fb02b8b13b5ee 100644
+index 7aadcaa1785c6560eb1ce2f1179225facca47d84..f2830b4a2a2b73633177e983af4d26f278a805b8 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
 @@ -433,6 +433,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -203,7 +203,7 @@ index af17220dab41c6621c7c187f4fa633e2f048482e..610e21ffeaf9b914a94168e9c86fb02b
      public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
  
      public void setOrigin(@javax.annotation.Nonnull Location location) {
-@@ -2594,6 +2595,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2596,6 +2597,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  nbttagcompound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end
@@ -211,7 +211,7 @@ index af17220dab41c6621c7c187f4fa633e2f048482e..610e21ffeaf9b914a94168e9c86fb02b
              return nbttagcompound;
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Saving entity NBT");
-@@ -2746,6 +2748,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2748,6 +2750,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  immuneToFire = nbt.getBoolean("Purpur.FireImmune");
              }
              // Purpur end
@@ -223,7 +223,7 @@ index af17220dab41c6621c7c187f4fa633e2f048482e..610e21ffeaf9b914a94168e9c86fb02b
  
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Loading entity NBT");
-@@ -5124,6 +5131,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5126,6 +5133,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return ((net.minecraft.server.level.ServerChunkCache) level.getChunkSource()).isPositionTicking(this);
      }
      // Paper end - Expose entity id counter

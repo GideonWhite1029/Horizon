@@ -134,10 +134,10 @@ index b455c7e9d18bac3654daa8510f85cc21202e254b..ddb5952c49f841f3a17cf31ad33daead
                              if (((List) object).size() >= i) {
                                  return (List) object;
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index ca37373833d9be3ddd991201168abb954dfddfef..a254adfa84fd9b2b227076893de676d795549772 100644
+index 9d7499a4e424cacb80d0b40a1caade1357902b17..fede444dbb8ddfb72bd4a05111949b939cb2e6b2 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1729,7 +1729,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1738,7 +1738,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -147,7 +147,7 @@ index ca37373833d9be3ddd991201168abb954dfddfef..a254adfa84fd9b2b227076893de676d7
  
          if (this.hidesOnlinePlayers()) {
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index 9fe798c493c8b6c051ec4f2dbd728a5394f0aefd..0fcfe34d5a8617a18dc96edd3e58c5130c44bfe6 100644
+index bc3bd26e030c28d23ce1aeab1ff86e331a447073..2863c9e3512f6e59b08c2ae8806ea7c7aab0f71e 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
 @@ -226,7 +226,7 @@ public class PlayerAdvancements {
@@ -173,7 +173,7 @@ index e7b444a10b244828827b3c66c53465206ea8e0ec..1cfe26441661af7c3aa2461758115e08
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 568fae1cfbeef315fd153ea3878fa6926855ba9b..3122001ac667583af0aaa0516169417100d4c7f8 100644
+index 81f3339858a93c84b1524dd3ee421d3d50f0ad13..aa089e88340d0bdf9a460d3cb5cfe6463e81ab82 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -104,6 +104,7 @@ import net.minecraft.world.scores.DisplaySlot;
@@ -429,7 +429,7 @@ index 2a4ff298e600cf7c76a395434ed0eedaf5e37cb9..7040eb8a56e43ccaa85463bfe49f0705
 +    // Leaves end - replay mod api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index 52b0234ad6ce97405ee18280a8ef1dc07e184f95..4c286c6fa5a7a85ba5a4d090757dd41a82c4170f 100644
+index 18d22c13be79188d353f28d6e7dcec7297a8e605..72b83d6fd90b67588bb6f4e2b5bbeee0ed9f454d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -61,6 +61,8 @@ import org.bukkit.util.Vector;
@@ -450,10 +450,10 @@ index 52b0234ad6ce97405ee18280a8ef1dc07e184f95..4c286c6fa5a7a85ba5a4d090757dd41a
          // Special case complex part, since there is no extra entity type for them
          if (entity instanceof EnderDragonPart complexPart) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index ceca8c1bb41a9c258f004863ea8ff76961e6b4f0..38bfaab8f38af020aa5a649e26b398d728ccda8d 100644
+index 173e4a075078af67f030750c9a6294ab3f796677..ec0366531d291a65989cf1a6662cb91959ee2b58 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2254,7 +2254,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

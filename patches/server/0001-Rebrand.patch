@@ -183,7 +183,7 @@ index 3099c21ee589acf6edff5903a23673adf489024f..7f93b811d80af4a22c2cf27e8fee4476
              SharedConstants.getCurrentVersion().getName(),
              getManifestAttribute(manifest, ATTRIBUTE_BUILD_NUMBER)
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 4bcb20cd6cd971f25327ec1322bb172f036a54a4..8dab7ade8aa64abb99ee436e794f4084b1ce503c 100644
+index d78cb68c3a53b277aa26186062efc716c8f80f36..3e89b6ebb05b15e8f28774ffa76cc0e3a8fbda20 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -1254,15 +1254,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -199,9 +199,22 @@ index 4bcb20cd6cd971f25327ec1322bb172f036a54a4..8dab7ade8aa64abb99ee436e794f4084
 -                LOGGER.info("*************************************************************************************");
 -            }
 -            // Paper end - Add onboarding message for initial server start
- 
              // Purpur start
-             if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
+             if (org.purpurmc.purpur.configuration.transformation.VoidDamageHeightMigration.HAS_BEEN_REGISTERED) {
+                 try {
+diff --git a/src/main/java/net/minecraft/server/commands/PerfCommand.java b/src/main/java/net/minecraft/server/commands/PerfCommand.java
+index 8ac4d5dbe7f8febf4226f26a6b035282dcdf1b0f..ea066f0e69d5a4620b769abdfb0690e360728eda 100644
+--- a/src/main/java/net/minecraft/server/commands/PerfCommand.java
++++ b/src/main/java/net/minecraft/server/commands/PerfCommand.java
+@@ -70,7 +70,7 @@ public class PerfCommand {
+     private static int removedMessage(CommandSourceStack source) {
+         if (true) {
+             net.kyori.adventure.text.minimessage.MiniMessage mm = net.kyori.adventure.text.minimessage.MiniMessage.miniMessage();
+-            source.getSender().sendMessage(mm.deserialize("<gold>Purpur has removed Mojang's Profiler to save your performance. Please use <click:suggest_command:'/spark'><grey>/spark</grey></click> instead"));
++            source.getSender().sendMessage(mm.deserialize("<gold>Horizon has removed Mojang's Profiler to save your performance. Please use <click:suggest_command:'/spark'><grey>/spark</grey></click> instead")); // Horizon
+             source.getSender().sendMessage(mm.deserialize("<gold>For more information, view its documentation at"));
+             source.getSender().sendMessage(mm.deserialize("<gold><click:open_url:'https://spark.lucko.me/docs/Command-Usage'>https://spark.lucko.me/docs/Command-Usage</click>"));
+         }
 diff --git a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 index 4c178b234bc1118a577d0e016f4b986e9197e99d..3ca0aa8f01ab5bc4524f2ee7b324c736e6c812c2 100644
 --- a/src/main/java/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
@@ -255,7 +268,7 @@ index 99597258e8e88cd9e2c901c4ac3ff7faeeabee2b..207400ecf514a1609979c363ddf28c05
  
          if (stream != null) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index 54abd6874a64c669fc22448849febc9ef7c0f95e..dc32312dfa94b96ea9d88bfe05e1319a874b70c7 100644
+index 546d920198acc2a7aea6e251a34d92d33cbaaee7..f7c8d28a1e753ec5a848739d8d082b1146dea60a 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -232,8 +232,7 @@ public class PurpurConfig {

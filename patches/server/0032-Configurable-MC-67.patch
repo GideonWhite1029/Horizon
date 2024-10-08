@@ -18,10 +18,10 @@ index ceb73ad3986745ef54b6b1e92cb9392aa02ee092..06955b6f7bb147ab436f2421a02a33e2
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index e5cf26e26f8e06465b35f16e9ace898d9e73efd1..2309ff2c8968c6096d447b8a9b56d43d2db1b70d 100644
+index a2d8641de0fcb518c491f2146115f0d778df0ff4..57a6170b7e769aacfaac3b050c8dbb46daf06aa3 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -3943,7 +3943,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -3945,7 +3945,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      public boolean canChangeDimensions(Level from, Level to) {

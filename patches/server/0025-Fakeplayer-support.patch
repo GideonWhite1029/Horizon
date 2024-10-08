@@ -241,7 +241,7 @@ index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137
          if (this.packetListener != null) {
              throw new IllegalStateException("Listener already set");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 832d9fc2c523ef985632c2b4393a2d116468ea0e..ca37373833d9be3ddd991201168abb954dfddfef 100644
+index 07334e5a079fd92b812ca5b608c453cc914eda3f..9d7499a4e424cacb80d0b40a1caade1357902b17 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -754,6 +754,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -261,7 +261,7 @@ index 832d9fc2c523ef985632c2b4393a2d116468ea0e..ca37373833d9be3ddd991201168abb95
          if (upnp) {
              if (dev.omega24.upnp4j.UPnP4J.close(this.getPort(), dev.omega24.upnp4j.util.Protocol.TCP)) {
 diff --git a/src/main/java/net/minecraft/server/PlayerAdvancements.java b/src/main/java/net/minecraft/server/PlayerAdvancements.java
-index 6fc0098634bbe9ea07b61bdc7d4971745066c0c1..9fe798c493c8b6c051ec4f2dbd728a5394f0aefd 100644
+index 177575830e6eb73ace3b0789738a86455a2d8377..bc3bd26e030c28d23ce1aeab1ff86e331a447073 100644
 --- a/src/main/java/net/minecraft/server/PlayerAdvancements.java
 +++ b/src/main/java/net/minecraft/server/PlayerAdvancements.java
 @@ -225,6 +225,11 @@ public class PlayerAdvancements {
@@ -378,7 +378,7 @@ index 4f72ce384f4c0dbae98effa89aed5c3bb802e635..9060f92f2e3cf309c681eed0959f307c
                  PlayerChangedWorldEvent changeEvent = new PlayerChangedWorldEvent(this.getBukkitEntity(), worldserver1.getWorld());
                  this.level().getCraftServer().getPluginManager().callEvent(changeEvent);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index c6bb420b8d994d5f6e1f02d18491e0a998df4595..568fae1cfbeef315fd153ea3878fa6926855ba9b 100644
+index fb5754c1172691250eae7c631778e47b9cbc235f..81f3339858a93c84b1524dd3ee421d3d50f0ad13 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -103,6 +103,7 @@ import net.minecraft.world.phys.Vec3;
@@ -443,7 +443,7 @@ index c6bb420b8d994d5f6e1f02d18491e0a998df4595..568fae1cfbeef315fd153ea3878fa692
  
          return astring;
      }
-@@ -1604,4 +1632,16 @@ public abstract class PlayerList {
+@@ -1605,4 +1633,16 @@ public abstract class PlayerList {
      public boolean isAllowCommandsForAllPlayers() {
          return this.allowCommandsForAllPlayers;
      }
@@ -461,10 +461,10 @@ index c6bb420b8d994d5f6e1f02d18491e0a998df4595..568fae1cfbeef315fd153ea3878fa692
 +    // Leaves end - fakeplayer support
  }
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index 485bace63101ebad3e9c20a0598c1a2efc21f6cb..b7fe65e1f06f3549a59b6bb9943d073399d10ee6 100644
+index 58e12f522f5a55f149179a63953727b0558806ae..a2d8641de0fcb518c491f2146115f0d778df0ff4 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -1489,7 +1489,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1491,7 +1491,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return offsetFactor;
      }
  
@@ -563,7 +563,7 @@ index e6f512d8f4e6af2627461065a3c26dc9f6cef91a..2a4ff298e600cf7c76a395434ed0eeda
 +    // Leaves end - Bot API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index bec40e26e17ba6fdefb68c79e2fa7a9593b0f4fe..52b0234ad6ce97405ee18280a8ef1dc07e184f95 100644
+index 770606c4462d85d116f6d0bf91192dc49f438d0f..18d22c13be79188d353f28d6e7dcec7297a8e605 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 @@ -59,6 +59,8 @@ import org.bukkit.util.NumberConversions;

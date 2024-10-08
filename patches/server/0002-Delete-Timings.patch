@@ -731,7 +731,7 @@ index 24121a43aeb5e9bce013f30c92dddd15f99736c6..64e192ee588d66499bb54b27644debcc
              String[] args = org.apache.commons.lang3.StringUtils.split(content, ' '); // fix adjacent spaces (from console/plugins) causing empty array elements
  
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 690086adcb1f87adc0b3ab664fde735ad3e1093a..959160c5859733d4029278054d9c970130d93ab8 100644
+index a9dd0e5216e95afd98fd2200d110e2cc0b1b0dca..53913dfa4d9b73862179dcdef080c7e3adfe3b0f 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 @@ -1,6 +1,5 @@
@@ -803,7 +803,7 @@ index 01efbc507b3d58f13f78ee286f93df40cdc3f0cb..548798d1e40f8a1e1f38ca84f6680201
                          packet.handle(listener);
                      } catch (Exception exception) {
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 8dab7ade8aa64abb99ee436e794f4084b1ce503c..c6433160e7b1bfcd874171984e196d42781f4e74 100644
+index 3e89b6ebb05b15e8f28774ffa76cc0e3a8fbda20..0a93ee9e71d519fd5b9eb9048caadcf8968d0692 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -3,7 +3,6 @@ package net.minecraft.server;
@@ -830,7 +830,7 @@ index 8dab7ade8aa64abb99ee436e794f4084b1ce503c..c6433160e7b1bfcd874171984e196d42
          this.server.spark.disable(); // Paper - spark
          // Purpur start
          if (upnp) {
-@@ -1610,11 +1607,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1619,11 +1616,11 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          long i = Util.getNanos();
  
          // Paper start - move oversleep into full server tick
@@ -845,7 +845,7 @@ index 8dab7ade8aa64abb99ee436e794f4084b1ce503c..c6433160e7b1bfcd874171984e196d42
          this.server.spark.tickStart(); // Paper - spark
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 2762f54515b352271feb4b26f506b06cd0fb1909..70bccefb015da24d582641a87154bcf0a37915e8 100644
+index 6e6f4dffceb0032153c5be119303c5809629cfcc..b3c3efe945130414b0f3977f3e5c5454709ecc1b 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -65,7 +65,6 @@ import org.apache.logging.log4j.Level;
@@ -893,7 +893,7 @@ index 1883abec14e05f8eb2e865446b4d81091b1aa5e0..580aa9930f01e5ec63bc6ec993cf4c94
  import com.google.common.collect.ImmutableList.Builder;
  import com.google.common.collect.Iterables;
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index c601061d1abb8f4a66dd5e478cf69a872a4d0f6f..ab0f96229a79e3832b19e9becbfaaceeab34254b 100644
+index 067b10134b087626e05596225744b905211e8b63..c093aa5f957083cf288843ea0cb4a5ae77c7fa69 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -1,7 +1,6 @@
@@ -923,7 +923,7 @@ index c601061d1abb8f4a66dd5e478cf69a872a4d0f6f..ab0f96229a79e3832b19e9becbfaacee
          entity.postTick(); // CraftBukkit
          } else { entity.inactiveTick(); } // Paper - EAR 2
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 6f4e471c45195996a1cdd93c7dfb64e68156212f..26ea6c68ed79f07c1fc17a248663c111780417ec 100644
+index 0ea07da1b4bd420cd6765577b4719a2368b5740c..fa795cf24e0af1ea9e8142a09d1aa62a8f323666 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -1,6 +1,5 @@
@@ -963,7 +963,7 @@ index d3de0362dd1ef3954d05c4d8fa56a25edfe1bb2b..bdc3042cd75958145d7f556f77fd748b
          return this != EntityType.PLAYER && this != EntityType.LLAMA_SPIT && this != EntityType.WITHER && this != EntityType.BAT && this != EntityType.ITEM_FRAME && this != EntityType.GLOW_ITEM_FRAME && this != EntityType.LEASH_KNOT && this != EntityType.PAINTING && this != EntityType.END_CRYSTAL && this != EntityType.EVOKER_FANGS;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index ee616c31b06bebaf5a27d7efa60bdd97ff12c1cb..8bf6d52259302d36518d6ec0689a4f057020bf1a 100644
+index f714e2dc212a3b70977e93c55e94f8b272c5b02d..64bca2e597aacf3b15094e716d6356505cb9f811 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -157,7 +157,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
@@ -1015,7 +1015,7 @@ index 09a7b418ddf564c0be13297f7c216db2e7ae1578..1e26b1099139d76e49fce14ee72061e1
          this.scanRate = senseInterval;
          this.timeToTick = (long)RANDOM.nextInt(senseInterval);
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
-index 26fbc981ec9acafc7ba1753759375c142261b6ab..67c328779197ad768a5dce9429826280073038c0 100644
+index 5057d9d433ba002a22d22adfaf7323b2cfaee9af..929b91ce785d7ff15a65ac69f86bdb2443778142 100644
 --- a/src/main/java/net/minecraft/world/level/Level.java
 +++ b/src/main/java/net/minecraft/world/level/Level.java
 @@ -174,7 +174,6 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl

@@ -162,7 +162,7 @@ index 5705cb920084b775cce4b361683b32c6b6e003ed..a325899b6dffce1fec13c811575c1e37
      }
  }
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
-index 0f15ab476f9fa07924178989d48825dcb6c4900b..fdb310be1aee8321b6c378a157479b89e731f395 100644
+index 4550b8c6bd91f658dc59dd763cbdf0fe587a7595..f8bc0cfc2fe614a7fee9f47bf43b145e8a699e62 100644
 --- a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -20,6 +20,8 @@ import java.util.Locale;
@@ -223,7 +223,7 @@ index 0d6307db1047bb5db7e33aa425fe2564cca93cfb..183a3d8afac2c17db727e0d38aacbf4f
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 26ea6c68ed79f07c1fc17a248663c111780417ec..205e461b37791e657026fbcdc679516fffee4b20 100644
+index fa795cf24e0af1ea9e8142a09d1aa62a8f323666..369e65ecd4db4a17f4824b71bf0ee78b5a68ba4b 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -24,6 +24,8 @@ import java.util.UUID;
@@ -235,7 +235,7 @@ index 26ea6c68ed79f07c1fc17a248663c111780417ec..205e461b37791e657026fbcdc679516f
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -1460,7 +1462,7 @@ public abstract class PlayerList {
+@@ -1461,7 +1463,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public

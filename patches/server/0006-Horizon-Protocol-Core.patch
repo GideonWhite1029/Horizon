@@ -599,10 +599,10 @@ index b2a4ae4388758f89fcd0dc3b0c4c03bf46fa5470..ac69756357bec1bdf963a30f8b3da1df
          };
      }
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 94dfb29f3fcc6b1353418d437fabff23516bbbee..c72e23e6c793d53a216f3bdb2101c43b8a6bb389 100644
+index 3519fb9c950e2b5dcca53d82e30fef0e73737abb..6ef27d3baf030fcbf81694082f725ba1b394b771 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -1860,6 +1860,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1869,6 +1869,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          //this.profiler.popPush("server gui refresh"); // Purpur
  
@@ -636,7 +636,7 @@ index 183a3d8afac2c17db727e0d38aacbf4f41db48ea..2dbef1e91014af0582f8879a04921545
              } catch (Exception ex) {
                  ServerGamePacketListenerImpl.LOGGER.error("Couldn\'t register custom payload", ex);
 diff --git a/src/main/java/net/minecraft/server/players/PlayerList.java b/src/main/java/net/minecraft/server/players/PlayerList.java
-index 205e461b37791e657026fbcdc679516fffee4b20..c6bb420b8d994d5f6e1f02d18491e0a998df4595 100644
+index 369e65ecd4db4a17f4824b71bf0ee78b5a68ba4b..fb5754c1172691250eae7c631778e47b9cbc235f 100644
 --- a/src/main/java/net/minecraft/server/players/PlayerList.java
 +++ b/src/main/java/net/minecraft/server/players/PlayerList.java
 @@ -351,6 +351,8 @@ public abstract class PlayerList {
