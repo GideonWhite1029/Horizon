@@ -34,7 +34,7 @@ index e0ae05346c79e8f53c4c85cd61e6fbb68d780c27..8278475217b8cc2d30663178aa7fde05
                  //net.minecraft.server.Main.main(options);
                  io.papermc.paper.PaperBootstrap.boot(options);
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
-index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..f365e2d5f12b6f0f8a352a4386699ab077d7abae 100644
+index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..5056e356e2611079c8a2f0cc1101922da0af9479 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 @@ -25,6 +25,7 @@ package org.bukkit.craftbukkit.scheduler;
@@ -45,14 +45,14 @@ index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..f365e2d5f12b6f0f8a352a4386699ab0
  import org.bukkit.plugin.Plugin;
  
  import java.util.ArrayList;
-@@ -38,17 +39,29 @@ import java.util.concurrent.TimeUnit;
+@@ -38,17 +39,39 @@ import java.util.concurrent.TimeUnit;
  
  public class CraftAsyncScheduler extends CraftScheduler {
  
 -    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
 -            4, Integer.MAX_VALUE,30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 -            new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").build());
-+    private final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(getClass().getName()); // Leaf - Class logger
++    private final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(getClass().getName()); // Horizon - Class logger
 +    private final Executor executor; // Horizon - use super class
      private final Executor management = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
              .setNameFormat("Craft Async Scheduler Management Thread").build());
@@ -64,13 +64,23 @@ index 3c1992e212a6d6f1db4d5b807b38d71913619fc0..f365e2d5f12b6f0f8a352a4386699ab0
 -        executor.prestartAllCoreThreads();
 +        // Horizon start - Ability to use Virtual Thread for async scheduler
 +        if (HorizonConfig.useVirtualThreadForAsyncScheduler) {
-+            executor = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("Craft Scheduler Thread - ", 0).factory());
++            executor = new ThreadPoolExecutor(
++                    0, Integer.MAX_VALUE, 10L, TimeUnit.SECONDS, new SynchronousQueue<>(), // Use 10s for keepalive time
++                    Thread.ofVirtual()
++                            .name("Craft Scheduler Thread - ", 0)
++                            .uncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER))
++                            .factory()
++            );
++
 +            return;
 +        }
 +
 +        executor = new ThreadPoolExecutor(
 +                4, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-+                new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build());
++                new ThreadFactoryBuilder()
++                        .setNameFormat("Craft Scheduler Thread - %1$d")
++                        .setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER))
++                        .build());
 +
 +        var threadPoolExecutor = (ThreadPoolExecutor) executor;
 +
