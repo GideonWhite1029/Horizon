@@ -612,10 +612,10 @@ index 3519fb9c950e2b5dcca53d82e30fef0e73737abb..6ef27d3baf030fcbf81694082f725ba1
          for (int i = 0; i < this.tickables.size(); ++i) {
              ((Runnable) this.tickables.get(i)).run();
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 183a3d8afac2c17db727e0d38aacbf4f41db48ea..2dbef1e91014af0582f8879a04921545d2e6083d 100644
+index 76e57be241bed1d610f508f2e754521dbcf14361..cd8700502601994be5336983fca93ce29e91f53c 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -168,6 +168,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -164,6 +164,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      @Override
      public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
@@ -627,7 +627,7 @@ index 183a3d8afac2c17db727e0d38aacbf4f41db48ea..2dbef1e91014af0582f8879a04921545
          // Paper start - Brand support
          if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload brandPayload) {
              this.player.clientBrandName = brandPayload.brand();
-@@ -185,6 +190,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -181,6 +186,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
                  String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
                  for (String channel : channels.split("\0")) {
                      this.getCraftPlayer().addChannel(channel);

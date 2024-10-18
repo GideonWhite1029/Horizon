@@ -184,7 +184,7 @@ index 4550b8c6bd91f658dc59dd763cbdf0fe587a7595..f8bc0cfc2fe614a7fee9f47bf43b145e
      }
  
 diff --git a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 0d6307db1047bb5db7e33aa425fe2564cca93cfb..183a3d8afac2c17db727e0d38aacbf4f41db48ea 100644
+index a9d54c80f682d826ad272731bd6477eed0fd44d5..76e57be241bed1d610f508f2e754521dbcf14361 100644
 --- a/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
@@ -196,7 +196,7 @@ index 0d6307db1047bb5db7e33aa425fe2564cca93cfb..183a3d8afac2c17db727e0d38aacbf4f
  import net.minecraft.ChatFormatting;
  import net.minecraft.CrashReport;
  import net.minecraft.CrashReportCategory;
-@@ -329,10 +331,25 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -325,10 +327,25 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
