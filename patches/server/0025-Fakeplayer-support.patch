@@ -222,7 +222,7 @@ index 35772110e9318df46a2729dbc0b5879b290011b7..f26989a44cdda9baabf337d573436c6c
          Set<CriterionTrigger.Listener<T>> set = (Set) playerAdvancements.criterionData.get(this); // Paper - fix AdvancementDataPlayer leak
          if (set != null && !set.isEmpty()) {
 diff --git a/src/main/java/net/minecraft/network/Connection.java b/src/main/java/net/minecraft/network/Connection.java
-index a937bc49a85c0e565f0400163c1c9174891fb48d..2399b6c0ef345f4fd7d990f5e6559137f3223222 100644
+index 56e47c5709c765943407d2065b25bd512d1f9388..31a9218258458d3f48b989b495807eeb0db27478 100644
 --- a/src/main/java/net/minecraft/network/Connection.java
 +++ b/src/main/java/net/minecraft/network/Connection.java
 @@ -400,6 +400,14 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -539,7 +539,7 @@ index 04f67f7b43d2f461c776c76614dc3e5f060aea63..7f95dac24f73c702a87c0ecd27c9116b
                                      if (randomsource.nextInt(j) >= world.paperConfig().entities.behavior.playerInsomniaStartTicks) { // Paper - Ability to control player's insomnia and phantoms
                                          BlockPos blockposition1 = blockposition.above(20 + randomsource.nextInt(15)).east(-10 + randomsource.nextInt(21)).south(-10 + randomsource.nextInt(21));
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e6f512d8f4e6af2627461065a3c26dc9f6cef91a..2a4ff298e600cf7c76a395434ed0eedaf5e37cb9 100644
+index 1b9bec5454db533270e305062ffaf355db70c237..ae981ad0e6f9b750c8ca9032c8f3308e64bf7603 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -310,6 +310,7 @@ public final class CraftServer implements Server {
@@ -550,7 +550,7 @@ index e6f512d8f4e6af2627461065a3c26dc9f6cef91a..2a4ff298e600cf7c76a395434ed0eeda
  
      // Paper start - Folia region threading API
      private final io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler regionizedScheduler = new io.papermc.paper.threadedregions.scheduler.FallbackRegionScheduler();
-@@ -3316,4 +3317,11 @@ public final class CraftServer implements Server {
+@@ -3318,4 +3319,11 @@ public final class CraftServer implements Server {
          return getServer().lagging;
      }
      // Purpur end

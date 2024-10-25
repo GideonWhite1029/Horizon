@@ -5,7 +5,7 @@ Subject: [PATCH] Linear region file format
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 661b3552d995cd452babd854f88f1d5b396cb002..8a2d010d0295651d360a55bb0aee0e0071674161 100644
+index 44a86ae663fa94ea76aab348f52064ee8f35be6b..7367bd9423f69e5f7d42745e9fa5733623ee3c58 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -30,6 +30,10 @@ dependencies {
@@ -17,7 +17,7 @@ index 661b3552d995cd452babd854f88f1d5b396cb002..8a2d010d0295651d360a55bb0aee0e00
 +    implementation("org.lz4:lz4-java:1.8.0")
 +    // Horizon end - Linear format
      implementation("org.apache.logging.log4j:log4j-iostreams:2.22.1") // Paper - remove exclusion
-     implementation("org.ow2.asm:asm-commons:9.7")
+     implementation("org.ow2.asm:asm-commons:9.7.1")
      implementation("org.spongepowered:configurate-yaml:4.2.0-SNAPSHOT") // Paper - config files
 diff --git a/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java b/src/main/java/ca/spottedleaf/moonrise/patches/chunk_system/io/ChunkSystemRegionFileStorage.java
 index 73df26b27146bbad2106d57b22dd3c792ed3dd1d..7c4c0cf4e2b26f3efba4d9f7f92a705137b87e72 100644

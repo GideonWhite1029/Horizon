@@ -657,10 +657,10 @@ index 369e65ecd4db4a17f4824b71bf0ee78b5a68ba4b..fb5754c1172691250eae7c631778e47b
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(entityplayer.getBukkitEntity()); // Purpur
          ServerLevel worldserver = entityplayer.serverLevel();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 3a73c57001c03683ac0f2a0d70861492f5aac049..e6f512d8f4e6af2627461065a3c26dc9f6cef91a 100644
+index ffb4923982114f169ba9866d972d59154e900deb..1b9bec5454db533270e305062ffaf355db70c237 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -490,6 +490,7 @@ public final class CraftServer implements Server {
+@@ -491,6 +491,7 @@ public final class CraftServer implements Server {
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
          this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
@@ -668,7 +668,7 @@ index 3a73c57001c03683ac0f2a0d70861492f5aac049..e6f512d8f4e6af2627461065a3c26dc9
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1122,6 +1123,7 @@ public final class CraftServer implements Server {
+@@ -1124,6 +1125,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

@@ -62,7 +62,7 @@ index ebe872c4643038f0c99b289d4d5afdbedd76c6ef..ce4d57b4a5a396be096b16f110a615d9
      }
  
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index ab0f96229a79e3832b19e9becbfaaceeab34254b..c77edc57b97c75e68cd924e3d764a3f95dbb0730 100644
+index c093aa5f957083cf288843ea0cb4a5ae77c7fa69..d807ef0e7d1dd6ed48f65707a1a2fb4bc4238fa2 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -557,6 +557,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ca.spottedleaf.
@@ -562,7 +562,7 @@ index 45e262308aebafa377a2353661acdd122933b99e..7eaa86a9cb056436cfb5b0f788761b9c
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index c2f33af28a767578c157cba9fa5b33ed2050d25e..3a21b879435922efd4bdbb864b6991088addebb1 100644
+index 17b0ffd85bf6bcb540ae8717f2b524b54894ec3d..7bf0a6288bfa3bea10ec33e7bdf0010c1c9976b8 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.brigadier.StringReader;
@@ -573,7 +573,7 @@ index c2f33af28a767578c157cba9fa5b33ed2050d25e..3a21b879435922efd4bdbb864b699108
  import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
  import java.awt.image.BufferedImage;
  import java.io.ByteArrayOutputStream;
-@@ -1394,7 +1395,11 @@ public final class CraftServer implements Server {
+@@ -1396,7 +1397,11 @@ public final class CraftServer implements Server {
              iregistrycustom_dimension = leveldataanddimensions.dimensions().dimensionsRegistryAccess();
          } else {
              LevelSettings worldsettings;

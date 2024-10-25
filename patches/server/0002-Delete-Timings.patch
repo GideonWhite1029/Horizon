@@ -1145,10 +1145,10 @@ index 8f181e03eda734b18f8c9ee80ee6e45f8689d178..f43561f7c8c4e63b5037d70bd1cde6d8
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index af7e7ad028b169bfc80adf32b0194b3988551b52..e777aed1a3dadb8fd9da06d9d7aec9bb5343c873 100644
+index 5505c13d0e602f39fe02dde350082c11a2f2a2e0..fde03e4a1f9f74444aac844ad4ced31f49542fb1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-@@ -200,7 +200,6 @@ public final class CraftMagicNumbers implements UnsafeValues {
+@@ -202,7 +202,6 @@ public final class CraftMagicNumbers implements UnsafeValues {
      // Paper start
      @Override
      public void reportTimings() {

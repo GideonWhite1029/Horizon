@@ -396,7 +396,7 @@ index 81f3339858a93c84b1524dd3ee421d3d50f0ad13..aa089e88340d0bdf9a460d3cb5cfe646
              }
          }
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 2a4ff298e600cf7c76a395434ed0eedaf5e37cb9..7040eb8a56e43ccaa85463bfe49f07051a5a99d2 100644
+index ae981ad0e6f9b750c8ca9032c8f3308e64bf7603..17b0ffd85bf6bcb540ae8717f2b524b54894ec3d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -311,6 +311,7 @@ public final class CraftServer implements Server {
@@ -416,7 +416,7 @@ index 2a4ff298e600cf7c76a395434ed0eedaf5e37cb9..7040eb8a56e43ccaa85463bfe49f0705
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3324,4 +3325,11 @@ public final class CraftServer implements Server {
+@@ -3326,4 +3327,11 @@ public final class CraftServer implements Server {
          return botManager;
      }
      // Leaves end - Bot API

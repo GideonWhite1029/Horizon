@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index b053160ee0faa550569a8b2273e38f48567ddbc7..a96169cac5decf9e9ec8d232443a13e6defaeb06 100644
+index 535b0c6a750cc77fb9340d6e080932f3eb3bde17..44a86ae663fa94ea76aab348f52064ee8f35be6b 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,7 +13,7 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -17,7 +17,7 @@ index b053160ee0faa550569a8b2273e38f48567ddbc7..a96169cac5decf9e9ec8d232443a13e6
      // Paper start
      implementation("org.jline:jline-terminal-jansi:3.21.0")
      implementation("net.minecrell:terminalconsoleappender:1.3.0")
-@@ -103,14 +103,14 @@ tasks.jar {
+@@ -104,14 +104,14 @@ tasks.jar {
          val gitBranch = git("rev-parse", "--abbrev-ref", "HEAD").getText().trim() // Paper
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
@@ -37,7 +37,7 @@ index b053160ee0faa550569a8b2273e38f48567ddbc7..a96169cac5decf9e9ec8d232443a13e6
              "Build-Number" to (build ?: ""),
              "Build-Time" to Instant.now().toString(),
              "Git-Branch" to gitBranch, // Paper
-@@ -224,6 +224,12 @@ tasks.registerRunTask("runDevServer") {
+@@ -229,6 +229,12 @@ tasks.registerRunTask("runDevServer") {
      description = "Spin up a test server without assembling a jar"
      classpath(sourceSets.main.map { it.runtimeClasspath })
      jvmArgs("-DPaper.pushPaperAssetsRoot=true")
@@ -229,7 +229,7 @@ index 4c178b234bc1118a577d0e016f4b986e9197e99d..3ca0aa8f01ab5bc4524f2ee7b324c736
  
      private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 479a8422a6786a8ada8536d528e7f57a06c8107a..7d2bde8b166e794aa4eae5a711d91c4d4ff3a191 100644
+index 8854e3adca98214697fdfa7f1296e2d66b5afa48..20693ea8722657ea47e4d430fd55b286cb19442d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -266,7 +266,7 @@ import javax.annotation.Nullable; // Paper
