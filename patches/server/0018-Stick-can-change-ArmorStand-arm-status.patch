@@ -5,7 +5,6 @@ Subject: [PATCH] Stick can change ArmorStand arm status
 
 Powered by Leaves: https://github.com/LeavesMC/Leaves
 
-
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 33702c249963ed46407587df6e4859f1a07e5ec7..2b853477e032712fde71a24258b2e87c86019ff1 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
@@ -20,7 +19,7 @@ index 33702c249963ed46407587df6e4859f1a07e5ec7..2b853477e032712fde71a24258b2e87c
  }
 \ No newline at end of file
 diff --git a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
-index ad1ec2578fa428baa6b172c44b6c17e52daa5792..7f8ce51455045f43d8e2d07b8862f233f4f1a42e 100644
+index c0383771b08e1d89dfa4996b979248da1de8aca1..c70bbb69f294d4c4a9f4e450da1e2ba1f0c73d2d 100644
 --- a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
 +++ b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
 @@ -395,6 +395,12 @@ public class ArmorStand extends LivingEntity {

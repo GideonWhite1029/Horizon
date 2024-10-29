@@ -5,7 +5,6 @@ Subject: [PATCH] Rail Optimization
 
 Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
-
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 2b853477e032712fde71a24258b2e87c86019ff1..4ac055aa686b0a27224ef1f3fc16656a009761da 100644
 --- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
