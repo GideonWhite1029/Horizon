@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 10 Jul 2024 10:25:34 +0400
 Subject: [PATCH] Faster chunk serialization
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 06eb6ea6d82f56dffb11206e20baa7fbac138cf7..a4e8e4f956fa0dfd4e31474026d1705bbd60e986 100644

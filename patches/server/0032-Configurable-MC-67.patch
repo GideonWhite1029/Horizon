@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 31 Jul 2024 10:17:07 +0400
 Subject: [PATCH] Configurable MC-67
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index ceb73ad3986745ef54b6b1e92cb9392aa02ee092..06955b6f7bb147ab436f2421a02a33e2027b0119 100644

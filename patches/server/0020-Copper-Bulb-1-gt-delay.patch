@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 17 Jun 2024 11:25:35 +0400
 Subject: [PATCH] Copper Bulb 1 gt delay
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
+
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 4ac055aa686b0a27224ef1f3fc16656a009761da..072f998e46b8ee663b668a4fdb5195677f996fdd 100644

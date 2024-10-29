@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 9 Sep 2024 22:12:57 +0300
 Subject: [PATCH] Matter Secure Seed
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index b9af2aef11be191611eacc74fc15c07bc1e6b743..18defab0bce5cf2d2f8e929dbd5881e33827e8c2 100644

@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 10 Jul 2024 17:42:56 +0400
 Subject: [PATCH] Optimize tickBlockEntities
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/net/minecraft/world/level/Level.java b/src/main/java/net/minecraft/world/level/Level.java
 index 77876bba90e5cd47352688526d4c67b71398047f..841a697f4e18e36aee227bd27a78519425803655 100644

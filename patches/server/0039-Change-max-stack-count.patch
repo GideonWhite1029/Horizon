@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 17 Sep 2024 23:39:00 +0300
 Subject: [PATCH] Change max stack count
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index b45101b4f78db52425e169b9bf1bf7798568a108..93915b4844425b11c309d92065e69ab623acb840 100644

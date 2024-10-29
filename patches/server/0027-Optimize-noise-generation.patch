@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 10 Jul 2024 10:45:05 +0400
 Subject: [PATCH] Optimize noise generation
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index a4e8e4f956fa0dfd4e31474026d1705bbd60e986..c8e7577e6391090dd4f6daf5bbb6a26a996f8af5 100644

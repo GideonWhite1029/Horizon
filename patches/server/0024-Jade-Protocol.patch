@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 12 Jun 2024 16:06:46 +0400
 Subject: [PATCH] Jade Protocol
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 331d609f84bc2597e7eb328d8dc5b9904c6225a9..36feef0c4418a556fd4cc88b7234f0662a4f13bc 100644

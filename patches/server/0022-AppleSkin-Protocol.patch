@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 12 Jun 2024 15:05:39 +0400
 Subject: [PATCH] AppleSkin Protocol
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index e97c75e30dc1d4f5fa71cfbee2dd43087f4d4be6..dd051aca08ce2dc6a6b94ad5389e99c317b9eeeb 100644

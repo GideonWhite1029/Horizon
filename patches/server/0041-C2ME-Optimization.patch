@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 18 Sep 2024 22:58:47 +0300
 Subject: [PATCH] C2ME Optimization
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/util/ObjectCachingUtils.java b/src/main/java/dev/horizonmc/horizon/util/ObjectCachingUtils.java
 new file mode 100644

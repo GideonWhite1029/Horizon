@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 9 Sep 2024 22:17:46 +0300
 Subject: [PATCH] Matter Seed Command
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/net/minecraft/server/commands/SeedCommand.java b/src/main/java/net/minecraft/server/commands/SeedCommand.java
 index 0b500b19a99fa6c2740c0db350a166462668df9c..b7d2f8f7828f3452527e428760c7c53a2dcf8d8a 100644

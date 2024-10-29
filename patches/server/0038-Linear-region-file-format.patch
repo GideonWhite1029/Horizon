@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 9 Sep 2024 23:51:33 +0300
 Subject: [PATCH] Linear region file format
 
+Powered by LinearPaper: https://github.com/RealTriassic/LinearPaper
 
 diff --git a/build.gradle.kts b/build.gradle.kts
 index 44a86ae663fa94ea76aab348f52064ee8f35be6b..7367bd9423f69e5f7d42745e9fa5733623ee3c58 100644

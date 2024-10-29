@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 31 Jul 2024 10:22:46 +0400
 Subject: [PATCH] Disable offline warn if use proxy
 
+Powered by Leaves: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java b/src/main/java/net/minecraft/server/dedicated/DedicatedServer.java
 index fdb310be1aee8321b6c378a157479b89e731f395..68bfa0be139606e958a1ecfa30d06389e9968820 100644
