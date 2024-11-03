@@ -3,6 +3,7 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 29 Oct 2024 16:49:07 +0300
 Subject: [PATCH] Virtual thread for ChatExecutor
 
+Powered by Leaf: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
 index 93915b4844425b11c309d92065e69ab623acb840..4fefbd3a82691e4267f2f5edaf7e016349130b58 100644

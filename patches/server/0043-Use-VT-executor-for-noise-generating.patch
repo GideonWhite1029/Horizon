@@ -1,0 +1,66 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 3 Nov 2024 12:42:06 +0300
+Subject: [PATCH] Use VT executor for noise generating
+
+Powered by Canvas: https://github.com/CraftCanvasMC/Canvas
+
+diff --git a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+index 4fefbd3a82691e4267f2f5edaf7e016349130b58..6c0aa275816c699b2315d4dc664aff4afa2183dd 100644
+--- a/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
++++ b/src/main/java/dev/horizonmc/horizon/HorizonConfig.java
+@@ -305,4 +305,7 @@ public final class HorizonConfig {
+     @GlobalConfig(name = "use_virtual_thread_for_chat_executor", category = {"utils"})
+     public static boolean useVirtualThreadForChatExecutor = false;
+ 
++    @GlobalConfig(name = "use_virtual_thread_for_executor_noise_generation", category = {"utils"})
++    public static boolean useVirtualThreadForExecutorNoiseGeneration = false;
++
+ }
+\ No newline at end of file
+diff --git a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
+index 68be0d51aa64b5d917fb53dbbbdf8966d4f4abd8..d8169d6565f60cbf2616e50733eed74bb265c34a 100644
+--- a/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
++++ b/src/main/java/net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator.java
+@@ -16,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
+ import java.util.function.Predicate;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
++
++import dev.horizonmc.horizon.HorizonConfig;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+@@ -262,8 +264,32 @@ public final class NoiseBasedChunkGenerator extends ChunkGenerator {
+ 
+     }
+ 
++    private static final java.util.concurrent.ExecutorService noiseGenExecutor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor(); // Canvas - Use VT executor for noise generating
+     @Override
+     public CompletableFuture<ChunkAccess> fillFromNoise(Blender blender, RandomState noiseConfig, StructureManager structureAccessor, ChunkAccess chunk) {
++        // Canvas start - Use VT executor for noise generating
++        if (HorizonConfig.useVirtualThreadForExecutorNoiseGeneration) {
++            NoiseSettings settings = this.settings.value().noiseSettings().clampToHeightAccessor(chunk.getHeightAccessorForGeneration());
++            int miny = settings.minY();
++            int minyDiv = Mth.floorDiv(miny, settings.getCellHeight());
++            int cellHeightDiv = Mth.floorDiv(settings.height(), settings.getCellHeight());
++
++            if (cellHeightDiv <= 0) return CompletableFuture.completedFuture(chunk);
++
++            int startIndex = chunk.getSectionIndex(cellHeightDiv * settings.getCellHeight() - 1 + miny);
++            int minYIndex = chunk.getSectionIndex(miny);
++
++            LevelChunkSection[] sections = chunk.getSections();
++            for (int i = startIndex; i >= minYIndex; --i) sections[i].acquire();
++
++            return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName(
++                    "wgen_fill_noise",
++                    () -> this.doFill(blender, structureAccessor, noiseConfig, chunk, minyDiv, cellHeightDiv)
++            ), Util.backgroundExecutor()).whenCompleteAsync((result, ignored) -> {
++                for (int i = startIndex; i >= minYIndex; --i) sections[i].release();
++            }, noiseGenExecutor);
++        }
++        // Canvas end - Use VT executor for noise generating
+         NoiseSettings noisesettings = ((NoiseGeneratorSettings) this.settings.value()).noiseSettings().clampToHeightAccessor(chunk.getHeightAccessorForGeneration());
+         int i = noisesettings.minY();
+         int j = Mth.floorDiv(i, noisesettings.getCellHeight());
