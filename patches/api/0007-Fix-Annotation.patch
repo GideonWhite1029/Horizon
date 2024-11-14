@@ -1,0 +1,156 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 5 Nov 2024 20:48:36 +0300
+Subject: [PATCH] Fix Annotation
+
+
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 0672c3dba1a914ade49f2528913445fc343e2df9..aa20c9393d53a1cdd4430e2d60385c4b50d87b9c 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -189,6 +189,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      *
+      * @return The array of startup arguments passed to the server during its launch.
+      */
++    @Nullable
+     public String[] getStartupArgs();
+     // Horizon end
+ 
+diff --git a/src/main/java/org/leavesmc/leaves/entity/BotManager.java b/src/main/java/org/leavesmc/leaves/entity/BotManager.java
+index 9a9a2c2fcb62a1bf5c89ddcc5dd993d20ee3eaf6..42767ee09a94bd6375a5fb1f437c975ab5e707e0 100644
+--- a/src/main/java/org/leavesmc/leaves/entity/BotManager.java
++++ b/src/main/java/org/leavesmc/leaves/entity/BotManager.java
+@@ -86,6 +86,7 @@ public interface BotManager {
+      *
+      * @return a view of fakeplayers.
+      */
++    @Nullable
+     public Collection<Bot> getBots();
+ 
+     /**
+@@ -95,7 +96,7 @@ public interface BotManager {
+      * @param action action executor
+      * @return true if success, or false
+      */
+-    public boolean registerCustomBotAction(String name, CustomBotAction action);
++    public boolean registerCustomBotAction(@NotNull String name, @NotNull CustomBotAction action);
+ 
+     /**
+      * Unregister a custom bot action.
+@@ -103,5 +104,5 @@ public interface BotManager {
+      * @param name action name
+      * @return true if success, or false
+      */
+-    public boolean unregisterCustomBotAction(String name);
++    public boolean unregisterCustomBotAction(@NotNull String name);
+ }
+diff --git a/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java b/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java
+index 3d7a0eae734513fc0cce5e71cde5087e0a262cab..fdd96f6398b72b5e404a7b7dd755cd87840f65ae 100644
+--- a/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java
++++ b/src/main/java/org/leavesmc/leaves/entity/PhotographerManager.java
+@@ -27,5 +27,6 @@ public interface PhotographerManager {
+ 
+     public void removeAllPhotographers();
+ 
++    @Nullable
+     public Collection<Photographer> getPhotographers();
+ }
+diff --git a/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java b/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java
+index 947c6d5d3781605d96bee4b8df64de37c7fd9468..6e181d5f5e59c912b2db2279104a12d7cf5b8f5d 100644
+--- a/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java
++++ b/src/main/java/org/leavesmc/leaves/entity/botaction/CustomBotAction.java
+@@ -18,7 +18,7 @@ public interface CustomBotAction {
+      * @param bot bot of the action
+      * @return true if once action finish, otherwise false
+      */
+-    public boolean doTick(Bot bot);
++    public boolean doTick(@NotNull Bot bot);
+ 
+     /**
+      * Created a new action instance.
+@@ -27,7 +27,7 @@ public interface CustomBotAction {
+      * @param args   passed action arguments
+      * @return a new action instance with given args
+      */
+-    public @Nullable CustomBotAction getNew(Player player, String[] args);
++    public @Nullable CustomBotAction getNew(@NotNull Player player, @NotNull String[] args);
+ 
+     /**
+      * Requests a list of possible completions for a action argument.
+diff --git a/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java b/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java
+index b239acd298b299e338ae56aa6507570942ce44e2..bd18ae83d74de0b93e596ac74939da53899b77e9 100644
+--- a/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java
++++ b/src/main/java/org/leavesmc/leaves/entity/botaction/LeavesBotAction.java
+@@ -1,5 +1,7 @@
+ package org.leavesmc.leaves.entity.botaction;
+ 
++import org.jetbrains.annotations.Nullable;
++
+ /**
+  * A Leaves bot action enum
+  */
+@@ -26,7 +28,7 @@ public enum LeavesBotAction {
+         this.name = name;
+     }
+ 
+-    public String getName() {
++    public @Nullable String getName() {
+         return name;
+     }
+ }
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java
+index 91ea5540387b7d7e1be5b6368a2f02b3b784614a..06b843d3743539caff7e3fbfbf2b768fa440a474 100644
+--- a/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotActionEvent.java
+@@ -12,7 +12,7 @@ public class BotActionEvent extends BotEvent implements Cancellable {
+     private final String[] actionArgs;
+     private boolean cancel = false;
+ 
+-    public BotActionEvent(@NotNull Bot who, String actionName, String[] actionArgs) {
++    public BotActionEvent(@NotNull Bot who, @NotNull String actionName, @NotNull String[] actionArgs) {
+         super(who);
+         this.actionArgs = actionArgs;
+         this.actionName = actionName;
+@@ -43,7 +43,7 @@ public class BotActionEvent extends BotEvent implements Cancellable {
+         this.cancel = cancel;
+     }
+ 
+-    public static HandlerList getHandlerList() {
++    public @NotNull static HandlerList getHandlerList() {
+         return handlers;
+     }
+ }
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java
+index 5e55759fd3d7891e8e1d5d6a306dc8144d366469..16850e86b7c3fdcb98aeb686e793e84398c6d47b 100644
+--- a/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotConfigModifyEvent.java
+@@ -12,7 +12,7 @@ public class BotConfigModifyEvent extends BotEvent implements Cancellable {
+     private final String configValue;
+     private boolean cancel;
+ 
+-    public BotConfigModifyEvent(@NotNull Bot who, String configName, String configValue) {
++    public BotConfigModifyEvent(@NotNull Bot who, @NotNull String configName, @NotNull String configValue) {
+         super(who);
+         this.configName = configName;
+         this.configValue = configValue;
+@@ -43,7 +43,7 @@ public class BotConfigModifyEvent extends BotEvent implements Cancellable {
+         this.cancel = cancel;
+     }
+ 
+-    public static HandlerList getHandlerList() {
++    public @NotNull static HandlerList getHandlerList() {
+         return handlers;
+     }
+ }
+diff --git a/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java b/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java
+index c093f68e5f1749c792255220f39bdbdffb78f0f9..3f049a528db9ccb19c84d3ca6cfad3b4e7eacf89 100644
+--- a/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java
++++ b/src/main/java/org/leavesmc/leaves/event/bot/BotCreateEvent.java
+@@ -31,6 +31,7 @@ public class BotCreateEvent extends Event implements Cancellable {
+      *
+      * @return fakeplayer name
+      */
++    @Nullable
+     public String getBot() {
+         return bot;
+     }

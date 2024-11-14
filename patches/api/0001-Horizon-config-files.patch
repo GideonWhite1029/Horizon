@@ -4,8 +4,32 @@ Date: Sun, 24 Mar 2024 21:27:16 +0400
 Subject: [PATCH] Horizon config files
 
 
+diff --git a/build.gradle.kts b/build.gradle.kts
+index f536f8f42b99e4b7dc2e25785617837fbc405b5b..dcef0423d349f7ff4a506ee30778c05cc175e4fd 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -150,6 +150,13 @@ tasks.jar {
+     }
+ }
+ 
++// Horizon start
++tasks.compileJava {
++    options.compilerArgs.add("-Xlint:-deprecation")
++    options.isWarnings = false
++}
++// Horizon end
++
+ tasks.withType<Javadoc> {
+     (options as StandardJavadocDocletOptions).addStringOption("-add-modules", "jdk.incubator.vector") // Purpur - our javadocs need this for pufferfish's SIMD patch
+     (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet") // Purpur - silence Paper's bajillion javadoc warnings
+@@ -233,3 +240,5 @@ tasks.check {
+     dependsOn(scanJarForOldGeneratedCode)
+ }
+ // Paper end
++
++tasks.getByName("jar").dependsOn("sourcesJar") // Horizon
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 84b07a7fd7941b2f75b531646b67a124a0607390..813f36d1e91167a6f3fe3002720bef52c3504cc7 100644
+index eb29794f6ca2efc9cde4dd1685822f9a3a73f3b9..9c11628b1f3c98fe48f57774fa32b6de7d598bb1 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2277,6 +2277,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
