@@ -28,6 +28,8 @@ jobs:
           java-version: '21'
       - name: Setup Git Config
         run: git config --global user.email "action@github.com" && git config --global user.name "Github Action"
+      - name: Set BUILD_NUMBER environment variable
+        run: echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
       - name: Apply Patches
         run: gradle applyPatches
       - name: Create Jar
