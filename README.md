@@ -11,6 +11,34 @@
 - **Fakeplayer Support** - Allows you to create bots for different tests
 - **and more in future**
 
+### Dependency Information
+Maven
+```xml
+<repository>
+    <id>horizon</id>
+    <url>https://repo.timelesswaffle.su/snapshots</url>
+</repository>
+```
+```xml
+<dependency>
+    <groupId>dev.horizonmc.horizon</groupId>
+    <artifactId>horizon-api</artifactId>
+    <version>1.21.1-R0.1-SNAPSHOT</version>
+</dependency>
+```
+
+Gradle
+```kotlin
+repositories {
+    maven("https://repo.timelesswaffle.su/snapshots")
+}
+```
+```kotlin
+dependencies {
+    compileOnly("dev.horizonmc.horizon:horizon-api:1.21.1-R0.1-SNAPSHOT")
+}
+```
+
 ## Build
 To build a paperclip jar, you need to run the following command. You can find the jar in build/libs(Note: JDK17 or JDK21 is needed)
 

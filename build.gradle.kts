@@ -97,7 +97,7 @@ tasks.generateDevelopmentBundle {
         listOf(
             "https://repo.maven.apache.org/maven2/",
             paperMavenPublicUrl,
-            "https://repo.purpurmc.org/snapshots"
+            "https://repo.timelesswaffle.su/snapshots"
         )
     )
 }
@@ -105,9 +105,12 @@ tasks.generateDevelopmentBundle {
 allprojects {
     publishing {
         repositories {
-            maven("https://repo.purpurmc.org/snapshots") {
+            maven("https://repo.timelesswaffle.su/snapshots") {
                 name = "horizon"
-                credentials(PasswordCredentials::class)
+                credentials(PasswordCredentials::class) {
+                    username = System.getenv("HORIZON_USERNAME")
+                    password = System.getenv("HORIZON_PASSWORD")
+                }
             }
         }
     }
