@@ -4,18 +4,6 @@ Date: Tue, 5 Nov 2024 20:48:36 +0300
 Subject: [PATCH] Fix Annotation
 
 
-diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 0672c3dba1a914ade49f2528913445fc343e2df9..aa20c9393d53a1cdd4430e2d60385c4b50d87b9c 100644
---- a/src/main/java/org/bukkit/Server.java
-+++ b/src/main/java/org/bukkit/Server.java
-@@ -189,6 +189,7 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-      *
-      * @return The array of startup arguments passed to the server during its launch.
-      */
-+    @Nullable
-     public String[] getStartupArgs();
-     // Horizon end
- 
 diff --git a/src/main/java/org/leavesmc/leaves/entity/BotManager.java b/src/main/java/org/leavesmc/leaves/entity/BotManager.java
 index 9a9a2c2fcb62a1bf5c89ddcc5dd993d20ee3eaf6..42767ee09a94bd6375a5fb1f437c975ab5e707e0 100644
 --- a/src/main/java/org/leavesmc/leaves/entity/BotManager.java
