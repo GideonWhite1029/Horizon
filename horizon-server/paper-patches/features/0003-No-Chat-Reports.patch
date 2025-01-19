@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 19 Jan 2025 20:52:19 +0300
+Subject: [PATCH] No Chat Reports
+
+
+diff --git a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
+index 14e412ebf75b0e06ab53a1c8f9dd1be6ad1e2680..70715c578198a1039a297731b081b2a13d7d9c5e 100644
+--- a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
++++ b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
+@@ -1,5 +1,6 @@
+ package io.papermc.paper.adventure;
+ 
++import dev.gideonwhite1029.horizon.HorizonConfig;
+ import io.papermc.paper.chat.ChatRenderer;
+ import io.papermc.paper.event.player.AbstractChatEvent;
+ import io.papermc.paper.event.player.AsyncChatEvent;
+@@ -317,7 +318,7 @@ public final class ChatProcessor {
+ 
+         private void sendToServer(final ChatType.Bound chatType, final @Nullable Function<Audience, net.minecraft.network.chat.Component> msgFunction) {
+             final PlayerChatMessage toConsoleMessage = msgFunction == null ? ChatProcessor.this.message : ChatProcessor.this.message.withUnsignedContent(msgFunction.apply(ChatProcessor.this.server.console));
+-            ChatProcessor.this.server.logChatMessage(toConsoleMessage.decoratedContent(), chatType, ChatProcessor.this.server.getPlayerList().verifyChatTrusted(toConsoleMessage) ? null : "Not Secure");
++            ChatProcessor.this.server.logChatMessage(toConsoleMessage.decoratedContent(), chatType, ChatProcessor.this.server.getPlayerList().verifyChatTrusted(toConsoleMessage) || HorizonConfig.noChatReports ? null : "Not Secure"); // Horizon - No Chat Reports
+         }
+     }
+ 

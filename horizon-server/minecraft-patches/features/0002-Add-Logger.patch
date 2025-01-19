@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 19 Jan 2025 17:32:40 +0300
+Subject: [PATCH] Add Logger
+
+
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index f61c29abf75443b206f37b90950d6c0e14ea59ff..b448e1b4aed7883ae01ea4d8ef354c91cd6cf604 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -344,6 +344,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     public boolean isTemporarilyActive;
+     public long activatedImmunityTick = Integer.MIN_VALUE;
+     public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
++    private CompoundTag horizonData = new CompoundTag(); // Horizon - Horizon ex data
+ 
+     public void inactiveTick() {
+     }
+@@ -2563,6 +2564,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 compound.putBoolean("Purpur.FireImmune", immuneToFire);
+             }
+             // Purpur end - Fire immune API
++            // Horizon start
++            if (compound.contains("Horizon.Data")) {
++                horizonData = compound.getCompound("Horizon.Data");
++            }
++            // Horizon end
+ 
+             return compound;
+         } catch (Throwable var9) {
+@@ -5152,6 +5158,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         return ((ServerLevel) this.level).isPositionEntityTicking(this.blockPosition());
+     }
+     // Paper end - Expose entity id counter
++
++    // Horizon start - horizon ex data
++    public CompoundTag getHorizonData() {
++        return horizonData;
++    }
++    // Horizon end - horizon ex data
++
+     // Purpur start - Ridables
+     @Nullable
+     private Player rider = null;

@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 19 Jan 2025 18:51:00 +0300
+Subject: [PATCH] Add Config
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index d067b775b7311631b947fd0faa0dce4129c4a846..44a35b16e164d4d509776694ee45441e67d9b93d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -1131,6 +1131,7 @@ public final class CraftServer implements Server {
+             playerMetadata.removeAll(plugin);
+         }
+         // Paper end
++        dev.gideonwhite1029.horizon.HorizonConfig.init((File) console.options.valueOf("horizon-settings")); // Horizon - Server Config
+         this.reloadData();
+         org.spigotmc.SpigotConfig.registerCommands(); // Spigot
+         io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
+@@ -3138,6 +3139,13 @@ public final class CraftServer implements Server {
+         }
+         // Purpur end - Purpur config files
+ 
++        // Horizon start
++        @Override
++        public YamlConfiguration getHorizonConfig() {
++            return dev.gideonwhite1029.horizon.HorizonConfig.config;
++        }
++        // Horizon end
++
+         @Override
+         public void restart() {
+             org.spigotmc.RestartCommand.restart();
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 90fb036607e752fcf43575be4f03bbf00bbb05c7..1a9228f9340f9f83aa9ecd5dde317b296bc03e0d 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -183,6 +183,13 @@ public class Main {
+                     .defaultsTo(new File("purpur.yml"))
+                     .describedAs("Yml file");
+                 // Purpur end - Purpur config files
++                // Horizon start - Server Config
++                acceptsAll(asList("horizon", "horizon-settings"), "File for horizon settings")
++                        .withRequiredArg()
++                        .ofType(File.class)
++                        .defaultsTo(new File("horizon.yml"))
++                        .describedAs("Yml file");
++                // Horizon end - Server Config
+                 // Paper start
+                 acceptsAll(asList("server-name"), "Name of the server")
+                         .withRequiredArg()
