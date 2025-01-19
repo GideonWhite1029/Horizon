@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: GideonWhite1029 <gideonwhite1029@gmail.com>
-Date: Thu, 28 Mar 2024 16:57:54 +0400
+Date: Sun, 19 Jan 2025 14:02:35 +0300
 Subject: [PATCH] Information changed during startup
 
 
@@ -24,10 +24,10 @@ index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee9
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index db453d04efb00baaeabb904a7bd1b99dd0a50735..5decafaa9c3f14384c854f77b06657bd6777d3eb 100644
+index 249d6549543c059694a9372200b8581feb8dd8f8..3c04b4f523e7e129105aad22a2244da26d8ebdd3 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -121,8 +121,17 @@ public final class Bukkit {
+@@ -122,8 +122,17 @@ public final class Bukkit {
      @NotNull
      public static String getVersionMessage() {
          final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();

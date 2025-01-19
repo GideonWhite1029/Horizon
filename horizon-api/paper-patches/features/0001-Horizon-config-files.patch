@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 19 Jan 2025 13:52:38 +0300
+Subject: [PATCH] Horizon config files
+
+
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 594bcedd823acc87ed429ad8ef17b66e9dc15beb..2fcc1d6ba19aca39bcb8d5420abc3eeb55edd7c9 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2342,6 +2342,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+         }
+         // Purpur end
+ 
++        // Horizon start
++        @NotNull
++        public org.bukkit.configuration.file.YamlConfiguration getHorizonConfig() {
++            throw new UnsupportedOperationException("Not supported yet.");
++        }
++        // Horizon end
++
+         /**
+          * Sends the component to the player
+          *

@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 19 Jan 2025 14:36:21 +0300
+Subject: [PATCH] Replay API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 38ce2448d7b717140f407cf68828bb87f3a18d35..ee939e5dadb5b1d611b9ef0d1cb1a4252505bb6a 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -2995,6 +2995,11 @@ public final class Bukkit {
+         return server.getBotManager();
+     }
+     // Horizon end - Bot API
++    // Horizon start - Photographer API
++    public static @NotNull dev.gideonwhite1029.horizon.entity.PhotographerManager getPhotographerManager() {
++        return server.getPhotographerManager();
++    }
++    // Horizon end - Photographer API
+ 
+     @NotNull
+     public static Server.Spigot spigot() {
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 740b5455873be8ac674b373aa7407957daccd43d..f710d2f716f9317da67c7d64e2ba4beb0a1116ea 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -16,6 +16,7 @@ import java.util.function.Consumer;
+ import java.util.logging.Logger;
+ 
+ import dev.gideonwhite1029.horizon.entity.BotManager;
++import dev.gideonwhite1029.horizon.entity.PhotographerManager;
+ import net.kyori.adventure.text.Component;
+ import net.kyori.adventure.text.minimessage.MiniMessage;
+ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+@@ -2684,6 +2685,9 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      */
+     @NotNull BotManager getBotManager();
+     // Horizon end - Bot API
++    // Horizon start - Photographer API
++    @NotNull PhotographerManager getPhotographerManager();
++    // Horizon end - Photographer API
+ 
+     // Purpur start - Bring back server name
+     /**
