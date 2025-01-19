@@ -5,13 +5,14 @@ Subject: [PATCH] Information changed during startup
 
 
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfo.java b/src/main/java/io/papermc/paper/ServerBuildInfo.java
-index 7196594e07af19a14c320d77df893978525fe386..b770c4dcbccba80e493207b01dec2eddcf0e4172 100644
+index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee976afd038 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfo.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfo.java
-@@ -33,6 +33,13 @@ public interface ServerBuildInfo {
+@@ -25,6 +25,14 @@ public interface ServerBuildInfo {
+      */
      Key BRAND_PURPUR_ID = Key.key("purpurmc", "purpur");
      // Purpur end
- 
++
 +    // Horizon start
 +    /**
 +     * The brand id for Horizon.
@@ -23,15 +24,15 @@ index 7196594e07af19a14c320d77df893978525fe386..b770c4dcbccba80e493207b01dec2edd
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 3a71f8fe73a2309f57cb06dedf204d3e37b46b03..2b2f4a389699bc22cadaef3d189a036a610aa8f8 100644
+index db453d04efb00baaeabb904a7bd1b99dd0a50735..5decafaa9c3f14384c854f77b06657bd6777d3eb 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -120,8 +120,18 @@ public final class Bukkit {
-       */
+@@ -121,8 +121,17 @@ public final class Bukkit {
      @NotNull
      public static String getVersionMessage() {
--        final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();
+         final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();
 -        return "This server is running " + getName() + " version " + version.asString(io.papermc.paper.ServerBuildInfo.StringRepresentation.VERSION_FULL) + " (Implementing API version " + getBukkitVersion() + ")";
+-        // Paper end
 +        // Horizon start
 +        return "\n" +
 +                "\u001B[38;5;99m      __ ______  ___  ________  ____  _  __\n" +
@@ -42,11 +43,10 @@ index 3a71f8fe73a2309f57cb06dedf204d3e37b46b03..2b2f4a389699bc22cadaef3d189a036a
 +                "  \u001b[38;5;105m Server name: \u001B[0m" + getName() + "\n"+
 +                "  \u001b[38;5;105m Version: \u001B[0m" + getVersion() + "\n" +
 +                "  \u001b[38;5;105m API version: \u001B[0m" + getBukkitVersion() + "\n";
-+
 +        // Horizon stop
-         // Paper end
      }
  
+     /**
 diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
 index c880d0010849ab733ad13bbd18fab3c864d0cf61..3d5faae011ebab29ca38175df2821e8e993cd10a 100644
 --- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java

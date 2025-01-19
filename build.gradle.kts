@@ -2,28 +2,60 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-    java
-    `maven-publish`
-    id("io.papermc.paperweight.patcher") version "1.7.3"
+    java // TODO java launcher tasks
+    id("io.papermc.paperweight.patcher") version "2.0.0-beta.14"
 }
 
-allprojects {
-    apply(plugin = "java")
-    apply(plugin = "maven-publish")
+val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
+val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/"
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+paperweight {
+    upstreams.register("purpur") {
+        repo = github("PurpurMC", "Purpur")
+        ref = providers.gradleProperty("purpurCommit")
+
+        patchFile {
+            path = "purpur-server/build.gradle.kts"
+            outputFile = file("horizon-server/build.gradle.kts")
+            patchFile = file("horizon-server/build.gradle.kts.patch")
+        }
+        patchFile {
+            path = "purpur-api/build.gradle.kts"
+            outputFile = file("horizon-api/build.gradle.kts")
+            patchFile = file("horizon-api/build.gradle.kts.patch")
+        }
+        patchRepo("paperApi") {
+            upstreamPath = "paper-api"
+            patchesDir = file("horizon-api/paper-patches")
+            outputDir = file("paper-api")
+        }
+        patchDir("purpurApi") {
+            upstreamPath = "purpur-api"
+            excludes = listOf("build.gradle.kts", "build.gradle.kts.patch", "paper-patches")
+            patchesDir = file("horizon-api/purpur-patches")
+            outputDir = file("purpur-api")
         }
     }
 }
 
-val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
-
 subprojects {
-    tasks.withType<JavaCompile>().configureEach {
+    apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+
+    extensions.configure<JavaPluginExtension> {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    dependencies {
+        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+    }
+
+    tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
         options.release = 21
+        options.isFork = true
     }
     tasks.withType<Javadoc> {
         options.encoding = Charsets.UTF_8.name()
@@ -38,72 +70,20 @@ subprojects {
             events(TestLogEvent.STANDARD_OUT)
         }
     }
+    tasks.withType<AbstractArchiveTask>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
 
     repositories {
         mavenCentral()
         maven(paperMavenPublicUrl)
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
+        maven(purpurMavenPublicUrl)
         maven("https://jitpack.io")
+        maven("https://repo.timelesswaffle.su/snapshots")
     }
-}
 
-repositories {
-    mavenCentral()
-    maven(paperMavenPublicUrl) {
-        content {
-            onlyForConfigurations(configurations.paperclip.name)
-        }
-    }
-}
-
-dependencies {
-    remapper("net.fabricmc:tiny-remapper:0.10.3:fat")
-    decompiler("org.vineflower:vineflower:1.10.1")
-    paperclip("io.papermc:paperclip:3.0.3")
-}
-
-paperweight {
-    serverProject = project(":horizon-server")
-
-    remapRepo = paperMavenPublicUrl
-    decompileRepo = paperMavenPublicUrl
-
-    useStandardUpstream("purpur") {
-        url = github("PurpurMC", "Purpur")
-        ref = providers.gradleProperty("purpurCommit")
-
-        withStandardPatcher {
-            baseName("Purpur")
-
-            apiPatchDir = layout.projectDirectory.dir("patches/api")
-            apiOutputDir = layout.projectDirectory.dir("Horizon-API")
-
-            serverPatchDir = layout.projectDirectory.dir("patches/server")
-            serverOutputDir = layout.projectDirectory.dir("Horizon-Server")
-        }
-
-        patchTasks.register("generatedApi") {
-            isBareDirectory = true
-            upstreamDirPath = "paper-api-generator/generated"
-            patchDir = layout.projectDirectory.dir("patches/generated-api")
-            outputDir = layout.projectDirectory.dir("paper-api-generator/generated")
-        }
-    }
-}
-
-tasks.generateDevelopmentBundle {
-    apiCoordinates = "dev.horizonmc.horizon:horizon-api"
-    libraryRepositories.set(
-        listOf(
-            "https://repo.maven.apache.org/maven2/",
-            paperMavenPublicUrl,
-            "https://repo.timelesswaffle.su/snapshots"
-        )
-    )
-}
-
-allprojects {
-    publishing {
+    extensions.configure<PublishingExtension> {
         repositories {
             maven("https://repo.timelesswaffle.su/snapshots") {
                 name = "horizon"
@@ -112,14 +92,6 @@ allprojects {
                     password = System.getenv("HORIZON_PASSWORD")
                 }
             }
-        }
-    }
-}
-
-publishing {
-    publications.create<MavenPublication>("devBundle") {
-        artifact(tasks.generateDevelopmentBundle) {
-            artifactId = "dev-bundle"
         }
     }
 }

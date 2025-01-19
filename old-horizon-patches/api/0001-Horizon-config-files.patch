@@ -5,10 +5,10 @@ Subject: [PATCH] Horizon config files
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index f536f8f42b99e4b7dc2e25785617837fbc405b5b..dcef0423d349f7ff4a506ee30778c05cc175e4fd 100644
+index ff4b6b735bf0117845cdb316af115079937792ed..1d9b4fe8840784ce4dd23023920d65cff036965a 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
-@@ -150,6 +150,13 @@ tasks.jar {
+@@ -161,6 +161,13 @@ tasks.jar {
      }
  }
  
@@ -22,17 +22,17 @@ index f536f8f42b99e4b7dc2e25785617837fbc405b5b..dcef0423d349f7ff4a506ee30778c05c
  tasks.withType<Javadoc> {
      (options as StandardJavadocDocletOptions).addStringOption("-add-modules", "jdk.incubator.vector") // Purpur - our javadocs need this for pufferfish's SIMD patch
      (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:none", "-quiet") // Purpur - silence Paper's bajillion javadoc warnings
-@@ -233,3 +240,5 @@ tasks.check {
+@@ -249,3 +256,5 @@ tasks.check {
      dependsOn(scanJarForOldGeneratedCode)
  }
  // Paper end
 +
 +tasks.getByName("jar").dependsOn("sourcesJar") // Horizon
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index eb29794f6ca2efc9cde4dd1685822f9a3a73f3b9..9c11628b1f3c98fe48f57774fa32b6de7d598bb1 100644
+index fcfad39173ecf2573a1ba77236bce8d9f73e02bb..52899e58d85cb6cc231fee84a6e500ab1c0f7e98 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2277,6 +2277,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2295,6 +2295,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
          }
          // Purpur end
  

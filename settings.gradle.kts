@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
 }
 
 if (!file(".git").exists()) {
@@ -21,7 +21,7 @@ if (!file(".git").exists()) {
          the repository using Git, not download a code zip from GitHub.
          
          See https://github.com/PurpurMC/Purpur/blob/HEAD/CONTRIBUTING.md
-         for further information on building and modifying Purpur.
+         for further information on building and modifying Horizon.
         ===================================================
     """.trimIndent()
     error(errorText)
@@ -29,7 +29,7 @@ if (!file(".git").exists()) {
 
 rootProject.name = "Horizon"
 
-for (name in listOf("Horizon-API", "Horizon-Server", "paper-api-generator")) {
+for (name in listOf("horizon-api", "horizon-server")) {
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
     findProject(":$projName")!!.projectDir = file(name)

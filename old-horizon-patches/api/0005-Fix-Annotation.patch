@@ -1,0 +1,73 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 5 Nov 2024 20:48:36 +0300
+Subject: [PATCH] Fix Annotation
+
+
+diff --git a/src/main/java/dev/horizonmc/horizon/entity/BotManager.java b/src/main/java/dev/horizonmc/horizon/entity/BotManager.java
+index dcc75d1dca12bdcf6e5fdf56868316e9acdc606e..b75621292fad972d532e4a51e591d945f29a4c86 100644
+--- a/src/main/java/dev/horizonmc/horizon/entity/BotManager.java
++++ b/src/main/java/dev/horizonmc/horizon/entity/BotManager.java
+@@ -36,6 +36,7 @@ public interface BotManager {
+      *
+      * @return a view of fakeplayers.
+      */
++    @Nullable
+     public Collection<Bot> getBots();
+ 
+     /**
+@@ -45,7 +46,7 @@ public interface BotManager {
+      * @param action action executor
+      * @return true if success, or false
+      */
+-    public boolean registerCustomBotAction(String name, CustomBotAction action);
++    public boolean registerCustomBotAction(@NotNull String name, @NotNull CustomBotAction action);
+ 
+     /**
+      * Unregister a custom bot action.
+@@ -53,7 +54,7 @@ public interface BotManager {
+      * @param name action name
+      * @return true if success, or false
+      */
+-    public boolean unregisterCustomBotAction(String name);
++    public boolean unregisterCustomBotAction(@NotNull String name);
+ 
+     public BotCreator botCreator(@NotNull String realName, @NotNull Location location);
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
+index 8dd9e5b74731b99bec5c4e32ad8a7db97b98f5d9..83436282009c9916ec2a7370417b8b13a521a306 100644
+--- a/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
++++ b/src/main/java/dev/horizonmc/horizon/entity/PhotographerManager.java
+@@ -28,5 +28,6 @@ public interface PhotographerManager {
+ 
+     public void removeAllPhotographers();
+ 
++    @Nullable
+     public Collection<Photographer> getPhotographers();
+ }
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
+index 571bd73b314ba956b75d8ab268fbb20db70b434d..a4a0206e9c92290dba2f7b44c2b0b1fc922afc74 100644
+--- a/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotConfigModifyEvent.java
+@@ -47,7 +47,7 @@ public class BotConfigModifyEvent extends BotEvent implements Cancellable {
+         return handlers;
+     }
+ 
+-    public static HandlerList getHandlerList() {
++    public @NotNull static HandlerList getHandlerList() {
+         return handlers;
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
+index a4cb73957fde882207ce469b1addd0b8e7c0235b..1a6b214266b339f974418b44249ce01ef7691417 100644
+--- a/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
++++ b/src/main/java/dev/horizonmc/horizon/event/bot/BotCreateEvent.java
+@@ -42,6 +42,7 @@ public class BotCreateEvent extends Event implements Cancellable {
+      *
+      * @return fakeplayer name
+      */
++    @Nullable
+     public String getBot() {
+         return bot;
+     }

@@ -51,8 +51,10 @@ manifest.mf
 # other stuff
 run/
 
-build-data/
-Horizon-API/
-Horizon-Server/
-paper-api-generator/
-Horizon-MojangAPI
+horizon-api/build.gradle.kts
+horizon-server/build.gradle.kts
+horizon-server/src/minecraft
+purpur-api
+purpur-server
+paper-api
+paper-server
