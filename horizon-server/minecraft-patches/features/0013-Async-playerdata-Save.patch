@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 21:39:53 +0300
+Subject: [PATCH] Async playerdata Save
+
+
+diff --git a/net/minecraft/world/level/storage/LevelStorageSource.java b/net/minecraft/world/level/storage/LevelStorageSource.java
+index de43e54698125ce9f319d4889dd49f7029fe95e0..af95874e8167d7a429e9c8374ec7fa7dec6f6ecf 100644
+--- a/net/minecraft/world/level/storage/LevelStorageSource.java
++++ b/net/minecraft/world/level/storage/LevelStorageSource.java
+@@ -514,7 +514,10 @@ public class LevelStorageSource {
+             CompoundTag compoundTag = serverConfiguration.createTag(registries, hostPlayerNBT);
+             CompoundTag compoundTag1 = new CompoundTag();
+             compoundTag1.put("Data", compoundTag);
+-            this.saveLevelData(compoundTag1);
++            // Horizon start - Async playerdata save
++            Runnable runnable = () -> this.saveLevelData(compoundTag1);
++            dev.gideonwhite1029.horizon.util.AsyncPlayerDataSaving.saveAsync(runnable);
++            // Horizon end - Async playerdata save
+         }
+ 
+         private void saveLevelData(CompoundTag tag) {
+@@ -601,7 +604,10 @@ public class LevelStorageSource {
+             this.checkLock();
+             CompoundTag levelDataTagRaw = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
+             modifier.accept(levelDataTagRaw.getCompound("Data"));
+-            this.saveLevelData(levelDataTagRaw);
++            // Horizon start - Async playerdata save
++            Runnable runnable = () -> this.saveLevelData(levelDataTagRaw);
++            dev.gideonwhite1029.horizon.util.AsyncPlayerDataSaving.saveAsync(runnable);
++            // Horizon end - Async playerdata save
+         }
+ 
+         public long makeWorldBackup() throws IOException {
+diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
+index c44110b123ba5912af18faf0065e9ded780da9b7..588d9eeec0f0bc23ecdb4735b010de02b1b9a929 100644
+--- a/net/minecraft/world/level/storage/PlayerDataStorage.java
++++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
+@@ -34,6 +34,13 @@ public class PlayerDataStorage {
+ 
+     public void save(Player player) {
+         if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot
++        // Horizon start - Async playerdata save
++        Runnable runnable = () -> save0(player);
++        dev.gideonwhite1029.horizon.util.AsyncPlayerDataSaving.saveAsync(runnable);
++    }
++
++    private void save0(Player player) {
++        // Horizon end - Async playerdata save
+         try {
+             CompoundTag compoundTag = player.saveWithoutId(new CompoundTag());
+             Path path = this.playerDir.toPath();

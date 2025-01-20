@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 23:20:26 +0300
+Subject: [PATCH] Secure Seed Command
+
+
+diff --git a/net/minecraft/server/commands/SeedCommand.java b/net/minecraft/server/commands/SeedCommand.java
+index a65affc41a4fc299bc2281f0f53f2e075633899d..69dbe79dfcc71855d42207d7b14087e584998df4 100644
+--- a/net/minecraft/server/commands/SeedCommand.java
++++ b/net/minecraft/server/commands/SeedCommand.java
+@@ -12,6 +12,15 @@ public class SeedCommand {
+             long seed = context.getSource().getLevel().getSeed();
+             Component component = ComponentUtils.copyOnClickText(String.valueOf(seed));
+             context.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
++            // Horizon start - Secure Seed Command
++            if (dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) {
++                dev.gideonwhite1029.horizon.matter.Globals.setupGlobals(context.getSource().getLevel());
++                String seedStr = dev.gideonwhite1029.horizon.matter.Globals.seedToString(dev.gideonwhite1029.horizon.matter.Globals.worldSeed);
++                Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
++
++                context.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
++            }
++            // Horizon end - Secure Seed Command
+             return (int)seed;
+         }));
+     }

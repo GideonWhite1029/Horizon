@@ -1,0 +1,41 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 23:16:38 +0300
+Subject: [PATCH] Secure Seed
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+index de8b9048c8395c05b8688bc9d984b8ad680f15b3..4271fd58291f7d8ca776c0dadb402e5bdf8ab666 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+@@ -206,7 +206,12 @@ public class CraftChunk implements Chunk {
+     @Override
+     public boolean isSlimeChunk() {
+         // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
+-        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        // Horizon start - Feature Secure Seed
++        boolean isSlimeChunk = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk()
++                : WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || isSlimeChunk;
++        // Horizon end - Feature Secure Seed
+     }
+ 
+     @Override
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 689c439cd0c3f0def63810ebc248971ca76abb73..9e5c0608de209347948d7ca682ce27f58e078330 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -1404,7 +1404,11 @@ public final class CraftServer implements Server {
+             registryAccess = levelDataAndDimensions.dimensions().dimensionsRegistryAccess();
+         } else {
+             LevelSettings levelSettings;
+-            WorldOptions worldOptions = new WorldOptions(creator.seed(), creator.generateStructures(), false);
++            // Horizon start - Feature Secure Seed
++            WorldOptions worldOptions = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                    ? new WorldOptions(creator.seed(), dev.gideonwhite1029.horizon.matter.Globals.createRandomWorldSeed(), creator.generateStructures(), false)
++                    : new WorldOptions(creator.seed(), creator.generateStructures(), false);
++            // Horizon end - Feature Secure Seed
+             WorldDimensions worldDimensions;
+ 
+             DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(GsonHelper.parse((creator.generatorSettings().isEmpty()) ? "{}" : creator.generatorSettings()), creator.type().name().toLowerCase(Locale.ROOT));

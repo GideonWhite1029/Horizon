@@ -103,4 +103,16 @@ public final class HorizonConfig {
     @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
     public static boolean fasterChunkSerialization = false;
 
+    @GlobalConfig(name = "disableMovedWronglyThreshold", category = {"features"})
+    public static boolean disableMovedWronglyThreshold = false;
+
+    @GlobalConfig(name = "async-player-data-saving", category = {"optimization"})
+    public static boolean asyncPlayerDataSaving = false;
+
+    @GlobalConfig(name = "use_virtual_thread_for_chat_executor", category = {"utils"})
+    public static boolean useVirtualThreadForChatExecutor = false;
+
+    @GlobalConfig(name = "secure-seed", category = {"features"})
+    public static boolean secureSeed = false;
+
 }
