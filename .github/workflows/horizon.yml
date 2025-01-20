@@ -52,7 +52,7 @@ jobs:
             ${{ env.commit_msg }}
           artifacts: |
             ${{ env.jar_dir }}
-            build/libs/${{ env.project_id }}-${{ env.mcversion }}-bundler.jar
+            horizon-server/build/libs/${{ env.project_id }}-${{ env.mcversion }}-bundler.jar
           generateReleaseNotes: true
           prerelease: ${{ env.pre }}
           makeLatest: ${{ env.make_latest }}

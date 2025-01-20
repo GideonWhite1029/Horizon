@@ -11,7 +11,7 @@ grdversion=$(prop version)
 preVersion=$(prop preVersion)
 release_tag="$mcversion-$commitid"
 jarName="$project_id-$mcversion-paperclip.jar"
-jarName_dir="build/libs/$jarName"
+jarName_dir="horizon-server/build/libs/$jarName"
 make_latest=$([ $preVersion = "true" ] && echo "false" || echo "true")
 
 mv horizon-server/build/libs/$project_id-paperclip-$grdversion-mojmap.jar horizon-server/build/libs/$jarName
