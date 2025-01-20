@@ -85,4 +85,22 @@ public final class HorizonConfig {
     @GlobalConfig(name = "vanilla-hopper", category = {"features"})
     public static boolean vanillaHopper = false;
 
+    @GlobalConfig(name = "spectator-dont-get-advancement", category = {"features"})
+    public static boolean spectatorDontGetAdvancement = false;
+
+    @GlobalConfig(name = "use_virtual_thread_for_async_scheduler", category = {"utils"})
+    public static boolean useVirtualThreadForAsyncScheduler = false;
+
+    @GlobalConfig(name = "copper-bulb-1-gt-delay", category = {"features"})
+    public static boolean copperBulb1gt = false;
+
+    @GlobalConfig(name = "crafter-1-gt-delay", category = {"features"})
+    public static boolean crafter1gt = false;
+
+    @GlobalConfig(name = "disable-packet-limit", category = {"features"})
+    public static boolean disablePacketLimit = false;
+
+    @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
+    public static boolean fasterChunkSerialization = false;
+
 }

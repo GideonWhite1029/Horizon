@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 15:25:42 +0300
+Subject: [PATCH] Copper Bulb 1 gt delay
+
+
+diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraft/world/level/block/CopperBulbBlock.java
+index d3d3ad8bb33313e735eec559f854fb76bdf84cc2..484a9c475cac48f793d41b3d25dca9e722f47047 100644
+--- a/net/minecraft/world/level/block/CopperBulbBlock.java
++++ b/net/minecraft/world/level/block/CopperBulbBlock.java
+@@ -32,16 +32,37 @@ public class CopperBulbBlock extends Block {
+     @Override
+     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+         if (oldState.getBlock() != state.getBlock() && level instanceof ServerLevel serverLevel) {
+-            this.checkAndFlip(state, serverLevel, pos);
++            // Horizon start - copper bulb 1 gt delay
++            if (!dev.gideonwhite1029.horizon.HorizonConfig.copperBulb1gt) {
++                this.checkAndFlip(state, serverLevel, pos);
++            } else {
++                level.scheduleTick(pos, this, 1);
++            }
++            // Horizon end - copper bulb 1 gt delay
+         }
+     }
+ 
+     @Override
+     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+         if (level instanceof ServerLevel serverLevel) {
+-            this.checkAndFlip(state, serverLevel, pos);
++            // Horizon start - copper bulb 1 gt delay
++            if (!dev.gideonwhite1029.horizon.HorizonConfig.copperBulb1gt) {
++                this.checkAndFlip(state, serverLevel, pos);
++            } else {
++                level.scheduleTick(pos, this, 1);
++            }
++            // Horizon end - copper bulb 1 gt delay
++        }
++    }
++
++    // Horizon start - copper bulb 1 gt delay
++    @Override
++    public void tick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
++        if (dev.gideonwhite1029.horizon.HorizonConfig.copperBulb1gt) {
++            checkAndFlip(state, level, pos);
+         }
+     }
++    // Horizon end - copper bulb 1 gt delay
+ 
+     public void checkAndFlip(BlockState state, ServerLevel level, BlockPos pos) {
+         boolean hasNeighborSignal = level.hasNeighborSignal(pos);

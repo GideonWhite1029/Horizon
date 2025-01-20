@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 14:43:43 +0300
+Subject: [PATCH] Horizon Protocol Core
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 44a35b16e164d4d509776694ee45441e67d9b93d..689c439cd0c3f0def63810ebc248971ca76abb73 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -506,6 +506,7 @@ public final class CraftServer implements Server {
+         this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
+         datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
+         this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.init(); // Horizon - protocol
+     }
+ 
+     public boolean getCommandBlockOverride(String command) {
+@@ -1139,6 +1140,7 @@ public final class CraftServer implements Server {
+         org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur - Purpur config files
+         this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
+         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleServerReload(); // Horizon - protocol
+ 
+         int pollCount = 0;
+ 

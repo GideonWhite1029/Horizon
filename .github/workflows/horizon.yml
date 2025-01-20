@@ -29,16 +29,16 @@ jobs:
       - name: Setup Git Config
         run: git config --global user.email "action@github.com" && git config --global user.name "Github Action"
       - name: Apply Patches
-        run: gradle applyPatches
+        run: gradle applyAllPatches
       - name: Create Jar
-        run: gradle createMojmapBundlerJar createMojmapPaperclipJar
+        run: gradle createMojmapPaperclipJar
       - name: Get Release Info
         run: sh scripts/ReleaseInfo.sh
       - name: Upload Artifact
         uses: "actions/upload-artifact@v4"
         with:
           name: "${{ env.project_id_b }} CI Artifacts"
-          path: "build/libs/*.jar"
+          path: "horizon-server/build/libs/*.jar"
       - name: Create Release
         if: "!contains(github.event.commits[0].message, '[release skip]')"
         uses: ncipollo/release-action@v1.14.0
@@ -57,8 +57,8 @@ jobs:
           prerelease: ${{ env.pre }}
           makeLatest: ${{ env.make_latest }}
           token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Publish to Maven repo
-        env:
-          HORIZON_USERNAME: ${{ secrets.REPO_USERNAME }}
-          HORIZON_PASSWORD: ${{ secrets.REPO_PASSWORD }}
-        run: ./gradlew publish
+#      - name: Publish to Maven repo
+#        env:
+#          HORIZON_USERNAME: ${{ secrets.REPO_USERNAME }}
+#          HORIZON_PASSWORD: ${{ secrets.REPO_PASSWORD }}
+#        run: ./gradlew publish

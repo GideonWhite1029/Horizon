@@ -1,0 +1,93 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 14:43:13 +0300
+Subject: [PATCH] Horizon Protocol Core
+
+
+diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
+index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..d95f9f32ca3367cc8f09b22745b8c47b2fd9a0b9 100644
+--- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
++++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
+@@ -40,13 +40,23 @@ public interface CustomPacketPayload {
+ 
+             @Override
+             public void encode(B buffer, CustomPacketPayload value) {
++                // Horizon start - protocol core
++                if (value instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload<?> horizonCustomPayload) {
++                    buffer.writeResourceLocation(horizonCustomPayload.id());
++                    horizonCustomPayload.write(buffer);
++                    return;
++                }
++                // Horizon end - protocol core
+                 this.writeCap(buffer, value.type(), value);
+             }
+ 
+             @Override
+             public CustomPacketPayload decode(B buffer) {
+                 ResourceLocation resourceLocation = buffer.readResourceLocation();
+-                return (CustomPacketPayload)this.findCodec(resourceLocation).decode(buffer);
++                // Horizon start - protocol core
++                var horizonCustomPayload = dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.decode(resourceLocation, buffer);
++                return java.util.Objects.requireNonNullElseGet(horizonCustomPayload, () -> (CustomPacketPayload) this.findCodec(resourceLocation).decode(buffer));
++                // Horizon end - protocol core
+             }
+         };
+     }
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index 54512846b6126cb5f78d663c3d40a5f199c96642..02e10dbd2deed7cb999b07bb2e351ae62b40bb0d 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -1784,6 +1784,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+         profilerFiller.popPush("server gui refresh");
+ 
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleTick(); // Horizon - protocol
++
+         for (int i = 0; i < this.tickables.size(); i++) {
+             this.tickables.get(i).run();
+         }
+diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
+index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd7248404c29 100644
+--- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
+@@ -148,6 +148,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+ 
+     @Override
+     public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
++        // Horizon start - protocol
++        if (packet.payload() instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload<?> horizonPayload) {
++            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(player, horizonPayload);
++        }
++        // Horizon end - protocol
+         // CraftBukkit start
+         // Paper start - Brand support
+         if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload(String brand)) {
+@@ -166,6 +171,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
+                 for (String channel : channels.split("\0")) {
+                     this.getCraftPlayer().addChannel(channel);
++                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
+                 }
+             } catch (Exception ex) {
+                 ServerGamePacketListenerImpl.LOGGER.error("Couldn't register custom payload", ex);
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index 4405f6feee53d0393fcedf555e65ecbacf93469f..bc91ff444cbe98a31a05d4b14fd090ee2ff83ef6 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -330,6 +330,8 @@ public abstract class PlayerList {
+             return;
+         }
+ 
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerJoin(player); // Horizon - protocol
++
+         final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
+ 
+         if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
+@@ -501,6 +503,7 @@ public abstract class PlayerList {
+         return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
+     }
+     public net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerLeave(player); // Horizon - protocol
+         // Paper end - Fix kick event leave message not being sent
+         org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar
+         ServerLevel serverLevel = player.serverLevel();

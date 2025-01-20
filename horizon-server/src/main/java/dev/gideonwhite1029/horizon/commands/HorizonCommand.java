@@ -1,6 +1,7 @@
 package dev.gideonwhite1029.horizon.commands;
 
 import dev.gideonwhite1029.horizon.commands.subcommands.ConfigCommand;
+import dev.gideonwhite1029.horizon.commands.subcommands.ReloadCommand;
 import io.papermc.paper.command.CommandUtil;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.Util;
@@ -33,6 +34,7 @@ public final class HorizonCommand extends Command {
     private static final Map<String, HorizonSubcommand> SUBCOMMANDS = Util.make(() -> {
         final Map<Set<String>, HorizonSubcommand> commands = new HashMap<>();
         commands.put(Set.of("config"), new ConfigCommand());
+        commands.put(Set.of("reload"), new ReloadCommand());
 
         return commands.entrySet().stream()
                 .flatMap(entry -> entry.getKey().stream().map(s -> Map.entry(s, entry.getValue())))

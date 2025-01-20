@@ -14,8 +14,9 @@ jarName="$project_id-$mcversion-paperclip.jar"
 jarName_dir="build/libs/$jarName"
 make_latest=$([ $preVersion = "true" ] && echo "false" || echo "true")
 
-mv build/libs/$project_id_b-paperclip-$grdversion-mojmap.jar build/libs/$jarName
-mv build/libs/$project_id_b-bundler-$grdversion-mojmap.jar build/libs/$project_id-$mcversion-bundler.jar
+mv horizon-server/build/libs/$project_id-paperclip-$grdversion-mojmap.jar horizon-server/build/libs/$jarName
+mv horizon-server/build/libs/$project_id-bundler-$grdversion-mojmap.jar horizon-server/build/libs/$project_id-$mcversion-bundler.jar
+rm horizon-server/build/libs/$project_id-server-$grdversion.jar
 
 echo "project_id=$project_id" >> $GITHUB_ENV
 echo "project_id_b=$project_id_b" >> $GITHUB_ENV
