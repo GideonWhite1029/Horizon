@@ -115,4 +115,16 @@ public final class HorizonConfig {
     @GlobalConfig(name = "secure-seed", category = {"features"})
     public static boolean secureSeed = false;
 
+    @GlobalConfig(name = "use_virtual_thread_for_user_authenticator", category = {"utils"})
+    public static boolean useVirtualThreadForUserAuthenticator = false;
+
+    @GlobalConfig(name = "tt20-lag-compensation", category = {"optimization", "tt20"})
+    public static boolean tt20LagCompensation = false;
+
+    @GlobalConfig(name = "enable-for-water", category = {"optimization", "tt20"})
+    public static boolean tt20LagCompensationWater = false;
+
+    @GlobalConfig(name = "enable-for-lava", category = {"optimization", "tt20"})
+    public static boolean tt20LagCompensationLava = false;
+
 }
