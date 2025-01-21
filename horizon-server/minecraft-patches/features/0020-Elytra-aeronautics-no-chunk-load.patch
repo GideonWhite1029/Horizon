@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Tue, 21 Jan 2025 14:47:40 +0300
+Subject: [PATCH] Elytra aeronautics no chunk load
+
+
+diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
+index b3f498558614243cf633dcd71e3c49c2c55e6e0f..9cdf814867a4d48ce6472f57b84b022d0c8d7d2c 100644
+--- a/net/minecraft/server/level/ChunkMap.java
++++ b/net/minecraft/server/level/ChunkMap.java
+@@ -792,7 +792,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+     }
+ 
+     private boolean skipPlayer(ServerPlayer player) {
+-        return player.isSpectator() && !this.level.getGameRules().getBoolean(GameRules.RULE_SPECTATORSGENERATECHUNKS);
++        return (player.isSpectator() && !this.level.getGameRules().getBoolean(GameRules.RULE_SPECTATORSGENERATECHUNKS))
++                || (dev.gideonwhite1029.horizon.HorizonConfig.elytraAeronauticsNoChunk && player.elytraAeronauticsNoChunk); // Horizon - Elytra aeronautics
+     }
+ 
+     void updatePlayerStatus(ServerPlayer player, boolean track) {
+@@ -826,6 +827,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+     }
+ 
+     public void move(ServerPlayer player) {
++        if (player.elytraAeronauticsNoChunk) return; // Horizon - no chunk
+         // Paper - optimise entity tracker
+ 
+         SectionPos lastSectionPos = player.getLastSectionPos();
+diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+index ab779c65a40467496b05df3d32de54632d0eb5f8..c15147dbf5f3a16ce6d265d7eaf772064c0df47a 100644
+--- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -564,7 +564,7 @@ public class ServerGamePacketListenerImpl
+                 speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
+ 
+                 // Paper start - Prevent moving into unloaded chunks
+-                if (this.player.level().paperConfig().chunks.preventMovingIntoUnloadedChunks && (
++                if (this.player.level().paperConfig().chunks.preventMovingIntoUnloadedChunks && !player.elytraAeronauticsNoChunk && ( // Horizon
+                     !serverLevel.areChunksLoadedForMove(this.player.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(this.player.position()))) ||
+                         !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
+                 )) {
+diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
+index b448e1b4aed7883ae01ea4d8ef354c91cd6cf604..35698215146139da8ab32a30a5eb0d409a505246 100644
+--- a/net/minecraft/world/entity/Entity.java
++++ b/net/minecraft/world/entity/Entity.java
+@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
+ import com.google.common.collect.Sets;
+ import com.google.common.collect.ImmutableList.Builder;
+ import com.mojang.logging.LogUtils;
++import dev.gideonwhite1029.horizon.HorizonConfig;
+ import it.unimi.dsi.fastutil.floats.FloatArraySet;
+ import it.unimi.dsi.fastutil.floats.FloatArrays;
+ import it.unimi.dsi.fastutil.floats.FloatSet;
+@@ -1145,6 +1146,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+                 }
+             }
+ 
++            // Horizon start - elytra aeronautics
++            if (HorizonConfig.elytraAeronauticsNoChunk && this instanceof Player player) {
++                if (type == MoverType.PLAYER && player.isFallFlying()) {
++                    dev.gideonwhite1029.horizon.util.ElytraAeronauticsHelper.flightBehaviour(player, movement);
++                }
++            }
++            // Horizon end - elytra aeronautics
+             ProfilerFiller profilerFiller = Profiler.get();
+             profilerFiller.push("move");
+             if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
+@@ -2094,6 +2102,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         this.yo = y;
+         this.zo = d1;
+         this.setPos(d, y, d1);
++        if (this instanceof Player player && player.elytraAeronauticsNoChunk) return; // Horizon - elytra aeronautics
+         if (this.valid) this.level.getChunk((int) Math.floor(this.getX()) >> 4, (int) Math.floor(this.getZ()) >> 4); // CraftBukkit
+     }
+ 
+diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
+index 15308ff3ed5835e3b8f41e7ddc2045f424e14660..de565f14f874c63fa2f2e58e2a01f5cdf72751f5 100644
+--- a/net/minecraft/world/entity/player/Player.java
++++ b/net/minecraft/world/entity/player/Player.java
+@@ -203,6 +203,7 @@ public abstract class Player extends LivingEntity {
+     public int burpDelay = 0; // Purpur - Burp delay
+     public boolean canPortalInstant = false; // Purpur - Add portal permission bypass
+     public int sixRowEnderchestSlotCount = -1; // Purpur - Barrels and enderchests 6 rows
++    public boolean elytraAeronauticsNoChunk = false; // Horizon - Elytra aeronautics
+ 
+     // CraftBukkit start
+     public boolean fauxSleeping;

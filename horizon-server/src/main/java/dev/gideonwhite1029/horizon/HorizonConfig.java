@@ -3,6 +3,7 @@ package dev.gideonwhite1029.horizon;
 import com.destroystokyo.paper.util.SneakyThrow;
 import dev.gideonwhite1029.horizon.commands.GlobalConfigManager;
 import dev.gideonwhite1029.horizon.commands.HorizonCommand;
+import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
@@ -126,5 +127,23 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "enable-for-lava", category = {"optimization", "tt20"})
     public static boolean tt20LagCompensationLava = false;
+
+    @GlobalConfig(name = "no-chunk-load", category = {"features", "elytra-aeronautics"})
+    public static boolean elytraAeronauticsNoChunk = false;
+
+    @GlobalConfig(name = "no-chunk-height", category = {"features", "elytra-aeronautics"})
+    public static double elytraAeronauticsNoChunkHeight = 500.0D;
+
+    @GlobalConfig(name = "no-chunk-speed", category = {"features", "elytra-aeronautics"})
+    public static double elytraAeronauticsNoChunkSpeed = -1.0D;
+
+    @GlobalConfig(name = "message", category = {"features", "elytra-aeronautics"})
+    public static boolean elytraAeronauticsNoChunkMes = true;
+
+    @GlobalConfig(name = "message-start", category = {"features", "elytra-aeronautics"})
+    public static String elytraAeronauticsNoChunkStartMes = "Flight enter cruise mode";
+
+    @GlobalConfig(name = "message-end", category = {"features", "elytra-aeronautics"})
+    public static String elytraAeronauticsNoChunkEndMes = "Flight exit cruise mode";
 
 }
