@@ -5,6 +5,7 @@ import dev.gideonwhite1029.horizon.commands.GlobalConfigManager;
 import dev.gideonwhite1029.horizon.commands.HorizonCommand;
 import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
+import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -145,5 +146,43 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "message-end", category = {"features", "elytra-aeronautics"})
     public static String elytraAeronauticsNoChunkEndMes = "Flight exit cruise mode";
+
+    // Horizon start - region
+    @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
+    public static dev.gideonwhite1029.horizon.region.EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
+
+    private static class RegionFormatVerify extends ConfigVerify.EnumConfigVerify<dev.gideonwhite1029.horizon.region.EnumRegionFileExtension> {
+    }
+
+    @GlobalConfig(name = "flush-frequency", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
+    public static int linearFlushFrequency = 10;
+
+    @GlobalConfig(name = "throw-on-unknown-extension", category = {"region", "linear"})
+    public static boolean throwOnUnknownExtension = true;
+
+    @GlobalConfig(name = "flush-max-threads", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
+    public static int linearFlushThreads = 1;
+
+    public static int getLinearFlushThreads() {
+        if (linearFlushThreads < 0) {
+            return Math.max(Runtime.getRuntime().availableProcessors() + linearFlushThreads, 1);
+        } else {
+            return Math.max(linearFlushThreads, 1);
+        }
+    }
+
+    @GlobalConfig(name = "compression-level", category = {"region", "linear"}, lock = true, verify = LinearCompressVerify.class)
+    public static int linearCompressionLevel = 1;
+
+    private static class LinearCompressVerify extends ConfigVerify.IntConfigVerify {
+        @Override
+        public String check(Integer old, Integer value) throws IllegalArgumentException {
+            if (value < 1 || value > 22) {
+                throw new IllegalArgumentException("linear.compression-level need between 1 and 22");
+            }
+            return null;
+        }
+    }
+    // Horizon end - region
 
 }

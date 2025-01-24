@@ -63,12 +63,16 @@
      }
  }
  
-@@ -142,7 +_,7 @@
+@@ -142,7 +_,11 @@
  }
  
  dependencies {
 -    implementation(project(":purpur-api"))
 +    implementation(project(":horizon-api"))
++    // Horizon start
++    implementation("com.github.luben:zstd-jni:1.5.6-9")
++    implementation("org.lz4:lz4-java:1.8.0")
++    // Horizon end
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
