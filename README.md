@@ -4,11 +4,11 @@
 
 ## Features
 - **Fully compatible** with Bukkit, Spigot and Paper plugins
-- **Mod Protocols** support
+- **Mod Protocols** support (temporarily absent)
 - **Linear region file format** support (by [LinearPaper](https://github.com/StupidCraft/LinearPaper))
 - **Secure Seed** support
-- **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves))
-- **Fakeplayer Support** - Allows you to create bots for different tests
+- **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves)) (temporarily absent)
+- **Fakeplayer Support** - Allows you to create bots for different tests (temporarily absent)
 - **and more in future**
 
 ### Dependency Information
@@ -21,9 +21,9 @@ Maven
 ```
 ```xml
 <dependency>
-    <groupId>dev.horizonmc.horizon</groupId>
+    <groupId>dev.gideonwhite1029.horizon</groupId>
     <artifactId>horizon-api</artifactId>
-    <version>1.21.1-R0.1-SNAPSHOT</version>
+    <version>1.21.4-R0.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -35,7 +35,7 @@ repositories {
 ```
 ```kotlin
 dependencies {
-    compileOnly("dev.horizonmc.horizon:horizon-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("dev.gideonwhite1029.horizon:horizon-api:1.21.4-R0.1-SNAPSHOT")
 }
 ```
 
@@ -43,11 +43,11 @@ dependencies {
 To build a paperclip jar, you need to run the following command. You can find the jar in build/libs(Note: JDK17 or JDK21 is needed)
 
  ```shell
- ./gradlew applyPatches && ./gradlew createReobfPaperclipJar
+ ./gradlew applyAllPatches && ./gradlew createMojmapPaperclipJar
 ```
 
 ## About Issue
 When you meet any problems, just ask us, we will do our best to solve it, but remember to state your problem clear and provide enough logs etc.
 
 ## Contributing
-This readme will eventually contain instructions regarding the patch system. For now, visit Purpur's [CONTRIBUTING.md](https://github.com/PurpurMC/Purpur/blob/HEAD/CONTRIBUTING.md).
+This readme will eventually contain instructions regarding the patch system. For now, visit Horizon's [CONTRIBUTING.md](https://github.com/GideonWhite1029/Horizon/blob/ver/1.21.4/CONTRIBUTING.md).
