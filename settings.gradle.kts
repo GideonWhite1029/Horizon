@@ -20,7 +20,7 @@ if (!file(".git").exists()) {
          In order to build Horizon from source you must clone
          the repository using Git, not download a code zip from GitHub.
          
-         See https://github.com/PurpurMC/Purpur/blob/HEAD/CONTRIBUTING.md
+         See https://github.com/GideonWhite1029/Horizon/blob/HEAD/CONTRIBUTING.md
          for further information on building and modifying Horizon.
         ===================================================
     """.trimIndent()
@@ -33,4 +33,22 @@ for (name in listOf("horizon-api", "horizon-server")) {
     val projName = name.lowercase(Locale.ENGLISH)
     include(projName)
     findProject(":$projName")!!.projectDir = file(name)
+}
+
+optionalInclude("test-plugin")
+
+fun optionalInclude(name: String, op: (ProjectDescriptor.() -> Unit)? = null) {
+    val settingsFile = file("$name.settings.gradle.kts")
+    if (settingsFile.exists()) {
+        apply(from = settingsFile)
+        findProject(":$name")?.let { op?.invoke(it) }
+    } else {
+        settingsFile.writeText(
+            """
+            // Uncomment to enable the '$name' project
+            // include(":$name")
+
+            """.trimIndent()
+        )
+    }
 }

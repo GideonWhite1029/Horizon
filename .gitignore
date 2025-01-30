@@ -58,3 +58,5 @@ purpur-api
 purpur-server
 paper-api
 paper-server
+*.jar
+test-plugin.settings.gradle.kts
