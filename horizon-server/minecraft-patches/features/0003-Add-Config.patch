@@ -25,11 +25,11 @@ index bf4d288b904643ace3985d89e5b9c81d81f9c087..54512846b6126cb5f78d663c3d40a5f1
              net.minecrell.terminalconsole.TerminalConsoleAppender.close(); // Paper - Use TerminalConsoleAppender
          } catch (final Exception ignored) {
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 4c81c4172d2e077ec7d627c2db8e7294c5b90a64..fd4c77b913cb501dd7210fcd5a8e82c953a3829e 100644
+index 4f90ebcd86fba38dec313143e36614e992c7dbc7..0c6cfd745a785bd732dc9dcdbd5e61cd079e18b9 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -245,6 +245,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
-         // Purpur end - Purpur config files
+         */// Purpur end - Purpur config files // Purpur - Configurable void damage height and damage
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  
 +        dev.gideonwhite1029.horizon.HorizonConfig.init((java.io.File) options.valueOf("horizon-settings")); // Horizon - Server Config

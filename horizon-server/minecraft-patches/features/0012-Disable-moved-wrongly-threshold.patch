@@ -5,7 +5,7 @@ Subject: [PATCH] Disable moved wrongly threshold
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index f524f1de2093e0a3bd2f3cf8806232b2211d0583..ab779c65a40467496b05df3d32de54632d0eb5f8 100644
+index a845d067171f15e2f70a03fde5bd96aeb911e516..628eaa813d24932f8c3832a5b8075467044b9bda 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -572,7 +572,7 @@ public class ServerGamePacketListenerImpl
@@ -26,7 +26,7 @@ index f524f1de2093e0a3bd2f3cf8806232b2211d0583..ab779c65a40467496b05df3d32de5463
                      flag2 = true; // Paper - diff on change, this should be moved wrongly
                      LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
                  }
-@@ -1442,7 +1442,7 @@ public class ServerGamePacketListenerImpl
+@@ -1449,7 +1449,7 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_TOO_QUICKLY,
                                              toX, toY, toZ, toYaw, toPitch, true);
                                          if (!event.isAllowed()) {
@@ -35,7 +35,7 @@ index f524f1de2093e0a3bd2f3cf8806232b2211d0583..ab779c65a40467496b05df3d32de5463
                                                  LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d3, d4, d5);
                                              }
                                              this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
-@@ -1508,7 +1508,7 @@ public class ServerGamePacketListenerImpl
+@@ -1515,7 +1515,7 @@ public class ServerGamePacketListenerImpl
                              d5 = d2 - this.player.getZ();
                              d7 = d3 * d3 + d4 * d4 + d5 * d5;
                              boolean movedWrongly = false; // Paper - Add fail move event; rename
