@@ -1,5 +1,6 @@
 package dev.gideonwhite1029.horizon.protocol.core;
 
+import io.papermc.paper.ServerBuildInfo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -10,6 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
 public class ProtocolUtils {
+
+    public static String buildProtocolVersion(String protocol) {
+        return protocol + "-horizon-" + ServerBuildInfo.buildInfo().asString(ServerBuildInfo.StringRepresentation.VERSION_SIMPLE);
+    }
 
     public static void sendEmptyPayloadPacket(ServerPlayer player, ResourceLocation id) {
         player.connection.send(new ClientboundCustomPayloadPacket(new HorizonProtocolManager.EmptyPayload(id)));

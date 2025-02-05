@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 5 Feb 2025 20:41:40 +0300
+Subject: [PATCH] Replay API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index 3c04b4f523e7e129105aad22a2244da26d8ebdd3..b49f388486e70ee703cd867d79e0ed274504a408 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -3118,4 +3118,20 @@ public final class Bukkit {
+         server.clearBlockHighlights();
+     }
+     // Purpur end - Debug Marker API
++
++    // Horizon start - Photographer API
++    /**
++     * Gets the PhotographerManager instance.
++     * <p>
++     * This method returns the PhotographerManager instance from the server.
++     * The PhotographerManager is responsible for managing photography-related functionalities
++     * within the Horizon replay system.
++     * </p>
++     *
++     * @return the PhotographerManager instance
++     */
++    public static @NotNull dev.gideonwhite1029.horizon.replay.PhotographerManager getPhotographerManager() {
++        return server.getPhotographerManager();
++    }
++    // Horizon end - Photographer API
+ }
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 2fcc1d6ba19aca39bcb8d5420abc3eeb55edd7c9..11d8d935da6f15d0c62ca7a3a828bd07f33a8f28 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2780,4 +2780,18 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      */
+     void clearBlockHighlights();
+     // Purpur end - Debug Marker API
++
++    // Horizon start - Photographer API
++    /**
++     * Gets the PhotographerManager instance.
++     * <p>
++     * This method returns the PhotographerManager instance from the server.
++     * The PhotographerManager is responsible for managing photography-related functionalities
++     * within the Horizon replay system.
++     * </p>
++     *
++     * @return the PhotographerManager instance
++     */
++    @NotNull dev.gideonwhite1029.horizon.replay.PhotographerManager getPhotographerManager();
++    // Horizon end - Photographer API
+ }

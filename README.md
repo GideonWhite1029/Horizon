@@ -7,10 +7,12 @@
 - **Mod Protocols** support (temporarily absent)
 - **Linear region file format** support (by [LinearPaper](https://github.com/StupidCraft/LinearPaper))
 - **Secure Seed** support
-- **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves)) (temporarily absent)
+- **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves))
 - **Fakeplayer Support** - Allows you to create bots for different tests (temporarily absent)
 - **and more in future**
 
+## API
+### [Javadoc](https://repo.timelesswaffle.su/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/1.21.4-R0.1-SNAPSHOT)
 ### Dependency Information
 Maven
 ```xml
