@@ -12,7 +12,7 @@ import java.io.File;
 public interface Photographer extends Player {
 
     /**
-     * Gets the unique identifier of the Photographer
+     * Gets the unique identifier of the Photographer.
      *
      * @return the unique identifier of the Photographer
      */
@@ -20,7 +20,7 @@ public interface Photographer extends Player {
     public String getId();
 
     /**
-     * Sets the file where the recording will be saved
+     * Sets the file where the recording will be saved.
      *
      * @param file the file to save the recording
      */
@@ -32,14 +32,14 @@ public interface Photographer extends Player {
     public void stopRecording();
 
     /**
-     * Stops the recording, optionally performing the operation asynchronously
+     * Stops the recording, optionally performing the operation asynchronously.
      *
      * @param async whether to stop the recording asynchronously
      */
     public void stopRecording(boolean async);
 
     /**
-     * Stops the recording, optionally performing the operation asynchronously and saving the recording
+     * Stops the recording, optionally performing the operation asynchronously and saving the recording.
      *
      * @param async whether to stop the recording asynchronously
      * @param save whether to save the recording
@@ -57,7 +57,7 @@ public interface Photographer extends Player {
     public void resumeRecording();
 
     /**
-     * Sets the player to follow during the recording
+     * Sets the player to follow during the recording.
      *
      * @param player the player to follow, or null to stop following
      */

@@ -185,4 +185,10 @@ public final class HorizonConfig {
     }
     // Horizon end - region
 
+    @GlobalConfig(name = "configurable-mc-67", category = {"optimization"})
+    public static boolean allowEntityPortalWithPassenger = true;
+
+    @GlobalConfig(name = "horizon-packet-event", category = {"features"})
+    public static boolean horizonPacketEvent = false;
+
 }

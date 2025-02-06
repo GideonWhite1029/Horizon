@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Fri, 7 Feb 2025 00:23:30 +0300
+Subject: [PATCH] Bytebuf API
+
+
+diff --git a/net/minecraft/network/chat/Component.java b/net/minecraft/network/chat/Component.java
+index c6e4f72825c868b416ce2e81fc6d9b5bfdbd85f2..351470ae5b2a94ba75cc0739375c0159d70ad40c 100644
+--- a/net/minecraft/network/chat/Component.java
++++ b/net/minecraft/network/chat/Component.java
+@@ -248,7 +248,7 @@ public interface Component extends Message, FormattedText, Iterable<Component> {
+                 .getOrThrow(JsonParseException::new);
+         }
+ 
+-        static JsonElement serialize(Component component, HolderLookup.Provider provider) {
++        public static JsonElement serialize(Component component, HolderLookup.Provider provider) { // Horizon - Bytebuf API
+             return ComponentSerialization.CODEC
+                 .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), component)
+                 .getOrThrow(JsonParseException::new);
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index 36def0a67ece0760429c5a35a102787104901734..374f09601a0e18dec0a02850911b363662bb13c7 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -20,6 +20,8 @@ import java.util.UUID;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
++
++import dev.gideonwhite1029.horizon.replay.ServerPhotographer;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.FileUtil;
+ import net.minecraft.commands.CommandSourceStack;
+@@ -433,6 +435,12 @@ public abstract class PlayerList {
+ 
+         final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
+ 
++        // Horizon start - Bytebuf API
++        if (!(player instanceof ServerPhotographer)) {
++            this.cserver.getBytebufHandler().injectPlayer(player);
++        }
++        // Horizon end - Bytebuf API
++
+         if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
+             joinMessage = io.papermc.paper.adventure.PaperAdventure.asVanilla(jm); // Paper - Adventure
+             this.server.getPlayerList().broadcastSystemMessage(joinMessage, false); // Paper - Adventure

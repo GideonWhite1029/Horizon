@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface PhotographerManager {
     /**
-     * Retrieves a Photographer by their UUID
+     * Retrieves a Photographer by their UUID.
      *
      * @param uuid the UUID of the Photographer
      * @return the Photographer instance, or null if not found
@@ -18,7 +18,7 @@ public interface PhotographerManager {
     public Photographer getPhotographer(@NotNull UUID uuid);
 
     /**
-     * Retrieves a Photographer by their ID
+     * Retrieves a Photographer by their ID.
      *
      * @param id the ID of the Photographer
      * @return the Photographer instance, or null if not found
@@ -27,7 +27,7 @@ public interface PhotographerManager {
     public Photographer getPhotographer(@NotNull String id);
 
     /**
-     * Creates a new Photographer at the specified location
+     * Creates a new Photographer at the specified location.
      *
      * @param id the ID of the new Photographer
      * @param location the location of the new Photographer
@@ -37,7 +37,7 @@ public interface PhotographerManager {
     public Photographer createPhotographer(@NotNull String id, @NotNull Location location);
 
     /**
-     * Creates a new Photographer at the specified location with the given recorder options
+     * Creates a new Photographer at the specified location with the given recorder options.
      *
      * @param id the ID of the new Photographer
      * @param location the location of the new Photographer
@@ -48,26 +48,26 @@ public interface PhotographerManager {
     public Photographer createPhotographer(@NotNull String id, @NotNull Location location, @NotNull BukkitRecorderOption recorderOption);
 
     /**
-     * Removes a Photographer by their ID
+     * Removes a Photographer by their ID.
      *
      * @param id the ID of the Photographer to remove
      */
     public void removePhotographer(@NotNull String id);
 
     /**
-     * Removes a Photographer by their UUID
+     * Removes a Photographer by their UUID.
      *
      * @param uuid the UUID of the Photographer to remove
      */
     public void removePhotographer(@NotNull UUID uuid);
 
     /**
-     * Removes all Photographers
+     * Removes all Photographers.
      */
     public void removeAllPhotographers();
 
     /**
-     * Retrieves a collection of all Photographers
+     * Retrieves a collection of all Photographers.
      *
      * @return a collection of all Photographer instances
      */

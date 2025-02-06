@@ -1,0 +1,80 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Fri, 7 Feb 2025 00:23:57 +0300
+Subject: [PATCH] Bytebuf API
+
+
+diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
+index b49f388486e70ee703cd867d79e0ed274504a408..5a5711af6f084022a14bc724e337ab99fa6311f6 100644
+--- a/src/main/java/org/bukkit/Bukkit.java
++++ b/src/main/java/org/bukkit/Bukkit.java
+@@ -3134,4 +3134,19 @@ public final class Bukkit {
+         return server.getPhotographerManager();
+     }
+     // Horizon end - Photographer API
++    // Horizon start - Bytebuf API
++    /**
++     * Gets the BytebufManager instance.
++     * <p>
++     * This method returns the BytebufManager instance from the server.
++     * The BytebufManager is responsible for managing byte buffer-related functionalities
++     * within the Horizon system.
++     * </p>
++     *
++     * @return the BytebufManager instance
++     */
++    public static dev.gideonwhite1029.horizon.bytebuf.BytebufManager getBytebufManager() {
++        return server.getBytebufManager();
++    }
++    // Horizon end - Bytebuf API
+ }
+diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
+index 11d8d935da6f15d0c62ca7a3a828bd07f33a8f28..b57f72c8f48c33c215d50d63a104f491fc064a69 100644
+--- a/src/main/java/org/bukkit/Server.java
++++ b/src/main/java/org/bukkit/Server.java
+@@ -2794,4 +2794,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+      */
+     @NotNull dev.gideonwhite1029.horizon.replay.PhotographerManager getPhotographerManager();
+     // Horizon end - Photographer API
++    // Horizon start - Bytebuf API
++    /**
++     * Gets the BytebufManager instance.
++     * <p>
++     * This method returns the BytebufManager instance from the server.
++     * The BytebufManager is responsible for managing byte buffer-related functionalities
++     * within the Horizon system.
++     * </p>
++     *
++     * @return the BytebufManager instance
++     */
++    dev.gideonwhite1029.horizon.bytebuf.BytebufManager getBytebufManager();
++    // Horizon end - Bytebuf API
+ }
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index 238fd007c30f33f60cb49ee7f2ba13319fd160d0..c66a1e6d9c118bf1b286a3af1eb4d13ac5890d37 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -3878,6 +3878,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+     boolean isChunkSent(long chunkKey);
+     // Paper end
+ 
++    // Horizon start - Bytebuf API
++    /**
++     * Sends a packet to the player.
++     *
++     * @param packet the packet to send
++     */
++    void sendPacket(dev.gideonwhite1029.horizon.bytebuf.packet.Packet packet);
++
++    /**
++     * Sends a packet to the player using a Bytebuf and PacketType.
++     *
++     * @param buf the Bytebuf containing the packet data
++     * @param type the type of the packet
++     */
++    void sendPacket(dev.gideonwhite1029.horizon.bytebuf.Bytebuf buf, dev.gideonwhite1029.horizon.bytebuf.packet.PacketType type);
++    // Horizon end - Bytebuf API
++
+     @NotNull
+     @Override
+     Spigot spigot();
