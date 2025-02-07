@@ -1,3 +1,5 @@
+<img src="resources/logo.svg" alt="Logo" align="right" width="150">
+
 # Horizon
 
 **Horizon is a Purpur fork with many useful optimizations, configurable vanilla features, and more API supports**
@@ -53,3 +55,14 @@ When you meet any problems, just ask us, we will do our best to solve it, but re
 
 ## Contributing
 This readme will eventually contain instructions regarding the patch system. For now, visit Horizon's [CONTRIBUTING.md](https://github.com/GideonWhite1029/Horizon/blob/ver/1.21.4/CONTRIBUTING.md).
+
+## Thank you
+Thanks to these projects below. Horizon just mix some of their patches together.
+
+- [Leaves](https://github.com/LeavesMC/Leaves)
+- [Leaf](https://github.com/Winds-Studio/Leaf)
+- [Gale](https://github.com/GaleMC/Gale)
+- [Purpur](https://github.com/PurpurMC/Purpur)
+- [Pufferfish](https://github.com/pufferfish-gg/Pufferfish)
+- [LinearPaper](https://github.com/StupidCraft/LinearPaper)
+- [Canvas](https://github.com/CraftCanvasMC/Canvas)
