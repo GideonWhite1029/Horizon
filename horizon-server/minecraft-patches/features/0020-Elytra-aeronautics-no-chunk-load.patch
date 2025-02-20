@@ -27,7 +27,7 @@ index b3f498558614243cf633dcd71e3c49c2c55e6e0f..9cdf814867a4d48ce6472f57b84b022d
  
          SectionPos lastSectionPos = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 628eaa813d24932f8c3832a5b8075467044b9bda..70ceaebf56242fd0a91b0c3ed7064c9236860b29 100644
+index f463e532e9b0568c6086792eb1b4764d2a3df017..e67f7212e3f9b9af3f3cf10a608b10bba0fd47f8 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -564,7 +564,7 @@ public class ServerGamePacketListenerImpl
@@ -40,7 +40,7 @@ index 628eaa813d24932f8c3832a5b8075467044b9bda..70ceaebf56242fd0a91b0c3ed7064c92
                          !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
                  )) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index a6bcd90ff1265818474839e208c659d8307d56b7..e45d11d2ec3db18203a51717e5924e1349400196 100644
+index 28a111afb551d61058e142ca6b3f25a74503a0c6..6e63b35059f67f8d4a5a540e635f53d5c49e318d 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
@@ -51,7 +51,7 @@ index a6bcd90ff1265818474839e208c659d8307d56b7..e45d11d2ec3db18203a51717e5924e13
  import it.unimi.dsi.fastutil.floats.FloatArraySet;
  import it.unimi.dsi.fastutil.floats.FloatArrays;
  import it.unimi.dsi.fastutil.floats.FloatSet;
-@@ -1141,6 +1142,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1142,6 +1143,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  }
              }
  
@@ -65,7 +65,7 @@ index a6bcd90ff1265818474839e208c659d8307d56b7..e45d11d2ec3db18203a51717e5924e13
              ProfilerFiller profilerFiller = Profiler.get();
              profilerFiller.push("move");
              if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
-@@ -2090,6 +2098,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2091,6 +2099,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          this.yo = y;
          this.zo = d1;
          this.setPos(d, y, d1);
@@ -74,7 +74,7 @@ index a6bcd90ff1265818474839e208c659d8307d56b7..e45d11d2ec3db18203a51717e5924e13
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 43657822f0660613078e9afa512000b5255a1537..3a30f3f57eba5fb331963df71e439656c9d73df7 100644
+index 3aab8856b07389a8d7a06a9f66f21771a3f2d122..8e8c83aa8b3fc7c655bc5240344422636e2b8626 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -203,6 +203,7 @@ public abstract class Player extends LivingEntity {

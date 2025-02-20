@@ -5,10 +5,10 @@ Subject: [PATCH] Disable Packet Limit
 
 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index d4a0b684e7e5a5d7ea1106d0adeccf12d501676c..42262e8fc32b21502c6fa706b851b6c997ec5030 100644
+index 42777adb028fe282c1619aeb5431c442ad5df0d0..5f34c2db1d056f920ef06066923267e559e19d65 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -279,7 +279,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -282,7 +282,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {

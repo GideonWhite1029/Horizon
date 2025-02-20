@@ -5,10 +5,10 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 664f8252a613fd7808b26f3be03587ca677db505..86b3c9fe963077dd184e4fc6e8a26072c3d02819 100644
+index 97eee300081268c673f0bece2861a54e227f8ed7..4390dfcc4b89a236667517421e0ed4b0ca4e3e58 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -321,6 +321,7 @@ public final class CraftServer implements Server {
+@@ -322,6 +322,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler globalRegionScheduler = new io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler();
  
      private final dev.gideonwhite1029.horizon.entity.CraftPhotographerManager photographerManager = new dev.gideonwhite1029.horizon.entity.CraftPhotographerManager(); // Horizon - photographer
@@ -16,7 +16,7 @@ index 664f8252a613fd7808b26f3be03587ca677db505..86b3c9fe963077dd184e4fc6e8a26072
  
      @Override
      public final io.papermc.paper.threadedregions.scheduler.RegionScheduler getRegionScheduler() {
-@@ -3415,4 +3416,15 @@ public final class CraftServer implements Server {
+@@ -3411,4 +3412,15 @@ public final class CraftServer implements Server {
          return photographerManager;
      }
      // Horizon end - replay mod api
@@ -33,10 +33,10 @@ index 664f8252a613fd7808b26f3be03587ca677db505..86b3c9fe963077dd184e4fc6e8a26072
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index b7946546fc7382355002562d5fb0dbe064dbb1d3..0398f5feee6e9b106a4cb060dfcfcde1cedf5eb3 100644
+index 54a267a3f2e959b3c3d38107994f9bda7714ede2..b977fd8b3c42b0be0590dff27be9eb2c566b8604 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3580,6 +3580,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3582,6 +3582,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      }
      // Paper end - entity effect API
  

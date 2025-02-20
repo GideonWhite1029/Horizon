@@ -13,6 +13,8 @@ if [ "$current" != "$upstream" ]; then
     sed -i 's/purpurCommit = .*/purpurCommit = '"$upstream"'/' gradle.properties
     {
       ./gradlew applyAllPatches --stacktrace
+      ./gradlew rebuildPaperApiFeaturePatches --stacktrace
+      ./gradlew rebuildAllServerFeaturePatches --stacktrace
     } || exit
 
     git add .
