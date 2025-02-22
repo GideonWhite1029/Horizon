@@ -10,20 +10,18 @@ import ca.spottedleaf.moonrise.patches.chunk_system.storage.ChunkSystemRegionFil
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.ChunkPos;
 
-public interface IRegionFile extends AutoCloseable, ChunkSystemRegionFile {
+public interface IRegionFile extends ChunkSystemRegionFile, AutoCloseable {
     Path getPath();
+    DataInputStream getChunkDataInputStream(ChunkPos pos) throws IOException;
+    boolean doesChunkExist(ChunkPos pos) throws Exception;
+    DataOutputStream getChunkDataOutputStream(ChunkPos pos) throws IOException;
     void flush() throws IOException;
     void clear(ChunkPos pos) throws IOException;
-    void close() throws IOException;
-    void setOversized(int x, int z, boolean b) throws IOException;
-    void write(ChunkPos pos, ByteBuffer buffer) throws IOException;
-
     boolean hasChunk(ChunkPos pos);
-    boolean doesChunkExist(ChunkPos pos) throws Exception;
+    void close() throws IOException;
+    void write(ChunkPos pos, ByteBuffer buf) throws IOException;
+    CompoundTag getOversizedData(int x, int z) throws IOException;
     boolean isOversized(int x, int z);
     boolean recalculateHeader() throws IOException;
-
-    DataOutputStream getChunkDataOutputStream(ChunkPos pos) throws IOException;
-    DataInputStream getChunkDataInputStream(ChunkPos pos) throws IOException;
-    CompoundTag getOversizedData(int x, int z) throws IOException;
+    void setOversized(int x, int z, boolean oversized) throws IOException;
 }

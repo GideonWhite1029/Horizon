@@ -1,56 +1,39 @@
 package dev.gideonwhite1029.horizon.region;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Locale;
+import dev.gideonwhite1029.horizon.HorizonConfig;
+import net.minecraft.world.level.chunk.storage.RegionFile;
+import org.jetbrains.annotations.Nullable;
 
 public enum EnumRegionFileExtension {
-    LINEAR(".linear"),
-    MCA(".mca"),
-    UNKNOWN(null);
+    MCA("mca", "mca" , (info) -> new RegionFile(info.info(), info.filePath(), info.folder(), info.sync())),
+    LINEAR_V2("linear_v2", "linear" ,(info) -> new HorizonRegionFile(info.info(), info.filePath(), info.folder(), info.sync(), HorizonConfig.linearCompressionLevel));
 
-    private final String extensionName;
+    private final String name;
+    private final String argument;
+    private final IRegionCreateFunction creator;
 
-    EnumRegionFileExtension(String extensionName) {
-        this.extensionName = extensionName;
+    EnumRegionFileExtension(String name, String argument, IRegionCreateFunction creator) {
+        this.name = name;
+        this.argument = argument;
+        this.creator = creator;
     }
 
-    public String getExtensionName() {
-        return this.extensionName;
-    }
-
-    @Contract(pure = true)
-    public static EnumRegionFileExtension fromName(@NotNull String name) {
-        switch (name.toUpperCase(Locale.ROOT)) {
-            default -> {
-                return UNKNOWN;
-            }
-
-            case "MCA" -> {
-                return MCA;
-            }
-
-            case "LINEAR" -> {
-                return LINEAR;
+    @Nullable
+    public static EnumRegionFileExtension fromString(String string) {
+        for (EnumRegionFileExtension format : values()) {
+            if (format.name.equalsIgnoreCase(string)) {
+                return format;
             }
         }
+
+        return null;
     }
 
-    @Contract(pure = true)
-    public static EnumRegionFileExtension fromExtension(@NotNull String name) {
-        switch (name.toLowerCase()) {
-            case "mca" -> {
-                return MCA;
-            }
+    public IRegionCreateFunction getCreator() {
+        return this.creator;
+    }
 
-            case "linear" -> {
-                return LINEAR;
-            }
-
-            default -> {
-                return UNKNOWN;
-            }
-        }
+    public String getArgument() {
+        return this.argument;
     }
 }

@@ -6,6 +6,7 @@ import dev.gideonwhite1029.horizon.commands.HorizonCommand;
 import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
 import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
+import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -151,23 +152,18 @@ public final class HorizonConfig {
     @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
     public static dev.gideonwhite1029.horizon.region.EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
 
-    private static class RegionFormatVerify extends ConfigVerify.EnumConfigVerify<dev.gideonwhite1029.horizon.region.EnumRegionFileExtension> {
-    }
-
-    @GlobalConfig(name = "flush-frequency", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
-    public static int linearFlushFrequency = 10;
-
-    @GlobalConfig(name = "throw-on-unknown-extension", category = {"region", "linear"})
-    public static boolean throwOnUnknownExtension = true;
-
-    @GlobalConfig(name = "flush-max-threads", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
-    public static int linearFlushThreads = 1;
-
-    public static int getLinearFlushThreads() {
-        if (linearFlushThreads < 0) {
-            return Math.max(Runtime.getRuntime().availableProcessors() + linearFlushThreads, 1);
-        } else {
-            return Math.max(linearFlushThreads, 1);
+    private static class RegionFormatVerify extends ConfigVerify.EnumConfigVerify<EnumRegionFileExtension> {
+        @Override
+        public String check(EnumRegionFileExtension old, EnumRegionFileExtension value) throws IllegalArgumentException {
+            if (value == null) {
+                throw new RuntimeException("Invalid region format: " + regionFormat);
+            }
+            if (regionFormat == EnumRegionFileExtension.LINEAR_V2) {
+                HorizonRegionFile.SAVE_DELAY_MS = linearIoFlushDelayMs;
+                HorizonRegionFile.SAVE_THREAD_MAX_COUNT = linearIoThreadCount;
+                HorizonRegionFile.USE_VIRTUAL_THREAD = linearUseVirtualThread;
+            }
+            return null;
         }
     }
 
@@ -177,10 +173,32 @@ public final class HorizonConfig {
     private static class LinearCompressVerify extends ConfigVerify.IntConfigVerify {
         @Override
         public String check(Integer old, Integer value) throws IllegalArgumentException {
-            if (value < 1 || value > 22) {
-                throw new IllegalArgumentException("linear.compression-level need between 1 and 22");
+            if (value < 1 || value > 23) {
+                MinecraftServer.LOGGER.error("Linear region compression level should be between 1 and 22 in config: {}", linearCompressionLevel);
+                MinecraftServer.LOGGER.error("Falling back to compression level 1.");
+                linearCompressionLevel = 1;
             }
             return null;
+        }
+    }
+
+    @GlobalConfig(name = "io-thread-count", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
+    public static int linearIoThreadCount = 6;
+
+    @GlobalConfig(name = "io-flush-delay-ms", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
+    public static int linearIoFlushDelayMs = 100;
+
+    @GlobalConfig(name = "use-virtual-thread", category = {"region", "linear"})
+    public static boolean linearUseVirtualThread = true;
+
+    @GlobalConfig(name = "flush-max-threads", category = {"region", "linear"}, lock = true, verify = ConfigVerify.IntConfigVerify.class)
+    public static int linearFlushThreads = 1;
+
+    public static int getLinearFlushThreads() {
+        if (linearFlushThreads < 0) {
+            return Math.max(Runtime.getRuntime().availableProcessors() + linearFlushThreads, 1);
+        } else {
+            return Math.max(linearFlushThreads, 1);
         }
     }
     // Horizon end - region
