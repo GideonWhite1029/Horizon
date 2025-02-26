@@ -1,5 +1,6 @@
 package dev.gideonwhite1029.horizon.protocol.core;
 
+import com.google.common.collect.ImmutableSet;
 import dev.gideonwhite1029.horizon.HorizonLogger;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,6 +27,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ public class HorizonProtocolManager {
 
     private static final Map<HorizonProtocol, Map<ProtocolHandler.PayloadReceiver, Executable>> KNOWN_TYPES = new HashMap<>();
     private static final Map<HorizonProtocol, Map<ProtocolHandler.PayloadReceiver, Method>> KNOW_RECEIVERS = new HashMap<>();
+    private static Set<ResourceLocation> ALL_KNOWN_ID = new HashSet<>();
 
     private static final List<Method> TICKERS = new ArrayList<>();
     private static final List<Method> PLAYER_JOIN = new ArrayList<>();
@@ -100,8 +103,10 @@ public class HorizonProtocolManager {
                             if (!found) {
                                 Constructor<? extends HorizonCustomPayload<?>> constructor = receiver.payload().getConstructor(PAYLOAD_PARAMETER_TYPES);
                                 if (constructor.isAnnotationPresent(HorizonCustomPayload.New.class)) {
-                                    map.put(receiver, constructor);
                                     constructor.setAccessible(true);
+                                    map.put(receiver, constructor);
+                                } else {
+                                    throw new NoSuchMethodException();
                                 }
                             }
                         } catch (NoSuchMethodException exception) {
@@ -153,6 +158,20 @@ public class HorizonProtocolManager {
                 KNOWN_TYPES.put(protocol, map);
             }
         }
+
+        for (HorizonProtocol protocol : KNOWN_TYPES.keySet()) {
+            Map<ProtocolHandler.PayloadReceiver, Executable> map = KNOWN_TYPES.get(protocol);
+            for (ProtocolHandler.PayloadReceiver receiver : map.keySet()) {
+                if (receiver.sendFabricRegister() && !receiver.ignoreId()) {
+                    for (String payloadId : receiver.payloadId()) {
+                        for (String namespace : protocol.namespace()) {
+                            ALL_KNOWN_ID.add(ResourceLocation.tryBuild(namespace, payloadId));
+                        }
+                    }
+                }
+            }
+        }
+        ALL_KNOWN_ID = ImmutableSet.copyOf(ALL_KNOWN_ID);
     }
 
     public static HorizonCustomPayload<?> decode(ResourceLocation id, FriendlyByteBuf buf) {
@@ -229,6 +248,8 @@ public class HorizonProtocolManager {
                 LOGGER.warning("Failed to handle player join, " + exception.getCause() + ": " + exception.getMessage());
             }
         }
+
+        ProtocolUtils.sendPayloadPacket(player, new FabricRegisterPayload(ALL_KNOWN_ID));
     }
 
     public static void handlePlayerLeave(ServerPlayer player) {
@@ -264,10 +285,9 @@ public class HorizonProtocolManager {
 
             Map<ProtocolHandler.MinecraftRegister, Method> map = MINECRAFT_REGISTER.get(protocol);
             for (ProtocolHandler.MinecraftRegister register : map.keySet()) {
-                if (register.ignoreId() || register.channelId().equals(channel[1]) ||
-                        ArrayUtils.contains(register.channelIds(), channel[1])) {
+                if (register.ignoreId() || ArrayUtils.contains(register.channelId(), channel[1])) {
                     try {
-                        map.get(register).invoke(null, player);
+                        map.get(register).invoke(null, player, channel[1]);
                     } catch (InvocationTargetException | IllegalAccessException exception) {
                         LOGGER.warning("Failed to handle minecraft register, " + exception.getCause() + ": " + exception.getMessage());
                     }
@@ -351,15 +371,13 @@ public class HorizonProtocolManager {
         }
     }
 
-    public record ErrorPayload(ResourceLocation id, String[] protocolID,
-                               String[] packetID) implements HorizonCustomPayload<ErrorPayload> {
+    public record ErrorPayload(ResourceLocation id, String[] protocolID, String[] packetID) implements HorizonCustomPayload<ErrorPayload> {
         @Override
         public void write(@NotNull FriendlyByteBuf buf) {
         }
     }
 
     public record EmptyPayload(ResourceLocation id) implements HorizonCustomPayload<EmptyPayload> {
-
         @New
         public EmptyPayload(ResourceLocation location, FriendlyByteBuf buf) {
             this(location);
@@ -370,9 +388,7 @@ public class HorizonProtocolManager {
         }
     }
 
-    public record HorizonPayload(FriendlyByteBuf data,
-                                 ResourceLocation id) implements HorizonCustomPayload<HorizonPayload> {
-
+    public record HorizonPayload(FriendlyByteBuf data, ResourceLocation id) implements HorizonCustomPayload<HorizonPayload> {
         @New
         public HorizonPayload(ResourceLocation location, FriendlyByteBuf buf) {
             this(new FriendlyByteBuf(buf.readBytes(buf.readableBytes())), location);
@@ -381,6 +397,36 @@ public class HorizonProtocolManager {
         @Override
         public void write(FriendlyByteBuf buf) {
             buf.writeBytes(data);
+        }
+    }
+
+    public record FabricRegisterPayload(Set<ResourceLocation> channels) implements HorizonCustomPayload<FabricRegisterPayload> {
+
+        public static final ResourceLocation CHANNEL = ResourceLocation.withDefaultNamespace("register");
+
+        @New
+        public FabricRegisterPayload(ResourceLocation location, FriendlyByteBuf buf) {
+            this(buf.readCollection(HashSet::new, FriendlyByteBuf::readResourceLocation));
+        }
+
+        @Override
+        public void write(FriendlyByteBuf buf) {
+            boolean first = true;
+
+            ResourceLocation channel;
+            for (Iterator<ResourceLocation> var3 = this.channels.iterator(); var3.hasNext(); buf.writeBytes(channel.toString().getBytes(StandardCharsets.US_ASCII))) {
+                channel = var3.next();
+                if (first) {
+                    first = false;
+                } else {
+                    buf.writeByte(0);
+                }
+            }
+        }
+
+        @Override
+        public ResourceLocation id() {
+            return CHANNEL;
         }
     }
 }

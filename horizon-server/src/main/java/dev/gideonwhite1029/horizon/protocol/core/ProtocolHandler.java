@@ -10,7 +10,6 @@ public class ProtocolHandler {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Init {
-
     }
 
     @Target(ElementType.METHOD)
@@ -22,6 +21,8 @@ public class ProtocolHandler {
         String[] payloadId() default "";
 
         boolean ignoreId() default false;
+
+        boolean sendFabricRegister() default true;
     }
 
     @Target(ElementType.METHOD)
@@ -33,28 +34,22 @@ public class ProtocolHandler {
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface PlayerJoin {
-
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface PlayerLeave {
-
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface ReloadServer {
-
     }
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface MinecraftRegister {
-
-        String channelId() default "";
-
-        String[] channelIds() default {};
+        String[] channelId() default "";
 
         boolean ignoreId() default false;
     }

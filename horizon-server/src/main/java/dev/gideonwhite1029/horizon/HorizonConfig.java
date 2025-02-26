@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Random;
 import java.util.logging.Level;
 
 public final class HorizonConfig {
@@ -208,5 +209,54 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "horizon-packet-event", category = {"features"})
     public static boolean horizonPacketEvent = false;
+
+    // Horizon start - protocols
+
+    // AppleSkin
+    @GlobalConfig(name = "appleskin-enable", category = {"protocols", "appleskin"})
+    public static boolean appleskinEnable = false;
+
+    @GlobalConfig(name = "sync-tick-interval", category = {"protocols", "appleskin"})
+    public static int syncTickInterval = 20;
+
+    // Jade
+    @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
+    public static boolean jadeEnable = false;
+
+    // REI
+    @GlobalConfig(name = "jade-enable", category = {"protocols", "rei"})
+    public static boolean reiEnable = false;
+
+    // XaeroMap
+    @GlobalConfig(name = "xaeromap-enable", category = {"protocols", "xaeromap"})
+    public static boolean xaeroMapEnable = false;
+
+    @GlobalConfig(name = "xaero-map-server-id", category = {"protocols", "xaeromap"})
+    public static int xaeroMapServerID = new Random().nextInt();
+
+    // Carpet
+    @GlobalConfig(name = "carpet-enable", category = {"protocols", "carpet"})
+    public static boolean carpetEnable = false;
+
+    // Syncmatica
+    @GlobalConfig(name = "syncmatica-enable", category = {"protocols", "syncmatica"}, verify = SyncmaticaVerify.class)
+    public static boolean syncmaticaProtocol = false;
+
+    @GlobalConfig(name = "quota", category = {"protocols", "syncmatica"})
+    public static boolean syncmaticaQuota = false;
+
+    @GlobalConfig(name = "quota-limit", category = {"protocols", "syncmatica"}, verify = ConfigVerify.IntConfigVerify.class)
+    public static int syncmaticaQuotaLimit = 40000000;
+
+    public static class SyncmaticaVerify extends ConfigVerify.BooleanConfigVerify {
+        @Override
+        public String check(Boolean old, Boolean value) {
+            if (value) {
+                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init();
+            }
+            return null;
+        }
+    }
+    // Horizon end - protocols
 
 }
