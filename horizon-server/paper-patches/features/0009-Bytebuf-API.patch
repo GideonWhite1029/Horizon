@@ -5,7 +5,7 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 97eee300081268c673f0bece2861a54e227f8ed7..4390dfcc4b89a236667517421e0ed4b0ca4e3e58 100644
+index 126203b0b074a857a68fc3c706fdc91de0b0319f..a9996accf3023c6ccacc77c6f72f7a9fb1fa0abe 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -322,6 +322,7 @@ public final class CraftServer implements Server {
@@ -16,7 +16,7 @@ index 97eee300081268c673f0bece2861a54e227f8ed7..4390dfcc4b89a236667517421e0ed4b0
  
      @Override
      public final io.papermc.paper.threadedregions.scheduler.RegionScheduler getRegionScheduler() {
-@@ -3411,4 +3412,15 @@ public final class CraftServer implements Server {
+@@ -3416,4 +3417,15 @@ public final class CraftServer implements Server {
          return photographerManager;
      }
      // Horizon end - replay mod api
