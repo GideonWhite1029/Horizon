@@ -1,0 +1,252 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 27 Feb 2025 16:19:17 +0300
+Subject: [PATCH] Extra Yggdrasil Service
+
+
+diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..a37c2c4b8cc3ee55f0f471d772b1a3fb047e6bed
+--- /dev/null
++++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
+@@ -0,0 +1,214 @@
++package com.mojang.authlib.yggdrasil;
++
++import com.google.common.cache.CacheBuilder;
++import com.google.common.cache.CacheLoader;
++import com.google.common.cache.LoadingCache;
++import com.google.common.collect.Iterables;
++import com.google.gson.Gson;
++import com.google.gson.GsonBuilder;
++import com.google.gson.JsonParseException;
++import com.mojang.authlib.Environment;
++import com.mojang.authlib.GameProfile;
++import com.mojang.authlib.HttpAuthenticationService;
++import com.mojang.authlib.SignatureState;
++import com.mojang.authlib.exceptions.AuthenticationException;
++import com.mojang.authlib.exceptions.AuthenticationUnavailableException;
++import com.mojang.authlib.exceptions.MinecraftClientException;
++import com.mojang.authlib.minecraft.InsecurePublicKeyException;
++import com.mojang.authlib.minecraft.MinecraftProfileTexture;
++import com.mojang.authlib.minecraft.MinecraftProfileTextures;
++import com.mojang.authlib.minecraft.MinecraftSessionService;
++import com.mojang.authlib.minecraft.client.MinecraftClient;
++import com.mojang.authlib.properties.Property;
++import com.mojang.authlib.yggdrasil.request.JoinMinecraftServerRequest;
++import com.mojang.authlib.yggdrasil.response.HasJoinedMinecraftServerResponse;
++import com.mojang.authlib.yggdrasil.response.MinecraftProfilePropertiesResponse;
++import com.mojang.authlib.yggdrasil.response.MinecraftTexturesPayload;
++import com.mojang.authlib.yggdrasil.response.ProfileAction;
++import com.mojang.util.UUIDTypeAdapter;
++import com.mojang.util.UndashedUuid;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import javax.annotation.Nullable;
++import java.net.InetAddress;
++import java.net.Proxy;
++import java.net.URL;
++import java.nio.charset.StandardCharsets;
++import java.util.*;
++import java.util.concurrent.TimeUnit;
++import java.util.stream.Collectors;
++
++public class YggdrasilMinecraftSessionService implements MinecraftSessionService {
++    private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilMinecraftSessionService.class);
++    protected final MinecraftClient client; // Horizon
++    private final ServicesKeySet servicesKeySet;
++    private final String baseUrl;
++    private final URL joinUrl;
++    private final URL checkUrl;
++
++    private final Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
++    private final LoadingCache<UUID, Optional<ProfileResult>> insecureProfiles = CacheBuilder
++        .newBuilder()
++        .expireAfterWrite(6, TimeUnit.HOURS)
++        .build(new CacheLoader<>() {
++            @Override
++            public Optional<ProfileResult> load(final UUID key) {
++                return Optional.ofNullable(fetchProfileUncached(key, false));
++            }
++        });
++
++    protected YggdrasilMinecraftSessionService(final ServicesKeySet servicesKeySet, final Proxy proxy, final Environment env) {
++        client = MinecraftClient.unauthenticated(proxy);
++        this.servicesKeySet = servicesKeySet;
++        baseUrl = env.sessionHost() + "/session/minecraft/";
++
++        joinUrl = HttpAuthenticationService.constantURL(baseUrl + "join");
++        checkUrl = HttpAuthenticationService.constantURL(baseUrl + "hasJoined");
++    }
++
++    @Override
++    public void joinServer(final UUID profileId, final String authenticationToken, final String serverId) throws AuthenticationException {
++        final JoinMinecraftServerRequest request = new JoinMinecraftServerRequest(authenticationToken, profileId, serverId);
++        try {
++            client.post(joinUrl, request, Void.class);
++        } catch (final MinecraftClientException e) {
++            throw e.toAuthenticationException();
++        }
++    }
++
++    @Override
++    @Nullable
++    public ProfileResult hasJoinedServer(final String profileName, final String serverId, @Nullable final InetAddress address) throws AuthenticationUnavailableException {
++        final Map<String, Object> arguments = new HashMap<>();
++
++        arguments.put("username", profileName);
++        arguments.put("serverId", serverId);
++
++        if (address != null) {
++            arguments.put("ip", address.getHostAddress());
++        }
++
++        final URL url = HttpAuthenticationService.concatenateURL(checkUrl, HttpAuthenticationService.buildQuery(arguments));
++
++        try {
++            final HasJoinedMinecraftServerResponse response = client.get(url, HasJoinedMinecraftServerResponse.class);
++            if (response != null && response.id() != null) {
++                final GameProfile result = new GameProfile(response.id(), profileName);
++
++                if (response.properties() != null) {
++                    result.getProperties().putAll(response.properties());
++                }
++
++                final Set<ProfileActionType> profileActions = response.profileActions().stream()
++                    .map(ProfileAction::type)
++                    .collect(Collectors.toSet());
++                return new ProfileResult(result, profileActions);
++            } else {
++                return null;
++            }
++        } catch (final MinecraftClientException e) {
++            if (e.toAuthenticationException() instanceof final AuthenticationUnavailableException unavailable) {
++                throw unavailable;
++            }
++            return null;
++        }
++    }
++
++    @Nullable
++    @Override
++    public Property getPackedTextures(final GameProfile profile) {
++        return Iterables.getFirst(profile.getProperties().get("textures"), null);
++    }
++
++    @Override
++    public MinecraftProfileTextures unpackTextures(final Property packedTextures) {
++        final String value = packedTextures.value();
++        final SignatureState signatureState = getPropertySignatureState(packedTextures);
++
++        final MinecraftTexturesPayload result;
++        try {
++            final String json = new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
++            result = gson.fromJson(json, MinecraftTexturesPayload.class);
++        } catch (final JsonParseException | IllegalArgumentException e) {
++            LOGGER.error("Could not decode textures payload", e);
++            return MinecraftProfileTextures.EMPTY;
++        }
++
++        if (result == null || result.textures() == null || result.textures().isEmpty()) {
++            return MinecraftProfileTextures.EMPTY;
++        }
++
++        final Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures = result.textures();
++        for (final Map.Entry<MinecraftProfileTexture.Type, MinecraftProfileTexture> entry : textures.entrySet()) {
++            final String url = entry.getValue().getUrl();
++            if (url == null || !TextureUrlChecker.isAllowedTextureDomain(url)) {
++                LOGGER.error("Textures payload url is invalid: {}", url);
++                return MinecraftProfileTextures.EMPTY;
++            }
++        }
++
++        return new MinecraftProfileTextures(
++            textures.get(MinecraftProfileTexture.Type.SKIN),
++            textures.get(MinecraftProfileTexture.Type.CAPE),
++            textures.get(MinecraftProfileTexture.Type.ELYTRA),
++            signatureState
++        );
++    }
++
++    @Nullable
++    @Override
++    public ProfileResult fetchProfile(final UUID profileId, final boolean requireSecure) {
++        if (!requireSecure) {
++            return insecureProfiles.getUnchecked(profileId).orElse(null);
++        }
++
++        return fetchProfileUncached(profileId, true);
++    }
++
++    @Override
++    public String getSecurePropertyValue(final Property property) throws InsecurePublicKeyException {
++        return switch (getPropertySignatureState(property)) {
++            case UNSIGNED ->
++                throw new InsecurePublicKeyException.MissingException("Missing signature from \"" + property.name() + "\"");
++            case INVALID ->
++                throw new InsecurePublicKeyException.InvalidException("Property \"" + property.name() + "\" has been tampered with (signature invalid)");
++            case SIGNED -> property.value();
++        };
++    }
++
++    private SignatureState getPropertySignatureState(final Property property) {
++        if (!property.hasSignature()) {
++            return SignatureState.UNSIGNED;
++        }
++        if (servicesKeySet.keys(ServicesKeyType.PROFILE_PROPERTY).stream().noneMatch(key -> key.validateProperty(property))) {
++            return SignatureState.INVALID;
++        }
++        return SignatureState.SIGNED;
++    }
++
++    @Nullable
++    private ProfileResult fetchProfileUncached(final UUID profileId, final boolean requireSecure) {
++        try {
++            URL url = HttpAuthenticationService.constantURL(baseUrl + "profile/" + UndashedUuid.toString(profileId));
++            url = HttpAuthenticationService.concatenateURL(url, "unsigned=" + !requireSecure);
++
++            final MinecraftProfilePropertiesResponse response = client.get(url, MinecraftProfilePropertiesResponse.class);
++            if (response == null) {
++                LOGGER.debug("Couldn't fetch profile properties for {} as the profile does not exist", profileId);
++                return null;
++            }
++
++            final GameProfile profile = response.toProfile();
++            final Set<ProfileActionType> profileActions = response.profileActions().stream()
++                .map(ProfileAction::type)
++                .collect(Collectors.toSet());
++
++            LOGGER.debug("Successfully fetched profile properties for {}", profile);
++            return new ProfileResult(profile, profileActions);
++        } catch (final MinecraftClientException | IllegalArgumentException e) {
++            LOGGER.warn("Couldn't look up profile properties for {}", profileId, e);
++            return null;
++        }
++    }
++}
+diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
+index 1485186d4989874ef89c4e83830f26358a43759c..4a8e6acbb968d2d731c16f43cbbf327775815ea8 100644
+--- a/net/minecraft/server/Main.java
++++ b/net/minecraft/server/Main.java
+@@ -183,7 +183,7 @@ public class Main {
+                 file = new File(bukkitConfiguration.getString("settings.world-container", "."));
+             }
+             // Paper end - fix SPIGOT-5824
+-            Services services = Services.create(new com.destroystokyo.paper.profile.PaperAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container
++            Services services = Services.create(new dev.gideonwhite1029.horizon.yggdrasil.HorizonAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container // Horizon - extra-yggdrasil-service
+             // CraftBukkit start
+             String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
+             LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index daf3470bd9948d22d90ef061de16adc0f37b63c4..e641e62e59504deb840551979da71d5c9c5ad885 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     private boolean isDemo;
+     private volatile boolean isReady;
+     private long lastOverloadWarningNanos;
+-    protected final Services services;
++    public final Services services; // Horizon
+     private long lastServerStatus;
+     public final Thread serverThread;
+     private long lastTickNanos = Util.getNanos();

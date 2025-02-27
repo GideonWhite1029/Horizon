@@ -6,11 +6,10 @@
 
 ## Features
 - **Fully compatible** with Bukkit, Spigot and Paper plugins
-- **Mod Protocols** support (temporarily absent)
+- **Mod Protocols** support
 - **Linear region file format** support (by [LinearPaper](https://github.com/StupidCraft/LinearPaper))
 - **Secure Seed** support
 - **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves))
-- **Fakeplayer Support** - Allows you to create bots for different tests (temporarily absent)
 - **and more in future**
 
 ## API

@@ -7,6 +7,8 @@ import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
 import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
 import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
+import dev.gideonwhite1029.horizon.yggdrasil.HorizonMinecraftSessionService;
+import io.papermc.paper.configuration.GlobalConfiguration;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,6 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
@@ -224,7 +227,7 @@ public final class HorizonConfig {
     public static boolean jadeEnable = false;
 
     // REI
-    @GlobalConfig(name = "jade-enable", category = {"protocols", "rei"})
+    @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
     public static boolean reiEnable = false;
 
     // XaeroMap
@@ -258,5 +261,33 @@ public final class HorizonConfig {
         }
     }
     // Horizon end - protocols
+
+    @GlobalConfig(name = "extra-yggdrasil-service-enable", category = {"features", "yggdrasil"}, verify = ExtraYggdrasilServiceVerify.class)
+    public static boolean extraYggdrasilService = false;
+
+    public static class ExtraYggdrasilServiceVerify extends ConfigVerify.BooleanConfigVerify {
+        @Override
+        public String check(Boolean old, Boolean value) {
+            if (value) {
+                HorizonLogger.LOGGER.warning("extra-yggdrasil-service is an unofficial support. Enabling it may cause data security problems!");
+                GlobalConfiguration.get().unsupportedSettings.performUsernameValidation = true; // always check username
+            }
+            return null;
+        }
+    }
+
+    @GlobalConfig(name = "login-protect", category = {"features", "yggdrasil"})
+    public static boolean loginProtect = false;
+
+    @GlobalConfig(name = "urls", category = {"features", "yggdrasil"}, lock = true, verify = ExtraYggdrasilUrlsValidator.class)
+    public static List<String> serviceList = List.of("https://url.with.authlib-injector-yggdrasil");
+
+    public static class ExtraYggdrasilUrlsValidator extends ConfigVerify.ListConfigVerify {
+        @Override
+        public String check(List<?> old, List<?> value) {
+            HorizonMinecraftSessionService.initExtraYggdrasilList(serviceList);
+            return null;
+        }
+    }
 
 }
