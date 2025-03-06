@@ -290,4 +290,7 @@ public final class HorizonConfig {
         }
     }
 
+    @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
+    public static boolean AsyncChunkSend = false;
+
 }

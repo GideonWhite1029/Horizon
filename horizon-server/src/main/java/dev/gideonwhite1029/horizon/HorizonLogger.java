@@ -15,11 +15,11 @@ public class HorizonLogger extends Logger {
     }
 
     public void severe(String msg, Exception exception) {
-        this.severe(msg + ", " + exception.getCause() + ": " + exception.getMessage());
+        this.log(Level.SEVERE, msg, exception);
     }
 
     public void warning(String msg, Exception exception) {
-        this.warning(msg + ", " + exception.getCause() + ": " + exception.getMessage());
+        this.log(Level.WARNING, msg, exception);
     }
 
 }
