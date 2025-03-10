@@ -5,10 +5,10 @@ Subject: [PATCH] Disable moved wrongly threshold
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index a845d067171f15e2f70a03fde5bd96aeb911e516..628eaa813d24932f8c3832a5b8075467044b9bda 100644
+index 032d298dadb64ceb5f110a62402a08f78fc99c34..860af2fc093cdf5efe3ce7b577c82d7d0e82069a 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -572,7 +572,7 @@ public class ServerGamePacketListenerImpl
+@@ -574,7 +574,7 @@ public class ServerGamePacketListenerImpl
                      return;
                  }
                  // Paper end - Prevent moving into unloaded chunks
@@ -17,7 +17,7 @@ index a845d067171f15e2f70a03fde5bd96aeb911e516..628eaa813d24932f8c3832a5b8075467
                      // CraftBukkit end
                      LOGGER.warn(
                          "{} (vehicle of {}) moved too quickly! {},{},{}", rootVehicle.getName().getString(), this.player.getName().getString(), d3, d4, d5
-@@ -602,7 +602,7 @@ public class ServerGamePacketListenerImpl
+@@ -604,7 +604,7 @@ public class ServerGamePacketListenerImpl
                  d5 = d2 - rootVehicle.getZ();
                  d7 = d3 * d3 + d4 * d4 + d5 * d5;
                  boolean flag2 = false;
@@ -26,7 +26,7 @@ index a845d067171f15e2f70a03fde5bd96aeb911e516..628eaa813d24932f8c3832a5b8075467
                      flag2 = true; // Paper - diff on change, this should be moved wrongly
                      LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
                  }
-@@ -1449,7 +1449,7 @@ public class ServerGamePacketListenerImpl
+@@ -1452,7 +1452,7 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_TOO_QUICKLY,
                                              toX, toY, toZ, toYaw, toPitch, true);
                                          if (!event.isAllowed()) {
@@ -35,7 +35,7 @@ index a845d067171f15e2f70a03fde5bd96aeb911e516..628eaa813d24932f8c3832a5b8075467
                                                  LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d3, d4, d5);
                                              }
                                              this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
-@@ -1515,7 +1515,7 @@ public class ServerGamePacketListenerImpl
+@@ -1518,7 +1518,7 @@ public class ServerGamePacketListenerImpl
                              d5 = d2 - this.player.getZ();
                              d7 = d3 * d3 + d4 * d4 + d5 * d5;
                              boolean movedWrongly = false; // Paper - Add fail move event; rename

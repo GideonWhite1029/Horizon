@@ -5,13 +5,13 @@ Subject: [PATCH] Syncmatica Protocol
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 7e05c312aaabb20e2aafa4861d117bce38b53596..d2003efdad8d67dc08393cd888e1ecbebe8c3a99 100644
+index 629de46a562573b429c8d53735858de4fd2a26eb..f245af6602adbb075e51e9420c90c22c7be5dbf7 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -324,8 +324,11 @@ public class ServerGamePacketListenerImpl
-         player.getTextFilter().join();
+@@ -326,8 +326,11 @@ public class ServerGamePacketListenerImpl
          this.signedMessageDecoder = SignedMessageChain.Decoder.unsigned(player.getUUID(), server::enforceSecureProfile);
          this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
+         this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
 +        this.exchangeTarget = new dev.gideonwhite1029.horizon.protocol.syncmatica.exchange.ExchangeTarget(this); // Horizon
      }
  
