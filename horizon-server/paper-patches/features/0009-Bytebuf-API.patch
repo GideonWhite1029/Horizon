@@ -33,10 +33,10 @@ index 012fe28a7d8a1f16db11d7bf352874e8ecf6394e..0a9f8b9e2d389156c0ff5c5bf60a348f
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index deabc0ce7ad69146203c1fba4e5773cf6a62564a..190d65e423fb1dbbc107f64ab8d5a63aaf29c7ef 100644
+index e317ad68439a26e6e997f8a03df444e786daf1d5..cc87e7da2e6934c63150f395a56b2608d5ce75be 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3579,6 +3579,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3581,6 +3581,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      }
      // Paper end - entity effect API
  
