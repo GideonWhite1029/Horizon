@@ -162,7 +162,7 @@ public final class HorizonConfig {
             if (value == null) {
                 throw new RuntimeException("Invalid region format: " + regionFormat);
             }
-            if (regionFormat == EnumRegionFileExtension.LINEAR_V2) {
+            if (regionFormat == EnumRegionFileExtension.LINEAR) {
                 HorizonRegionFile.SAVE_DELAY_MS = linearIoFlushDelayMs;
                 HorizonRegionFile.SAVE_THREAD_MAX_COUNT = linearIoThreadCount;
                 HorizonRegionFile.USE_VIRTUAL_THREAD = linearUseVirtualThread;
