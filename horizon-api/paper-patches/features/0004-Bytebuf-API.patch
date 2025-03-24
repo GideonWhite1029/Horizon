@@ -5,10 +5,10 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index b35fcbf62dd98e43a650cbea35c0f60cc33fbdf3..a70725fc4b5eadba774d3eb2d62fe54406f9141c 100644
+index 4252fe01ba88cf6d42b00b96717e13cc1a078685..76d70a16c84b79fdde6ffd9af86907360eb9bbf4 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3149,4 +3149,19 @@ public final class Bukkit {
+@@ -3150,4 +3150,19 @@ public final class Bukkit {
          return server.getPhotographerManager();
      }
      // Horizon end - Photographer API
@@ -29,7 +29,7 @@ index b35fcbf62dd98e43a650cbea35c0f60cc33fbdf3..a70725fc4b5eadba774d3eb2d62fe544
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 74d2132b567de27697fee23298856b11b7e62e89..324c8f3a84ab9bd25e47758d5ad2d0bcbdacb80f 100644
+index caf0441e7afaa6862e6c98f2f4d2570104723aa5..4b676f05723f755fd2dc4a68ef39ae145a748b44 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
 @@ -2838,4 +2838,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
@@ -51,7 +51,7 @@ index 74d2132b567de27697fee23298856b11b7e62e89..324c8f3a84ab9bd25e47758d5ad2d0bc
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 09dddc39bcf52260f9fdda489fbf0caff9473af3..1274e4360e35749b0f9bcc4a1ab25606e9d7472e 100644
+index cb77f958927515eb826eeee71a5c48c92199549d..5711908de1eb4048975c07dd1778eb0cbdbb9266 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
 @@ -3853,6 +3853,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
