@@ -5,28 +5,30 @@ Subject: [PATCH] Secure Seed
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index de8b9048c8395c05b8688bc9d984b8ad680f15b3..4271fd58291f7d8ca776c0dadb402e5bdf8ab666 100644
+index 400e632208d133a3f49fc7f14bceb48a1026769b..2025012eb6ae3086436179a372da2864c1370c92 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-@@ -206,7 +206,12 @@ public class CraftChunk implements Chunk {
+@@ -195,8 +195,13 @@ public class CraftChunk implements Chunk {
+ 
      @Override
      public boolean isSlimeChunk() {
-         // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
--        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
+-        // 987234911L is taken from Slime when seeing if a slime can spawn in a chunk
+-        return this.level.paperConfig().entities.spawning.allChunksAreSlimeChunks || WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), level.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
 +        // Horizon start - Feature Secure Seed
 +        boolean isSlimeChunk = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? worldServer.getChunk(this.getX(), this.getZ()).isSlimeChunk()
-+                : WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), worldServer.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
-+        return this.worldServer.paperConfig().entities.spawning.allChunksAreSlimeChunks || isSlimeChunk;
++                ? level.getChunk(this.getX(), this.getZ()).isSlimeChunk()
++                : WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), level.spigotConfig.slimeSeed).nextInt(10) == 0; // Paper
++        return this.level.paperConfig().entities.spawning.allChunksAreSlimeChunks || isSlimeChunk;
 +        // Horizon end - Feature Secure Seed
      }
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index d32c85affcff7640f12689eff15c35390c732179..58209ec2b1e5a28d03423d592f24922d7fddc153 100644
+index e57fe58f8ba472aa28f44c6d25e525022024ae5d..6f5acad8062e21694e91c8e53dd0e3c91325860e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1405,7 +1405,11 @@ public final class CraftServer implements Server {
+@@ -1365,7 +1365,11 @@ public final class CraftServer implements Server {
              registryAccess = levelDataAndDimensions.dimensions().dimensionsRegistryAccess();
          } else {
              LevelSettings levelSettings;

@@ -7,8 +7,8 @@
 +val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/" // Horizon - Initial build
  
  dependencies {
-     mache("io.papermc:mache:1.21.4+build.7")
-@@ -29,7 +_,30 @@
+     mache("io.papermc:mache:1.21.5+build.1")
+@@ -32,7 +_,30 @@
              outputDir = rootDirectory.dir("paper-server")
          }
      }
@@ -39,8 +39,8 @@
 +    // Horizon end - Initial build
  
      spigot {
-         buildDataRef = "3edaf46ec1eed4115ce1b18d2846cded42577e42"
-@@ -53,6 +_,7 @@
+         buildDataRef = "702e1a0a5072b2c4082371d5228cb30525687efc"
+@@ -56,6 +_,7 @@
      libraryRepositories.addAll(
          "https://repo.maven.apache.org/maven2/",
          paperMavenPublicUrl,
@@ -48,7 +48,7 @@
      )
  }
  
-@@ -115,10 +_,14 @@
+@@ -119,10 +_,14 @@
      main {
          java { srcDir("../paper-server/src/main/java") }
          resources { srcDir("../paper-server/src/main/resources") }
@@ -63,7 +63,7 @@
      }
  }
  
-@@ -142,7 +_,12 @@
+@@ -146,7 +_,12 @@
  }
  
  dependencies {
@@ -77,23 +77,23 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -216,14 +_,14 @@
+@@ -220,14 +_,14 @@
          val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
--            "Implementation-Title" to "Purpur", // Purpur
-+            "Implementation-Title" to "Horizon", // Purpur // Horizon
+-            "Implementation-Title" to "Purpur",
++            "Implementation-Title" to "Horizon", // Horizon
              "Implementation-Version" to implementationVersion,
              "Implementation-Vendor" to date,
--            "Specification-Title" to "Purpur", // Purpur
-+            "Specification-Title" to "Horizon", // Purpur // Horizon
+-            "Specification-Title" to "Purpur",
++            "Specification-Title" to "Horizon", // Horizon
              "Specification-Version" to project.version,
--            "Specification-Vendor" to "Purpur Team", // Purpur
--            "Brand-Id" to "purpurmc:purpur", // Purpur
--            "Brand-Name" to "Purpur", // Purpur
-+            "Specification-Vendor" to "GideonWhite1029", // Purpur // Horizon
-+            "Brand-Id" to "gideonwhite1029:horizon", // Purpur // Horizon
-+            "Brand-Name" to "Horizon", // Purpur // Horizon
+-            "Specification-Vendor" to "Purpur Team",
+-            "Brand-Id" to "purpurmc:purpur",
+-            "Brand-Name" to "Purpur",
++            "Specification-Vendor" to "GideonWhite1029", // Horizon
++            "Brand-Id" to "gideonwhite1029:horizon", // Horizon
++            "Brand-Name" to "Horizon", // Horizon
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,

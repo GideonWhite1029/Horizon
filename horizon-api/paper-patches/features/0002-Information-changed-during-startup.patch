@@ -24,10 +24,10 @@ index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee9
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 249d6549543c059694a9372200b8581feb8dd8f8..3c04b4f523e7e129105aad22a2244da26d8ebdd3 100644
+index 5b59ae1649fa9d7d1521420e43742e8e3aed96b1..8014d901a4a9fadab7dae878d9c15c0060fd95cc 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -122,8 +122,17 @@ public final class Bukkit {
+@@ -123,8 +123,17 @@ public final class Bukkit {
      @NotNull
      public static String getVersionMessage() {
          final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();
@@ -48,10 +48,10 @@ index 249d6549543c059694a9372200b8581feb8dd8f8..3c04b4f523e7e129105aad22a2244da2
  
      /**
 diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
-index c880d0010849ab733ad13bbd18fab3c864d0cf61..3d5faae011ebab29ca38175df2821e8e993cd10a 100644
+index ec2b71cc2023b8ec7b9567a9ab1875cafc14f40d..379b26c4aee4a62bdb9af68c6d3b83d81e79d897 100644
 --- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java
 +++ b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
-@@ -259,7 +259,7 @@ public class VersionCommand extends BukkitCommand {
+@@ -257,7 +257,7 @@ public class VersionCommand extends BukkitCommand {
          // Purpur start
          int distance = getVersionFetcher().distance();
          final Component message = Component.join(net.kyori.adventure.text.JoinConfiguration.separator(Component.newline()),

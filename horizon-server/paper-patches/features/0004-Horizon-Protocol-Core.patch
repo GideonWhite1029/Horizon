@@ -5,10 +5,10 @@ Subject: [PATCH] Horizon Protocol Core
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e1dd0b6053d295eedf7059068b81d76ebb5c123f..d32c85affcff7640f12689eff15c35390c732179 100644
+index 96ee2a369bd7266ba066a164158b10f62833539c..e57fe58f8ba472aa28f44c6d25e525022024ae5d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -507,6 +507,7 @@ public final class CraftServer implements Server {
+@@ -502,6 +502,7 @@ public final class CraftServer implements Server {
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
          this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
@@ -16,7 +16,7 @@ index e1dd0b6053d295eedf7059068b81d76ebb5c123f..d32c85affcff7640f12689eff15c3539
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1140,6 +1141,7 @@ public final class CraftServer implements Server {
+@@ -1116,6 +1117,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur - Purpur config files
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

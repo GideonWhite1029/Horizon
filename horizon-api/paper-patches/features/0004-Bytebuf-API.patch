@@ -5,10 +5,10 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 4252fe01ba88cf6d42b00b96717e13cc1a078685..76d70a16c84b79fdde6ffd9af86907360eb9bbf4 100644
+index 69bd4dc366bdc73580da413f258ea89d45a2c9b3..a42972c2ee1e166e1c314431e5f4cad1c910ad97 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3150,4 +3150,19 @@ public final class Bukkit {
+@@ -3151,4 +3151,19 @@ public final class Bukkit {
          return server.getPhotographerManager();
      }
      // Horizon end - Photographer API
@@ -29,10 +29,10 @@ index 4252fe01ba88cf6d42b00b96717e13cc1a078685..76d70a16c84b79fdde6ffd9af8690736
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index caf0441e7afaa6862e6c98f2f4d2570104723aa5..4b676f05723f755fd2dc4a68ef39ae145a748b44 100644
+index ddc7493db1600164472b6922b9f1f795ddba80c3..2874c8c3585d1a5365065e177fdec80209c07a81 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2838,4 +2838,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2845,4 +2845,17 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
       */
      @NotNull dev.gideonwhite1029.horizon.replay.PhotographerManager getPhotographerManager();
      // Horizon end - Photographer API
@@ -51,10 +51,10 @@ index caf0441e7afaa6862e6c98f2f4d2570104723aa5..4b676f05723f755fd2dc4a68ef39ae14
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index cb77f958927515eb826eeee71a5c48c92199549d..5711908de1eb4048975c07dd1778eb0cbdbb9266 100644
+index 75bcbc8698f1c22c68faf0912ec200556b0251b1..6da5181e2a10ad3eac4bf4af745a23ac4111a3eb 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -3853,6 +3853,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+@@ -3829,6 +3829,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      boolean isChunkSent(long chunkKey);
      // Paper end
  

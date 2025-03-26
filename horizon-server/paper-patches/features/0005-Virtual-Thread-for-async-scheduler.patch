@@ -5,18 +5,18 @@ Subject: [PATCH] Virtual Thread for async scheduler
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 1a9228f9340f9f83aa9ecd5dde317b296bc03e0d..67ffdd9bcea0e6cd18d02499e74c30ae01957e5b 100644
+index c5414ce54f2bca766472246267aba11020c39316..91929915194e18cef531c2b03265bf036801c72a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -288,7 +288,7 @@ public class Main {
+@@ -252,7 +252,7 @@ public class Main {
                      }
                  }
  
 -                System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
 +                System.setProperty("org.jline.terminal.disableDeprecatedProviderWarning", "true"); // Horizon - Ignore terminal provider warning
                  System.setProperty("jdk.console", "java.base"); // Paper - revert default console provider back to java.base so we can have our own jline
-                 //System.out.println("Loading libraries, please wait...");
-                 //net.minecraft.server.Main.main(options);
+ 
+                 io.papermc.paper.PaperBootstrap.boot(options);
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 index 0ca279fb71d39c81b1f608e0ee9ba3e498d55fa3..9fab42aea95033d685ef716679913cba3b84f7de 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
