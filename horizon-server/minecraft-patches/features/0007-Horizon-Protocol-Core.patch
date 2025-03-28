@@ -47,7 +47,7 @@ index 54512846b6126cb5f78d663c3d40a5f199c96642..02e10dbd2deed7cb999b07bb2e351ae6
              this.tickables.get(i).run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd7248404c29 100644
+index 66549601222e4a7ae1efd609b4584136f1cf9193..6849f9b2e8d3cd38b9bc9f6dd8852f46268349d6 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -148,6 +148,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -59,19 +59,19 @@ index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd72
 +            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(player, horizonPayload);
 +        }
 +        // Horizon end - protocol
-         // CraftBukkit start
-         // Paper start - Brand support
+         // Paper start
          if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload(String brand)) {
-@@ -166,6 +171,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
-                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
-                 for (String channel : channels.split("\0")) {
-                     this.getCraftPlayer().addChannel(channel);
-+                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
-                 }
-             } catch (Exception ex) {
-                 ServerGamePacketListenerImpl.LOGGER.error("Couldn't register custom payload", ex);
+             this.player.clientBrandName = brand;
+@@ -208,6 +213,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+         final String channel = new String(data, from, length, java.nio.charset.StandardCharsets.US_ASCII);
+         if (register) {
+             this.getCraftPlayer().addChannel(channel);
++            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
+         } else {
+             this.getCraftPlayer().removeChannel(channel);
+         }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 4405f6feee53d0393fcedf555e65ecbacf93469f..bc91ff444cbe98a31a05d4b14fd090ee2ff83ef6 100644
+index a8d99020751a8360b1c466ca4c77e50be2778713..60901602a656a0f00e3400ec754d1af9a50458f1 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -330,6 +330,8 @@ public abstract class PlayerList {

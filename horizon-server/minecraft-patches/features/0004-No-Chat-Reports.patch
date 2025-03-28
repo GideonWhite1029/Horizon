@@ -130,10 +130,10 @@ index 7b4728c5ca17425be68e761f7a118121cf921297..67fd3ae99972b38a6ab5006c8161cd7f
      }
  
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 398c1733824b689520170de0be94006731afa5cd..d108243f6a7dcaba4464a28624d23240b1af201e 100644
+index c089a01765945277aafc62cb3566d81162c40c1d..66549601222e4a7ae1efd609b4584136f1cf9193 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -312,10 +312,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -316,10 +316,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
