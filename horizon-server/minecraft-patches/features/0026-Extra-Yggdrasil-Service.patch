@@ -18,7 +18,7 @@ index 8c3151c25c172b846f0d028b5100718ada2d09d7..10166aa16fd1c5c557f03647b33d784b
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index 1485186d4989874ef89c4e83830f26358a43759c..4a8e6acbb968d2d731c16f43cbbf327775815ea8 100644
+index 47d4d89180a7a8f40accd247115607a71b59c4ca..bd75571f95b4557e5ae09c3b3202ab50c635f740 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
 @@ -183,7 +183,7 @@ public class Main {
@@ -31,10 +31,10 @@ index 1485186d4989874ef89c4e83830f26358a43759c..4a8e6acbb968d2d731c16f43cbbf3277
              String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index daf3470bd9948d22d90ef061de16adc0f37b63c4..e641e62e59504deb840551979da71d5c9c5ad885 100644
+index e8a69144d5f9d1947dbc3d294a4758a903415fdd..d9e767fc033443957f2fc4b62bdddc9da3146dd5 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -245,7 +245,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private boolean isDemo;
      private volatile boolean isReady;
      private long lastOverloadWarningNanos;

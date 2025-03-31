@@ -5,7 +5,7 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index bf4d288b904643ace3985d89e5b9c81d81f9c087..54512846b6126cb5f78d663c3d40a5f199c96642 100644
+index 52cf12f0f108007813e0fa2a5ecc1ea2eacd59bd..f391fc28266e3171958c081123da25ce11efc38c 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.datafixers.DataFixer;
@@ -13,11 +13,11 @@ index bf4d288b904643ace3985d89e5b9c81d81f9c087..54512846b6126cb5f78d663c3d40a5f1
  import com.mojang.jtracy.TracyClient;
  import com.mojang.logging.LogUtils;
 +import dev.gideonwhite1029.horizon.HorizonConfig;
- import it.unimi.dsi.fastutil.longs.LongIterator;
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-@@ -1079,6 +1080,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         // Paper end - rewrite chunk system
+ import java.awt.image.BufferedImage;
+@@ -997,6 +998,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         // Spigot end
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
 +        HorizonConfig.createWorldSections = false; // Horizon
@@ -25,10 +25,10 @@ index bf4d288b904643ace3985d89e5b9c81d81f9c087..54512846b6126cb5f78d663c3d40a5f1
              net.minecrell.terminalconsole.TerminalConsoleAppender.close(); // Paper - Use TerminalConsoleAppender
          } catch (final Exception ignored) {
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 4f90ebcd86fba38dec313143e36614e992c7dbc7..0c6cfd745a785bd732dc9dcdbd5e61cd079e18b9 100644
+index 127935326dbfa0aa454dc12d52dcef328fcf2771..9c3f029b7866eb465a2492b1d7085c6fa7eee57c 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -245,6 +245,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -204,6 +204,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          */// Purpur end - Purpur config files // Purpur - Configurable void damage height and damage
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  

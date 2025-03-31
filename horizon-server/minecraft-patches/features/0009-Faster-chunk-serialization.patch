@@ -5,7 +5,7 @@ Subject: [PATCH] Faster chunk serialization
 
 
 diff --git a/net/minecraft/util/BitStorage.java b/net/minecraft/util/BitStorage.java
-index 02502d50f0255f5bbcc0ecb965abb48cc1a112da..02f586b89eeb60c19af2f8958e4beb8743f9a4d4 100644
+index 32fe9b22e1d3a422dd80c64d61156dbc7241ba20..7bbea9c118ef235515c736616e68596edb36b47b 100644
 --- a/net/minecraft/util/BitStorage.java
 +++ b/net/minecraft/util/BitStorage.java
 @@ -1,5 +1,7 @@
@@ -15,18 +15,16 @@ index 02502d50f0255f5bbcc0ecb965abb48cc1a112da..02f586b89eeb60c19af2f8958e4beb87
 +
  import java.util.function.IntConsumer;
  
- public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counting.BlockCountingBitStorage { // Paper - block counting
-@@ -21,6 +23,8 @@ public interface BitStorage extends ca.spottedleaf.moonrise.patches.block_counti
+ public interface BitStorage {
+@@ -20,4 +22,6 @@ public interface BitStorage {
+     void unpack(int[] array);
  
      BitStorage copy();
- 
-+    <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out); // Leaves - faster chunk serialization
 +
-     // Paper start - block counting
-     // provide default impl in case mods implement this...
-     @Override
++    <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out); // Horizon - faster chunk serialization
+ }
 diff --git a/net/minecraft/util/SimpleBitStorage.java b/net/minecraft/util/SimpleBitStorage.java
-index e6306a68c8652d4c5d22d5ecb1416f5f931f76ee..a60f1ccc83c0c22d5c3f7d9e532847a5b0bbddc8 100644
+index 6fb3a3f167d8cbaa78135af0c180b592661e2c1d..7433d85a7ec681e931532752cbaf25c38cd68e14 100644
 --- a/net/minecraft/util/SimpleBitStorage.java
 +++ b/net/minecraft/util/SimpleBitStorage.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -38,7 +36,7 @@ index e6306a68c8652d4c5d22d5ecb1416f5f931f76ee..a60f1ccc83c0c22d5c3f7d9e532847a5
  import org.apache.commons.lang3.Validate;
  
  public class SimpleBitStorage implements BitStorage {
-@@ -465,4 +467,44 @@ public class SimpleBitStorage implements BitStorage {
+@@ -360,4 +362,44 @@ public class SimpleBitStorage implements BitStorage {
              super(message);
          }
      }
@@ -84,7 +82,7 @@ index e6306a68c8652d4c5d22d5ecb1416f5f931f76ee..a60f1ccc83c0c22d5c3f7d9e532847a5
 +    // Horizon end - faster chunk serialization
  }
 diff --git a/net/minecraft/util/ZeroBitStorage.java b/net/minecraft/util/ZeroBitStorage.java
-index 09fd99c9cbd23b5f3c899bfb00c9b89651948ed8..d37ed8c6f0d00e3f50e75c659accb64813de9a30 100644
+index 8cc5c0716392ba06501542ff5cbe71ee43979e5d..62cda87fb1c2cd44c8a4f1596b00ba4a343145a7 100644
 --- a/net/minecraft/util/ZeroBitStorage.java
 +++ b/net/minecraft/util/ZeroBitStorage.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -96,15 +94,13 @@ index 09fd99c9cbd23b5f3c899bfb00c9b89651948ed8..d37ed8c6f0d00e3f50e75c659accb648
  import org.apache.commons.lang3.Validate;
  
  public class ZeroBitStorage implements BitStorage {
-@@ -63,6 +65,8 @@ public class ZeroBitStorage implements BitStorage {
+@@ -62,4 +64,6 @@ public class ZeroBitStorage implements BitStorage {
+     public BitStorage copy() {
          return this;
      }
- 
-+    @Override public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {}  // Horizon - faster chunk serialization
 +
-     // Paper start - block counting
-     @Override
-     public final it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap<it.unimi.dsi.fastutil.shorts.ShortArrayList> moonrise$countEntries() {
++    @Override public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {}  // Horizon - faster chunk serialization
+ }
 diff --git a/net/minecraft/world/level/chunk/PaletteResize.java b/net/minecraft/world/level/chunk/PaletteResize.java
 index c723606fa0be811e580ba47de8c9c575583cc930..885b66c7f240eb065fbe0b9f8f456b366edb3afd 100644
 --- a/net/minecraft/world/level/chunk/PaletteResize.java
@@ -117,7 +113,7 @@ index c723606fa0be811e580ba47de8c9c575583cc930..885b66c7f240eb065fbe0b9f8f456b36
      int onResize(int bits, T objectAdded);
  }
 diff --git a/net/minecraft/world/level/chunk/PalettedContainer.java b/net/minecraft/world/level/chunk/PalettedContainer.java
-index f5da433050fd3060e0335d4002d520ebe8cd691f..3938ad31708a38c477e53349ce160eb3ae2691d5 100644
+index 6781df510906f4e7e51ea852f3d2f6dcbea42b3b..9268f4071bdf5f10dc6e1645924ecf13d96afe3d 100644
 --- a/net/minecraft/world/level/chunk/PalettedContainer.java
 +++ b/net/minecraft/world/level/chunk/PalettedContainer.java
 @@ -3,6 +3,8 @@ package net.minecraft.world.level.chunk;
@@ -151,7 +147,7 @@ index f5da433050fd3060e0335d4002d520ebe8cd691f..3938ad31708a38c477e53349ce160eb3
      private static final int MIN_PALETTE_BITS = 0;
      private final PaletteResize<T> dummyPaletteResize = (bits, objectAdded) -> 0;
      public final IdMap<T> registry;
-@@ -343,29 +360,76 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+@@ -306,29 +323,76 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
      @Override
      public synchronized PalettedContainerRO.PackedData<T> pack(IdMap<T> registry, PalettedContainer.Strategy strategy) { // Paper - synchronize
          this.acquire();
@@ -248,7 +244,7 @@ index f5da433050fd3060e0335d4002d520ebe8cd691f..3938ad31708a38c477e53349ce160eb3
      }
  
      private static <T> void swapPalette(int[] bits, IntUnaryOperator operator) {
-@@ -405,12 +469,45 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+@@ -368,12 +432,45 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
  
      @Override
      public void count(PalettedContainer.CountConsumer<T> countConsumer) {

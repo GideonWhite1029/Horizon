@@ -5,7 +5,7 @@ Subject: [PATCH] Spectator dont get Advancement
 
 
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
-index 3530653b073254d16d406aa4ddfa9311f7c550a2..18f3a1c40138b32680d9e202689acbd9a8f5c3e0 100644
+index bc5fe40ba202bf80b925f08ceee045e8a69a7d45..02caad2851bfeecf3a353a3dd7f2c1b07403ecf5 100644
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
 @@ -24,6 +24,8 @@ import java.util.Set;

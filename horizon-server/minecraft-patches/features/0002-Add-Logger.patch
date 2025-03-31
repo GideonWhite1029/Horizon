@@ -5,10 +5,10 @@ Subject: [PATCH] Add Logger
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 80f2d38449f1db1d9b6926e4552d3061cb88b4af..28a111afb551d61058e142ca6b3f25a74503a0c6 100644
+index 7148e8c6deeb1e5f99eb6d2fe6c0fc9583e44934..56cf556650cbf12e92c7469d7dafa3ea7cb5a206 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -345,6 +345,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -397,6 +397,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      public boolean isTemporarilyActive;
      public long activatedImmunityTick = Integer.MIN_VALUE;
      public @Nullable Boolean immuneToFire = null; // Purpur - Fire immune API
@@ -16,20 +16,20 @@ index 80f2d38449f1db1d9b6926e4552d3061cb88b4af..28a111afb551d61058e142ca6b3f25a7
  
      public void inactiveTick() {
      }
-@@ -2560,6 +2561,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2403,6 +2404,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  compound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end - Fire immune API
 +            // Horizon start
 +            if (compound.contains("Horizon.Data")) {
-+                horizonData = compound.getCompound("Horizon.Data");
++                horizonData = compound;
 +            }
 +            // Horizon end
  
              return compound;
-         } catch (Throwable var9) {
-@@ -5149,6 +5155,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
-         return ((ServerLevel) this.level).isPositionEntityTicking(this.blockPosition());
+         } catch (Throwable var8) {
+@@ -4856,6 +4862,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+         return ((ServerLevel) this.level()).isPositionEntityTicking(this.blockPosition());
      }
      // Paper end - Expose entity id counter
 +

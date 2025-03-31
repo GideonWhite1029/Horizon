@@ -5,10 +5,10 @@ Subject: [PATCH] Virtual thread for User Authenticator
 
 
 diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-index 45ea5fa0ef57724acce46008c53f7fa216cf78ee..c82be2aba6ca7c5d8a103a7dd6223654fa998619 100644
+index 637b2eb7104cb0bc7f314ad6eea11a432e899861..76e3e60efe610f643b13c0f7ada33a458cbcaa80 100644
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -55,7 +55,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
+@@ -54,7 +54,7 @@ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener,
      // CraftBukkit end
      private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
      static final Logger LOGGER = LogUtils.getLogger();

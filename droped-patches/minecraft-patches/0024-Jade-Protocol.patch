@@ -5,10 +5,10 @@ Subject: [PATCH] Jade Protocol
 
 
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-index 90bcd8c79cccbcbe7ff3fd2534e0c3450b970bd4..ece3dad3513fdec9c7b8c88d792adbadeaa211b4 100644
+index 0b4d1e6633ecc2e11606024d085bb9e6cca5a86b..cdd099110bf42db8ce422d603ad74192e27ec132 100644
 --- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-@@ -61,7 +61,7 @@ public class Armadillo extends Animal {
+@@ -62,7 +62,7 @@ public class Armadillo extends Animal {
      public final AnimationState rollOutAnimationState = new AnimationState();
      public final AnimationState rollUpAnimationState = new AnimationState();
      public final AnimationState peekAnimationState = new AnimationState();
@@ -18,10 +18,10 @@ index 90bcd8c79cccbcbe7ff3fd2534e0c3450b970bd4..ece3dad3513fdec9c7b8c88d792adbad
  
      public Armadillo(EntityType<? extends Animal> entityType, Level level) {
 diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
-index e888e606b4b14fa6485de7426bc146b6005962af..ad1c68b60c7d6bdfee200afebec555844af9a8cc 100644
+index 4db2d63fbc021f28b8ad8d20cc1cc1bb257b057f..224c0f13ad1c6f95e55f9609f5e6a6b592bcd5ff 100644
 --- a/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -291,7 +291,7 @@ public class Tadpole extends AbstractFish {
+@@ -290,7 +290,7 @@ public class Tadpole extends AbstractFish {
          }
      }
  
@@ -44,11 +44,11 @@ index 29ad43245a310756c4227acd7532e905f7f8b8ee..7e5c267b92051a29ae620894bd26cef7
      private final Predicate<LootContext> compositeCondition;
      private final List<LootItemFunction> functions;
 diff --git a/net/minecraft/world/level/storage/loot/LootTable.java b/net/minecraft/world/level/storage/loot/LootTable.java
-index dd646b11ef0a40e7f782742e62ccccfa9bcfd235..087745584116ad626f1f687f48a417a1cc183f0e 100644
+index 7a8eb1e8b07647e1124594f78652d34731e4fda6..743360388f4b16408bd2c9cd5267374ae9121e93 100644
 --- a/net/minecraft/world/level/storage/loot/LootTable.java
 +++ b/net/minecraft/world/level/storage/loot/LootTable.java
-@@ -45,7 +45,7 @@ public class LootTable {
-     public static final Codec<Holder<LootTable>> CODEC = RegistryFileCodec.create(Registries.LOOT_TABLE, DIRECT_CODEC);
+@@ -49,7 +49,7 @@ public class LootTable {
+     public static final LootTable EMPTY = new LootTable(LootContextParamSets.EMPTY, Optional.empty(), List.of(), List.of());
      private final ContextKeySet paramSet;
      private final Optional<ResourceLocation> randomSequence;
 -    private final List<LootPool> pools;
@@ -83,10 +83,10 @@ index e0e933245e038b7229eeddbda272b081161ab603..26b4813c1f3b58c5dd861e3f6ca07fc6
  
      protected LootPoolEntryContainer(List<LootItemCondition> conditions) {
 diff --git a/net/minecraft/world/level/storage/loot/entries/NestedLootTable.java b/net/minecraft/world/level/storage/loot/entries/NestedLootTable.java
-index d5e697a0cf6091a7f37c68e3c2a52851535735b1..3ff4ec6269b4cf5092378f16e1ba9298a89fb6e6 100644
+index f7b647e81ca99040bae8161a2bc0dcacf5bd537f..516e27971d9ade0c2b830c23efa69f62376bf890 100644
 --- a/net/minecraft/world/level/storage/loot/entries/NestedLootTable.java
 +++ b/net/minecraft/world/level/storage/loot/entries/NestedLootTable.java
-@@ -25,7 +25,7 @@ public class NestedLootTable extends LootPoolSingletonContainer {
+@@ -22,7 +22,7 @@ public class NestedLootTable extends LootPoolSingletonContainer {
              .and(singletonFields(instance))
              .apply(instance, NestedLootTable::new)
      );

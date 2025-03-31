@@ -36,7 +36,7 @@ index 47cb25aa9c37bd84d156288c397321009f1d9ae2..7a1f9b698ee2ae5f1819976c299d8d82
      public void write(FriendlyByteBuf buffer) {
          buffer.writeCollection(this.entries, (buffer1, entry) -> entry.write(buffer1));
 diff --git a/net/minecraft/network/FriendlyByteBuf.java b/net/minecraft/network/FriendlyByteBuf.java
-index d1daa3443446f47e2215f0c7c5823da58e053bab..d25c7e34fa49193b95f214dd4b498c68185b6201 100644
+index 7da7d645f83f351e8c964da01734f3074a877ca1..78ba252f8b0a4914de0cf8ece6440272e7751567 100644
 --- a/net/minecraft/network/FriendlyByteBuf.java
 +++ b/net/minecraft/network/FriendlyByteBuf.java
 @@ -8,6 +8,7 @@ import com.mojang.serialization.Codec;
@@ -108,7 +108,7 @@ index 1df628ac0b414511aaed6e09d78f884c4170f730..09679f8d6a2ebda32a21f62f60db9192
      }
  }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 7b4728c5ca17425be68e761f7a118121cf921297..67fd3ae99972b38a6ab5006c8161cd7f8f54611a 100644
+index 9c3f029b7866eb465a2492b1d7085c6fa7eee57c..dc40d83066939b4fca2b97a324b8cce11a86d860 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -19,6 +19,8 @@ import java.util.List;
@@ -120,7 +120,7 @@ index 7b4728c5ca17425be68e761f7a118121cf921297..67fd3ae99972b38a6ab5006c8161cd7f
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -659,7 +661,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -591,7 +593,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return properties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -130,10 +130,10 @@ index 7b4728c5ca17425be68e761f7a118121cf921297..67fd3ae99972b38a6ab5006c8161cd7f
      }
  
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 398c1733824b689520170de0be94006731afa5cd..d108243f6a7dcaba4464a28624d23240b1af201e 100644
+index aa1470d068c6c8b16ba3f54edf71032c95ff2df2..3f0f1fcddaad8be2e7ec72d68a3dde58b5cb4be6 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -312,10 +312,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -309,10 +309,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -159,13 +159,13 @@ index 398c1733824b689520170de0be94006731afa5cd..d108243f6a7dcaba4464a28624d23240
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 5ba1fa59cdc8b1006a9c4e87af6da841467431ea..a8d99020751a8360b1c466ca4c77e50be2778713 100644
+index e5f51a9577305a218395e10f452c6d84c4258986..63694c2912c441a35b4a3109c874ed605cafb573 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1324,7 +1324,7 @@ public abstract class PlayerList {
+@@ -1313,7 +1313,7 @@ public abstract class PlayerList {
      }
  
-     public boolean verifyChatTrusted(PlayerChatMessage message) { // Paper - private -> public
+     public boolean verifyChatTrusted(PlayerChatMessage message) {
 -        return message.hasSignature() && !message.hasExpiredServer(Instant.now());
 +        return dev.gideonwhite1029.horizon.HorizonConfig.noChatReports || (message.hasSignature() && !message.hasExpiredServer(Instant.now())); // Horizon - No Not Secure
      }

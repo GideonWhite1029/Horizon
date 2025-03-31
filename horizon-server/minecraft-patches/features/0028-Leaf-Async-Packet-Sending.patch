@@ -254,10 +254,10 @@ index 00a82873d226f113278632a53c0faca420dd67d4..b4f3dfe3bf5d818132f70c2fb25689fc
  
      private boolean processQueue() {
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index e641e62e59504deb840551979da71d5c9c5ad885..826288a3872cc17fa3b361600512eb2c321b7817 100644
+index d9e767fc033443957f2fc4b62bdddc9da3146dd5..06a38626e1417b20c6fb64cf28f915c2e231e000 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -71,6 +71,7 @@ import net.minecraft.core.RegistryAccess;
+@@ -70,6 +70,7 @@ import net.minecraft.core.RegistryAccess;
  import net.minecraft.core.registries.Registries;
  import net.minecraft.data.worldgen.features.MiscOverworldFeatures;
  import net.minecraft.gametest.framework.GameTestTicker;
@@ -265,7 +265,7 @@ index e641e62e59504deb840551979da71d5c9c5ad885..826288a3872cc17fa3b361600512eb2c
  import net.minecraft.network.chat.ChatDecorator;
  import net.minecraft.network.chat.ChatType;
  import net.minecraft.network.chat.Component;
-@@ -1023,6 +1024,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -939,6 +940,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // CraftBukkit end
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.shutdown(); // Paper - Plugin remapping
          this.getConnection().stop();

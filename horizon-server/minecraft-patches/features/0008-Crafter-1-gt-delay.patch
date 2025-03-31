@@ -5,19 +5,19 @@ Subject: [PATCH] Crafter 1 gt delay
 
 
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
-index 5f5966278faf86ed9b28955c80ba845c0cb75595..594a646ca726f01ca9d834851076836a05b29715 100644
+index 38b03c7b02bdfc579e5e126c12de3d878e26d188..f46bd76748da51c81778a8ee468a4c858f7d1907 100644
 --- a/net/minecraft/world/level/block/CrafterBlock.java
 +++ b/net/minecraft/world/level/block/CrafterBlock.java
-@@ -82,7 +82,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -75,7 +75,7 @@ public class CrafterBlock extends BaseEntityBlock {
          boolean triggeredValue = state.getValue(TRIGGERED);
          BlockEntity blockEntity = level.getBlockEntity(pos);
          if (hasNeighborSignal && !triggeredValue) {
 -            level.scheduleTick(pos, this, 4);
 +            level.scheduleTick(pos, this, !dev.gideonwhite1029.horizon.HorizonConfig.crafter1gt ? 4 : 1); // Horizon - crafter 1 gt delay
-             level.setBlock(pos, state.setValue(TRIGGERED, Boolean.valueOf(true)), 2);
+             level.setBlock(pos, state.setValue(TRIGGERED, true), 2);
              this.setBlockEntityTriggered(blockEntity, true);
          } else if (!hasNeighborSignal && triggeredValue) {
-@@ -132,7 +132,7 @@ public class CrafterBlock extends BaseEntityBlock {
+@@ -125,7 +125,7 @@ public class CrafterBlock extends BaseEntityBlock {
      @Override
      public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
          if (state.getValue(TRIGGERED)) {

@@ -5,8 +5,8 @@ import dev.gideonwhite1029.horizon.commands.GlobalConfigManager;
 import dev.gideonwhite1029.horizon.commands.HorizonCommand;
 import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
-import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
-import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
+//import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
+//import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
 import dev.gideonwhite1029.horizon.yggdrasil.HorizonMinecraftSessionService;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import net.minecraft.server.MinecraftServer;
@@ -26,7 +26,7 @@ public final class HorizonConfig {
             + "# \n"
             + "# Created by GideonWhite1029\n"
             + "# Boosty: https://boosty.to/gideonwhite1029\n";
-    public static final int CURRENT_CONFIG_VERSION = 4;
+    public static final int CURRENT_CONFIG_VERSION = 5;
 
     private static File configFile;
     public static YamlConfiguration config;
@@ -89,8 +89,8 @@ public final class HorizonConfig {
     @GlobalConfig(name = "no-chat-reports", category = {"features"})
     public static boolean noChatReports = true;
 
-    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
-    public static boolean vanillaHopper = false;
+    // @GlobalConfig(name = "vanilla-hopper", category = {"features"})
+    // public static boolean vanillaHopper = false;
 
     @GlobalConfig(name = "spectator-dont-get-advancement", category = {"features"})
     public static boolean spectatorDontGetAdvancement = false;
@@ -151,7 +151,7 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "message-end", category = {"features", "elytra-aeronautics"})
     public static String elytraAeronauticsNoChunkEndMes = "Flight exit cruise mode";
-
+/*
     // Horizon start - region
     @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
     public static dev.gideonwhite1029.horizon.region.EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
@@ -206,6 +206,7 @@ public final class HorizonConfig {
         }
     }
     // Horizon end - region
+*/
 
     @GlobalConfig(name = "configurable-mc-67", category = {"optimization"})
     public static boolean allowEntityPortalWithPassenger = true;
@@ -223,12 +224,12 @@ public final class HorizonConfig {
     public static int syncTickInterval = 20;
 
     // Jade
-    @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
-    public static boolean jadeEnable = false;
+    // @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
+    // public static boolean jadeEnable = false;
 
     // REI
-    @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
-    public static boolean reiEnable = false;
+    // @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
+    // public static boolean reiEnable = false;
 
     // XaeroMap
     @GlobalConfig(name = "xaeromap-enable", category = {"protocols", "xaeromap"})
@@ -290,8 +291,8 @@ public final class HorizonConfig {
         }
     }
 
-    @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
-    public static boolean AsyncChunkSend = false;
+    // @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
+    // public static boolean AsyncChunkSend = false;
 
     // Horizon start - AsyncPacketSending
     @GlobalConfig(name = "async-packet-sending", category = {"optimization", "packet-sending"})

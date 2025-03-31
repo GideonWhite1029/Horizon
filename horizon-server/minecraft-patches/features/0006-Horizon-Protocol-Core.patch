@@ -34,10 +34,10 @@ index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..d95f9f32ca3367cc8f09b22745b8c47b
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 54512846b6126cb5f78d663c3d40a5f199c96642..02e10dbd2deed7cb999b07bb2e351ae62b40bb0d 100644
+index f391fc28266e3171958c081123da25ce11efc38c..67121e7431d1a881f34cff079421fc7c9d724486 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1784,6 +1784,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1673,6 +1673,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
@@ -47,7 +47,7 @@ index 54512846b6126cb5f78d663c3d40a5f199c96642..02e10dbd2deed7cb999b07bb2e351ae6
              this.tickables.get(i).run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd7248404c29 100644
+index 3f0f1fcddaad8be2e7ec72d68a3dde58b5cb4be6..ee346b4f447bdc710cbd979c93e55927baf33744 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -148,6 +148,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -63,7 +63,7 @@ index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd72
          // Paper start - Brand support
          if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload(String brand)) {
 @@ -166,6 +171,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
-                 String channels = payload.toString(com.google.common.base.Charsets.UTF_8);
+                 String channels = payload.toString(java.nio.charset.StandardCharsets.UTF_8);
                  for (String channel : channels.split("\0")) {
                      this.getCraftPlayer().addChannel(channel);
 +                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
@@ -71,10 +71,10 @@ index d108243f6a7dcaba4464a28624d23240b1af201e..2b0ce353c29436655a25f2066fcecd72
              } catch (Exception ex) {
                  ServerGamePacketListenerImpl.LOGGER.error("Couldn't register custom payload", ex);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 4405f6feee53d0393fcedf555e65ecbacf93469f..bc91ff444cbe98a31a05d4b14fd090ee2ff83ef6 100644
+index 63694c2912c441a35b4a3109c874ed605cafb573..cdd70e932813c24411de695c983db0808a0f3a29 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -330,6 +330,8 @@ public abstract class PlayerList {
+@@ -334,6 +334,8 @@ public abstract class PlayerList {
              return;
          }
  
@@ -83,10 +83,10 @@ index 4405f6feee53d0393fcedf555e65ecbacf93469f..bc91ff444cbe98a31a05d4b14fd090ee
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -501,6 +503,7 @@ public abstract class PlayerList {
+@@ -504,6 +506,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
-     public net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
+     public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerLeave(player); // Horizon - protocol
          // Paper end - Fix kick event leave message not being sent
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar

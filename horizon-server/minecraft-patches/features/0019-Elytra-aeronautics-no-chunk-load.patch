@@ -5,10 +5,10 @@ Subject: [PATCH] Elytra aeronautics no chunk load
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index b3f498558614243cf633dcd71e3c49c2c55e6e0f..9cdf814867a4d48ce6472f57b84b022d0c8d7d2c 100644
+index 00a5ed09caa2689543bd47bcd93d5a6141d0af46..a830ebbfeef11f12310eac6cb059481a7eeaf49a 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -792,7 +792,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1080,7 +1080,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      private boolean skipPlayer(ServerPlayer player) {
@@ -18,19 +18,20 @@ index b3f498558614243cf633dcd71e3c49c2c55e6e0f..9cdf814867a4d48ce6472f57b84b022d
      }
  
      void updatePlayerStatus(ServerPlayer player, boolean track) {
-@@ -826,6 +827,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -1112,6 +1113,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void move(ServerPlayer player) {
 +        if (player.elytraAeronauticsNoChunk) return; // Horizon - no chunk
-         // Paper - optimise entity tracker
- 
-         SectionPos lastSectionPos = player.getLastSectionPos();
++
+         for (ChunkMap.TrackedEntity trackedEntity : this.entityMap.values()) {
+             if (trackedEntity.entity == player) {
+                 trackedEntity.updatePlayers(this.level.players());
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 860af2fc093cdf5efe3ce7b577c82d7d0e82069a..629de46a562573b429c8d53735858de4fd2a26eb 100644
+index 96f9400397b8e14c47aebee4df2d67ecc8b38810..afe389697a1ccedcc6dd572470a87783168b481d 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -566,7 +566,7 @@ public class ServerGamePacketListenerImpl
+@@ -558,7 +558,7 @@ public class ServerGamePacketListenerImpl
                  speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
  
                  // Paper start - Prevent moving into unloaded chunks
@@ -40,18 +41,18 @@ index 860af2fc093cdf5efe3ce7b577c82d7d0e82069a..629de46a562573b429c8d53735858de4
                          !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
                  )) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index a88c94c2bab92e300b3a328fdd3e6f95e19b33a0..bdb2a434cc8ddd14d384bc82a83ea3cd52737398 100644
+index 56cf556650cbf12e92c7469d7dafa3ea7cb5a206..9cb5b3c1e82f6e071156df140be955737edeb655 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
+@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
  import com.google.common.collect.Sets;
  import com.google.common.collect.ImmutableList.Builder;
- import com.mojang.logging.LogUtils;
+ import com.mojang.serialization.Codec;
 +import dev.gideonwhite1029.horizon.HorizonConfig;
  import it.unimi.dsi.fastutil.floats.FloatArraySet;
  import it.unimi.dsi.fastutil.floats.FloatArrays;
  import it.unimi.dsi.fastutil.floats.FloatSet;
-@@ -1142,6 +1143,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1019,6 +1020,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  }
              }
  
@@ -65,7 +66,7 @@ index a88c94c2bab92e300b3a328fdd3e6f95e19b33a0..bdb2a434cc8ddd14d384bc82a83ea3cd
              ProfilerFiller profilerFiller = Profiler.get();
              profilerFiller.push("move");
              if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
-@@ -2091,6 +2099,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -1937,6 +1945,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          this.yo = y;
          this.zo = d1;
          this.setPos(d, y, d1);
@@ -74,10 +75,10 @@ index a88c94c2bab92e300b3a328fdd3e6f95e19b33a0..bdb2a434cc8ddd14d384bc82a83ea3cd
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 3aab8856b07389a8d7a06a9f66f21771a3f2d122..8e8c83aa8b3fc7c655bc5240344422636e2b8626 100644
+index 87c8bc6f9128d2fcb19628bc3ef354e517b632bb..5a414c57add635ee21d8bf1aea959aa6d61cc141 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -203,6 +203,7 @@ public abstract class Player extends LivingEntity {
+@@ -213,6 +213,7 @@ public abstract class Player extends LivingEntity {
      public int burpDelay = 0; // Purpur - Burp delay
      public boolean canPortalInstant = false; // Purpur - Add portal permission bypass
      public int sixRowEnderchestSlotCount = -1; // Purpur - Barrels and enderchests 6 rows

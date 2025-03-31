@@ -18,7 +18,7 @@ index c6e4f72825c868b416ce2e81fc6d9b5bfdbd85f2..351470ae5b2a94ba75cc0739375c0159
                  .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), component)
                  .getOrThrow(JsonParseException::new);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 36def0a67ece0760429c5a35a102787104901734..374f09601a0e18dec0a02850911b363662bb13c7 100644
+index 8bfa5f73de2d007434e24b17cc0f9ae80d4309dc..2fd0373dd6000a6904f74c765fc5ce753da9bf7e 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -20,6 +20,8 @@ import java.util.UUID;
@@ -30,7 +30,7 @@ index 36def0a67ece0760429c5a35a102787104901734..374f09601a0e18dec0a02850911b3636
  import net.minecraft.ChatFormatting;
  import net.minecraft.FileUtil;
  import net.minecraft.commands.CommandSourceStack;
-@@ -433,6 +435,12 @@ public abstract class PlayerList {
+@@ -437,6 +439,12 @@ public abstract class PlayerList {
  
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
