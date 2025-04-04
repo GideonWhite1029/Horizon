@@ -1,6 +1,6 @@
 package dev.gideonwhite1029.horizon.config;
 
-// import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
+import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -89,6 +89,6 @@ public interface ConfigVerify<E> extends ConfigConvert<E> {
             return enumValues;
         }
 
-        // public abstract String check(EnumRegionFileExtension old, EnumRegionFileExtension value) throws IllegalArgumentException;
+        public abstract String check(EnumRegionFileExtension old, EnumRegionFileExtension value) throws IllegalArgumentException;
     }
 }

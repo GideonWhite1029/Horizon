@@ -5,8 +5,8 @@ import dev.gideonwhite1029.horizon.commands.GlobalConfigManager;
 import dev.gideonwhite1029.horizon.commands.HorizonCommand;
 import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
-//import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
-//import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
+import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
+import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
 import dev.gideonwhite1029.horizon.yggdrasil.HorizonMinecraftSessionService;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import net.minecraft.server.MinecraftServer;
@@ -151,7 +151,7 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "message-end", category = {"features", "elytra-aeronautics"})
     public static String elytraAeronauticsNoChunkEndMes = "Flight exit cruise mode";
-/*
+
     // Horizon start - region
     @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
     public static dev.gideonwhite1029.horizon.region.EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
@@ -206,7 +206,6 @@ public final class HorizonConfig {
         }
     }
     // Horizon end - region
-*/
 
     @GlobalConfig(name = "configurable-mc-67", category = {"optimization"})
     public static boolean allowEntityPortalWithPassenger = true;
@@ -291,8 +290,8 @@ public final class HorizonConfig {
         }
     }
 
-    // @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
-    // public static boolean AsyncChunkSend = false;
+    @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
+    public static boolean AsyncChunkSend = false;
 
     // Horizon start - AsyncPacketSending
     @GlobalConfig(name = "async-packet-sending", category = {"optimization", "packet-sending"})

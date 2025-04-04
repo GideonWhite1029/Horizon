@@ -34,10 +34,10 @@ index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..d95f9f32ca3367cc8f09b22745b8c47b
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index f391fc28266e3171958c081123da25ce11efc38c..67121e7431d1a881f34cff079421fc7c9d724486 100644
+index 8d5f3176bdcafa5edda7b99704bb9d7f06eb08eb..80d93176d52ba9f45880dec91ffb9e539dc219ee 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1673,6 +1673,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1761,6 +1761,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
@@ -47,7 +47,7 @@ index f391fc28266e3171958c081123da25ce11efc38c..67121e7431d1a881f34cff079421fc7c
              this.tickables.get(i).run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 3f0f1fcddaad8be2e7ec72d68a3dde58b5cb4be6..ee346b4f447bdc710cbd979c93e55927baf33744 100644
+index 710e75ac5ca3c4922299c48f4dabf86eb0557afc..1fee6d6ae7b20cbb216ec525c3695194e8ae9c44 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -148,6 +148,11 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -59,19 +59,19 @@ index 3f0f1fcddaad8be2e7ec72d68a3dde58b5cb4be6..ee346b4f447bdc710cbd979c93e55927
 +            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(player, horizonPayload);
 +        }
 +        // Horizon end - protocol
-         // CraftBukkit start
-         // Paper start - Brand support
+         // Paper start
          if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.BrandPayload(String brand)) {
-@@ -166,6 +171,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
-                 String channels = payload.toString(java.nio.charset.StandardCharsets.UTF_8);
-                 for (String channel : channels.split("\0")) {
-                     this.getCraftPlayer().addChannel(channel);
-+                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
-                 }
-             } catch (Exception ex) {
-                 ServerGamePacketListenerImpl.LOGGER.error("Couldn't register custom payload", ex);
+             this.player.clientBrandName = brand;
+@@ -207,6 +212,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+         final String channel = new String(data, from, length, java.nio.charset.StandardCharsets.US_ASCII);
+         if (register) {
+             this.getCraftPlayer().addChannel(channel);
++            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleMinecraftRegister(channel, player); // Horizon - protocol
+         } else {
+             this.getCraftPlayer().removeChannel(channel);
+         }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 63694c2912c441a35b4a3109c874ed605cafb573..cdd70e932813c24411de695c983db0808a0f3a29 100644
+index e3da7c5e7047f3c7f79f960f1b4d29442720f719..37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -334,6 +334,8 @@ public abstract class PlayerList {

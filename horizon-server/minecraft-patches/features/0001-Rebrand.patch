@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 31e5244a43c1c55baef3be745ca5dc5857bdf348..52cf12f0f108007813e0fa2a5ecc1ea2eacd59bd 100644
+index 195dd839c50f5a86dffcbd3b6b82b5fb30a54e16..4fb4a1bee70cc9c67671688c51e72d562f754574 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1120,15 +1120,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1200,15 +1200,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop
@@ -25,10 +25,10 @@ index 31e5244a43c1c55baef3be745ca5dc5857bdf348..52cf12f0f108007813e0fa2a5ecc1ea2
              // Purpur start - config for startup commands
              if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index c1ddc3da839539d5d9cbbeae935969b8b656428e..a246f159da16a53e16f24a53ebea63140522d469 100644
+index af76a3b29762effbca4e9a98db733f6982e50eb7..612800b72805cf5e13ada826c354ac9f2a545789 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -49,7 +49,7 @@ public final class RegionFileStorage implements AutoCloseable {
+@@ -238,7 +238,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
      // Paper start
      private static void printOversizedLog(String msg, Path file, int x, int z) {

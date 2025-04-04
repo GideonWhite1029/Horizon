@@ -108,7 +108,7 @@ index 1df628ac0b414511aaed6e09d78f884c4170f730..09679f8d6a2ebda32a21f62f60db9192
      }
  }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 9c3f029b7866eb465a2492b1d7085c6fa7eee57c..dc40d83066939b4fca2b97a324b8cce11a86d860 100644
+index 6dbb4b346dd5e287970e31f87a2e35140996fdd3..66ec8c13564a1125060441db2908bd9c8d48ee22 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -19,6 +19,8 @@ import java.util.List;
@@ -120,7 +120,7 @@ index 9c3f029b7866eb465a2492b1d7085c6fa7eee57c..dc40d83066939b4fca2b97a324b8cce1
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -591,7 +593,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -617,7 +619,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return properties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -130,10 +130,10 @@ index 9c3f029b7866eb465a2492b1d7085c6fa7eee57c..dc40d83066939b4fca2b97a324b8cce1
      }
  
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index aa1470d068c6c8b16ba3f54edf71032c95ff2df2..3f0f1fcddaad8be2e7ec72d68a3dde58b5cb4be6 100644
+index eb6c6b6b45a680336944361f96927400c65601e6..710e75ac5ca3c4922299c48f4dabf86eb0557afc 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -309,10 +309,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -315,10 +315,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      }
  
      public void send(Packet<?> packet) {
@@ -159,7 +159,7 @@ index aa1470d068c6c8b16ba3f54edf71032c95ff2df2..3f0f1fcddaad8be2e7ec72d68a3dde58
          if (packet == null || this.processedDisconnect) { // Spigot
              return;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index e5f51a9577305a218395e10f452c6d84c4258986..63694c2912c441a35b4a3109c874ed605cafb573 100644
+index 06345c82dfa27feddfbcd8d1bfb9b138fddd9ae5..e3da7c5e7047f3c7f79f960f1b4d29442720f719 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -1313,7 +1313,7 @@ public abstract class PlayerList {

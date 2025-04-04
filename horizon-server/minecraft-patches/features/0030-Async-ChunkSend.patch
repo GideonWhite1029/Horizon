@@ -5,11 +5,11 @@ Subject: [PATCH] Async ChunkSend
 
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-index dd2509996bfd08e8c3f9f2be042229eac6d7692d..ec872da669644b7cf038b9808c73b1a80ba92a86 100644
+index 02a9ef1694c796584c29430d27f0a09047368835..70ca6f1819b6347f4eab105cbb573b5e1f1ad43f 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-@@ -16,21 +16,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkHolderManage
- import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskScheduler;
+@@ -17,21 +17,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskSchedule
+ import ca.spottedleaf.moonrise.patches.chunk_system.ticket.ChunkSystemTicketType;
  import ca.spottedleaf.moonrise.patches.chunk_system.util.ParallelSearchRadiusIteration;
  import com.google.gson.JsonObject;
 +import dev.gideonwhite1029.horizon.HorizonConfig;
@@ -34,7 +34,7 @@ index dd2509996bfd08e8c3f9f2be042229eac6d7692d..ec872da669644b7cf038b9808c73b1a8
  import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.chunk.ChunkAccess;
-@@ -411,18 +411,90 @@ public final class RegionizedPlayerChunkLoader {
+@@ -409,18 +409,90 @@ public final class RegionizedPlayerChunkLoader {
              this.delayedTicketOps.addLast(op);
          }
  

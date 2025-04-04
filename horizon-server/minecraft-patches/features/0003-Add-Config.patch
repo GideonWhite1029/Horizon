@@ -5,7 +5,7 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 52cf12f0f108007813e0fa2a5ecc1ea2eacd59bd..f391fc28266e3171958c081123da25ce11efc38c 100644
+index 4fb4a1bee70cc9c67671688c51e72d562f754574..8d5f3176bdcafa5edda7b99704bb9d7f06eb08eb 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -13,6 +13,7 @@ import com.mojang.datafixers.DataFixer;
@@ -16,8 +16,8 @@ index 52cf12f0f108007813e0fa2a5ecc1ea2eacd59bd..f391fc28266e3171958c081123da25ce
  import it.unimi.dsi.fastutil.objects.ObjectArrayList;
  import it.unimi.dsi.fastutil.objects.ObjectArraySet;
  import java.awt.image.BufferedImage;
-@@ -997,6 +998,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         // Spigot end
+@@ -1077,6 +1078,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         // Paper end - rewrite chunk system
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
 +        HorizonConfig.createWorldSections = false; // Horizon
@@ -25,7 +25,7 @@ index 52cf12f0f108007813e0fa2a5ecc1ea2eacd59bd..f391fc28266e3171958c081123da25ce
              net.minecrell.terminalconsole.TerminalConsoleAppender.close(); // Paper - Use TerminalConsoleAppender
          } catch (final Exception ignored) {
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 127935326dbfa0aa454dc12d52dcef328fcf2771..9c3f029b7866eb465a2492b1d7085c6fa7eee57c 100644
+index 8bb2c4266a543c4b6a3d9686d6010241a0f40c86..6dbb4b346dd5e287970e31f87a2e35140996fdd3 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -204,6 +204,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface

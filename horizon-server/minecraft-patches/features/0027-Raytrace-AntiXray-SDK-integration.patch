@@ -22,10 +22,10 @@ index d1f74d10e5e3d65895d7e87dd77f298cd9689b33..8fdc5ab8bfba0e40cedfac64d6bc5e24
      }
  
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index bfd5214ec7ad3101dbfa8f25f5837417af31ad27..c8dc0c857a8503d4c866061f83599b781b6792e2 100644
+index 4f1217f2d80aa8d97486b9381e70c7197fddbc56..92983fcf518c9a382c70f8ff61510f6e18b83295 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -532,6 +532,12 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
+@@ -1165,6 +1165,12 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
                  snapshot.setFlags(flags); // Paper - always set the flag of the most recent call to mitigate issues with multiple update at the same pos with different flags
              }
              BlockState blockState = chunkAt.setBlockState(pos, state, flags);
