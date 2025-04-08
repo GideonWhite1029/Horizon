@@ -34,10 +34,10 @@ index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..d95f9f32ca3367cc8f09b22745b8c47b
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 8d5f3176bdcafa5edda7b99704bb9d7f06eb08eb..80d93176d52ba9f45880dec91ffb9e539dc219ee 100644
+index 3de48e7cb1757fb323a62548cf2dc46911af6b84..735be2f5bc78875617ff0ae2e58166c2e015f4f3 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1761,6 +1761,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1782,6 +1782,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
@@ -71,7 +71,7 @@ index 710e75ac5ca3c4922299c48f4dabf86eb0557afc..1fee6d6ae7b20cbb216ec525c3695194
              this.getCraftPlayer().removeChannel(channel);
          }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index e3da7c5e7047f3c7f79f960f1b4d29442720f719..37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9 100644
+index 27fb6bc8bb39da8c57eadc528025a6eb8d225517..64d19aa1753f0bd7641869b11006d0481aaf2690 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -334,6 +334,8 @@ public abstract class PlayerList {
@@ -83,7 +83,7 @@ index e3da7c5e7047f3c7f79f960f1b4d29442720f719..37fc4ff5cf8ab77c68de4d6e5ea54c69
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -504,6 +506,7 @@ public abstract class PlayerList {
+@@ -505,6 +507,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {

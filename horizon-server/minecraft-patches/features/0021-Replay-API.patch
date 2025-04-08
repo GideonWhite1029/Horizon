@@ -121,10 +121,10 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f16a065f7c0cbefcf80eec946a2599b3
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 23dd49770994720242cb9683d53e6d6f696ed871..33c38491ccc4f9db64706fb8f5761f6daf6f6283 100644
+index e71ffc084660eb7394574027ae5720b13e92be9f..5b0ce36b1c710ba8ea1e179d05ec9b4193817416 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1658,7 +1658,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1678,7 +1678,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -163,18 +163,18 @@ index 814bb2981ab32b216b7953e9b14fe09e96cc7c89..d340bc2720ff6a1db53db7999d7bd0b1
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 3d236c24fe4c4f001e2fc8d20b2d9b76389e2883..e1b33efd3e381abca7d82b9a4d0cb10fa82e3d22 100644
+index 1668ae0d2438a72b1dd433b2b6bdda9999fa208e..518d3cd451d5fb75441761f46928edb1abd555d1 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -213,6 +213,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
-     public boolean hasPhysicsEvent = true; // Paper - BlockPhysicsEvent
+@@ -214,6 +214,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
      public boolean hasEntityMoveEvent; // Paper - Add EntityMoveEvent
+     private final alternate.current.wire.WireHandler wireHandler = new alternate.current.wire.WireHandler(this); // Paper - optimize redstone (Alternate Current)
      public boolean hasRidableMoveEvent = false; // Purpur - Ridables
 +    final List<ServerPlayer> realPlayers; // Horizon - skip
  
      @Override
      public @Nullable LevelChunk getChunkIfLoaded(int x, int z) {
-@@ -692,6 +693,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -693,6 +694,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
          this.preciseTime = this.serverLevelData.getDayTime(); // Purpur - Configurable daylight cycle
@@ -182,7 +182,7 @@ index 3d236c24fe4c4f001e2fc8d20b2d9b76389e2883..e1b33efd3e381abca7d82b9a4d0cb10f
      }
  
      // Paper start
-@@ -2657,6 +2659,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2687,6 +2689,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              // ServerLevel.this.getChunkSource().addEntity(entity); // Paper - ignore and warn about illegal addEntity calls instead of crashing server; moved down below valid=true
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.add(serverPlayer);
@@ -194,7 +194,7 @@ index 3d236c24fe4c4f001e2fc8d20b2d9b76389e2883..e1b33efd3e381abca7d82b9a4d0cb10f
                  ServerLevel.this.updateSleepingPlayerList();
              }
  
-@@ -2727,6 +2734,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2757,6 +2764,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              ServerLevel.this.getChunkSource().removeEntity(entity);
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.remove(serverPlayer);
@@ -207,10 +207,10 @@ index 3d236c24fe4c4f001e2fc8d20b2d9b76389e2883..e1b33efd3e381abca7d82b9a4d0cb10f
              }
  
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 786222aeb501fb31e0d77661b87e8d097c88b8b7..d967ca7ebf9b01d7f26ca3d0c5f707c41feab95a 100644
+index 5e92affba115662a8b16c7f15971e1770f29cbfd..9580c60bd50c5bf342f6c6f2baad75fde5c2bd8c 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -208,7 +208,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -209,7 +209,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private static final boolean DEFAULT_SPAWN_EXTRA_PARTICLES_ON_FALL = false;
      public ServerGamePacketListenerImpl connection;
      public final MinecraftServer server;
@@ -220,7 +220,7 @@ index 786222aeb501fb31e0d77661b87e8d097c88b8b7..d967ca7ebf9b01d7f26ca3d0c5f707c4
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9..e5f7de4897a56a34fea98164e9dcdac72bd82b66 100644
+index 64d19aa1753f0bd7641869b11006d0481aaf2690..0a0cef9920de4ab60942a854d3cd66baccacab02 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -131,6 +131,7 @@ public abstract class PlayerList {
@@ -356,7 +356,7 @@ index 37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9..e5f7de4897a56a34fea98164e9dcdac7
              onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
          }
          // Paper start - Use single player info update packet on join
-@@ -501,6 +606,43 @@ public abstract class PlayerList {
+@@ -502,6 +607,43 @@ public abstract class PlayerList {
          }
      }
  
@@ -400,7 +400,7 @@ index 37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9..e5f7de4897a56a34fea98164e9dcdac7
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -577,6 +719,7 @@ public abstract class PlayerList {
+@@ -578,6 +720,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -408,7 +408,7 @@ index 37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9..e5f7de4897a56a34fea98164e9dcdac7
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -667,7 +810,7 @@ public abstract class PlayerList {
+@@ -668,7 +811,7 @@ public abstract class PlayerList {
              // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameProfile)
              //     ? Component.translatable("multiplayer.disconnect.server_full")
              //     : null;
@@ -418,7 +418,7 @@ index 37fc4ff5cf8ab77c68de4d6e5ea54c69023bb7c9..e5f7de4897a56a34fea98164e9dcdac7
              }
          }
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
-index 24d32c0163d27a7886bd4048d508591b89f714a4..274c2e234b44418861be7cf68b7b3cb24b6fd158 100644
+index dd406c5becacbc2d05b062726a8af88a1d6faba9..e1db6faf95e973f8fc3d9f1d86a1f90b400dec0a 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
 @@ -45,7 +45,7 @@ public class Inventory implements Container, Nameable {

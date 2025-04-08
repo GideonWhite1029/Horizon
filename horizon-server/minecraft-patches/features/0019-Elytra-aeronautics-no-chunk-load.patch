@@ -5,10 +5,10 @@ Subject: [PATCH] Elytra aeronautics no chunk load
 
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 1463c31ba980ab0eb2174e3e891d1423a505e9dc..b4cdc503983ea243976605bd49b82a88ec9cd508 100644
+index 0d8aefe8c886eaa4c33cbab53b0ad1c016f0531f..7ada45b3e3737f72f5a7be4ccf865e001a0fec49 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -819,7 +819,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -854,7 +854,8 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      private boolean skipPlayer(ServerPlayer player) {
@@ -18,7 +18,7 @@ index 1463c31ba980ab0eb2174e3e891d1423a505e9dc..b4cdc503983ea243976605bd49b82a88
      }
  
      void updatePlayerStatus(ServerPlayer player, boolean track) {
-@@ -853,6 +854,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
+@@ -888,6 +889,7 @@ public class ChunkMap extends ChunkStorage implements ChunkHolder.PlayerProvider
      }
  
      public void move(ServerPlayer player) {
@@ -27,7 +27,7 @@ index 1463c31ba980ab0eb2174e3e891d1423a505e9dc..b4cdc503983ea243976605bd49b82a88
  
          SectionPos lastSectionPos = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 96f9400397b8e14c47aebee4df2d67ecc8b38810..afe389697a1ccedcc6dd572470a87783168b481d 100644
+index 3d163ed3f4e3d24a8c777e707a602ed6c29ae315..b4bd42e5a431da278994f8f142d545d6880e069e 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -558,7 +558,7 @@ public class ServerGamePacketListenerImpl
@@ -40,7 +40,7 @@ index 96f9400397b8e14c47aebee4df2d67ecc8b38810..afe389697a1ccedcc6dd572470a87783
                          !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
                  )) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index aa18bec93d82a141fb37690e0e673a5aa0405e4f..fd3532b47710c7ccdc8be1f612b7fbf2696a77e8 100644
+index 11da5520c799cd3e7f8eb6795c021b64c9dc2a60..77143474a3254fa7b8d24dc11eb9e09e7b6a32c4 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
