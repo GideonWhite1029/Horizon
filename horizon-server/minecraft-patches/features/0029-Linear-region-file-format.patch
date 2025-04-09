@@ -28,7 +28,7 @@ index a814512fcfb85312474ae2c2c21443843bf57831..4d972bf972cb38fa0f0fa88a2b9860ff
      public MoonriseRegionFileIO.RegionDataController.WriteData moonrise$startWrite(
              final int chunkX, final int chunkZ, final CompoundTag compound
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
-index 98fbc5c8044bd945d64569f13412a6e7e49a4e7f..3540c70b64602ea98e1d0f64e977a46e94f47948 100644
+index 98fbc5c8044bd945d64569f13412a6e7e49a4e7f..9c2960c550a2551212d762c50f12ae43bbad8f2a 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
 @@ -14,6 +14,7 @@ import ca.spottedleaf.moonrise.common.util.CoordinateUtils;
@@ -39,6 +39,15 @@ index 98fbc5c8044bd945d64569f13412a6e7e49a4e7f..3540c70b64602ea98e1d0f64e977a46e
  import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
  import net.minecraft.nbt.CompoundTag;
  import net.minecraft.server.MinecraftServer;
+@@ -1260,7 +1261,7 @@ public final class MoonriseRegionFileIO {
+                 this.regionDataController.finishWrite(this.chunkX, this.chunkZ, writeData);
+                 // Paper start - flush regionfiles on save
+                 if (this.world.paperConfig().chunks.flushRegionsOnSave) {
+-                    final RegionFile regionFile = this.regionDataController.getCache().moonrise$getRegionFileIfLoaded(this.chunkX, this.chunkZ);
++                    final IRegionFile regionFile = this.regionDataController.getCache().moonrise$getRegionFileIfLoaded(this.chunkX, this.chunkZ); // Horizon - Configurable region file format
+                     if (regionFile != null) {
+                         regionFile.flush();
+                     } // else: evicted from cache, which should have called flush
 @@ -1470,7 +1471,7 @@ public final class MoonriseRegionFileIO {
  
          public static interface IORunnable {
@@ -141,7 +150,7 @@ index 559bd4eef7174b04f5aa71b982ba34cbace8da8a..8265e0d63620a3e69ac9ab5ecf89ba12
  
      class PoiUpgrader extends WorldUpgrader.SimpleRegionStorageUpgrader {
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFile.java b/net/minecraft/world/level/chunk/storage/RegionFile.java
-index 0c41177462cca5c4bbab6490e323b9535fd6300f..56f396a4c3aab97c6a16bfc06051a913f1cdee83 100644
+index 0c41177462cca5c4bbab6490e323b9535fd6300f..1289d3efc52bf1f9f5e4c96e26ee1ad607c6cb05 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFile.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFile.java
 @@ -16,13 +16,15 @@ import java.nio.file.Path;
@@ -161,6 +170,15 @@ index 0c41177462cca5c4bbab6490e323b9535fd6300f..56f396a4c3aab97c6a16bfc06051a913
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final int MAX_CHUNK_SIZE = 500 * 1024 * 1024; // Paper - don't write garbage data to disk if writing serialization fails
      private static final int SECTOR_BYTES = 4096;
+@@ -124,7 +126,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+     }
+ 
+     // note: only call for CHUNK regionfiles
+-    boolean recalculateHeader() throws IOException {
++    public boolean recalculateHeader() throws IOException { // Horizon - public
+         if (!this.canRecalcHeader) {
+             return false;
+         }
 @@ -786,7 +788,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
          }
      }
