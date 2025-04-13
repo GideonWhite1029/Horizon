@@ -2,7 +2,7 @@ name: Horizon CI
 
 on:
   push:
-    branches: [ "ver/1.21.4" ]
+    branches: [ "ver/1.21.5" ]
 
 permissions: write-all
 
