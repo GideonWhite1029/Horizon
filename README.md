@@ -13,7 +13,7 @@
 - **and more in future**
 
 ## API
-### [Javadoc](https://repo.timelesswaffle.su/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/1.21.4-R0.1-SNAPSHOT)
+### [Javadoc](https://repo.timelesswaffle.su/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/1.21.5-R0.1-SNAPSHOT)
 ### Dependency Information
 Maven
 ```xml
@@ -26,7 +26,7 @@ Maven
 <dependency>
     <groupId>dev.gideonwhite1029.horizon</groupId>
     <artifactId>horizon-api</artifactId>
-    <version>1.21.4-R0.1-SNAPSHOT</version>
+    <version>1.21.5-R0.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ repositories {
 ```
 ```kotlin
 dependencies {
-    compileOnly("dev.gideonwhite1029.horizon:horizon-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("dev.gideonwhite1029.horizon:horizon-api:1.21.5-R0.1-SNAPSHOT")
 }
 ```
 

@@ -163,7 +163,7 @@ index 814bb2981ab32b216b7953e9b14fe09e96cc7c89..d340bc2720ff6a1db53db7999d7bd0b1
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 1668ae0d2438a72b1dd433b2b6bdda9999fa208e..518d3cd451d5fb75441761f46928edb1abd555d1 100644
+index 9c3e2817f269f9f04826353df948e9b559f226fe..d6e4e84647e7fabf62ce4c50c8eca26eb48a22db 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -214,6 +214,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -182,7 +182,7 @@ index 1668ae0d2438a72b1dd433b2b6bdda9999fa208e..518d3cd451d5fb75441761f46928edb1
      }
  
      // Paper start
-@@ -2687,6 +2689,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2713,6 +2715,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              // ServerLevel.this.getChunkSource().addEntity(entity); // Paper - ignore and warn about illegal addEntity calls instead of crashing server; moved down below valid=true
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.add(serverPlayer);
@@ -194,7 +194,7 @@ index 1668ae0d2438a72b1dd433b2b6bdda9999fa208e..518d3cd451d5fb75441761f46928edb1
                  ServerLevel.this.updateSleepingPlayerList();
              }
  
-@@ -2757,6 +2764,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2783,6 +2790,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              ServerLevel.this.getChunkSource().removeEntity(entity);
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.remove(serverPlayer);
