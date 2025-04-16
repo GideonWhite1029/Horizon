@@ -25,18 +25,18 @@ index 400e632208d133a3f49fc7f14bceb48a1026769b..2025012eb6ae3086436179a372da2864
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index e57fe58f8ba472aa28f44c6d25e525022024ae5d..6f5acad8062e21694e91c8e53dd0e3c91325860e 100644
+index d58aa8645c4aed88d7839b8e8a0325c6bf3d989e..51ece599e0d2e0187f313a79c789da2c704a75cf 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -1365,7 +1365,11 @@ public final class CraftServer implements Server {
              registryAccess = levelDataAndDimensions.dimensions().dimensionsRegistryAccess();
          } else {
              LevelSettings levelSettings;
--            WorldOptions worldOptions = new WorldOptions(creator.seed(), creator.generateStructures(), false);
+-            WorldOptions worldOptions = new WorldOptions(creator.seed(), creator.generateStructures(), creator.bonusChest());
 +            // Horizon start - Feature Secure Seed
 +            WorldOptions worldOptions = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                    ? new WorldOptions(creator.seed(), dev.gideonwhite1029.horizon.matter.Globals.createRandomWorldSeed(), creator.generateStructures(), false)
-+                    : new WorldOptions(creator.seed(), creator.generateStructures(), false);
++                    ? new WorldOptions(creator.seed(), dev.gideonwhite1029.horizon.matter.Globals.createRandomWorldSeed(), creator.generateStructures(), creator.bonusChest())
++                    : new WorldOptions(creator.seed(), creator.generateStructures(), creator.bonusChest());
 +            // Horizon end - Feature Secure Seed
              WorldDimensions worldDimensions;
  

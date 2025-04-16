@@ -1,6 +1,6 @@
 --- a/purpur-api/build.gradle.kts
 +++ b/purpur-api/build.gradle.kts
-@@ -108,17 +_,21 @@
+@@ -104,17 +_,22 @@
          java {
              srcDir(generatedDir)
              srcDir(file("../paper-api/src/main/java"))
