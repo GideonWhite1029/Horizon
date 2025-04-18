@@ -322,4 +322,19 @@ public final class HorizonConfig {
     public static int batchSize = 128;
     // Horizon end - AsyncPacketSending
 
+    @GlobalConfig(name = "instant-block-updater-reintroduced", category = {"old-minecraft"})
+    public static boolean instantBlockUpdaterReintroduced = false;
+
+    @GlobalConfig(name = "redstone-dont-cant-on-trapdoor", category = {"old-minecraft"})
+    public static boolean redstoneDontCantOnTrapDoor = false;
+
+    @GlobalConfig(name = "cce-update-suppression", category = {"old-minecraft"})
+    public static boolean cceUpdateSuppression = false;
+
+    @GlobalConfig(name = "update-suppression-crash-fix", category = {"old-minecraft"})
+    public static boolean updateSuppressionCrashFix = false;
+
+    @GlobalConfig(name = "old-block-entity-behaviour", category = {"old-minecraft"})
+    public static boolean oldBlockEntityBehaviour = false;
+
 }
