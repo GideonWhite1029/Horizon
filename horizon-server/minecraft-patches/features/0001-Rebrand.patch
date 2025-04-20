@@ -25,10 +25,10 @@ index d0dada3d7ff8d1b50c349036272b2b464155053c..6e8f4f1bca4a2698e9455fd23af7b208
              // Purpur start - config for startup commands
              if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 87986b3c82cce7028c2436ae67d2e544cf892745..265bafb5f0f72b76e7a0d43fa0c8f2203c4590d1 100644
+index 77db68349aa73d33b86a867099c9395c96d5a02d..963de016fe0477e3aaf5f2da4ddcc7dea306bd82 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -283,7 +283,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -308,7 +308,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
      // Paper start
      private static void printOversizedLog(String msg, Path file, int x, int z) {

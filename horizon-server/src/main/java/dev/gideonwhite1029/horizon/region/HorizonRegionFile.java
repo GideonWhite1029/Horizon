@@ -566,6 +566,12 @@ public class HorizonRegionFile implements IRegionFile {
         return false;
     }
 
+    private final java.util.concurrent.atomic.AtomicInteger recalculateCount = new java.util.concurrent.atomic.AtomicInteger();
+
+    public int getRecalculateCount() {
+        return this.recalculateCount.get();
+    }
+
     public void setOversized(int x, int z, boolean something) {}
 
     public CompoundTag getOversizedData(int x, int z) throws IOException {
