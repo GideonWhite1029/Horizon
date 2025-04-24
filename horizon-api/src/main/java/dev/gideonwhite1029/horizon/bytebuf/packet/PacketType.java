@@ -3,6 +3,7 @@ package dev.gideonwhite1029.horizon.bytebuf.packet;
 /**
  * Enum representing the different types of packets in the Horizon system.
  */
+@Deprecated
 public enum PacketType {
     // ClientboundBundle,
     // ClientboundBundleDelimiter,

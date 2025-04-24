@@ -121,10 +121,10 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f16a065f7c0cbefcf80eec946a2599b3
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index e71ffc084660eb7394574027ae5720b13e92be9f..5b0ce36b1c710ba8ea1e179d05ec9b4193817416 100644
+index 2a5c7d85596136916c64e8003370351b91771d24..959fb3d7a01e42547b5a5361c19e33a088f13a96 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1678,7 +1678,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1668,7 +1668,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -163,7 +163,7 @@ index 814bb2981ab32b216b7953e9b14fe09e96cc7c89..d340bc2720ff6a1db53db7999d7bd0b1
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 9c3e2817f269f9f04826353df948e9b559f226fe..d6e4e84647e7fabf62ce4c50c8eca26eb48a22db 100644
+index 4675d4ff3e0f14eda5f11d47fab09c25c64efacb..5ded4695ed1fb73017bc254853adb972367fc7d2 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -214,6 +214,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -207,7 +207,7 @@ index 9c3e2817f269f9f04826353df948e9b559f226fe..d6e4e84647e7fabf62ce4c50c8eca26e
              }
  
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 5e92affba115662a8b16c7f15971e1770f29cbfd..9580c60bd50c5bf342f6c6f2baad75fde5c2bd8c 100644
+index 7be35fca144f1b4f6564cd37bc8293a18fe7ed61..d1d9f22f2de8dcbdf0b0033745bc2cab57e202a0 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -209,7 +209,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -418,7 +418,7 @@ index 64d19aa1753f0bd7641869b11006d0481aaf2690..0a0cef9920de4ab60942a854d3cd66ba
              }
          }
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
-index dd406c5becacbc2d05b062726a8af88a1d6faba9..e1db6faf95e973f8fc3d9f1d86a1f90b400dec0a 100644
+index d9cb4f0ed0c4f63362c837aeef3c4194911455c9..31ef8c1016e58b7f55a5272da170171260bf3bb9 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
 @@ -45,7 +45,7 @@ public class Inventory implements Container, Nameable {

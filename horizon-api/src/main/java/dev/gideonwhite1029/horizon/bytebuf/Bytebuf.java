@@ -347,6 +347,11 @@ public interface Bytebuf {
     Bytebuf copy();
 
     /**
+     * Retains the Bytebuf, increasing its reference count.
+     */
+    void retain();
+
+    /**
      * Releases the Bytebuf.
      *
      * @return true if the Bytebuf was successfully released, false otherwise

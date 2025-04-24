@@ -2,6 +2,7 @@ package dev.gideonwhite1029.horizon.bytebuf.packet;
 
 import org.bukkit.entity.Player;
 
+@Deprecated
 public interface PacketListener {
 
     /**

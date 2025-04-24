@@ -11,6 +11,7 @@ public interface BytebufManager {
      * @param plugin the plugin to register the listener
      * @param listener the packet listener to register
      */
+    @Deprecated
     void registerListener(Plugin plugin, PacketListener listener);
 
     /**
@@ -19,6 +20,7 @@ public interface BytebufManager {
      * @param plugin the plugin to unregister the listener
      * @param listener the packet listener to unregister
      */
+    @Deprecated
     void unregisterListener(Plugin plugin, PacketListener listener);
 
     /**

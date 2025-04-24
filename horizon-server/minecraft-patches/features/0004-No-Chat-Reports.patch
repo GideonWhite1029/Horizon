@@ -108,7 +108,7 @@ index 1df628ac0b414511aaed6e09d78f884c4170f730..09679f8d6a2ebda32a21f62f60db9192
      }
  }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index 6dbb4b346dd5e287970e31f87a2e35140996fdd3..66ec8c13564a1125060441db2908bd9c8d48ee22 100644
+index fa308ac88a6490571ec4bc200801d6b1c01a7699..6b002d0d5bf7806c6bcdf69b41e842e7ef097ce9 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
 @@ -19,6 +19,8 @@ import java.util.List;
@@ -120,7 +120,7 @@ index 6dbb4b346dd5e287970e31f87a2e35140996fdd3..66ec8c13564a1125060441db2908bd9c
  import net.minecraft.DefaultUncaughtExceptionHandler;
  import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
  import net.minecraft.SharedConstants;
-@@ -617,7 +619,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -608,7 +610,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          // Paper start - Add setting for proxy online mode status
          return properties.enforceSecureProfile
              && io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()
@@ -130,7 +130,7 @@ index 6dbb4b346dd5e287970e31f87a2e35140996fdd3..66ec8c13564a1125060441db2908bd9c
      }
  
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index eb6c6b6b45a680336944361f96927400c65601e6..710e75ac5ca3c4922299c48f4dabf86eb0557afc 100644
+index 66d70c330fd70009018d8d0a7441b93fcef96c97..64e03e75c5bc30754317085b89eee7590d74c0a5 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -315,10 +315,24 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack

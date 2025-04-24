@@ -8,5 +8,6 @@ import dev.gideonwhite1029.horizon.bytebuf.Bytebuf;
  * @param type the type of the packet
  * @param bytebuf the byte buffer associated with the packet
  */
+@Deprecated
 public record Packet(PacketType type, Bytebuf bytebuf) {
 }

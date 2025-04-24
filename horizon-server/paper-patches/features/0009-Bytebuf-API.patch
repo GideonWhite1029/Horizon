@@ -5,7 +5,7 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index b6e113bc6635e717b0dadd7db8d97b2b4b4eec3c..3fafd65f0571e422119582cfb74e3841e87d178c 100644
+index bdea93b42a903ad8c64f12f76bca729579d7be75..b6414df2b6f2e6765a241348d8679ca7bf727fe2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -317,6 +317,7 @@ public final class CraftServer implements Server {
@@ -16,7 +16,7 @@ index b6e113bc6635e717b0dadd7db8d97b2b4b4eec3c..3fafd65f0571e422119582cfb74e3841
  
      @Override
      public final io.papermc.paper.threadedregions.scheduler.RegionScheduler getRegionScheduler() {
-@@ -3302,4 +3303,15 @@ public final class CraftServer implements Server {
+@@ -3305,4 +3306,15 @@ public final class CraftServer implements Server {
          return photographerManager;
      }
      // Horizon end - replay mod api
@@ -33,7 +33,7 @@ index b6e113bc6635e717b0dadd7db8d97b2b4b4eec3c..3fafd65f0571e422119582cfb74e3841
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 7eea4c3750abe0fd5eed03ca8a2abed9eecd79e3..11e1242ee69685bb922f0ba3398e50f71c796389 100644
+index 0428ea5c2bb6b4a6fa1b22b40a5556bcebf22aa4..e4b7d9d25979609bc410c32c878e299415561263 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -3550,6 +3550,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
