@@ -25,6 +25,7 @@ import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.ChunkPos;
 import org.slf4j.Logger;
 
@@ -110,15 +111,19 @@ public class HorizonRegionFile implements IRegionFile {
                             byte[] finalCompressed = new byte[compressedLength];
                             System.arraycopy(compressed, 0, finalCompressed, 0, compressedLength);
 
-                            // TODO: Optimization - return the requested chunk immediately to save on one LZ4 decompression
+                            if (chunkX == cx && chunkZ == cz) {
+                                this.buffer[chunkIndex] = finalCompressed;
+                                this.bufferUncompressedSize[chunkIndex] = chunkData.length;
+                                return;
+                            }
                             this.buffer[chunkIndex] = finalCompressed;
                             this.bufferUncompressedSize[chunkIndex] = chunkData.length;
                         }
                     }
                 }
             } catch (IOException ex) {
-                throw new RuntimeException("Region file corrupted: " + regionFile + " bucket: " + idx);
-                // TODO: Make sure the server crashes instead of corrupting the world
+                LOGGER.error("Region file corrupted: " + regionFile + " bucket: " + idx);
+                MinecraftServer.getServer().safeShutdown(true, false);
             }
             bucketBuffers[idx] = null;
         }
