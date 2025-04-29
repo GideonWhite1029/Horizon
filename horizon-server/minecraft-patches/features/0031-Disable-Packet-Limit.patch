@@ -20,7 +20,7 @@ index b4f3dfe3bf5d818132f70c2fb25689fce13e7b4a..7969e4e9da4a43f7a2ec4fe4f03755f6
                      synchronized (PACKET_LIMIT_LOCK) {
                          if (this.allPacketCounts != null) {
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 00c058dfd3074100dc0d420101ed02b9461a8962..22c3cfae6cee1cb5700160fe71268c4a3bc95de2 100644
+index 38d2f154864e52ff30d994c8cebcd5f339617788..2f8b17b7a6973e557084ceebfa7dd287ce5595f1 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -806,7 +806,7 @@ public class ServerGamePacketListenerImpl
@@ -40,7 +40,7 @@ index 00c058dfd3074100dc0d420101ed02b9461a8962..22c3cfae6cee1cb5700160fe71268c4a
          if (this.lastLimitedPacket != -1 && timestamp - this.lastLimitedPacket < getSpamThreshold() && this.limitedPackets++ >= 8) { // Paper - Configurable threshold; raise packet limit to 8
              return false;
          }
-@@ -2585,6 +2586,7 @@ public class ServerGamePacketListenerImpl
+@@ -2578,6 +2579,7 @@ public class ServerGamePacketListenerImpl
  
      // Spigot start - spam exclusions
      private void detectRateSpam(String message) {
@@ -48,7 +48,7 @@ index 00c058dfd3074100dc0d420101ed02b9461a8962..22c3cfae6cee1cb5700160fe71268c4a
          // CraftBukkit start - replaced with thread safe throttle
          if (org.spigotmc.SpigotConfig.enableSpamExclusions) {
              for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
-@@ -3375,7 +3377,7 @@ public class ServerGamePacketListenerImpl
+@@ -3368,7 +3370,7 @@ public class ServerGamePacketListenerImpl
      @Override
      public void handlePlaceRecipe(ServerboundPlaceRecipePacket packet) {
          // Paper start - auto recipe limit

@@ -5,10 +5,10 @@ Subject: [PATCH] Bytebuf API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index bdea93b42a903ad8c64f12f76bca729579d7be75..b6414df2b6f2e6765a241348d8679ca7bf727fe2 100644
+index 97fd5afe9e8e865858f860547b70c69cfee432ad..d6dffaf9c10694d95ff6085d7f92758aef30e63f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -317,6 +317,7 @@ public final class CraftServer implements Server {
+@@ -318,6 +318,7 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler globalRegionScheduler = new io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler();
  
      private final dev.gideonwhite1029.horizon.entity.CraftPhotographerManager photographerManager = new dev.gideonwhite1029.horizon.entity.CraftPhotographerManager(); // Horizon - photographer
@@ -16,7 +16,7 @@ index bdea93b42a903ad8c64f12f76bca729579d7be75..b6414df2b6f2e6765a241348d8679ca7
  
      @Override
      public final io.papermc.paper.threadedregions.scheduler.RegionScheduler getRegionScheduler() {
-@@ -3305,4 +3306,15 @@ public final class CraftServer implements Server {
+@@ -3311,4 +3312,15 @@ public final class CraftServer implements Server {
          return photographerManager;
      }
      // Horizon end - replay mod api
