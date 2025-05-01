@@ -5,7 +5,7 @@ Subject: [PATCH] Add Logger
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index f55db145661cab3cfc9ffa755792be2c3d80f50a..aa18bec93d82a141fb37690e0e673a5aa0405e4f 100644
+index bf440407548c6b1ff906c26adcb102f42b3286d5..1630e63d9fe6cc4d0bb844b3607fa7fffbb465c6 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -353,6 +353,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
@@ -16,7 +16,7 @@ index f55db145661cab3cfc9ffa755792be2c3d80f50a..aa18bec93d82a141fb37690e0e673a5a
  
      public void inactiveTick() {
      }
-@@ -2551,6 +2552,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -2552,6 +2553,11 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
                  compound.putBoolean("Purpur.FireImmune", immuneToFire);
              }
              // Purpur end - Fire immune API
@@ -28,7 +28,7 @@ index f55db145661cab3cfc9ffa755792be2c3d80f50a..aa18bec93d82a141fb37690e0e673a5a
  
              return compound;
          } catch (Throwable var8) {
-@@ -5169,6 +5175,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -5170,6 +5176,13 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
          return ((ServerLevel) this.level()).isPositionEntityTicking(this.blockPosition());
      }
      // Paper end - Expose entity id counter

@@ -5,10 +5,10 @@ Subject: [PATCH] Configurable MC-67
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index fd3532b47710c7ccdc8be1f612b7fbf2696a77e8..af3a2192f344df7d9404f0aa0e8748440144ebe3 100644
+index 8d5f38fe4b0de153fa4933717889217de3ade833..361f745166d756c40edf15b7f814ead90deec73e 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -3999,6 +3999,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4000,6 +4000,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
      }
  
      public boolean canTeleport(Level fromLevel, Level toLevel) {

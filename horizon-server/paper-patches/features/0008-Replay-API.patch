@@ -21,10 +21,10 @@ index 7ce9ebba8ce304d1f3f21d4f15ee5f3560d7700b..2eb029ef329a0d592e0ff34bb2cc13b2
          HandlerList handlers = event.getHandlers();
          RegisteredListener[] listeners = handlers.getRegisteredListeners();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index ba3305d62271b3b0add58baa5893581bfe019c2b..97fd5afe9e8e865858f860547b70c69cfee432ad 100644
+index 9b0f08d321666bd26a82803bad8eb78fb2a4a813..4fc5f19894120765540c482791448d905321fdac 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -317,6 +317,8 @@ public final class CraftServer implements Server {
+@@ -318,6 +318,8 @@ public final class CraftServer implements Server {
      private final io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler asyncScheduler = new io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler();
      private final io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler globalRegionScheduler = new io.papermc.paper.threadedregions.scheduler.FoliaGlobalRegionScheduler();
  
@@ -33,7 +33,7 @@ index ba3305d62271b3b0add58baa5893581bfe019c2b..97fd5afe9e8e865858f860547b70c69c
      @Override
      public final io.papermc.paper.threadedregions.scheduler.RegionScheduler getRegionScheduler() {
          return this.regionizedScheduler;
-@@ -405,7 +407,7 @@ public final class CraftServer implements Server {
+@@ -406,7 +408,7 @@ public final class CraftServer implements Server {
      public CraftServer(DedicatedServer console, PlayerList playerList) {
          this.console = console;
          this.playerList = (DedicatedPlayerList) playerList;
@@ -42,7 +42,7 @@ index ba3305d62271b3b0add58baa5893581bfe019c2b..97fd5afe9e8e865858f860547b70c69c
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3302,4 +3304,11 @@ public final class CraftServer implements Server {
+@@ -3309,4 +3311,11 @@ public final class CraftServer implements Server {
          return getServer().lagging;
      }
      // Purpur end - Lagging threshold
@@ -68,10 +68,10 @@ index 8feb78c4d7fa793f01991756b618fc49de023db6..9de57c80f754f595317195a37ad817e8
          if (entity instanceof EnderDragonPart complexPart) {
              if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index a5cf4e4b9cc35bd81b530bc3eac31b0af3d72b7c..0428ea5c2bb6b4a6fa1b22b40a5556bcebf22aa4 100644
+index 6933e64ff1f22e4fc15bc745ff0bdb52a2091db6..554fb1da6e708ab911af6c15daeb4c01ab157cdb 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2249,7 +2249,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2250,7 +2250,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public boolean canSee(Player player) {

@@ -5,10 +5,10 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 5f3e0c880ed0679327c6e53cc73a4748cfbde091..51cd68c1fc815957d580951e63214ca6427efd80 100644
+index 869f9a7ead9be7caeb672ae889e9edd2504508a8..991494985e2e88689c19e2c5bc56ad93c083f21a 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1112,6 +1112,7 @@ public final class CraftServer implements Server {
+@@ -1113,6 +1113,7 @@ public final class CraftServer implements Server {
              playerMetadata.removeAll(plugin);
          }
          // Paper end
@@ -16,7 +16,7 @@ index 5f3e0c880ed0679327c6e53cc73a4748cfbde091..51cd68c1fc815957d580951e63214ca6
          this.reloadData();
          org.spigotmc.SpigotConfig.registerCommands(); // Spigot
          io.papermc.paper.command.PaperCommands.registerCommands(this.console); // Paper
-@@ -3034,6 +3035,13 @@ public final class CraftServer implements Server {
+@@ -3041,6 +3042,13 @@ public final class CraftServer implements Server {
          }
          // Purpur end - Purpur config files
  
