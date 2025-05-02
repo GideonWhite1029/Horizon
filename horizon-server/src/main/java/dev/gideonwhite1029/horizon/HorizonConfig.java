@@ -230,12 +230,22 @@ public final class HorizonConfig {
     // @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
     // public static boolean reiEnable = false;
 
+    @GlobalConfig(name = "maps-block-message", category = {"protocols"})
+    public static String blockMinimapsMessage = "On the server banned these mods (Xaero's Minimap/Xaero's World Map/JourneyMap)!";
+
     // XaeroMap
     @GlobalConfig(name = "xaeromap-enable", category = {"protocols", "xaeromap"})
     public static boolean xaeroMapEnable = false;
 
+    @GlobalConfig(name = "xaeromap-block-enable", category = {"protocols", "xaeromap"})
+    public static boolean blockXaeromap = false;
+
     @GlobalConfig(name = "xaero-map-server-id", category = {"protocols", "xaeromap"})
     public static int xaeroMapServerID = new Random().nextInt();
+
+    // JourneyMap
+    @GlobalConfig(name = "journeymap-block-enable", category = {"protocols", "journeymap"})
+    public static boolean blockJourneyMap = false;
 
     // Carpet
     @GlobalConfig(name = "carpet-enable", category = {"protocols", "carpet"})
