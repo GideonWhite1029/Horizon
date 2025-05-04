@@ -5,10 +5,10 @@ Subject: [PATCH] Replay API
 
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 8014d901a4a9fadab7dae878d9c15c0060fd95cc..69bd4dc366bdc73580da413f258ea89d45a2c9b3 100644
+index 261f3da54e4deb410461bcf62b1d5454067a440e..054bda6b8b86f413794889cecf2d80b7528db169 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3135,4 +3135,20 @@ public final class Bukkit {
+@@ -3145,4 +3145,20 @@ public final class Bukkit {
          server.clearBlockHighlights();
      }
      // Purpur end - Debug Marker API
@@ -30,10 +30,10 @@ index 8014d901a4a9fadab7dae878d9c15c0060fd95cc..69bd4dc366bdc73580da413f258ea89d
 +    // Horizon end - Photographer API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index c2420e3ac864228c7fc637950b4315a5e5272765..aaad621eda0d68e6578a6e356b1f99d692891dd4 100644
+index 3153355d2ba78466d38b108461dbe038c9f9b1b6..aaef3f8f75f051fd3fa41ba2491c26e62e556611 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2830,4 +2830,18 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2842,4 +2842,18 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
       */
      void clearBlockHighlights();
      // Purpur end - Debug Marker API

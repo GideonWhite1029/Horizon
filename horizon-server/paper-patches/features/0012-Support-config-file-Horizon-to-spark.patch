@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 4 May 2025 11:03:47 +0300
+Subject: [PATCH] Support config file Horizon to spark
+
+
+diff --git a/src/main/java/io/papermc/paper/SparksFly.java b/src/main/java/io/papermc/paper/SparksFly.java
+index 62e2d5704c348955bc8284dc2d54c933b7bcdd06..d1761b9c2bb11ac81675e621b3a634d80522627a 100644
+--- a/src/main/java/io/papermc/paper/SparksFly.java
++++ b/src/main/java/io/papermc/paper/SparksFly.java
+@@ -42,7 +42,7 @@ public final class SparksFly {
+         this.mainThreadTaskQueue = new ConcurrentLinkedQueue<>();
+         this.logger = Logger.getLogger(ID);
+         this.logger.log(Level.INFO, "This server bundles the spark profiler. For more information please visit https://docs.papermc.io/paper/profiling");
+-        this.spark = PaperSparkModule.create(Compatibility.VERSION_1_0, server, this.logger, new PaperScheduler() {
++        this.spark = dev.gideonwhite1029.horizon.util.spark.HorizonSparkPlugin.create(Compatibility.VERSION_1_0, server, this.logger, new PaperScheduler() { // Horizon - spark support
+             @Override
+             public void executeAsync(final Runnable runnable) {
+                 MCUtil.scheduleAsyncTask(this.catching(runnable, "asynchronous"));

@@ -5,7 +5,7 @@ Subject: [PATCH] Disable moved wrongly threshold
 
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 6ba184b5314356214e9ff9508fba57150d92d87a..3d163ed3f4e3d24a8c777e707a602ed6c29ae315 100644
+index 9f695e97d247b24b12a4a115bfb012c7e344ccf8..bcd9bbebc90f09cf6d8985dfd5ba89ec9b55183a 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -566,7 +566,7 @@ public class ServerGamePacketListenerImpl
@@ -26,7 +26,7 @@ index 6ba184b5314356214e9ff9508fba57150d92d87a..3d163ed3f4e3d24a8c777e707a602ed6
                      flag2 = true; // Paper - diff on change, this should be moved wrongly
                      LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
                  }
-@@ -1494,6 +1494,9 @@ public class ServerGamePacketListenerImpl
+@@ -1496,6 +1496,9 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_INTO_UNLOADED_CHUNK,
                                                  toX, toY, toZ, toYaw, toPitch, false);
                                          if (!event.isAllowed()) {
@@ -36,7 +36,7 @@ index 6ba184b5314356214e9ff9508fba57150d92d87a..3d163ed3f4e3d24a8c777e707a602ed6
                                              this.internalTeleport(PositionMoveRotation.of(this.player), Collections.emptySet());
                                              return;
                                          }
-@@ -1577,7 +1580,8 @@ public class ServerGamePacketListenerImpl
+@@ -1579,7 +1582,8 @@ public class ServerGamePacketListenerImpl
                                  d5 = d2 - this.player.getZ();
                                  d7 = d3 * d3 + d4 * d4 + d5 * d5;
                                  boolean movedWrongly = false; // Paper - Add fail move event; rename
