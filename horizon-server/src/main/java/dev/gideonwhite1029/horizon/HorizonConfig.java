@@ -223,8 +223,8 @@ public final class HorizonConfig {
     public static int syncTickInterval = 20;
 
     // Jade
-    // @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
-    // public static boolean jadeEnable = false;
+    @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
+    public static boolean jadeEnable = false;
 
     // REI
     // @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
