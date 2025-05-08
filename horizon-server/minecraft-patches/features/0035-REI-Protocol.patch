@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 8 May 2025 14:14:00 +0300
+Subject: [PATCH] REI Protocol
+
+
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index 95d0e50117ef2a98dce01204d644d3905403cf96..2b1e0c0735745d16bd165c43c2d823eb48cef5b8 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -1613,6 +1613,7 @@ public abstract class PlayerList {
+             serverPlayer.connection.send(clientboundUpdateRecipesPacket);
+             serverPlayer.getRecipeBook().sendInitialRecipeBook(serverPlayer);
+         }
++        dev.gideonwhite1029.horizon.protocol.rei.REIServerProtocol.onRecipeReload(); // Horizon
+     }
+ 
+     public boolean isAllowCommandsForAllPlayers() {
+diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
+index 36677cb0db42b74fa84d67b85717f629f84b4dd0..48a52778daa019b11fb4b797884fd82c54254edb 100644
+--- a/net/minecraft/world/item/ItemStack.java
++++ b/net/minecraft/world/item/ItemStack.java
+@@ -165,7 +165,7 @@ public final class ItemStack implements DataComponentHolder {
+     @Deprecated
+     @Nullable
+     private Item item;
+-    PatchedDataComponentMap components;
++    public PatchedDataComponentMap components;
+     @Nullable
+     private Entity entityRepresentation;
+ 
+diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+index 9bc0a9c3577d63a0ad5489bfd4c07d5006245c5f..18250002d5048769c667fbee603598fcfde81744 100644
+--- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
+@@ -83,6 +83,12 @@ public class SmithingTransformRecipe implements SmithingRecipe {
+         );
+     }
+ 
++    // Horizon start
++    public ItemStack getResult() {
++        return this.result.apply(net.minecraft.world.item.Items.OAK_LEAVES.getDefaultInstance()); // Awful usage due to Mojang's changing in 1.21.5
++    }
++    // Horizon end
++
+     // CraftBukkit start
+     @Override
+     public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
+diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+index c324896afc2ee28ebb4d426ce4a469ee847ce24d..0bd16820ce1d5edce88edaedba769527d0646229 100644
+--- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
++++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
+@@ -85,6 +85,12 @@ public class SmithingTrimRecipe implements SmithingRecipe {
+         return Optional.of(this.addition);
+     }
+ 
++    // Horizon start
++    public Holder<TrimPattern> pattern() {
++        return pattern;
++    }
++    // Horizon end
++
+     @Override
+     public RecipeSerializer<SmithingTrimRecipe> getSerializer() {
+         return RecipeSerializer.SMITHING_TRIM;

@@ -23,17 +23,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SmithingTemplateItem;
-import net.minecraft.world.item.crafting.FireworkRocketRecipe;
-import net.minecraft.world.item.crafting.MapCloningRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeMap;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.minecraft.world.item.crafting.SmithingTrimRecipe;
-import net.minecraft.world.item.crafting.TippedArrowRecipe;
-import net.minecraft.world.item.crafting.TransmuteRecipe;
+import net.minecraft.world.item.crafting.*;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
@@ -146,7 +136,7 @@ public class REIServerProtocol {
         recipeMap.byType(RecipeType.SMITHING).forEach(holder -> {
             switch (holder.value()) {
                 case SmithingTrimRecipe ignored -> builder.addAll(Display.ofSmithingTrimRecipe((RecipeHolder) holder));
-                case SmithingTemplateItem ignored -> builder.add(Display.ofTransforming((RecipeHolder) holder));
+                case SmithingTransformRecipe ignored -> builder.add(Display.ofTransforming((RecipeHolder) holder));
                 default -> {
                 }
             }

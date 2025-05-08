@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.Fireworks;
+import net.minecraft.world.item.component.ProvidesTrimMaterial;
 import net.minecraft.world.item.crafting.FireworkRocketRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.MapCloningRecipe;
@@ -35,11 +36,7 @@ import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-import net.minecraft.world.item.equipment.trim.ArmorTrim;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
-import net.minecraft.world.item.equipment.trim.TrimMaterials;
-import net.minecraft.world.item.equipment.trim.TrimPattern;
-import net.minecraft.world.item.equipment.trim.TrimPatterns;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 
@@ -134,25 +131,25 @@ public abstract class Display {
         Set<ResourceLocation> registeredPotions = new HashSet<>();
         List<Display> displays = new ArrayList<>();
         MinecraftServer.getServer().registryAccess().lookup(Registries.POTION).stream()
-            .flatMap(Registry::listElements)
-            .map(reference -> PotionContents.createItemStack(Items.LINGERING_POTION, reference))
-            .forEach(itemStack -> {
-                PotionContents potion = itemStack.get(DataComponents.POTION_CONTENTS);
-                if (potion == null || potion.potion().isEmpty()) {
-                    return;
-                }
-                if (potion.potion().get().unwrapKey().isPresent() && registeredPotions.add(potion.potion().get().unwrapKey().get().location())) {
-                    List<EntryIngredient> input = new ArrayList<>();
-                    for (int i = 0; i < 4; i++)
-                        input.add(arrowIngredient);
-                    input.add(EntryIngredient.of(itemStack));
-                    for (int i = 0; i < 4; i++)
-                        input.add(arrowIngredient);
-                    ItemStack outputStack = new ItemStack(Items.TIPPED_ARROW, 8);
-                    outputStack.set(DataComponents.POTION_CONTENTS, potion);
-                    displays.add(new CustomDisplay(input, List.of(EntryIngredient.of(outputStack)), recipeHolder.id().location()));
-                }
-            });
+                .flatMap(Registry::listElements)
+                .map(reference -> PotionContents.createItemStack(Items.LINGERING_POTION, reference))
+                .forEach(itemStack -> {
+                    PotionContents potion = itemStack.get(DataComponents.POTION_CONTENTS);
+                    if (potion == null || potion.potion().isEmpty()) {
+                        return;
+                    }
+                    if (potion.potion().get().unwrapKey().isPresent() && registeredPotions.add(potion.potion().get().unwrapKey().get().location())) {
+                        List<EntryIngredient> input = new ArrayList<>();
+                        for (int i = 0; i < 4; i++)
+                            input.add(arrowIngredient);
+                        input.add(EntryIngredient.of(itemStack));
+                        for (int i = 0; i < 4; i++)
+                            input.add(arrowIngredient);
+                        ItemStack outputStack = new ItemStack(Items.TIPPED_ARROW, 8);
+                        outputStack.set(DataComponents.POTION_CONTENTS, potion);
+                        displays.add(new CustomDisplay(input, List.of(EntryIngredient.of(outputStack)), recipeHolder.id().location()));
+                    }
+                });
         return displays;
     }
 
@@ -180,10 +177,10 @@ public abstract class Display {
     @NotNull
     public static Collection<Display> ofMapCloningRecipe(@NotNull RecipeHolder<MapCloningRecipe> recipeHolder) {
         return Collections.singleton(
-            new ShapelessDisplay(
-                List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
-                List.of(EntryIngredient.of(new ItemStack(Items.FILLED_MAP, 2))),
-                recipeHolder.id().location())
+                new ShapelessDisplay(
+                        List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
+                        List.of(EntryIngredient.of(new ItemStack(Items.FILLED_MAP, 2))),
+                        recipeHolder.id().location())
         );
     }
 
@@ -192,17 +189,15 @@ public abstract class Display {
      */
     @NotNull
     public static SmithingDisplay ofTransforming(RecipeHolder<SmithingTransformRecipe> recipeHolder) {
-
-
         return new SmithingDisplay(
-            List.of(
-                recipeHolder.value().templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
-                recipeHolder.value().baseIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
-                recipeHolder.value().additionIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty())
-            ),
-            List.of(EntryIngredient.of(recipeHolder.value().getResult())),
-            SmithingDisplay.SmithingRecipeType.TRANSFORM,
-            recipeHolder.id().location()
+                List.of(
+                        recipeHolder.value().templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
+                        EntryIngredient.ofIngredient(recipeHolder.value().baseIngredient()),
+                        recipeHolder.value().additionIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty())
+                ),
+                List.of(EntryIngredient.of(recipeHolder.value().getResult())),
+                SmithingDisplay.SmithingRecipeType.TRANSFORM,
+                recipeHolder.id().location()
         );
     }
 
@@ -214,57 +209,24 @@ public abstract class Display {
         RegistryAccess registryAccess = MinecraftServer.getServer().registryAccess();
         SmithingTrimRecipe recipe = recipeHolder.value();
         List<Display> displays = new ArrayList<>();
-        for (Holder<Item> templateItem : (Iterable<Holder<Item>>) recipe.templateIngredient().map(Ingredient::items).orElse(Stream.of())::iterator) {
-            Holder.Reference<TrimPattern> trimPattern = getPatternFromTemplate(registryAccess, templateItem)
-                .orElse(null);
-            if (trimPattern == null) continue;
+        for (Holder<Item> additionStack : (Iterable<Holder<Item>>) recipe.additionIngredient().map(Ingredient::items).orElse(Stream.of())::iterator) {
+            Holder<TrimMaterial> trimMaterial = getMaterialFromIngredient(registryAccess, additionStack).orElse(null);
+            if (trimMaterial == null) continue;
 
-            for (Holder<Item> additionStack : (Iterable<Holder<Item>>) recipe.additionIngredient().map(Ingredient::items).orElse(Stream.of())::iterator) {
-                Holder.Reference<TrimMaterial> trimMaterial = getMaterialFromIngredient(registryAccess, additionStack)
-                    .orElse(null);
-                if (trimMaterial == null) continue;
-
-                EntryIngredient baseIngredient = recipe.baseIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty());
-                EntryIngredient templateOutput = baseIngredient.isEmpty() ? EntryIngredient.empty()
-                    : getTrimmingOutput(registryAccess, templateItem.value().getDefaultInstance(), baseIngredient.get(0), additionStack.value().getDefaultInstance());
-
-                displays.add(new SmithingDisplay(List.of(
-                    EntryIngredient.ofItemHolder(templateItem),
+            EntryIngredient baseIngredient = EntryIngredient.ofIngredient(recipe.baseIngredient());
+            displays.add(new SmithingDisplay.Trimming(List.of(
+                    recipe.templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
                     baseIngredient,
                     EntryIngredient.ofItemHolder(additionStack)
-                ), List.of(templateOutput), SmithingDisplay.SmithingRecipeType.TRIM, recipeHolder.id().location()));
-            }
+            ), List.of(baseIngredient), SmithingDisplay.SmithingRecipeType.TRIM, recipeHolder.id().location(), recipe.pattern()));
+
         }
         return displays;
     }
 
-    public static EntryIngredient getTrimmingOutput(RegistryAccess registryAccess, ItemStack templateItem, ItemStack baseItem, ItemStack additionItem) {
-        Holder.Reference<TrimPattern> trimPattern = TrimPatterns.getFromTemplate(registryAccess, templateItem)
-            .orElse(null);
-        if (trimPattern == null) return EntryIngredient.empty();
-        Holder.Reference<TrimMaterial> trimMaterial = (Holder.Reference<TrimMaterial>) TrimMaterials.getFromIngredient(registryAccess, additionItem)
-            .orElse(null);
-        if (trimMaterial == null) return EntryIngredient.empty();
-        ArmorTrim armorTrim = new ArmorTrim(trimMaterial, trimPattern);
-        ArmorTrim trim = baseItem.get(DataComponents.TRIM);
-        if (trim != null && trim.hasPatternAndMaterial(trimPattern, trimMaterial)) return EntryIngredient.empty();
-        ItemStack newItem = baseItem.copyWithCount(1);
-        newItem.set(DataComponents.TRIM, armorTrim);
-        return EntryIngredient.of(newItem);
-    }
-
-    private static Optional<Holder.Reference<TrimPattern>> getPatternFromTemplate(HolderLookup.Provider provider, Holder<Item> item) {
-        return provider.lookupOrThrow(Registries.TRIM_PATTERN)
-            .listElements()
-            .filter(reference -> item == reference.value().templateItem())
-            .findFirst();
-    }
-
-    private static Optional<Holder.Reference<TrimMaterial>> getMaterialFromIngredient(HolderLookup.Provider provider, Holder<Item> item) {
-        return provider.lookupOrThrow(Registries.TRIM_MATERIAL)
-            .listElements()
-            .filter(reference -> item == reference.value().ingredient())
-            .findFirst();
+    private static Optional<Holder<TrimMaterial>> getMaterialFromIngredient(HolderLookup.Provider provider, Holder<Item> item) {
+        ProvidesTrimMaterial providesTrimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
+        return providesTrimMaterial != null ? providesTrimMaterial.unwrap(provider) : Optional.empty();
     }
 
     public static EntryIngredient ofSlotDisplay(SlotDisplay slot) {
@@ -286,8 +248,8 @@ public abstract class Display {
                 RegistryAccess access = MinecraftServer.getServer().registryAccess();
                 try {
                     List<ItemStack> stacks = slot.resolveForStacks(new ContextMap.Builder()
-                        .withParameter(SlotDisplayContext.REGISTRIES, access)
-                        .create(SlotDisplayContext.CONTEXT));
+                            .withParameter(SlotDisplayContext.REGISTRIES, access)
+                            .create(SlotDisplayContext.CONTEXT));
                     yield EntryIngredient.of(stacks.toArray(new ItemStack[0]));
                 } catch (Exception e) {
                     MinecraftServer.LOGGER.warn("Failed to resolve slot display: {}", slot, e);
