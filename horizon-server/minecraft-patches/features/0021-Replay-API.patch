@@ -163,7 +163,7 @@ index 814bb2981ab32b216b7953e9b14fe09e96cc7c89..d340bc2720ff6a1db53db7999d7bd0b1
                                          .filter(player -> !playerList.isOp(player.getGameProfile()))
                                          .map(player -> player.getGameProfile().getName()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 4675d4ff3e0f14eda5f11d47fab09c25c64efacb..5ded4695ed1fb73017bc254853adb972367fc7d2 100644
+index 0e71fb69aa5b05385d5f56d70bc4c06f459d05aa..1a5e73fbdf80d3cbb7265b979ffebe59b191d7a2 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -214,6 +214,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
@@ -207,10 +207,10 @@ index 4675d4ff3e0f14eda5f11d47fab09c25c64efacb..5ded4695ed1fb73017bc254853adb972
              }
  
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 7be35fca144f1b4f6564cd37bc8293a18fe7ed61..d1d9f22f2de8dcbdf0b0033745bc2cab57e202a0 100644
+index ac6c8d1961bce62f1b8bd84908a6f343f2af21ae..4e6753edb1f12e5eab85722fdf002002f54f83ca 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -209,7 +209,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -208,7 +208,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private static final boolean DEFAULT_SPAWN_EXTRA_PARTICLES_ON_FALL = false;
      public ServerGamePacketListenerImpl connection;
      public final MinecraftServer server;
@@ -220,7 +220,7 @@ index 7be35fca144f1b4f6564cd37bc8293a18fe7ed61..d1d9f22f2de8dcbdf0b0033745bc2cab
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 64d19aa1753f0bd7641869b11006d0481aaf2690..0a0cef9920de4ab60942a854d3cd66baccacab02 100644
+index 00dea59c4fb0110674f930d1de07f6dcc375e4e5..7087e7dd71f67f8d6f0255f5585771dbf69fd498 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -131,6 +131,7 @@ public abstract class PlayerList {

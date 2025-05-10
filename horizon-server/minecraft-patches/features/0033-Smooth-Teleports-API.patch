@@ -5,10 +5,10 @@ Subject: [PATCH] Smooth Teleports API
 
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 0ed49243e488d8f42eb4f6b57a43594ada518aa2..ad7ff5efd0669ffe2460c412832488b9fd76d827 100644
+index 4e6753edb1f12e5eab85722fdf002002f54f83ca..21150b8ee7cad394fc8d0bae34a297fc89166b79 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -432,6 +432,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -431,6 +431,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private boolean tpsBar = false; // Purpur - Implement TPSBar
      private boolean compassBar = false; // Purpur - Add compass command
      private boolean ramBar = false; // Purpur - Implement rambar commands
@@ -17,7 +17,7 @@ index 0ed49243e488d8f42eb4f6b57a43594ada518aa2..ad7ff5efd0669ffe2460c412832488b9
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 515be26806af69d4255f8307455d7454af28015a..d625117d86a991152369be2bf6a3792a369985de 100644
+index 95973c27c7c9753d84c57ca8c8b81242ed75772e..95d0e50117ef2a98dce01204d644d3905403cf96 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -933,11 +933,11 @@ public abstract class PlayerList {
