@@ -1,41 +1,14 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: GideonWhite1029 <gideonwhite1029@gmail.com>
-Date: Mon, 20 Jan 2025 00:08:42 +0300
+Date: Sun, 18 May 2025 18:29:01 +0300
 Subject: [PATCH] Vanilla Hopper
 
 
-diff --git a/net/minecraft/world/entity/vehicle/MinecartHopper.java b/net/minecraft/world/entity/vehicle/MinecartHopper.java
-index 8341e7f01606fca90e69384c16fc19bb9e20d1b7..7d8e95361460195cd25467713e90e8f7a21aba0c 100644
---- a/net/minecraft/world/entity/vehicle/MinecartHopper.java
-+++ b/net/minecraft/world/entity/vehicle/MinecartHopper.java
-@@ -99,6 +99,13 @@ public class MinecartHopper extends AbstractMinecartContainer implements Hopper
-         }
-     }
- 
-+    // Horizon start - tick every
-+    @Override
-+    public void inactiveTick() {
-+        this.tick();
-+    }
-+    // Horizon start - tick every
-+
-     public boolean suckInItems() {
-         if (HopperBlockEntity.suckInItems(this.level(), this)) {
-             this.immunize(); // Paper
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 5cd1326ad5d046c88b2b3449d610a78fa880b4cd..bd8a752773d61f919c8e3c4b65cbdf5dd93ed4c7 100644
+index 15d4f60942c0cc612c1468b4c0fda886867a67cb..bd702a3f4ee5390e974c5e22f4b79be1bb6cfae7 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -3,6 +3,8 @@ package net.minecraft.world.level.block.entity;
- import java.util.List;
- import java.util.function.BooleanSupplier;
- import javax.annotation.Nullable;
-+
-+import dev.gideonwhite1029.horizon.HorizonConfig;
- import net.minecraft.core.BlockPos;
- import net.minecraft.core.Direction;
- import net.minecraft.core.HolderLookup;
-@@ -266,36 +268,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -270,36 +270,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          ItemStack movedItem = origItemStack;
          final int originalItemCount = origItemStack.getCount();
          final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);
@@ -49,10 +22,10 @@ index 5cd1326ad5d046c88b2b3449d610a78fa880b4cd..bd8a752773d61f919c8e3c4b65cbdf5d
 -                // Drastically improve performance by returning true.
 -                // No plugin could have relied on the behavior of false as the other call
 -                // site for IMIE did not exhibit the same behavior
-+        // Horizon start - fix vanilla
-+        if (HorizonConfig.vanillaHopper && movedItem.getCount() <= movedItemCount) {
++        // Horizon start - vanilla hopper
++        if (dev.gideonwhite1029.horizon.HorizonConfig.vanillaHopper && movedItem.getCount() <= movedItemCount) {
 +            movedItem = origItemStack.copy();
-+            final ItemStack remainingItem = addItem(container, hopper, container.removeItem(i, movedItemCount), null);
++            final ItemStack remainingItem = addItem(container, hopper,  container.removeItem(i, movedItemCount), null);
 +            if (remainingItem.isEmpty()) {
 +                container.setChanged();
                  return true;
@@ -75,7 +48,7 @@ index 5cd1326ad5d046c88b2b3449d610a78fa880b4cd..bd8a752773d61f919c8e3c4b65cbdf5d
 +                if (movedItem == null) { // cancelled
 +                    origItemStack.setCount(originalItemCount);
 +                    // Drastically improve performance by returning true.
-+                    // No plugin could of relied on the behavior of false as the other call
++                    // No plugin could have relied on the behavior of false as the other call
 +                    // site for IMIE did not exhibit the same behavior
 +                    return true;
 +                }
@@ -104,7 +77,7 @@ index 5cd1326ad5d046c88b2b3449d610a78fa880b4cd..bd8a752773d61f919c8e3c4b65cbdf5d
 +            origItemStack.setCount(originalItemCount);
          }
 -        origItemStack.setCount(originalItemCount);
-+        // Horizon end - fix vanilla
++        // Horizon end - vanilla hopper
  
          if (level.paperConfig().hopper.cooldownWhenFull) {
              applyCooldown(hopper);

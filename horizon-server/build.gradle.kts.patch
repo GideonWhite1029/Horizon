@@ -7,7 +7,7 @@
 +val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/" // Horizon - Initial build
  
  dependencies {
-     mache("io.papermc:mache:1.21.5+build.1")
+     mache("io.papermc:mache:1.21.5+build.2")
 @@ -37,7 +_,30 @@
              outputDir = rootDirectory.dir("paper-server")
          }

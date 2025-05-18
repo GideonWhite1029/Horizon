@@ -89,8 +89,8 @@ public final class HorizonConfig {
     @GlobalConfig(name = "no-chat-reports", category = {"features"})
     public static boolean noChatReports = true;
 
-    // @GlobalConfig(name = "vanilla-hopper", category = {"features"})
-    // public static boolean vanillaHopper = false;
+    @GlobalConfig(name = "vanilla-hopper", category = {"features"})
+    public static boolean vanillaHopper = false;
 
     @GlobalConfig(name = "spectator-dont-get-advancement", category = {"features"})
     public static boolean spectatorDontGetAdvancement = false;
