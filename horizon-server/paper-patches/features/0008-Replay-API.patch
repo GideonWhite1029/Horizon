@@ -55,10 +55,10 @@ index a50532ff6671b0a45aaf2d4f890d84f31a3504a1..209bae2972ee0ed09f327ce948c8ca66
 +    // Horizon end - replay mod api
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-index efcd7e52bfda50970054a37f8c98452e5306c66a..0fea368a2066598a83f6bc3cefb82b88867603cc 100644
+index 395951c968e95adffa97e1851d104faf192744fd..7b23ab686fcb1d136ce842913805ef1d15700afa 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftEntity.java
-@@ -126,6 +126,8 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
+@@ -127,6 +127,8 @@ public abstract class CraftEntity implements org.bukkit.entity.Entity {
              return new CraftHumanEntity(server, (net.minecraft.world.entity.player.Player) entity);
          }
  
