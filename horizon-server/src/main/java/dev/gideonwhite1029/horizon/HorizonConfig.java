@@ -347,4 +347,31 @@ public final class HorizonConfig {
     @GlobalConfig(name = "old-block-entity-behaviour", category = {"old-minecraft"})
     public static boolean oldBlockEntityBehaviour = false;
 
+    @GlobalConfig(name = "sentry-dsn", category = {"features", "sentry"}, verify = SentryDsnVerify.class)
+    public static String sentryDsn = "";
+
+    @GlobalConfig(name = "sentry-only-log-thrown", category = {"features", "sentry"})
+    public static boolean onlyLogThrown = false;
+
+    public static class SentryDsnVerify extends ConfigVerify.StringConfigVerify {
+        @Override
+        public String check(String old, String value) {
+            String sentryEnvironment = System.getenv("SENTRY_DSN");
+            String finalDsn = sentryEnvironment != null ? sentryEnvironment : value;
+            sentryDsn = finalDsn;
+            if (finalDsn != null && !finalDsn.isBlank()) {
+                try {
+                    dev.gideonwhite1029.horizon.util.sentry.SentryManager.init(org.apache.logging.log4j.Level.WARN);
+                    HorizonLogger.LOGGER.info("Sentry initialized with DSN");
+                } catch (Exception ex) {
+                    HorizonLogger.LOGGER.warning("Failed to initialize Sentry", ex);
+                    return "Failed to initialize Sentry: " + ex.getMessage();
+                }
+            } else {
+                HorizonLogger.LOGGER.info("Sentry disabled (no DSN provided)");
+            }
+            return null;
+        }
+    }
+
 }

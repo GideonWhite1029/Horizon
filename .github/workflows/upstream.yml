@@ -6,8 +6,13 @@ jobs:
   upstream:
     runs-on: ubuntu-latest
     if: "!contains(github.event.commits[0].message, '[ci-skip]')"
+    outputs:
+      changes_detected: ${{ steps.check_changes.outputs.changes_detected }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       - uses: gradle/wrapper-validation-action@v3
       - uses: actions/setup-java@v4
         with:
@@ -15,11 +20,36 @@ jobs:
           java-version: 21
       - name: Configure Git
         run: git config --global user.email "action@github.com" && git config --global user.name "Github Action"
+      - name: Get current commit hash
+        id: before_update
+        run: echo "hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Update upstream
         run: |
           ./scripts/updateUpstream.sh
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet HEAD ${{ steps.before_update.outputs.hash }}; then
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+            echo "No changes detected after upstream update"
+          else
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+            echo "Changes detected after upstream update"
+          fi
       - name: Push changes
+        if: steps.check_changes.outputs.changes_detected == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+
+  trigger_horizon_ci:
+    needs: upstream
+    runs-on: ubuntu-latest
+    if: needs.upstream.outputs.changes_detected == 'true'
+    steps:
+      - name: Trigger Horizon CI
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: upstream-updated
