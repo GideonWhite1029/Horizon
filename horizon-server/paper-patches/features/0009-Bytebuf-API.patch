@@ -33,10 +33,10 @@ index 209bae2972ee0ed09f327ce948c8ca6682f0bb72..f994ab9ca9a9d2e7fb4bcb78c93db903
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 2e2537d84b854d992b6ff2148c1aa7da3cfcd0ac..78d4aadb85d4deb162706753ea09f458aa2f6403 100644
+index b98d75baab7c1e3ab96252ddafc13484969764d4..3c9e7d032e232030ef886c408af755773a1f588e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -3541,6 +3541,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3539,6 +3539,18 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      }
      // Paper end - entity effect API
  
@@ -53,5 +53,5 @@ index 2e2537d84b854d992b6ff2148c1aa7da3cfcd0ac..78d4aadb85d4deb162706753ea09f458
 +    // Horizon end - Bytebuf API
 +
      @Override
-     public @NotNull PlayerGiveResult give(@NotNull final Collection<@NotNull ItemStack> items, final boolean dropIfFull) {
+     public @NonNull PlayerGiveResult give(final @NonNull Collection<@NonNull ItemStack> items, final boolean dropIfFull) {
          Preconditions.checkArgument(items != null, "items cannot be null");
