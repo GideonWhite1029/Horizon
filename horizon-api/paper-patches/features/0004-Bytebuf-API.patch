@@ -51,10 +51,10 @@ index aaef3f8f75f051fd3fa41ba2491c26e62e556611..8bbd3a0fd8fc18bf8c69dfa0511d1eb8
 +    // Horizon end - Bytebuf API
  }
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 7262543459d43006f8758e6623c64a12c10c974c..1b97f044266f3bac2bd1a21a715f70fd1814ec44 100644
+index 531e0b77110b956b772d8698fd838ec2cc83f59c..17e9c8755f4fb1729cda9e30c245fadfbb4426e7 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -3845,6 +3845,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+@@ -3860,6 +3860,23 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      boolean isChunkSent(long chunkKey);
      // Paper end
  
