@@ -6,7 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 public enum EnumRegionFileExtension {
     MCA("mca", "mca" , (info) -> new RegionFile(info.info(), info.filePath(), info.folder(), info.sync())),
-    LINEAR("linear_v2", "linear" ,(info) -> new HorizonRegionFile(info.info(), info.filePath(), info.folder(), info.sync(), HorizonConfig.linearCompressionLevel));
+    LINEAR("linear_v2", "linear" ,(info) -> new HorizonRegionFile(info.info(), info.filePath(), info.folder(), info.sync(), HorizonConfig.linearCompressionLevel)),
+    B_LINEAR("b_linear", "b_linear", (info) -> new BufferedLinearRegionFile(info.filePath(), HorizonConfig.linearCompressionLevel));
 
     private final String name;
     private final String argument;
