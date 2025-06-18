@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Thu, 27 Feb 2025 16:19:17 +0300
+Subject: [PATCH] Extra Yggdrasil Service
+
+
+diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
+index 8c3151c25c172b846f0d028b5100718ada2d09d7..10166aa16fd1c5c557f03647b33d784b11106bc7 100644
+--- a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
++++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
+@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
+ 
+ public class YggdrasilMinecraftSessionService implements MinecraftSessionService {
+     private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilMinecraftSessionService.class);
+-    private final MinecraftClient client;
++    protected final MinecraftClient client; // Horizon
+     private final ServicesKeySet servicesKeySet;
+     private final String baseUrl;
+     private final URL joinUrl;
+diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
+index bc3209d3cbe971af74b7856caa6300b59b0bb6bc..7cac456bcfceab9b1f70ffe49a1cf4b3a63c9d48 100644
+--- a/net/minecraft/server/Main.java
++++ b/net/minecraft/server/Main.java
+@@ -184,7 +184,7 @@ public class Main {
+                 file = new File(bukkitConfiguration.getString("settings.world-container", "."));
+             }
+             // Paper end - fix SPIGOT-5824
+-            Services services = Services.create(new com.destroystokyo.paper.profile.PaperAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container
++            Services services = Services.create(new dev.gideonwhite1029.horizon.yggdrasil.HorizonAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container // Horizon - extra-yggdrasil-service
+             // CraftBukkit start
+             String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
+             LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index cd977cc4a69afc04b35d43f74e1b531ca6ba6103..d9902253c5c949d99a0a5733ba52d716a3688542 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
+@@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     private boolean isDemo;
+     private volatile boolean isReady;
+     private long lastOverloadWarningNanos;
+-    protected final Services services;
++    public final Services services; // Horizon
+     private long lastServerStatus;
+     public final Thread serverThread;
+     private long lastTickNanos = Util.getNanos();

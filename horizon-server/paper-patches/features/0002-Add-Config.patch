@@ -31,14 +31,13 @@ index 262b0fd28e10ac18b54e3ddcc6fffd566e0bdb19..1e704d7f9954c48c8791ee915019a2d3
          public void restart() {
              CraftServer.this.restart();
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 7091dcb86cad81ed4429f11bf5876b4e192a93f5..c5414ce54f2bca766472246267aba11020c39316 100644
+index 748bd9650da4a209743b7a5dde584b2e19c5a578..bd5bb0558c7a31b2fb39cfc57c376a8de312a6e7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -172,7 +172,14 @@ public class Main {
-                     .defaultsTo(new File("purpur.yml"))
+@@ -172,6 +172,14 @@ public class Main {
                      .describedAs("Yml file");
                  // Purpur end - Purpur config files
--
+ 
 +                // Horizon start - Server Config
 +                acceptsAll(asList("horizon", "horizon-settings"), "File for horizon settings")
 +                        .withRequiredArg()
@@ -46,7 +45,7 @@ index 7091dcb86cad81ed4429f11bf5876b4e192a93f5..c5414ce54f2bca766472246267aba110
 +                        .defaultsTo(new File("horizon.yml"))
 +                        .describedAs("Yml file");
 +                // Horizon end - Server Config
-+                // Paper start
-                 acceptsAll(asList("server-name"), "Name of the server")
++
+                 this.accepts("server-name", "Name of the server")
                          .withRequiredArg()
                          .ofType(String.class)

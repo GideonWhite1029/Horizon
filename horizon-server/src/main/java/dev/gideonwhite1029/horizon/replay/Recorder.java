@@ -2,6 +2,7 @@ package dev.gideonwhite1029.horizon.replay;
 
 import com.mojang.serialization.DynamicOps;
 import dev.gideonwhite1029.horizon.HorizonLogger;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.local.LocalChannel;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.LayeredRegistryAccess;
@@ -37,8 +38,8 @@ import net.minecraft.tags.TagNetworkSerialization;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -89,7 +90,7 @@ public class Recorder extends Connection {
         metaData.singleplayer = false;
         metaData.serverName = recorderOption.serverName;
         metaData.date = startTime;
-        metaData.mcversion = SharedConstants.getCurrentVersion().getName();
+        metaData.mcversion = SharedConstants.getCurrentVersion().name();
 
         // TODO start event
         this.savePacket(new ClientboundLoginFinishedPacket(photographer.getGameProfile()), ConnectionProtocol.LOGIN);
@@ -171,7 +172,7 @@ public class Recorder extends Connection {
     }
 
     @Override
-    public void send(@NotNull Packet<?> packet, @Nullable PacketSendListener callbacks, boolean flush) {
+    public void send(@NotNull Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flag) {
         if (!stopped) {
             if (packet instanceof BundlePacket<?> packet1) {
                 packet1.subPackets().forEach(subPacket -> send(subPacket, null));

@@ -60,7 +60,7 @@ public class ServerPhotographer extends ServerPlayer {
 
         photographer.recorder.start();
         MinecraftServer.getServer().getPlayerList().placeNewPhotographer(photographer.recorder, photographer, world, state.loc);
-        photographer.serverLevel().chunkSource.move(photographer);
+        photographer.level().chunkSource.move(photographer);
         photographer.setInvisible(true);
         photographers.add(photographer);
 
@@ -78,7 +78,7 @@ public class ServerPhotographer extends ServerPlayer {
 
         if (this.server.getTickCount() % 10 == 0) {
             connection.resetPosition();
-            this.serverLevel().chunkSource.move(this);
+            this.level().chunkSource.move(this);
         }
 
         if (this.followPlayer != null) {

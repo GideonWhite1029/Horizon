@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index d0dada3d7ff8d1b50c349036272b2b464155053c..6e8f4f1bca4a2698e9455fd23af7b208ea37ef80 100644
+index c6e5eb1bac6164a1323cf39fa215096d58fe2f1f..1c2d3d9ef01bc6290f6b46c3467f7dce127db9bb 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1200,15 +1200,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1202,15 +1202,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              long tickSection = Util.getNanos();
              long currentTime;
              // Paper end - further improve server tick loop

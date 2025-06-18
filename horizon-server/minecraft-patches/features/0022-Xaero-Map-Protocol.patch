@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Wed, 26 Feb 2025 21:33:27 +0300
+Subject: [PATCH] Xaero Map Protocol
+
+
+diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
+index 6af6f89eecb870b163922b466d31a49d7b598997..0c3dd0da4bdc3b7a8bcb66ffd346d9498db320fa 100644
+--- a/net/minecraft/server/players/PlayerList.java
++++ b/net/minecraft/server/players/PlayerList.java
+@@ -1304,6 +1304,7 @@ public abstract class PlayerList {
+         player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
+         player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
+         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
++        dev.gideonwhite1029.horizon.protocol.MinimapsProtocol.sendXaeroServerInfo(player); // Horizon
+         if (level.isRaining()) {
+             // CraftBukkit start - handle player weather
+             // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));

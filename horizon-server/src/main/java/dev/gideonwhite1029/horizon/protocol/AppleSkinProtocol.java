@@ -93,7 +93,7 @@ public class AppleSkinProtocol {
                         }
 
                         case "natural_regeneration" -> {
-                            boolean regeneration = player.serverLevel().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+                            boolean regeneration = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
                             Boolean previousRegeneration = previousNaturalRegeneration.get(player);
                             if (previousRegeneration == null || regeneration != previousRegeneration) {
                                 ProtocolUtils.sendPayloadPacket(player, NATURAL_REGENERATION_KEY, buf -> buf.writeBoolean(regeneration));

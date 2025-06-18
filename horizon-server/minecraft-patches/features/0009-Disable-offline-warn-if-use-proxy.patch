@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 20 Jan 2025 21:15:26 +0300
+Subject: [PATCH] Disable offline warn if use proxy
+
+
+diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
+index 24a5e9eb0595edc5c36f858f7916d7aa562d2c2c..924fe0fc5ceb033cd0d68a0ac3a61553014022a1 100644
+--- a/net/minecraft/server/dedicated/DedicatedServer.java
++++ b/net/minecraft/server/dedicated/DedicatedServer.java
+@@ -279,7 +279,7 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+         String proxyFlavor = (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) ? "Velocity" : "BungeeCord";
+         String proxyLink = (io.papermc.paper.configuration.GlobalConfiguration.get().proxies.velocity.enabled) ? "https://docs.papermc.io/velocity/security" : "http://www.spigotmc.org/wiki/firewall-guide/";
+         // Paper end - Add Velocity IP Forwarding Support
+-        if (!this.usesAuthentication()) {
++        if (!io.papermc.paper.configuration.GlobalConfiguration.get().proxies.isProxyOnlineMode()) { // Horizon - bungee or velocity
+             LOGGER.warn("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
+             LOGGER.warn("The server will make no attempt to authenticate usernames. Beware.");
+             // Spigot start
