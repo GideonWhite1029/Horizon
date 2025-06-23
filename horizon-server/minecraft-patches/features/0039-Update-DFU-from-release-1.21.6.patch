@@ -1,0 +1,306 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 23 Jun 2025 10:12:52 +0300
+Subject: [PATCH] Update DFU from release 1.21.6
+
+
+diff --git a/ca/spottedleaf/dataconverter/minecraft/MCVersionRegistry.java b/ca/spottedleaf/dataconverter/minecraft/MCVersionRegistry.java
+index 60ab65df1a95646b167988ddf1536e5b6c488cb3..b38c689b2dc4f39c4022bac67963705e943e4716 100644
+--- a/ca/spottedleaf/dataconverter/minecraft/MCVersionRegistry.java
++++ b/ca/spottedleaf/dataconverter/minecraft/MCVersionRegistry.java
+@@ -279,9 +279,9 @@ public final class MCVersionRegistry {
+             4311,
+             4312,
+             4314,
+-//            4420,
+-//            4424,
+-            // All up to 1.21.6-pre2
++            //4420,
++            //4424,
++            // All up to 1.21.6
+         };
+         Arrays.sort(converterVersions);
+ 
+@@ -308,6 +308,8 @@ public final class MCVersionRegistry {
+         registerSubVersion(MCVersions.V24W07A + 1, 5);
+         registerSubVersion(MCVersions.V24W07A + 1, 6);
+ 
++        registerSubVersion(V4290.VERSION, 1);
++
+         // register breakpoints here
+         // for all major releases after 1.16, add them. this reduces the work required to determine if a breakpoint
+         // is needed for new converters
+@@ -334,7 +336,7 @@ public final class MCVersionRegistry {
+ 
+         // There is a read of entity sub data in V4299 (salmon) which was written to after V1_20_6
+         // There is also a sub type read in V4290 as it reads and converts all data within a text component
+-        registerBreakpointBefore(V4290.VERSION);
++        registerBreakpointAfter(V4290.VERSION);
+     }
+ 
+     static {
+diff --git a/ca/spottedleaf/dataconverter/minecraft/MCVersions.java b/ca/spottedleaf/dataconverter/minecraft/MCVersions.java
+index d2d572733f848108c156a629c9e65d35e0c681c4..f54d93488ce8d6161bc69735fe4be9c54c374424 100644
+--- a/ca/spottedleaf/dataconverter/minecraft/MCVersions.java
++++ b/ca/spottedleaf/dataconverter/minecraft/MCVersions.java
+@@ -579,15 +579,21 @@ public final class MCVersions {
+     public static final int V1_21_5_RC1           = 4323;
+     public static final int V1_21_5_RC2           = 4324;
+     public static final int V1_21_5               = 4325;
+-//    public static final int V25W15A               = 4422;
+-//    public static final int V25W16A               = 4423;
+-//    public static final int V25W17A               = 4425;
+-//    public static final int V25W18A               = 4426;
+-//    public static final int V25W19A               = 4427;
+-//    public static final int V25W20A               = 4428;
+-//    public static final int V25W21A               = 4429;
+-//    public static final int V1_21_6_PRE1          = 4430;
+-//    public static final int V1_21_6_PRE2          = 4431;
++    /*
++    public static final int V25W15A               = 4422;
++    public static final int V25W16A               = 4423;
++    public static final int V25W17A               = 4425;
++    public static final int V25W18A               = 4426;
++    public static final int V25W19A               = 4427;
++    public static final int V25W20A               = 4428;
++    public static final int V25W21A               = 4429;
++    public static final int V1_21_6_PRE1          = 4430;
++    public static final int V1_21_6_PRE2          = 4431;
++    public static final int V1_21_6_PRE3          = 4432;
++    public static final int V1_21_6_PRE4          = 4433;
++    public static final int V1_21_6_RC1           = 4434;
++    public static final int V1_21_6               = 4435;
++     */
+ 
+     private MCVersions() {}
+ }
+diff --git a/ca/spottedleaf/dataconverter/minecraft/datatypes/MCTypeRegistry.java b/ca/spottedleaf/dataconverter/minecraft/datatypes/MCTypeRegistry.java
+index df973a2d9e7c77b9b48646dddb9a28b1bc0cbcfd..58fd70e536e559a3eb97824361c5b011be07db5a 100644
+--- a/ca/spottedleaf/dataconverter/minecraft/datatypes/MCTypeRegistry.java
++++ b/ca/spottedleaf/dataconverter/minecraft/datatypes/MCTypeRegistry.java
+@@ -359,9 +359,11 @@ public final class MCTypeRegistry {
+         V4311.register();
+         V4312.register();
+         V4314.register();
+-//        V4420.register();
+-//        V4421.register();
+-//        V4424.register();
++        /*
++        V4420.register();
++        V4421.register();
++        V4424.register();
++         */
+     }
+ 
+     private MCTypeRegistry() {}
+diff --git a/ca/spottedleaf/dataconverter/minecraft/util/StringWalker.java b/ca/spottedleaf/dataconverter/minecraft/util/StringWalker.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..4e1add641c092b241b48e93732dab4ef646eafc3
+--- /dev/null
++++ b/ca/spottedleaf/dataconverter/minecraft/util/StringWalker.java
+@@ -0,0 +1,78 @@
++package ca.spottedleaf.dataconverter.minecraft.util;
++
++public final class StringWalker {
++
++    public final String string;
++    private int index; // index of next value to return
++    private final int maxIndex; // exclusive
++
++    public StringWalker(final String string) {
++        this(string, 0);
++    }
++
++    public StringWalker(final String string, final int index) {
++        this(string, index, string.length());
++    }
++
++    public StringWalker(final String string, final int index, final int maxIndex) {
++        this.string = string;
++        this.index = index;
++        this.maxIndex = maxIndex;
++
++        if (maxIndex < 0 || maxIndex > string.length()) {
++            throw new IllegalArgumentException("Max index out of string range");
++        }
++
++        if (index < 0 || index > maxIndex) {
++            throw new IllegalArgumentException("Index out of string range");
++        }
++    }
++
++    public int getIndex() {
++        return this.index;
++    }
++
++    public void setIndex(final int to) {
++        this.index = to;
++    }
++
++    private void checkNext() {
++        if (!this.hasNext()) {
++            throw this.parseFail(this.getIndex(), "Expecting more input");
++        }
++    }
++
++    public boolean hasNext() {
++        return this.index < this.maxIndex;
++    }
++
++    public char next() {
++        return this.string.charAt(this.index++);
++    }
++
++    public char peek() {
++        return this.string.charAt(this.index);
++    }
++
++    public void advance() {
++        ++this.index;
++    }
++
++    public void skipWhitespace() {
++        while (this.hasNext() || Character.isWhitespace(this.peek())) {
++            this.advance();
++        }
++    }
++
++    public boolean skipIf(final char c) {
++        if (this.hasNext() && this.peek() == c) {
++            this.advance();
++            return true;
++        }
++        return false;
++    }
++
++    public IllegalStateException parseFail(final int index, final String reason) {
++        return new IllegalStateException("At column " + index + ": " + reason);
++    }
++}
+diff --git a/ca/spottedleaf/dataconverter/minecraft/versions/V4290.java b/ca/spottedleaf/dataconverter/minecraft/versions/V4290.java
+index 5fef196928fc07370f393ffccb9a13b1422c6544..03854463a49e720cd788b2cc6abcf375b87af8f1 100644
+--- a/ca/spottedleaf/dataconverter/minecraft/versions/V4290.java
++++ b/ca/spottedleaf/dataconverter/minecraft/versions/V4290.java
+@@ -136,6 +136,70 @@ public final class V4290 {
+         }
+     }
+ 
++    private static void directWalkComponentList(final ListType list, final long fromVersion, final long toVersion) {
++        for (int i = 0, len = list.size(); i < len; ++i) {
++            directWalkComponent(list.getGeneric(i), fromVersion, toVersion);
++        }
++    }
++
++    private static void directWalkComponent(final Object input, final long fromVersion, final long toVersion) {
++        if (input instanceof ListType listType) {
++            directWalkComponentList(listType, fromVersion, toVersion);
++        } else if (input instanceof MapType root) {
++            final ListType extra = root.getListUnchecked("extra");
++            if (extra != null) {
++                directWalkComponentList(extra, fromVersion, toVersion);
++            }
++
++            final Object separator = root.getGeneric("separator");
++            if (separator != null) {
++                directWalkComponent(separator, fromVersion, toVersion);
++            }
++
++            final MapType clickEvent = root.getMap("clickEvent");
++            if (clickEvent != null) {
++                switch (clickEvent.getString("action", "")) {
++                    case "run_command":
++                    case "suggest_command": {
++                        WalkerUtils.convert(MCTypeRegistry.DATACONVERTER_CUSTOM_TYPE_COMMAND, clickEvent, "value", fromVersion, toVersion);
++                        break;
++                    }
++                }
++            }
++
++            final MapType hoverEvent = root.getMap("hoverEvent");
++            if (hoverEvent != null) {
++                switch (hoverEvent.getString("action", "")) {
++                    case "show_text": {
++                        final Object contents = hoverEvent.getGeneric("contents");
++                        if (contents != null) {
++                            directWalkComponent(contents, fromVersion, toVersion);
++                        }
++                        break;
++                    }
++                    case "show_item": {
++                        if (hoverEvent.hasKey("contents", ObjectType.STRING)) {
++                            WalkerUtils.convert(MCTypeRegistry.ITEM_NAME, hoverEvent, "contents", fromVersion, toVersion);
++                        } else {
++                            WalkerUtils.convert(MCTypeRegistry.ITEM_STACK, hoverEvent, "contents", fromVersion, toVersion);
++                        }
++                        break;
++                    }
++                    case "show_entity": {
++                        WalkerUtils.convert(MCTypeRegistry.ENTITY_NAME, hoverEvent, "type", fromVersion, toVersion);
++
++                        final Object name = hoverEvent.getGeneric("name");
++                        if (name != null) {
++                            directWalkComponent(name, fromVersion, toVersion);
++                        }
++                        break;
++                    }
++                    // default: do nothing
++                }
++            }
++        } // else: should only be string
++    }
++
+     public static void register() {
+         MCTypeRegistry.TEXT_COMPONENT.addStructureConverter(new DataConverter<>(VERSION) {
+             @Override
+@@ -182,6 +246,7 @@ public final class V4290 {
+                         };
+ 
+                         convertNested(ret);
++                        directWalkComponent(ret, sourceVersion, toVersion);
+                         return ret;
+                     }
+                 } catch (final JsonParseException ex) {
+@@ -192,7 +257,8 @@ public final class V4290 {
+             }
+         });
+ 
+-        MCTypeRegistry.TEXT_COMPONENT.addStructureWalker(VERSION, (final Object input, final long fromVersion, final long toVersion) -> {
++        // step 1
++        MCTypeRegistry.TEXT_COMPONENT.addStructureWalker(VERSION, 1, (final Object input, final long fromVersion, final long toVersion) -> {
+             if (input instanceof ListType listType) {
+                 WalkerUtils.convert(MCTypeRegistry.TEXT_COMPONENT, listType, fromVersion, toVersion);
+             } else if (input instanceof MapType root) {
+diff --git a/ca/spottedleaf/dataconverter/types/json/JsonTypeUtil.java b/ca/spottedleaf/dataconverter/types/json/JsonTypeUtil.java
+index 1223539f183ba2efe4a7e874e7e8846dc0445d3a..a9acfb09824d531d540cea26407d0b2258d48634 100644
+--- a/ca/spottedleaf/dataconverter/types/json/JsonTypeUtil.java
++++ b/ca/spottedleaf/dataconverter/types/json/JsonTypeUtil.java
+@@ -175,12 +175,4 @@ public final class JsonTypeUtil implements TypeUtil<JsonElement> {
+ 
+         return ret;
+     }
+-
+-    private static MapType convertJson(final TypeUtil<?> to, final JsonMapType json) {
+-        return convertJson(to, json.map, json.compressed);
+-    }
+-
+-    private static ListType convertJson(final TypeUtil<?> to, final JsonListType json) {
+-        return convertJson(to, json.array, json.compressed);
+-    }
+ }
+diff --git a/ca/spottedleaf/dataconverter/types/nbt/NBTTypeUtil.java b/ca/spottedleaf/dataconverter/types/nbt/NBTTypeUtil.java
+index 8ad56e5e6cf8d2a97858d90b786d6ba52cee22f4..dbf842c5c6842238e7101c194c1ce93043221470 100644
+--- a/ca/spottedleaf/dataconverter/types/nbt/NBTTypeUtil.java
++++ b/ca/spottedleaf/dataconverter/types/nbt/NBTTypeUtil.java
+@@ -113,12 +113,4 @@ public final class NBTTypeUtil implements TypeUtil<Tag> {
+ 
+         return ret;
+     }
+-
+-    public static MapType convertNBT(final TypeUtil<?> to, final NBTMapType nbt) {
+-        return convertNBT(to, nbt.map);
+-    }
+-
+-    public static ListType convertNBT(final TypeUtil<?> to, final NBTListType nbt) {
+-        return convertNBT(to, nbt.list);
+-    }
+ }
