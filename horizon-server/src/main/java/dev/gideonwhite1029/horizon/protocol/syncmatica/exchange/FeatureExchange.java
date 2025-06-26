@@ -1,12 +1,12 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 
+import dev.gideonwhite1029.horizon.protocol.syncmatica.FeatureSet;
+import dev.gideonwhite1029.horizon.protocol.syncmatica.PacketType;
+import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.FeatureSet;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.PacketType;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol;
 
 public abstract class FeatureExchange extends AbstractExchange {
 

@@ -3,12 +3,26 @@ package dev.gideonwhite1029.horizon.protocol.syncmatica;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FeatureSet {
 
     private static final Map<String, FeatureSet> versionFeatures;
+
+    static {
+        versionFeatures = new HashMap<>();
+        versionFeatures.put("0.1", new FeatureSet(Collections.singletonList(Feature.CORE)));
+    }
+
     private final Collection<Feature> features;
+
+    public FeatureSet(final Collection<Feature> features) {
+        this.features = features;
+    }
 
     @Nullable
     public static FeatureSet fromVersionString(@NotNull String version) {
@@ -48,16 +62,7 @@ public class FeatureSet {
         return output.toString();
     }
 
-    public FeatureSet(final Collection<Feature> features) {
-        this.features = features;
-    }
-
     public boolean hasFeature(final Feature f) {
         return features.contains(f);
-    }
-
-    static {
-        versionFeatures = new HashMap<>();
-        versionFeatures.put("0.1", new FeatureSet(Collections.singletonList(Feature.CORE)));
     }
 }

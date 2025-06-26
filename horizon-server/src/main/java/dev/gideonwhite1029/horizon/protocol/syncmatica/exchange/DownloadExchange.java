@@ -1,13 +1,10 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 
+import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.MessageType;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.PacketType;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.ServerPlacement;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -101,7 +98,8 @@ public class DownloadExchange extends AbstractExchange {
 
     @Override
     protected void onClose() {
-        getManager().setDownloadState(toDownload, false);
+        getManager();
+        CommunicationManager.setDownloadState(toDownload, false);
         try {
             outputStream.close();
         } catch (final IOException e) {

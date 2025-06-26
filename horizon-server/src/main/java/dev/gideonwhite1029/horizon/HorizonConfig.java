@@ -265,7 +265,7 @@ public final class HorizonConfig {
         @Override
         public String check(Boolean old, Boolean value) {
             if (value) {
-                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init();
+                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init(true);
             }
             return null;
         }
