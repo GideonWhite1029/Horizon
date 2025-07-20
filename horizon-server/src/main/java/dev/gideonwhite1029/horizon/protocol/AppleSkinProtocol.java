@@ -1,6 +1,7 @@
 package dev.gideonwhite1029.horizon.protocol;
 
 import dev.gideonwhite1029.horizon.HorizonConfig;
+import dev.gideonwhite1029.horizon.protocol.core.Context;
 import dev.gideonwhite1029.horizon.protocol.core.HorizonProtocol;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolHandler;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
@@ -16,9 +17,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
-@HorizonProtocol(namespace = "appleskin")
-public class AppleSkinProtocol {
+@HorizonProtocol.Register(namespace = "appleskin")
+public class AppleSkinProtocol implements HorizonProtocol {
 
     public static final String PROTOCOL_ID = "appleskin";
 
@@ -32,7 +34,7 @@ public class AppleSkinProtocol {
     private static final Map<ServerPlayer, Float> previousExhaustionLevels = new HashMap<>();
     private static final Map<ServerPlayer, Boolean> previousNaturalRegeneration = new HashMap<>();
 
-    private static final Map<ServerPlayer, Set<String>> subscribedChannels = new HashMap<>();
+    private static final Map<UUID, Set<String>> subscribedChannels = new HashMap<>();
 
     @Contract("_ -> new")
     public static ResourceLocation id(String path) {
@@ -41,64 +43,55 @@ public class AppleSkinProtocol {
 
     @ProtocolHandler.PlayerJoin
     public static void onPlayerLoggedIn(@NotNull ServerPlayer player) {
-        if (HorizonConfig.appleskinEnable) {
-            resetPlayerData(player);
-        }
+        resetPlayerData(player);
     }
 
     @ProtocolHandler.PlayerLeave
     public static void onPlayerLoggedOut(@NotNull ServerPlayer player) {
-        if (HorizonConfig.appleskinEnable) {
-            subscribedChannels.remove(player);
-            resetPlayerData(player);
-        }
+        subscribedChannels.remove(player.getUUID());
+        resetPlayerData(player);
     }
 
-    @ProtocolHandler.MinecraftRegister(ignoreId = true)
-    public static void onPlayerSubscribed(@NotNull ServerPlayer player, String channel) {
-        if (HorizonConfig.appleskinEnable) {
-            subscribedChannels.computeIfAbsent(player, k -> new HashSet<>()).add(channel);
-        }
+    @ProtocolHandler.MinecraftRegister(onlyNamespace = true)
+    public static void onPlayerSubscribed(@NotNull Context context, ResourceLocation id) {
+        subscribedChannels.computeIfAbsent(context.profile().getId(), k -> new HashSet<>()).add(id.getPath());
     }
 
     @ProtocolHandler.Ticker
     public static void tick() {
-        if (HorizonConfig.appleskinEnable) {
-            if (MinecraftServer.getServer().getTickCount() % HorizonConfig.syncTickInterval != 0) {
-                return;
+        for (Map.Entry<UUID, Set<String>> entry : subscribedChannels.entrySet()) {
+            ServerPlayer player = MinecraftServer.getServer().getPlayerList().getPlayer(entry.getKey());
+            if (player == null) {
+                continue;
             }
 
-            for (Map.Entry<ServerPlayer, Set<String>> entry : subscribedChannels.entrySet()) {
-                ServerPlayer player = entry.getKey();
-                FoodData data = player.getFoodData();
-
-                for (String channel : entry.getValue()) {
-                    switch (channel) {
-                        case "saturation" -> {
-                            float saturation = data.getSaturationLevel();
-                            Float previousSaturation = previousSaturationLevels.get(player);
-                            if (previousSaturation == null || saturation != previousSaturation) {
-                                ProtocolUtils.sendPayloadPacket(player, SATURATION_KEY, buf -> buf.writeFloat(saturation));
-                                previousSaturationLevels.put(player, saturation);
-                            }
+            FoodData data = player.getFoodData();
+            for (String channel : entry.getValue()) {
+                switch (channel) {
+                    case "saturation" -> {
+                        float saturation = data.getSaturationLevel();
+                        Float previousSaturation = previousSaturationLevels.get(player);
+                        if (previousSaturation == null || saturation != previousSaturation) {
+                            ProtocolUtils.sendBytebufPacket(player, SATURATION_KEY, buf -> buf.writeFloat(saturation));
+                            previousSaturationLevels.put(player, saturation);
                         }
+                    }
 
-                        case "exhaustion" -> {
-                            float exhaustion = data.exhaustionLevel;
-                            Float previousExhaustion = previousExhaustionLevels.get(player);
-                            if (previousExhaustion == null || Math.abs(exhaustion - previousExhaustion) >= MINIMUM_EXHAUSTION_CHANGE_THRESHOLD) {
-                                ProtocolUtils.sendPayloadPacket(player, EXHAUSTION_KEY, buf -> buf.writeFloat(exhaustion));
-                                previousExhaustionLevels.put(player, exhaustion);
-                            }
+                    case "exhaustion" -> {
+                        float exhaustion = data.exhaustionLevel;
+                        Float previousExhaustion = previousExhaustionLevels.get(player);
+                        if (previousExhaustion == null || Math.abs(exhaustion - previousExhaustion) >= MINIMUM_EXHAUSTION_CHANGE_THRESHOLD) {
+                            ProtocolUtils.sendBytebufPacket(player, EXHAUSTION_KEY, buf -> buf.writeFloat(exhaustion));
+                            previousExhaustionLevels.put(player, exhaustion);
                         }
+                    }
 
-                        case "natural_regeneration" -> {
-                            boolean regeneration = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
-                            Boolean previousRegeneration = previousNaturalRegeneration.get(player);
-                            if (previousRegeneration == null || regeneration != previousRegeneration) {
-                                ProtocolUtils.sendPayloadPacket(player, NATURAL_REGENERATION_KEY, buf -> buf.writeBoolean(regeneration));
-                                previousNaturalRegeneration.put(player, regeneration);
-                            }
+                    case "natural_regeneration" -> {
+                        boolean regeneration = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+                        Boolean previousRegeneration = previousNaturalRegeneration.get(player);
+                        if (previousRegeneration == null || regeneration != previousRegeneration) {
+                            ProtocolUtils.sendBytebufPacket(player, NATURAL_REGENERATION_KEY, buf -> buf.writeBoolean(regeneration));
+                            previousNaturalRegeneration.put(player, regeneration);
                         }
                     }
                 }
@@ -108,9 +101,7 @@ public class AppleSkinProtocol {
 
     @ProtocolHandler.ReloadServer
     public static void onServerReload() {
-        if (!HorizonConfig.appleskinEnable) {
-            disableAllPlayer();
-        }
+        disableAllPlayer();
     }
 
     public static void disableAllPlayer() {
@@ -123,6 +114,16 @@ public class AppleSkinProtocol {
         previousExhaustionLevels.remove(player);
         previousSaturationLevels.remove(player);
         previousNaturalRegeneration.remove(player);
+    }
+
+    @Override
+    public int tickerInterval(String tickerID) {
+        return HorizonConfig.syncTickInterval;
+    }
+
+    @Override
+    public boolean isActive() {
+        return HorizonConfig.appleskinEnable;
     }
 }
 

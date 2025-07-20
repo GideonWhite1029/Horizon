@@ -1,10 +1,10 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 
+import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 
 import java.util.Collection;
 

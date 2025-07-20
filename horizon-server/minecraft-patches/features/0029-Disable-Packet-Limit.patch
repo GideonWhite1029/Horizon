@@ -5,10 +5,10 @@ Subject: [PATCH] Disable Packet Limit
 
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 3b8834801074e8011d0c5858813382801b6c38be..8b5b2d239a75f259acc0196316dd0ae8d7435c6f 100644
+index dfb14a238bc4658a8e8a30cebcd10a5651539283..75eb1dd83512a5976c40b474836ab6a4789a1044 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -275,8 +275,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -277,8 +277,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
                  if (this.stopReadingPackets) {
                      return;
                  }
@@ -20,10 +20,10 @@ index 3b8834801074e8011d0c5858813382801b6c38be..8b5b2d239a75f259acc0196316dd0ae8
                      synchronized (PACKET_LIMIT_LOCK) {
                          if (this.allPacketCounts != null) {
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index e3057a09436ada996c7799dccb5b357c025bc8a5..ed726d6ed8ed3e0624a2f2020c9950dd0715de35 100644
+index deb2542de195618addcfbded4b3c05211936f491..c579fe4fcb65a6feef06834d3b47901c6bb1ab2d 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -833,7 +833,7 @@ public class ServerGamePacketListenerImpl
+@@ -847,7 +847,7 @@ public class ServerGamePacketListenerImpl
      public void handleCustomCommandSuggestions(ServerboundCommandSuggestionPacket packet) {
          // PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level()); // Paper - AsyncTabCompleteEvent; run this async
          // CraftBukkit start
@@ -32,7 +32,7 @@ index e3057a09436ada996c7799dccb5b357c025bc8a5..ed726d6ed8ed3e0624a2f2020c9950dd
              this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause // Paper - add proper async disconnect
              return;
          }
-@@ -2075,6 +2075,7 @@ public class ServerGamePacketListenerImpl
+@@ -2089,6 +2089,7 @@ public class ServerGamePacketListenerImpl
      private static int getSpamThreshold() { return io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.incomingPacketThreshold; } // Paper - Configurable threshold
  
      private boolean checkLimit(long timestamp) {
@@ -40,7 +40,7 @@ index e3057a09436ada996c7799dccb5b357c025bc8a5..ed726d6ed8ed3e0624a2f2020c9950dd
          if (this.lastLimitedPacket != -1 && timestamp - this.lastLimitedPacket < getSpamThreshold() && this.limitedPackets++ >= 8) { // Paper - Configurable threshold; raise packet limit to 8
              return false;
          }
-@@ -2614,6 +2615,7 @@ public class ServerGamePacketListenerImpl
+@@ -2624,6 +2625,7 @@ public class ServerGamePacketListenerImpl
  
      // Spigot start - spam exclusions
      private void detectRateSpam(String message) {
@@ -48,7 +48,7 @@ index e3057a09436ada996c7799dccb5b357c025bc8a5..ed726d6ed8ed3e0624a2f2020c9950dd
          // CraftBukkit start - replaced with thread safe throttle
          if (org.spigotmc.SpigotConfig.enableSpamExclusions) {
              for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
-@@ -3382,7 +3384,7 @@ public class ServerGamePacketListenerImpl
+@@ -3334,7 +3336,7 @@ public class ServerGamePacketListenerImpl
      @Override
      public void handlePlaceRecipe(ServerboundPlaceRecipePacket packet) {
          // Paper start - auto recipe limit

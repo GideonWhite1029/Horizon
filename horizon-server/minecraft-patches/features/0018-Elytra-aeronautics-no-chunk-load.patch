@@ -27,10 +27,10 @@ index eb352aa4296abc3ed4cf31c590bc0be66daf4de3..9cbbee33ec05cffe0931d53187adbbae
  
          SectionPos lastSectionPos = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 07fe969dbecb4b1f4c09dc18bbab8dab3fb2ca30..13f828be3568fd9b62006c2704324d31f3efdd53 100644
+index b43c0a3b6e0a6dd9c1e86aa113f69565b73134db..dc89df3498e91e8ac0b72469572d2ce4c841b40a 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -585,7 +585,7 @@ public class ServerGamePacketListenerImpl
+@@ -599,7 +599,7 @@ public class ServerGamePacketListenerImpl
                  speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
  
                  // Paper start - Prevent moving into unloaded chunks
@@ -40,7 +40,7 @@ index 07fe969dbecb4b1f4c09dc18bbab8dab3fb2ca30..13f828be3568fd9b62006c2704324d31
                          !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
                  )) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 125bef9e69b2d17d407d303b979076f0f2491507..22df578629df53cde83f65e47155a3b424e11ec8 100644
+index fa829d84cd47b68426bb30f662de6e05b608cc69..d4ce191d8ae581a5f5de6b15d3d35e40e8c882c5 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
@@ -74,7 +74,7 @@ index 125bef9e69b2d17d407d303b979076f0f2491507..22df578629df53cde83f65e47155a3b4
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 97b104679bb2b9e466caa10d7b022ee6d597e7e5..198914e61ecbc66e79b3fa003e0d5b164eeed2c6 100644
+index d72e338232b95826b63d784ac0731f5a20bf8dcb..03ff3d984c6de9d2b0607ba62f059126a7cd8fff 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -222,6 +222,7 @@ public abstract class Player extends LivingEntity {

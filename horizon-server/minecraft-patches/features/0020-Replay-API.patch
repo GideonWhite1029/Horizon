@@ -122,10 +122,10 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f460458a863c9fafb9969213a215a140
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 29b53522ef9c3864f8d51991613995cc88b55fce..cd977cc4a69afc04b35d43f74e1b531ca6ba6103 100644
+index 599684d87c7f9bcf995e6974580916a2bacc25e7..d76f967ac8bd7571e396ed2bb5f886f9c32b3b55 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1670,7 +1670,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1671,7 +1671,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -208,7 +208,7 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 853d54a28a348492372eb38b50b155a6644129e4..5a225dcc63a4a2c7a6732bafd8bbac5633c70602 100644
+index f17f54c93d3a10dbae9e2316849667e647904777..5608a17c73f21679322131f138ba22ce9e0b22b4 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -218,8 +218,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -223,7 +223,7 @@ index 853d54a28a348492372eb38b50b155a6644129e4..5a225dcc63a4a2c7a6732bafd8bbac56
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 54e3a0fb56d5c477cfdebabfa42f1b3608739ac6..6af6f89eecb870b163922b466d31a49d7b598997 100644
+index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb1263a4f44a 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -130,6 +130,7 @@ public abstract class PlayerList {
@@ -347,6 +347,19 @@ index 54e3a0fb56d5c477cfdebabfa42f1b3608739ac6..6af6f89eecb870b163922b466d31a49d
              this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
              this.playersByUUID.put(player.getUUID(), player);
              // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
+@@ -348,9 +446,9 @@ public abstract class PlayerList {
+             // CraftBukkit start - sendAll above replaced with this loop
+             ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player)); // Paper - Add Listing API for Player
+ 
+-            final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.players.size() - 1); // Paper - Use single player info update packet on join
+-            for (int i = 0; i < this.players.size(); ++i) {
+-                ServerPlayer entityplayer1 = (ServerPlayer) this.players.get(i);
++            final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.realPlayers.size() - 1); // Paper - Use single player info update packet on join
++            for (int i = 0; i < this.realPlayers.size(); ++i) {
++                ServerPlayer entityplayer1 = (ServerPlayer) this.realPlayers.get(i);
+ 
+                 if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
+                     // Paper start - Add Listing API for Player
 @@ -368,6 +466,12 @@ public abstract class PlayerList {
                      continue;
                  }
@@ -412,15 +425,15 @@ index 54e3a0fb56d5c477cfdebabfa42f1b3608739ac6..6af6f89eecb870b163922b466d31a49d
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -671,7 +813,7 @@ public abstract class PlayerList {
-             // return this.players.size() >= this.maxPlayers && !this.canBypassPlayerLimit(gameProfile)
-             //     ? Component.translatable("multiplayer.disconnect.server_full")
-             //     : null;
--            if (this.players.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameProfile))) { // Purpur - Allow player join full server by permission
-+            if (this.realPlayers.size() >= this.maxPlayers && !(player.hasPermission("purpur.joinfullserver") || this.canBypassPlayerLimit(gameProfile))) { // Purpur - Allow player join full server by permission // Horizon - only real player
-                 event.disallow(org.bukkit.event.player.PlayerLoginEvent.Result.KICK_FULL, net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(org.spigotmc.SpigotConfig.serverFullMessage)); // Spigot // Paper - Adventure
-             }
-         }
+@@ -1032,7 +1174,7 @@ public abstract class PlayerList {
+ 
+     // Paper start - whitelist verify event / login event
+     public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {
+-        final boolean shouldKick = this.players.size() >= this.maxPlayers && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(profile)); // Purpur - Allow player join full server by permission TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
++        final boolean shouldKick = this.realPlayers.size() >= this.maxPlayers && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(profile)); // Purpur - Allow player join full server by permission // Horizon - only real player TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
+         final io.papermc.paper.event.player.PlayerServerFullCheckEvent fullCheckEvent = new io.papermc.paper.event.player.PlayerServerFullCheckEvent(
+             com.destroystokyo.paper.profile.CraftPlayerProfile.asBukkitMirror(profile),
+             io.papermc.paper.adventure.PaperAdventure.asAdventure(currentResult.message),
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
 index a6bb436dc80daf6901dc027a6011ead4b3ed27e2..9a8d7d4c4041ec83edfe0ac450d6ee858cfdd25b 100644
 --- a/net/minecraft/world/entity/player/Inventory.java

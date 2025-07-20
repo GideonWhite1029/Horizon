@@ -3,7 +3,6 @@ package dev.gideonwhite1029.horizon.protocol.jade.provider.block;
 import dev.gideonwhite1029.horizon.protocol.jade.JadeProtocol;
 import dev.gideonwhite1029.horizon.protocol.jade.accessor.BlockAccessor;
 import dev.gideonwhite1029.horizon.protocol.jade.provider.StreamServerDataProvider;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 

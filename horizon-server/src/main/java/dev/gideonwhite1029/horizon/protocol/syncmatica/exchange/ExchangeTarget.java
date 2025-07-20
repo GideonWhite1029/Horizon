@@ -1,11 +1,11 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.FeatureSet;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaPayload;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;

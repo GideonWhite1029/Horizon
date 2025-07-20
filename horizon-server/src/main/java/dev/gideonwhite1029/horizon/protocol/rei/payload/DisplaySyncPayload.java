@@ -1,7 +1,7 @@
 package dev.gideonwhite1029.horizon.protocol.rei.payload;
 
 import dev.gideonwhite1029.horizon.HorizonLogger;
-import dev.gideonwhite1029.horizon.protocol.rei.REIServerProtocol;
+import dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload;
 import dev.gideonwhite1029.horizon.protocol.rei.display.Display;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -9,7 +9,6 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.ByIdMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,12 +18,13 @@ import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
 
+// This payload will never be sent to the client. We use PacketTransformer to send split payload.
 public record DisplaySyncPayload(
     SyncType syncType,
     Collection<Display> displays,
     long version
-) implements CustomPacketPayload {
-    public static final Type<DisplaySyncPayload> TYPE = new Type<>(REIServerProtocol.SYNC_DISPLAYS_PACKET);
+) implements HorizonCustomPayload {
+
     public static final StreamCodec<? super RegistryFriendlyByteBuf, DisplaySyncPayload> STREAM_CODEC = StreamCodec.composite(
         SyncType.STREAM_CODEC,
         DisplaySyncPayload::syncType,
@@ -62,11 +62,6 @@ public record DisplaySyncPayload(
         DisplaySyncPayload::new
     );
 
-    @Override
-    @NotNull
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
 
     public enum SyncType {
         APPEND,

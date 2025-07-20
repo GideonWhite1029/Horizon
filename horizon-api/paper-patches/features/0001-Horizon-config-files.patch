@@ -5,10 +5,10 @@ Subject: [PATCH] Horizon config files
 
 
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index ff3c20a1b3a3179cc6dfe991653a4020fd505490..3153355d2ba78466d38b108461dbe038c9f9b1b6 100644
+index 69c0ca1b0c0cdbc911ba3f053fafc5624539917d..7550b9f93c908fe95a157e2c445b320fcb4d3a57 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2392,6 +2392,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+@@ -2399,6 +2399,13 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
          }
          // Purpur end
  

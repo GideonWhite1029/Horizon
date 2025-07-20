@@ -8,6 +8,8 @@ import dev.gideonwhite1029.horizon.protocol.core.ProtocolHandler;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
@@ -17,13 +19,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-@HorizonProtocol(namespace = "carpet")
-public class CarpetServerProtocol {
+@HorizonProtocol.Register(namespace = "carpet")
+public class CarpetServerProtocol implements HorizonProtocol {
 
     public static final String PROTOCOL_ID = "carpet";
     public static final String VERSION = ProtocolUtils.buildProtocolVersion(PROTOCOL_ID);
-
-    private static final ResourceLocation HELLO_ID = CarpetServerProtocol.id("hello");
 
     private static final String HI = "69";
     private static final String HELLO = "420";
@@ -35,23 +35,24 @@ public class CarpetServerProtocol {
 
     @ProtocolHandler.PlayerJoin
     public static void onPlayerJoin(ServerPlayer player) {
-        if (HorizonConfig.carpetEnable) {
+        CompoundTag data = new CompoundTag();
+        data.putString(HI, VERSION);
+        ProtocolUtils.sendPayloadPacket(player, new CarpetPayload(data));
+    }
+
+    @ProtocolHandler.PayloadReceiver(payload = CarpetPayload.class)
+    private static void handleHello(@NotNull ServerPlayer player, @NotNull CarpetServerProtocol.CarpetPayload payload) {
+        if (payload.nbt.contains(HELLO)) {
+            HorizonLogger.LOGGER.info("Player " + player.getScoreboardName() + " joined with carpet " + payload.nbt.getString(HELLO));
             CompoundTag data = new CompoundTag();
-            data.putString(HI, VERSION);
+            CarpetRules.write(data);
             ProtocolUtils.sendPayloadPacket(player, new CarpetPayload(data));
         }
     }
 
-    @ProtocolHandler.PayloadReceiver(payload = CarpetPayload.class, payloadId = "hello")
-    private static void handleHello(@NotNull ServerPlayer player, @NotNull CarpetServerProtocol.CarpetPayload payload) {
-        if (HorizonConfig.carpetEnable) {
-            if (payload.nbt.contains(HELLO)) {
-                HorizonLogger.LOGGER.info("Player " + player.getScoreboardName() + " joined with carpet " + payload.nbt.getString(HELLO));
-                CompoundTag data = new CompoundTag();
-                CarpetRules.write(data);
-                ProtocolUtils.sendPayloadPacket(player, new CarpetPayload(data));
-            }
-        }
+    @Override
+    public boolean isActive() {
+        return HorizonConfig.carpetEnable;
     }
 
     public static class CarpetRules {
@@ -99,22 +100,13 @@ public class CarpetServerProtocol {
         }
     }
 
-    public record CarpetPayload(CompoundTag nbt) implements HorizonCustomPayload<CarpetPayload> {
+    public record CarpetPayload(CompoundTag nbt) implements HorizonCustomPayload {
+        @ID
+        private static final ResourceLocation HELLO_ID = CarpetServerProtocol.id("hello");
 
-        @New
-        public CarpetPayload(ResourceLocation location, FriendlyByteBuf buf) {
-            this(buf.readNbt());
-        }
-
-        @Override
-        public void write(FriendlyByteBuf buf) {
-            buf.writeNbt(nbt);
-        }
-
-        @Override
-        @NotNull
-        public ResourceLocation id() {
-            return HELLO_ID;
-        }
+        @Codec
+        private static final StreamCodec<FriendlyByteBuf, CarpetPayload> CODEC = StreamCodec.composite(
+                ByteBufCodecs.COMPOUND_TAG, CarpetPayload::nbt, CarpetPayload::new
+        );
     }
 }

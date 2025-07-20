@@ -2,6 +2,7 @@ package dev.gideonwhite1029.horizon.protocol;
 
 import dev.gideonwhite1029.horizon.HorizonConfig;
 import dev.gideonwhite1029.horizon.HorizonLogger;
+import dev.gideonwhite1029.horizon.protocol.core.Context;
 import dev.gideonwhite1029.horizon.protocol.core.HorizonProtocol;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolHandler;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
@@ -15,8 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-@HorizonProtocol(namespace = {"xaerominimap", "xaeroworldmap", "journeymap"})
-public class MinimapsProtocol {
+@HorizonProtocol.Register(namespace = "xaerominimap, xaeroworldmap, journeymap")
+public class MinimapsProtocol implements HorizonProtocol {
 
     private static final HorizonLogger LOGGER = HorizonLogger.LOGGER;
 
@@ -26,6 +27,7 @@ public class MinimapsProtocol {
 
     private static final ResourceLocation XAERO_MINIMAP_KEY = idXaeroMini("main");
     private static final ResourceLocation XAERO_WORLDMAP_KEY = idXaeroWorld("main");
+    private static final ResourceLocation JOURNEYMAP_PERM_REQ = idJourneyMap("perm_req");
 
     private static final String KICK_MESSAGE = HorizonConfig.blockMinimapsMessage;
 
@@ -64,35 +66,86 @@ public class MinimapsProtocol {
         PLAYERS_WITH_MINIMAPS.remove(player.getScoreboardName());
     }
 
-    @ProtocolHandler.MinecraftRegister(channelId = {"main"})
-    public static void onXaeroMinimapRegister(ServerPlayer player, String channelId) {
-        LOGGER.info("Player " + player.getScoreboardName() + " has Xaero's Minimap/Worldmap installed");
-        PLAYERS_WITH_MINIMAPS.put(player.getScoreboardName(), "Xaero's Map");
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_MINI + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
+    public static void onXaeroMinimapRegisterConfig(Context context, ResourceLocation channelId) {
+        String playerName = context.profile().getName();
+        LOGGER.info("Player " + playerName + " has Xaero's Minimap installed (config stage)");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
 
         if (HorizonConfig.blockXaeromap) {
-            player.connection.disconnect(Component.literal(KICK_MESSAGE), PlayerKickEvent.Cause.KICK_COMMAND);
-            LOGGER.info("Player " + player.getScoreboardName() + " was kicked for using Xaero's Minimap/Worldmap");
+            context.connection().disconnect(Component.literal(KICK_MESSAGE));
+            LOGGER.info("Player " + playerName + " was kicked for using Xaero's Minimap");
         }
     }
 
-    @ProtocolHandler.MinecraftRegister(channelId = {"perm_req"})
-    public static void onJourneyMapRegister(ServerPlayer player, String channelId) {
-        LOGGER.info("Player " + player.getScoreboardName() + " has JourneyMap installed");
-        PLAYERS_WITH_MINIMAPS.put(player.getScoreboardName(), "JourneyMap");
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_WORLD + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
+    public static void onXaeroWorldmapRegisterConfig(Context context, ResourceLocation channelId) {
+        String playerName = context.profile().getName();
+        LOGGER.info("Player " + playerName + " has Xaero's Worldmap installed (config stage)");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
+
+        if (HorizonConfig.blockXaeromap) {
+            context.connection().disconnect(Component.literal(KICK_MESSAGE));
+            LOGGER.info("Player " + playerName + " was kicked for using Xaero's Worldmap");
+        }
+    }
+
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_JOURNEY + ":perm_req", stage = ProtocolHandler.Stage.CONFIGURATION)
+    public static void onJourneyMapRegisterConfig(Context context, ResourceLocation channelId) {
+        String playerName = context.profile().getName();
+        LOGGER.info("Player " + playerName + " has JourneyMap installed (config stage)");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "JourneyMap");
+
+        if (HorizonConfig.blockJourneyMap) {
+            context.connection().disconnect(Component.literal(KICK_MESSAGE));
+            LOGGER.info("Player " + playerName + " was kicked for using JourneyMap");
+        }
+    }
+
+    // Обработчики для стадии GAME используют ServerPlayer
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_MINI + ":main", stage = ProtocolHandler.Stage.GAME)
+    public static void onXaeroMinimapRegister(ServerPlayer player, ResourceLocation channelId) {
+        String playerName = player.getScoreboardName();
+        LOGGER.info("Player " + playerName + " has Xaero's Minimap installed");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
+
+        if (HorizonConfig.blockXaeromap) {
+            player.connection.disconnect(Component.literal(KICK_MESSAGE), PlayerKickEvent.Cause.KICK_COMMAND);
+            LOGGER.info("Player " + playerName + " was kicked for using Xaero's Minimap");
+        }
+    }
+
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_WORLD + ":main", stage = ProtocolHandler.Stage.GAME)
+    public static void onXaeroWorldmapRegister(ServerPlayer player, ResourceLocation channelId) {
+        String playerName = player.getScoreboardName();
+        LOGGER.info("Player " + playerName + " has Xaero's Worldmap installed");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
+
+        if (HorizonConfig.blockXaeromap) {
+            player.connection.disconnect(Component.literal(KICK_MESSAGE), PlayerKickEvent.Cause.KICK_COMMAND);
+            LOGGER.info("Player " + playerName + " was kicked for using Xaero's Worldmap");
+        }
+    }
+
+    @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_JOURNEY + ":perm_req", stage = ProtocolHandler.Stage.GAME)
+    public static void onJourneyMapRegister(ServerPlayer player, ResourceLocation channelId) {
+        String playerName = player.getScoreboardName();
+        LOGGER.info("Player " + playerName + " has JourneyMap installed");
+        PLAYERS_WITH_MINIMAPS.put(playerName, "JourneyMap");
 
         if (HorizonConfig.blockJourneyMap) {
             player.connection.disconnect(Component.literal(KICK_MESSAGE), PlayerKickEvent.Cause.KICK_COMMAND);
-            LOGGER.info("Player " + player.getScoreboardName() + " was kicked for using JourneyMap");
+            LOGGER.info("Player " + playerName + " was kicked for using JourneyMap");
         }
     }
 
     public static void sendXaeroServerInfo(@NotNull ServerPlayer player) {
         if (HorizonConfig.xaeroMapEnable && !HorizonConfig.blockXaeromap) {
-            ProtocolUtils.sendPayloadPacket(player, XAERO_MINIMAP_KEY, buf -> {
+            ProtocolUtils.sendBytebufPacket(player, XAERO_MINIMAP_KEY, buf -> {
                 buf.writeByte(0);
                 buf.writeInt(HorizonConfig.xaeroMapServerID);
             });
-            ProtocolUtils.sendPayloadPacket(player, XAERO_WORLDMAP_KEY, buf -> {
+            ProtocolUtils.sendBytebufPacket(player, XAERO_WORLDMAP_KEY, buf -> {
                 buf.writeByte(0);
                 buf.writeInt(HorizonConfig.xaeroMapServerID);
             });
@@ -106,5 +159,10 @@ public class MinimapsProtocol {
 
     public static String getMinimapType(ServerPlayer player) {
         return PLAYERS_WITH_MINIMAPS.get(player.getScoreboardName());
+    }
+
+    @Override
+    public boolean isActive() {
+        return HorizonConfig.xaeroMapEnable;
     }
 }

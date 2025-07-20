@@ -70,22 +70,6 @@ public abstract class Display {
         this.id = id;
     }
 
-    public List<EntryIngredient> getInputEntries() {
-        return inputs;
-    }
-
-    public List<EntryIngredient> getOutputEntries() {
-        return outputs;
-    }
-
-    public ResourceLocation getDisplayLocation() {
-        return id;
-    }
-
-    public Optional<ResourceLocation> getOptionalLocation() {
-        return Optional.ofNullable(id);
-    }
-
     @SuppressWarnings("unchecked")
     public static StreamCodec<RegistryFriendlyByteBuf, Display> dispatchCodec() {
         return new StreamCodec<>() {
@@ -102,10 +86,6 @@ public abstract class Display {
             }
         };
     }
-
-    public abstract ResourceLocation getSerializerId();
-
-    public abstract StreamCodec<RegistryFriendlyByteBuf, ? extends Display> streamCodec();
 
     public static Collection<Display> ofTransmuteRecipe(@NotNull RecipeHolder<TransmuteRecipe> recipeHolder) {
         TransmuteRecipe recipe = recipeHolder.value();
@@ -131,25 +111,27 @@ public abstract class Display {
         Set<ResourceLocation> registeredPotions = new HashSet<>();
         List<Display> displays = new ArrayList<>();
         MinecraftServer.getServer().registryAccess().lookup(Registries.POTION).stream()
-                .flatMap(Registry::listElements)
-                .map(reference -> PotionContents.createItemStack(Items.LINGERING_POTION, reference))
-                .forEach(itemStack -> {
-                    PotionContents potion = itemStack.get(DataComponents.POTION_CONTENTS);
-                    if (potion == null || potion.potion().isEmpty()) {
-                        return;
+            .flatMap(Registry::listElements)
+            .map(reference -> PotionContents.createItemStack(Items.LINGERING_POTION, reference))
+            .forEach(itemStack -> {
+                PotionContents potion = itemStack.get(DataComponents.POTION_CONTENTS);
+                if (potion == null || potion.potion().isEmpty()) {
+                    return;
+                }
+                if (potion.potion().get().unwrapKey().isPresent() && registeredPotions.add(potion.potion().get().unwrapKey().get().location())) {
+                    List<EntryIngredient> input = new ArrayList<>();
+                    for (int i = 0; i < 4; i++) {
+                        input.add(arrowIngredient);
                     }
-                    if (potion.potion().get().unwrapKey().isPresent() && registeredPotions.add(potion.potion().get().unwrapKey().get().location())) {
-                        List<EntryIngredient> input = new ArrayList<>();
-                        for (int i = 0; i < 4; i++)
-                            input.add(arrowIngredient);
-                        input.add(EntryIngredient.of(itemStack));
-                        for (int i = 0; i < 4; i++)
-                            input.add(arrowIngredient);
-                        ItemStack outputStack = new ItemStack(Items.TIPPED_ARROW, 8);
-                        outputStack.set(DataComponents.POTION_CONTENTS, potion);
-                        displays.add(new CustomDisplay(input, List.of(EntryIngredient.of(outputStack)), recipeHolder.id().location()));
+                    input.add(EntryIngredient.of(itemStack));
+                    for (int i = 0; i < 4; i++) {
+                        input.add(arrowIngredient);
                     }
-                });
+                    ItemStack outputStack = new ItemStack(Items.TIPPED_ARROW, 8);
+                    outputStack.set(DataComponents.POTION_CONTENTS, potion);
+                    displays.add(new CustomDisplay(input, List.of(EntryIngredient.of(outputStack)), recipeHolder.id().location()));
+                }
+            });
         return displays;
     }
 
@@ -177,10 +159,10 @@ public abstract class Display {
     @NotNull
     public static Collection<Display> ofMapCloningRecipe(@NotNull RecipeHolder<MapCloningRecipe> recipeHolder) {
         return Collections.singleton(
-                new ShapelessDisplay(
-                        List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
-                        List.of(EntryIngredient.of(new ItemStack(Items.FILLED_MAP, 2))),
-                        recipeHolder.id().location())
+            new ShapelessDisplay(
+                List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
+                List.of(EntryIngredient.of(new ItemStack(Items.FILLED_MAP, 2))),
+                recipeHolder.id().location())
         );
     }
 
@@ -190,20 +172,21 @@ public abstract class Display {
     @NotNull
     public static SmithingDisplay ofTransforming(RecipeHolder<SmithingTransformRecipe> recipeHolder) {
         return new SmithingDisplay(
-                List.of(
-                        recipeHolder.value().templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
-                        EntryIngredient.ofIngredient(recipeHolder.value().baseIngredient()),
-                        recipeHolder.value().additionIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty())
-                ),
-                List.of(EntryIngredient.of(recipeHolder.value().getResult())),
-                SmithingDisplay.SmithingRecipeType.TRANSFORM,
-                recipeHolder.id().location()
+            List.of(
+                recipeHolder.value().templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
+                EntryIngredient.ofIngredient(recipeHolder.value().baseIngredient()),
+                recipeHolder.value().additionIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty())
+            ),
+            List.of(ofSlotDisplay(recipeHolder.value().getResult())),
+            SmithingDisplay.SmithingRecipeType.TRANSFORM,
+            recipeHolder.id().location()
         );
     }
 
     /**
      * see me.shedaniel.rei.plugin.common.displays.DefaultSmithingDisplay#fromTrimming
      */
+    @SuppressWarnings("deprecation")
     @NotNull
     public static Collection<Display> ofSmithingTrimRecipe(@NotNull RecipeHolder<SmithingTrimRecipe> recipeHolder) {
         RegistryAccess registryAccess = MinecraftServer.getServer().registryAccess();
@@ -211,13 +194,15 @@ public abstract class Display {
         List<Display> displays = new ArrayList<>();
         for (Holder<Item> additionStack : (Iterable<Holder<Item>>) recipe.additionIngredient().map(Ingredient::items).orElse(Stream.of())::iterator) {
             Holder<TrimMaterial> trimMaterial = getMaterialFromIngredient(registryAccess, additionStack).orElse(null);
-            if (trimMaterial == null) continue;
+            if (trimMaterial == null) {
+                continue;
+            }
 
             EntryIngredient baseIngredient = EntryIngredient.ofIngredient(recipe.baseIngredient());
             displays.add(new SmithingDisplay.Trimming(List.of(
-                    recipe.templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
-                    baseIngredient,
-                    EntryIngredient.ofItemHolder(additionStack)
+                recipe.templateIngredient().map(EntryIngredient::ofIngredient).orElse(EntryIngredient.empty()),
+                baseIngredient,
+                EntryIngredient.ofItemHolder(additionStack)
             ), List.of(baseIngredient), SmithingDisplay.SmithingRecipeType.TRIM, recipeHolder.id().location(), recipe.pattern()));
 
         }
@@ -248,8 +233,8 @@ public abstract class Display {
                 RegistryAccess access = MinecraftServer.getServer().registryAccess();
                 try {
                     List<ItemStack> stacks = slot.resolveForStacks(new ContextMap.Builder()
-                            .withParameter(SlotDisplayContext.REGISTRIES, access)
-                            .create(SlotDisplayContext.CONTEXT));
+                        .withParameter(SlotDisplayContext.REGISTRIES, access)
+                        .create(SlotDisplayContext.CONTEXT));
                     yield EntryIngredient.of(stacks.toArray(new ItemStack[0]));
                 } catch (Exception e) {
                     MinecraftServer.LOGGER.warn("Failed to resolve slot display: {}", slot, e);
@@ -260,7 +245,9 @@ public abstract class Display {
     }
 
     public static List<EntryIngredient> ofSlotDisplays(Collection<SlotDisplay> slots) {
-        if (slots instanceof Collection<?> collection && collection.isEmpty()) return Collections.emptyList();
+        if (slots instanceof Collection<?> collection && collection.isEmpty()) {
+            return Collections.emptyList();
+        }
         ImmutableList.Builder<EntryIngredient> ingredients = ImmutableList.builder();
         for (SlotDisplay slot : slots) {
             ingredients.add(ofSlotDisplay(slot));
@@ -271,11 +258,17 @@ public abstract class Display {
     public static <T extends ItemLike> EntryIngredient ofItemTag(TagKey<T> tagKey) {
         HolderGetter<T> getter = MinecraftServer.getServer().registryAccess().lookupOrThrow(tagKey.registry());
         HolderSet.Named<T> holders = getter.get(tagKey).orElse(null);
-        if (holders == null) return EntryIngredient.empty();
+        if (holders == null) {
+            return EntryIngredient.empty();
+        }
 
         int size = holders.size();
-        if (size == 0) return EntryIngredient.empty();
-        if (size == 1) return EntryIngredient.of(new ItemStack(holders.get(0).value()));
+        if (size == 0) {
+            return EntryIngredient.empty();
+        }
+        if (size == 1) {
+            return EntryIngredient.of(new ItemStack(holders.get(0).value()));
+        }
 
         List<ItemStack> stackList = new ArrayList<>();
         for (Holder<T> t : holders) {
@@ -286,4 +279,24 @@ public abstract class Display {
         }
         return EntryIngredient.of(stackList.toArray(new ItemStack[0]));
     }
+
+    public List<EntryIngredient> getInputEntries() {
+        return inputs;
+    }
+
+    public List<EntryIngredient> getOutputEntries() {
+        return outputs;
+    }
+
+    public ResourceLocation getDisplayLocation() {
+        return id;
+    }
+
+    public Optional<ResourceLocation> getOptionalLocation() {
+        return Optional.ofNullable(id);
+    }
+
+    public abstract ResourceLocation getSerializerId();
+
+    public abstract StreamCodec<RegistryFriendlyByteBuf, ? extends Display> streamCodec();
 }

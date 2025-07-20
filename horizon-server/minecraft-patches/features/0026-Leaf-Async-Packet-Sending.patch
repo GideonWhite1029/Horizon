@@ -5,7 +5,7 @@ Subject: [PATCH] Leaf: Async Packet Sending
 
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 1014ab2aeb5e496124c99c938538e88d75561cd5..3b8834801074e8011d0c5858813382801b6c38be 100644
+index 411e1284a208ca1a097cf6eaa92e1e0d2203d83d..dfb14a238bc4658a8e8a30cebcd10a5651539283 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -4,6 +4,7 @@ import com.google.common.base.Suppliers;
@@ -27,7 +27,7 @@ index 1014ab2aeb5e496124c99c938538e88d75561cd5..3b8834801074e8011d0c585881338280
  import java.util.function.Consumer;
  import java.util.function.Supplier;
  import javax.annotation.Nullable;
-@@ -128,6 +131,35 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -127,6 +130,35 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          return null;
      }
      // Paper end - add utility methods
@@ -63,7 +63,7 @@ index 1014ab2aeb5e496124c99c938538e88d75561cd5..3b8834801074e8011d0c585881338280
      // Paper start - packet limiter
      protected final Object PACKET_LIMIT_LOCK = new Object();
      protected final @Nullable io.papermc.paper.util.IntervalledCounter allPacketCounts = io.papermc.paper.configuration.GlobalConfiguration.get().packetLimiter.allPackets.isEnabled() ? new io.papermc.paper.util.IntervalledCounter(
-@@ -469,11 +501,77 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -471,11 +503,77 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
  
      private void sendPacket(Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flag) {
          this.sentPackets++;
@@ -142,7 +142,7 @@ index 1014ab2aeb5e496124c99c938538e88d75561cd5..3b8834801074e8011d0c585881338280
      }
  
      private void doSendPacket(Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flag) {
-@@ -528,15 +626,105 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
+@@ -530,15 +628,105 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
          if (!this.isConnected()) {
              return true;
          }
@@ -254,7 +254,7 @@ index 1014ab2aeb5e496124c99c938538e88d75561cd5..3b8834801074e8011d0c585881338280
  
      private boolean processQueue() {
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index d9902253c5c949d99a0a5733ba52d716a3688542..10eb35d8e2c0b6ce566f1750a8c4cb5643369f9b 100644
+index 085e341b92a7b52e8a0b615c321335335ef4de75..fc6010553f88eaa2ec523ae248f70f1127c07b7a 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -71,6 +71,7 @@ import net.minecraft.core.registries.Registries;
@@ -265,7 +265,7 @@ index d9902253c5c949d99a0a5733ba52d716a3688542..10eb35d8e2c0b6ce566f1750a8c4cb56
  import net.minecraft.network.chat.ChatDecorator;
  import net.minecraft.network.chat.ChatType;
  import net.minecraft.network.chat.Component;
-@@ -1017,6 +1018,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1018,6 +1019,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // CraftBukkit end
          if (io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper != null) io.papermc.paper.plugin.PluginInitializerManager.instance().pluginRemapper.shutdown(); // Paper - Plugin remapping
          this.getConnection().stop();

@@ -1,23 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: GideonWhite1029 <gideonwhite1029@gmail.com>
-Date: Thu, 8 May 2025 14:14:00 +0300
+Date: Sun, 20 Jul 2025 23:13:03 +0300
 Subject: [PATCH] REI Protocol
 
 
-diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index b59c1b7b42a6a4a14eef45c974d3b29cc619bb89..857b66109af1d688cb8407182acac922fcb86b48 100644
---- a/net/minecraft/server/players/PlayerList.java
-+++ b/net/minecraft/server/players/PlayerList.java
-@@ -1600,6 +1600,7 @@ public abstract class PlayerList {
-             serverPlayer.connection.send(clientboundUpdateRecipesPacket);
-             serverPlayer.getRecipeBook().sendInitialRecipeBook(serverPlayer);
-         }
-+        dev.gideonwhite1029.horizon.protocol.rei.REIServerProtocol.onRecipeReload(); // Horizon
-     }
- 
-     public boolean isAllowCommandsForAllPlayers() {
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index b95acf4c688a9113a34e9be2639536245c66c83e..e6ae962bf8fe74b84e802abb8c85765677829ce5 100644
+index d3892cc9ef3ab66a45fe3ab72e8a5ef8b904b7c0..9768e23f03e84a878b8c38997102d5f2f0f5f151 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
 @@ -162,7 +162,7 @@ public final class ItemStack implements DataComponentHolder {
@@ -25,23 +13,23 @@ index b95acf4c688a9113a34e9be2639536245c66c83e..e6ae962bf8fe74b84e802abb8c857656
      @Nullable
      private Item item;
 -    PatchedDataComponentMap components;
-+    public PatchedDataComponentMap components;
++    public PatchedDataComponentMap components; // Horizon - public
      @Nullable
      private Entity entityRepresentation;
  
 diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
-index 9bc0a9c3577d63a0ad5489bfd4c07d5006245c5f..18250002d5048769c667fbee603598fcfde81744 100644
+index 9bc0a9c3577d63a0ad5489bfd4c07d5006245c5f..0cefb53cdc0788e72e8e1650f5ca206f9422be11 100644
 --- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
 +++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
 @@ -83,6 +83,12 @@ public class SmithingTransformRecipe implements SmithingRecipe {
          );
      }
  
-+    // Horizon start
-+    public ItemStack getResult() {
-+        return this.result.apply(net.minecraft.world.item.Items.OAK_LEAVES.getDefaultInstance()); // Awful usage due to Mojang's changing in 1.21.5
++    // Horizon start - REI
++    public SlotDisplay getResult() {
++        return this.result.display();
 +    }
-+    // Horizon end
++    // Horizon end - REI
 +
      // CraftBukkit start
      @Override

@@ -227,8 +227,8 @@ public final class HorizonConfig {
     public static boolean jadeEnable = false;
 
     // REI
-    // @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
-    // public static boolean reiEnable = false;
+    @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
+    public static boolean reiEnable = false;
 
     @GlobalConfig(name = "maps-block-message", category = {"protocols"})
     public static String blockMinimapsMessage = "On the server banned these mods (Xaero's Minimap/Xaero's World Map/JourneyMap)!";
@@ -265,7 +265,7 @@ public final class HorizonConfig {
         @Override
         public String check(Boolean old, Boolean value) {
             if (value) {
-                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init();
+                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init(true);
             }
             return null;
         }

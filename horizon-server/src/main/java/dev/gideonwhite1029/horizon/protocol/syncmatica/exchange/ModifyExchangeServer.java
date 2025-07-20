@@ -1,9 +1,6 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 
-import dev.gideonwhite1029.horizon.protocol.syncmatica.PacketType;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.PlayerIdentifier;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.ServerPlacement;
-import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol;
+import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +28,7 @@ public class ModifyExchangeServer extends AbstractExchange {
     public void handle(final @NotNull ResourceLocation id, final @NotNull FriendlyByteBuf packetBuf) {
         packetBuf.readUUID();
         if (id.equals(PacketType.MODIFY_FINISH.identifier)) {
-            SyncmaticaProtocol.getCommunicationManager().receivePositionData(placement, packetBuf, getPartner());
+            CommunicationManager.receivePositionData(placement, packetBuf, getPartner());
             final PlayerIdentifier identifier = SyncmaticaProtocol.getPlayerIdentifierProvider().createOrGet(
                 getPartner()
             );
@@ -43,7 +40,7 @@ public class ModifyExchangeServer extends AbstractExchange {
 
     @Override
     public void init() {
-        if (getPlacement() == null || SyncmaticaProtocol.getCommunicationManager().getModifier(placement) != null) {
+        if (getPlacement() == null || CommunicationManager.getModifier(placement) != null) {
             close(true);
         } else {
             if (SyncmaticaProtocol.getPlayerIdentifierProvider().createOrGet(this.getPartner()).uuid.equals(placement.getOwner().uuid)) {
@@ -58,7 +55,7 @@ public class ModifyExchangeServer extends AbstractExchange {
         final FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         buf.writeUUID(placement.getId());
         getPartner().sendPacket(PacketType.MODIFY_REQUEST_ACCEPT.identifier, buf);
-        SyncmaticaProtocol.getCommunicationManager().setModifier(placement, this);
+        CommunicationManager.setModifier(placement, this);
     }
 
     @Override
@@ -74,8 +71,8 @@ public class ModifyExchangeServer extends AbstractExchange {
 
     @Override
     protected void onClose() {
-        if (SyncmaticaProtocol.getCommunicationManager().getModifier(placement) == this) {
-            SyncmaticaProtocol.getCommunicationManager().setModifier(placement, null);
+        if (CommunicationManager.getModifier(placement) == this) {
+            CommunicationManager.setModifier(placement, null);
         }
     }
 }

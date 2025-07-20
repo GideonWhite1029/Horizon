@@ -12,6 +12,7 @@ import dev.gideonwhite1029.horizon.protocol.jade.provider.*;
 import dev.gideonwhite1029.horizon.protocol.jade.provider.block.*;
 import dev.gideonwhite1029.horizon.protocol.jade.provider.entity.*;
 import dev.gideonwhite1029.horizon.protocol.jade.util.*;
+import dev.gideonwhite1029.horizon.util.NbtUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -48,27 +49,28 @@ import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.level.block.entity.TrialSpawnerBlockEntity;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.purpurmc.purpur.util.MinecraftInternalPlugin;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@HorizonProtocol(namespace = "jade")
-public class JadeProtocol {
-
-    public static PriorityStore<ResourceLocation, IJadeProvider> priorities;
-    private static List<Block> shearableBlocks = null;
+@HorizonProtocol.Register(namespace = "jade")
+public class JadeProtocol implements HorizonProtocol {
 
     public static final String PROTOCOL_ID = "jade";
-    public static final String PROTOCOL_VERSION = "7";
-
+    public static final String PROTOCOL_VERSION = "8";
     public static final HierarchyLookup<IServerDataProvider<EntityAccessor>> entityDataProviders = new HierarchyLookup<>(Entity.class);
     public static final PairHierarchyLookup<IServerDataProvider<BlockAccessor>> blockDataProviders = new PairHierarchyLookup<>(new HierarchyLookup<>(Block.class), new HierarchyLookup<>(BlockEntity.class));
     public static final WrappedHierarchyLookup<IServerExtensionProvider<ItemStack>> itemStorageProviders = WrappedHierarchyLookup.forAccessor();
     private static final Set<ServerPlayer> enabledPlayers = new HashSet<>();
+
+    public static PriorityStore<ResourceLocation, IJadeProvider> priorities;
+    private static List<Block> shearableBlocks = null;
 
     @Contract("_ -> new")
     public static ResourceLocation id(String path) {
@@ -135,12 +137,8 @@ public class JadeProtocol {
         rebuildShearableBlocks();
     }
 
-    @ProtocolHandler.PayloadReceiver(payload = ClientHandshakePayload.class, payloadId = "client_handshake")
+    @ProtocolHandler.PayloadReceiver(payload = ClientHandshakePayload.class)
     public static void clientHandshake(ServerPlayer player, ClientHandshakePayload payload) {
-        if (!HorizonConfig.jadeEnable) {
-            return;
-        }
-
         if (!payload.protocolVersion().equals(PROTOCOL_VERSION)) {
             player.sendSystemMessage(Component.literal("You are using a different version of Jade than the server. Please update Jade or report to the server operator").withColor(0xff0000));
             return;
@@ -154,13 +152,9 @@ public class JadeProtocol {
         enabledPlayers.remove(player);
     }
 
-    @ProtocolHandler.PayloadReceiver(payload = RequestEntityPayload.class, payloadId = "request_entity")
+    @ProtocolHandler.PayloadReceiver(payload = RequestEntityPayload.class)
     public static void requestEntityData(ServerPlayer player, RequestEntityPayload payload) {
-        if (!HorizonConfig.jadeEnable) {
-            return;
-        }
-
-        MinecraftServer.getServer().execute(() -> {
+        Bukkit.getGlobalRegionScheduler().run(MinecraftInternalPlugin.INSTANCE, (task) -> {
             EntityAccessor accessor = payload.data().unpack(player);
             if (accessor == null) {
                 return;
@@ -194,14 +188,9 @@ public class JadeProtocol {
         });
     }
 
-    @ProtocolHandler.PayloadReceiver(payload = RequestBlockPayload.class, payloadId = "request_block")
+    @ProtocolHandler.PayloadReceiver(payload = RequestBlockPayload.class)
     public static void requestBlockData(ServerPlayer player, RequestBlockPayload payload) {
-        if (!HorizonConfig.jadeEnable) {
-            return;
-        }
-
-        MinecraftServer server = MinecraftServer.getServer();
-        server.execute(() -> {
+        Bukkit.getGlobalRegionScheduler().run(MinecraftInternalPlugin.INSTANCE, (task) -> {
             BlockAccessor accessor = payload.data().unpack(player);
             if (accessor == null) {
                 return;
@@ -237,9 +226,7 @@ public class JadeProtocol {
                     HorizonLogger.LOGGER.warning("Error while saving data for block " + accessor.getBlockState());
                 }
             }
-            tag.putInt("x", pos.getX());
-            tag.putInt("y", pos.getY());
-            tag.putInt("z", pos.getZ());
+            NbtUtils.writeBlockPosToTag(pos, tag);
             tag.putString("BlockId", BuiltInRegistries.BLOCK.getKey(block).toString());
 
             ProtocolUtils.sendPayloadPacket(player, new ReceiveDataPayload(tag));
@@ -248,11 +235,9 @@ public class JadeProtocol {
 
     @ProtocolHandler.ReloadServer
     public static void onServerReload() {
-        if (HorizonConfig.jadeEnable) {
-            rebuildShearableBlocks();
-            for (ServerPlayer player : enabledPlayers) {
-                ProtocolUtils.sendPayloadPacket(player, new ServerHandshakePayload(Collections.emptyMap(), shearableBlocks, blockDataProviders.mappedIds(), entityDataProviders.mappedIds()));
-            }
+        rebuildShearableBlocks();
+        for (ServerPlayer player : enabledPlayers) {
+            ProtocolUtils.sendPayloadPacket(player, new ServerHandshakePayload(Collections.emptyMap(), shearableBlocks, blockDataProviders.mappedIds(), entityDataProviders.mappedIds()));
         }
     }
 
@@ -266,5 +251,10 @@ public class JadeProtocol {
             shearableBlocks = List.of();
             HorizonLogger.LOGGER.severe("Failed to collect shearable blocks");
         }
+    }
+
+    @Override
+    public boolean isActive() {
+        return HorizonConfig.jadeEnable;
     }
 }

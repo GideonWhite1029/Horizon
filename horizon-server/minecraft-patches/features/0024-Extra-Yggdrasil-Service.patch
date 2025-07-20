@@ -18,10 +18,10 @@ index 8c3151c25c172b846f0d028b5100718ada2d09d7..10166aa16fd1c5c557f03647b33d784b
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index bc3209d3cbe971af74b7856caa6300b59b0bb6bc..7cac456bcfceab9b1f70ffe49a1cf4b3a63c9d48 100644
+index b06c2c4aa77edafb374f7cf0406cf4d29c6e7f9f..eebb5916cbf2dd3b2dc388244effe607275b4d99 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -184,7 +184,7 @@ public class Main {
+@@ -185,7 +185,7 @@ public class Main {
                  file = new File(bukkitConfiguration.getString("settings.world-container", "."));
              }
              // Paper end - fix SPIGOT-5824
@@ -31,7 +31,7 @@ index bc3209d3cbe971af74b7856caa6300b59b0bb6bc..7cac456bcfceab9b1f70ffe49a1cf4b3
              String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index cd977cc4a69afc04b35d43f74e1b531ca6ba6103..d9902253c5c949d99a0a5733ba52d716a3688542 100644
+index d76f967ac8bd7571e396ed2bb5f886f9c32b3b55..085e341b92a7b52e8a0b615c321335335ef4de75 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

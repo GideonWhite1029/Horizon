@@ -1,14 +1,14 @@
 --- a/purpur-server/build.gradle.kts
 +++ b/purpur-server/build.gradle.kts
-@@ -14,6 +_,7 @@
+@@ -16,6 +_,7 @@
  }
  
  val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
 +val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/" // Horizon - Initial build
  
  dependencies {
-     mache("io.papermc:mache:1.21.6+build.1")
-@@ -34,7 +_,30 @@
+     mache("io.papermc:mache:1.21.8+build.1")
+@@ -36,7 +_,30 @@
              outputDir = rootDirectory.dir("paper-server")
          }
      }
@@ -40,7 +40,7 @@
      // Purpur end - Rebrand
  
      spigot {
-@@ -60,6 +_,7 @@
+@@ -62,6 +_,7 @@
      libraryRepositories.addAll(
          "https://repo.maven.apache.org/maven2/",
          paperMavenPublicUrl,
@@ -48,7 +48,7 @@
      )
  }
  
-@@ -123,10 +_,14 @@
+@@ -125,10 +_,14 @@
      main {
          java { srcDir("../paper-server/src/main/java") }
          resources { srcDir("../paper-server/src/main/resources") }
@@ -63,7 +63,7 @@
      }
  }
  val log4jPlugins = sourceSets.create("log4jPlugins") {
-@@ -154,7 +_,12 @@
+@@ -156,7 +_,12 @@
  }
  
  dependencies {
@@ -77,7 +77,7 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -222,6 +_,14 @@
+@@ -220,6 +_,14 @@
      implementation("me.lucko:spark-paper:1.10.133-20250413.112336-1")
  }
  
@@ -92,7 +92,7 @@
  tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
-@@ -234,14 +_,14 @@
+@@ -232,14 +_,14 @@
          val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
@@ -112,7 +112,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -358,6 +_,7 @@
+@@ -356,6 +_,7 @@
      val memoryGb = providers.gradleProperty("paper.runMemoryGb").getOrElse("2")
      minHeapSize = "${memoryGb}G"
      maxHeapSize = "${memoryGb}G"

@@ -5,7 +5,7 @@ Subject: [PATCH] Async ChunkSend
 
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-index f3bac0906d8a1c5dea7b0dee13c5cd6fdbbcae49..6b7ce530c33fc1e80675b74831ec86bdbf487d28 100644
+index bdc1200ef5317fdaf58973bf580b0a672aee800f..088e6abb3a9972f8873d760eb589e4b52754c0c6 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 @@ -17,21 +17,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskSchedule
@@ -34,7 +34,7 @@ index f3bac0906d8a1c5dea7b0dee13c5cd6fdbbcae49..6b7ce530c33fc1e80675b74831ec86bd
  import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.chunk.ChunkAccess;
-@@ -409,18 +409,90 @@ public final class RegionizedPlayerChunkLoader {
+@@ -413,18 +413,90 @@ public final class RegionizedPlayerChunkLoader {
              this.delayedTicketOps.addLast(op);
          }
  
