@@ -2,20 +2,17 @@ package dev.gideonwhite1029.horizon.replay;
 
 import com.mojang.authlib.GameProfile;
 import dev.gideonwhite1029.horizon.HorizonLogger;
-import dev.gideonwhite1029.horizon.bot.BotStatsCounter;
 import dev.gideonwhite1029.horizon.entity.CraftPhotographer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -33,13 +30,10 @@ public class ServerPhotographer extends ServerPlayer {
     private File saveFile;
     private Vec3 lastPos;
 
-    private final ServerStatsCounter stats;
-
     private ServerPhotographer(MinecraftServer server, ServerLevel world, GameProfile profile) {
         super(server, world, profile, ClientInformation.createDefault());
         this.gameMode = new ServerPhotographerGameMode(this);
         this.followPlayer = null;
-        this.stats = new BotStatsCounter(server);
         this.lastPos = this.position();
     }
 
@@ -59,7 +53,7 @@ public class ServerPhotographer extends ServerPlayer {
         photographer.createState = state;
 
         photographer.recorder.start();
-        MinecraftServer.getServer().getPlayerList().placeNewPhotographer(photographer.recorder, photographer, world, state.loc);
+        MinecraftServer.getServer().getPlayerList().placeNewPhotographer(photographer.recorder, photographer, world);
         photographer.level().chunkSource.move(photographer);
         photographer.setInvisible(true);
         photographers.add(photographer);
@@ -76,7 +70,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.tick();
         super.doTick();
 
-        if (this.server.getTickCount() % 10 == 0) {
+        if (this.getServer().getTickCount() % 10 == 0) {
             connection.resetPosition();
             this.level().chunkSource.move(this);
         }
@@ -114,12 +108,6 @@ public class ServerPhotographer extends ServerPlayer {
     public void setHealth(float health) {
     }
 
-    @NotNull
-    @Override
-    public ServerStatsCounter getStats() {
-        return stats;
-    }
-
     public void remove(boolean async) {
         this.remove(async, true);
     }
@@ -128,7 +116,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.remove(RemovalReason.KILLED);
         photographers.remove(this);
         this.recorder.stop();
-        this.server.getPlayerList().removePhotographer(this);
+        this.getServer().getPlayerList().removePhotographer(this);
 
         HorizonLogger.LOGGER.info("Photographer " + createState.id + " removed");
 

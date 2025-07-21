@@ -17,10 +17,10 @@ index 5608a17c73f21679322131f138ba22ce9e0b22b4..c568e01b7bd39e1555ece6980055117a
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index f06857a0d2ebbb46847394fb119f21ba4ae4036d..8708f8c337c6889331e5b40a46cebda058b9f0f9 100644
+index 7effaefc793294a413ead15d1a648b33dbabaf18..bf4ac3a40338077673c4385e13c2b0967dcda7c1 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -887,11 +887,11 @@ public abstract class PlayerList {
+@@ -895,11 +895,11 @@ public abstract class PlayerList {
          byte b = (byte)(keepInventory ? 1 : 0);
          ServerLevel serverLevel = serverPlayer.level();
          LevelData levelData = serverLevel.getLevelData();
@@ -34,7 +34,7 @@ index f06857a0d2ebbb46847394fb119f21ba4ae4036d..8708f8c337c6889331e5b40a46cebda0
          serverPlayer.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
          serverPlayer.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
          serverPlayer.connection
-@@ -978,6 +978,8 @@ public abstract class PlayerList {
+@@ -986,6 +986,8 @@ public abstract class PlayerList {
          return serverPlayer;
      }
  

@@ -53,7 +53,7 @@ index 8f6a1788b5ca396b79a638955fc6a6b3a276337f..5013d29d3b31837fe9f80566854514d4
                          ? onlinePlayerNames
                          : Iterables.concat(onlinePlayerNames, sharedSuggestionProvider.getSelectedEntities()));
 diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net/minecraft/commands/arguments/selector/EntitySelector.java
-index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f460458a863c9fafb9969213a215a140853b57e3 100644
+index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8e1fe40b1 100644
 --- a/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/net/minecraft/commands/arguments/selector/EntitySelector.java
 @@ -128,11 +128,12 @@ public class EntitySelector {
@@ -87,7 +87,7 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f460458a863c9fafb9969213a215a140
  
                  return this.sortAndLimit(vec3, list);
              }
-@@ -192,27 +194,30 @@ public class EntitySelector {
+@@ -192,27 +194,29 @@ public class EntitySelector {
          this.checkPermissions(source);
          if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -109,9 +109,9 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..f460458a863c9fafb9969213a215a140
                  int resultLimit = this.getResultLimit();
                  List<ServerPlayer> players;
                  if (this.isWorldLimited()) {
-                     players = source.getLevel().getPlayers(predicate, resultLimit);
+-                    players = source.getLevel().getPlayers(predicate, resultLimit);
 -                    players.removeIf(entityplayer3 -> !canSee(source, entityplayer3)); // Purpur - Hide hidden players from entity selector
-+                    players.removeIf(entityplayer3 -> entityplayer3 instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer || !canSee(source, entityplayer3)); // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
++                    players = source.getLevel().getPlayers((player -> !(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player)), resultLimit); // Horizon - skip photographer
                  } else {
                      players = new ObjectArrayList<>();
  
@@ -223,7 +223,7 @@ index f17f54c93d3a10dbae9e2316849667e647904777..5608a17c73f21679322131f138ba22ce
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb1263a4f44a 100644
+index 9de3c694acb727b59e6fe069b17bedbc89ede994..8162ac2c506e8c8c06e4cda89d9325acb0a45409 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -130,6 +130,7 @@ public abstract class PlayerList {
@@ -234,12 +234,12 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
  
      // CraftBukkit start
      private org.bukkit.craftbukkit.CraftServer cserver;
-@@ -148,6 +149,103 @@ public abstract class PlayerList {
+@@ -148,6 +149,110 @@ public abstract class PlayerList {
  
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
-+    // Horizon start - replay api
-+    public void placeNewPhotographer(Connection connection, dev.gideonwhite1029.horizon.replay.ServerPhotographer player, ServerLevel worldserver, org.bukkit.Location location) {
++    // Horizon start - replay mod api
++    public void placeNewPhotographer(Connection connection, dev.gideonwhite1029.horizon.replay.ServerPhotographer player, ServerLevel worldserver) {
 +        player.isRealPlayer = true; // Paper
 +        player.loginTime = System.currentTimeMillis(); // Paper
 +
@@ -262,9 +262,10 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
 +        player.getBukkitEntity().sendSupportedChannels(); // CraftBukkit
 +        playerconnection.send(new ClientboundChangeDifficultyPacket(worlddata.getDifficulty(), worlddata.isDifficultyLocked()));
 +        playerconnection.send(new ClientboundPlayerAbilitiesPacket(player.getAbilities()));
-+        playerconnection.send(new ClientboundSetHeldSlotPacket(player.getInventory().selected));
++        playerconnection.send(new ClientboundSetHeldSlotPacket(player.getInventory().getSelectedSlot()));
 +        RecipeManager craftingmanager = this.server.getRecipeManager();
 +        playerconnection.send(new ClientboundUpdateRecipesPacket(craftingmanager.getSynchronizedItemProperties(), craftingmanager.getSynchronizedStonecutterRecipes()));
++
 +        this.sendPlayerPermissionLevel(player);
 +        player.getStats().markAllDirty();
 +        player.getRecipeBook().sendInitialRecipeBook(player);
@@ -300,6 +301,12 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
 +                continue;
 +            }
 +
++            // Horizon start - skip photographer
++            if (entityplayer1 instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) {
++                continue;
++            }
++            // Horizon end - skip photographer
++
 +            onlinePlayers.add(entityplayer1);
 +        }
 +        if (!onlinePlayers.isEmpty()) {
@@ -318,7 +325,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
 +        }
 +
 +        worldserver1 = player.level();
-+        java.util.Iterator<MobEffectInstance> iterator = player.getActiveEffects().iterator();
++        java.util.Iterator<net.minecraft.world.effect.MobEffectInstance> iterator = player.getActiveEffects().iterator();
 +        while (iterator.hasNext()) {
 +            MobEffectInstance mobeffect = iterator.next();
 +            playerconnection.send(new ClientboundUpdateMobEffectPacket(player.getId(), mobeffect, false));
@@ -333,34 +340,20 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
 +            );
 +        }
 +    }
-+    // Horizon end - replay api
++    // Horizon end - replay mod api
 +
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie) {
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -309,7 +407,7 @@ public abstract class PlayerList {
-             }
+@@ -310,6 +415,7 @@ public abstract class PlayerList {
  
              // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
--            this.players.add(player);
+             this.players.add(player);
 +            this.realPlayers.add(player); // Horizon - replay api
              this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
              this.playersByUUID.put(player.getUUID(), player);
              // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
-@@ -348,9 +446,9 @@ public abstract class PlayerList {
-             // CraftBukkit start - sendAll above replaced with this loop
-             ClientboundPlayerInfoUpdatePacket packet = ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player)); // Paper - Add Listing API for Player
- 
--            final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.players.size() - 1); // Paper - Use single player info update packet on join
--            for (int i = 0; i < this.players.size(); ++i) {
--                ServerPlayer entityplayer1 = (ServerPlayer) this.players.get(i);
-+            final List<ServerPlayer> onlinePlayers = Lists.newArrayListWithExpectedSize(this.realPlayers.size() - 1); // Paper - Use single player info update packet on join
-+            for (int i = 0; i < this.realPlayers.size(); ++i) {
-+                ServerPlayer entityplayer1 = (ServerPlayer) this.realPlayers.get(i);
- 
-                 if (entityplayer1.getBukkitEntity().canSee(bukkitPlayer)) {
-                     // Paper start - Add Listing API for Player
-@@ -368,6 +466,12 @@ public abstract class PlayerList {
+@@ -368,6 +474,12 @@ public abstract class PlayerList {
                      continue;
                  }
  
@@ -373,7 +366,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
                  onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
              }
              // Paper start - Use single player info update packet on join
-@@ -505,6 +609,43 @@ public abstract class PlayerList {
+@@ -505,6 +617,43 @@ public abstract class PlayerList {
          }
      }
  
@@ -417,7 +410,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -581,6 +722,7 @@ public abstract class PlayerList {
+@@ -581,6 +730,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -425,7 +418,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..4f273d9342b8064b80a308acca65fb12
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -1032,7 +1174,7 @@ public abstract class PlayerList {
+@@ -1032,7 +1182,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
      public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {

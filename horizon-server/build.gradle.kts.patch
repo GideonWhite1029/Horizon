@@ -77,7 +77,7 @@
      implementation("ca.spottedleaf:concurrentutil:0.0.3")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -220,6 +_,14 @@
+@@ -219,6 +_,14 @@
      implementation("me.lucko:spark-paper:1.10.133-20250413.112336-1")
  }
  
@@ -92,7 +92,7 @@
  tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
-@@ -232,14 +_,14 @@
+@@ -231,14 +_,14 @@
          val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",
@@ -112,7 +112,7 @@
              "Build-Number" to (build ?: ""),
              "Build-Time" to buildTime.toString(),
              "Git-Branch" to gitBranch,
-@@ -356,6 +_,7 @@
+@@ -355,6 +_,7 @@
      val memoryGb = providers.gradleProperty("paper.runMemoryGb").getOrElse("2")
      minHeapSize = "${memoryGb}G"
      maxHeapSize = "${memoryGb}G"

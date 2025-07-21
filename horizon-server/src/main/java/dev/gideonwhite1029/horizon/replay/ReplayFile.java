@@ -2,9 +2,11 @@ package dev.gideonwhite1029.horizon.replay;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.gideonwhite1029.horizon.HorizonLogger;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
 import dev.gideonwhite1029.horizon.util.UUIDSerializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.ConnectionProtocol;
@@ -36,6 +38,8 @@ import java.util.UUID;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import static dev.gideonwhite1029.horizon.replay.Recorder.saveService;
 
 public class ReplayFile {
 
@@ -75,10 +79,10 @@ public class ReplayFile {
         this.packetStream = new DataOutputStream(new DigestOutputStream(new BufferedOutputStream(new FileOutputStream(packetFile)), crc32));
 
         this.protocols = Map.of(
-            ConnectionProtocol.STATUS, StatusProtocols.CLIENTBOUND,
-            ConnectionProtocol.LOGIN, LoginProtocols.CLIENTBOUND,
-            ConnectionProtocol.CONFIGURATION, ConfigurationProtocols.CLIENTBOUND,
-            ConnectionProtocol.PLAY, GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess()))
+                ConnectionProtocol.STATUS, StatusProtocols.CLIENTBOUND,
+                ConnectionProtocol.LOGIN, LoginProtocols.CLIENTBOUND,
+                ConnectionProtocol.CONFIGURATION, ConfigurationProtocols.CLIENTBOUND,
+                ConnectionProtocol.PLAY, GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(MinecraftServer.getServer().registryAccess()))
         );
     }
 
@@ -93,8 +97,7 @@ public class ReplayFile {
         protocol.codec().encode(buf, packet);
 
         buf.readerIndex(0);
-        byte[] ret = new byte[buf.readableBytes()];
-        buf.readBytes(ret);
+        byte[] ret = ByteBufUtil.getBytes(buf);
         buf.release();
         return ret;
     }
@@ -118,9 +121,16 @@ public class ReplayFile {
 
     public void savePacket(long timestamp, Packet<?> packet, ConnectionProtocol protocol) throws Exception {
         byte[] data = getPacketBytes(packet, protocol);
-        packetStream.writeInt((int) timestamp);
-        packetStream.writeInt(data.length);
-        packetStream.write(data);
+        saveService.execute(() -> {
+            try {
+                packetStream.writeInt((int) timestamp);
+                packetStream.writeInt(data.length);
+                packetStream.write(data);
+            } catch (Exception e) {
+                HorizonLogger.LOGGER.severe("Error saving packet");
+                e.printStackTrace();
+            }
+        });
     }
 
     public synchronized void closeAndSave(File file) throws IOException {
