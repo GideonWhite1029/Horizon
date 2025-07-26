@@ -14,7 +14,7 @@ public class GlobalConfigCreator {
 
     public static void main(String[] args) {
         YamlConfiguration config = new YamlConfiguration();
-        config.options().setHeader(Collections.singletonList(HorizonConfig.CONFIG_HEADER));
+        config.options().setHeader(HorizonConfig.CONFIG_HEADER);
 
         config.set("config-version", HorizonConfig.CURRENT_CONFIG_VERSION);
 

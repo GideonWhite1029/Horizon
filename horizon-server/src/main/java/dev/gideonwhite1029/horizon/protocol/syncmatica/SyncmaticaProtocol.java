@@ -1,6 +1,7 @@
 package dev.gideonwhite1029.horizon.protocol.syncmatica;
 
 import dev.gideonwhite1029.horizon.HorizonConfig;
+import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -8,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -84,7 +84,7 @@ public class SyncmaticaProtocol {
     public static String sanitizeFileName(final @NotNull String badFileName) {
         String input = badFileName;
         try {
-            input = Paths.get(input).getFileName().toString();
+            input = FilenameUtils.getName(input);
         } catch (Exception ignored) {
         }
         final StringBuilder sanitized = new StringBuilder();

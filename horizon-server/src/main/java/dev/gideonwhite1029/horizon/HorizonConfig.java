@@ -16,17 +16,20 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 
 public final class HorizonConfig {
-    public static final String CONFIG_HEADER = "This is the main configuration file for Horizon.\n"
-            + "# \n"
-            + "# Created by GideonWhite1029\n"
-            + "# Boosty: https://boosty.to/gideonwhite1029\n";
-    public static final int CURRENT_CONFIG_VERSION = 5;
+    public static final List<String> CONFIG_HEADER = List.of(
+            "This is the main configuration file for Horizon.",
+            "",
+            "Created by GideonWhite1029",
+            "Boosty: https://boosty.to/gideonwhite1029"
+    );
+    public static final int CURRENT_CONFIG_VERSION = 6;
 
     private static File configFile;
     public static YamlConfiguration config;
@@ -36,7 +39,7 @@ public final class HorizonConfig {
     public static void init(final File file) {
         HorizonConfig.configFile = file;
         config = new YamlConfiguration();
-        config.options().setHeader(Collections.singletonList(CONFIG_HEADER));
+        config.options().setHeader(CONFIG_HEADER);
         config.options().copyDefaults(true);
 
         if (!file.exists()) {
