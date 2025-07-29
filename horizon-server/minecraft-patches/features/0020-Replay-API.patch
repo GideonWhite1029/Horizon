@@ -122,7 +122,7 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 599684d87c7f9bcf995e6974580916a2bacc25e7..d76f967ac8bd7571e396ed2bb5f886f9c32b3b55 100644
+index 96e5ff17234512843943e4c2e633e9ac0f8090ec..a2d400e80e67016c2195f91f5e21c02300a0f71b 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1671,7 +1671,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -208,7 +208,7 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index f17f54c93d3a10dbae9e2316849667e647904777..5608a17c73f21679322131f138ba22ce9e0b22b4 100644
+index 577bb59afb4e059523e68af6c3515d64f0b9e559..874338d80ff3dbf8a6a7bb2ec0d25a41672a6aa9 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -218,8 +218,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
@@ -223,7 +223,7 @@ index f17f54c93d3a10dbae9e2316849667e647904777..5608a17c73f21679322131f138ba22ce
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 9de3c694acb727b59e6fe069b17bedbc89ede994..8162ac2c506e8c8c06e4cda89d9325acb0a45409 100644
+index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650f1e25d2f 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -130,6 +130,7 @@ public abstract class PlayerList {
@@ -410,7 +410,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..8162ac2c506e8c8c06e4cda89d9325ac
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -581,6 +730,7 @@ public abstract class PlayerList {
+@@ -579,6 +728,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -418,7 +418,7 @@ index 9de3c694acb727b59e6fe069b17bedbc89ede994..8162ac2c506e8c8c06e4cda89d9325ac
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -1032,7 +1182,7 @@ public abstract class PlayerList {
+@@ -1030,7 +1180,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
      public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {

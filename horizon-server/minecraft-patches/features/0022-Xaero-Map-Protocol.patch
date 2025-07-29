@@ -5,10 +5,10 @@ Subject: [PATCH] Xaero Map Protocol
 
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 8162ac2c506e8c8c06e4cda89d9325acb0a45409..7effaefc793294a413ead15d1a648b33dbabaf18 100644
+index 7edc854687bcdbd5ad34d2e582063650f1e25d2f..ebe161898c30677e9746f8e9ba5699219b300f14 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1296,6 +1296,7 @@ public abstract class PlayerList {
+@@ -1294,6 +1294,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
          player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
