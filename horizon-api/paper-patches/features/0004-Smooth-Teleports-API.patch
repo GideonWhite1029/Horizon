@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 1 May 2025 12:12:08 +0300
 Subject: [PATCH] Smooth Teleports API
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
 index 18ab7ed5819510f6ee6de380cdbb0cff2493f58f..9d25e1a7cca6fb481508fddc4e4ca7b0ca3928db 100644

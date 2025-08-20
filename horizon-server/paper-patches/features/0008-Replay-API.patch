@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 5 Feb 2025 21:33:35 +0300
 Subject: [PATCH] Replay API
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java b/src/main/java/io/papermc/paper/plugin/manager/PaperEventManager.java
 index 7ce9ebba8ce304d1f3f21d4f15ee5f3560d7700b..2eb029ef329a0d592e0ff34bb2cc13b29e69df7f 100644

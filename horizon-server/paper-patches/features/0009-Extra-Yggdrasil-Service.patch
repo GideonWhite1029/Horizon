@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 27 Feb 2025 16:19:47 +0300
 Subject: [PATCH] Extra Yggdrasil Service
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/com/destroystokyo/paper/profile/PaperAuthenticationService.java b/src/main/java/com/destroystokyo/paper/profile/PaperAuthenticationService.java
 index 48e774677edf17d4a99ae9ed23d1b371dab41abb..76fc8da34604b39f22cfc68b2d89c7e60943ff44 100644

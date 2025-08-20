@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 15:25:42 +0300
 Subject: [PATCH] Copper Bulb 1 gt delay
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraft/world/level/block/CopperBulbBlock.java
 index 25caeb117d9a49fa00f46ec895a35dee8242aacd..92b92300dbd4e0266e60c871c3ae20d732d4f8ff 100644

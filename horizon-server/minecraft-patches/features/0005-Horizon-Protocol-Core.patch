@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 14:43:13 +0300
 Subject: [PATCH] Horizon Protocol Core
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..3010983ea5f001984d2d3f8d847603162654c516 100644

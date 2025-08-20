@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 6 Mar 2025 18:03:51 +0300
 Subject: [PATCH] Async ChunkSend
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 index bdc1200ef5317fdaf58973bf580b0a672aee800f..088e6abb3a9972f8873d760eb589e4b52754c0c6 100644

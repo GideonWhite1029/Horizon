@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 5 Feb 2025 21:34:20 +0300
 Subject: [PATCH] Replay API
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/commands/CommandSourceStack.java
 index 51caf352e77df49fc04bf84f1fab29b6f4f4fc14..4fa10b43e21ca2fb6f20cc5a2a6adc94a86090bd 100644

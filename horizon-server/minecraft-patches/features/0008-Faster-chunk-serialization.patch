@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 16:06:44 +0300
 Subject: [PATCH] Faster chunk serialization
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/util/BitStorage.java b/net/minecraft/util/BitStorage.java
 index 02502d50f0255f5bbcc0ecb965abb48cc1a112da..b86f3d05e287b2d4c27f3a907fd07a05014f3ac6 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 17 Apr 2025 20:00:51 +0300
 Subject: [PATCH] Return Old Behavior Minecraft
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/protocol/PacketUtils.java b/net/minecraft/network/protocol/PacketUtils.java
 index 4535858701b2bb232b9d2feb2af6551526232ddc..b175f366568c505bd86f9830f1261831bdfa4893 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 21 Jan 2025 14:47:40 +0300
 Subject: [PATCH] Elytra aeronautics no chunk load
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
 index eb352aa4296abc3ed4cf31c590bc0be66daf4de3..9cbbee33ec05cffe0931d53187adbbae3d458dd5 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 23:20:26 +0300
 Subject: [PATCH] Secure Seed Command
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/commands/SeedCommand.java b/net/minecraft/server/commands/SeedCommand.java
 index 7c1e18d8362be5ae885c32b05e98b9ef45942d93..550abfcb3aacf4d456dc390d2f49bfe173289281 100644

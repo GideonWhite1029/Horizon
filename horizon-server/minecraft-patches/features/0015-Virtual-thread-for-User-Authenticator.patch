@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 21 Jan 2025 10:34:07 +0300
 Subject: [PATCH] Virtual thread for User Authenticator
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 index 20ba45054c243fbb85e50cf0bdf75648730cb0bc..a2f432d1bb8901f34de00b1db62c30e2d3486159 100644

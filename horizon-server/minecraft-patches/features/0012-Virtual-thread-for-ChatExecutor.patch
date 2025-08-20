@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 21:51:21 +0300
 Subject: [PATCH] Virtual thread for ChatExecutor
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
 index 4dadfb7828ed25ca5f07b10789cfb4d102f281be..28140a8b28acddebab571f5b52b4adb079a72af1 100644

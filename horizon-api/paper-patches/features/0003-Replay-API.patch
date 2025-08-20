@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 5 Feb 2025 20:41:40 +0300
 Subject: [PATCH] Replay API
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
 index e93a99d654e63354864c5d6c6dcab19a93877085..0fd3e17df38ebc70d5da904edf229bf9422389af 100644

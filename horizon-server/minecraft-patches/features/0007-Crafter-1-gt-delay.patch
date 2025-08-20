@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 15:30:59 +0300
 Subject: [PATCH] Crafter 1 gt delay
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/CrafterBlock.java b/net/minecraft/world/level/block/CrafterBlock.java
 index 38b03c7b02bdfc579e5e126c12de3d878e26d188..f46bd76748da51c81778a8ee468a4c858f7d1907 100644

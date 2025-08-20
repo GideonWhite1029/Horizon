@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 6 May 2025 19:05:08 +0300
 Subject: [PATCH] Jade Protocol
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 index 0da5c51c4830cf1826261f4d8877303b34c6cb87..e4578193f58417c7ef2776bb3d831ba55c553aec 100644

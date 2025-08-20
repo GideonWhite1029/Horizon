@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 26 Mar 2025 08:43:00 +0300
 Subject: [PATCH] Leaf: Async Packet Sending
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
 index 411e1284a208ca1a097cf6eaa92e1e0d2203d83d..dfb14a238bc4658a8e8a30cebcd10a5651539283 100644

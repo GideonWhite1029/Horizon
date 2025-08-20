@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 19 Jan 2025 20:52:19 +0300
 Subject: [PATCH] No Chat Reports
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/io/papermc/paper/adventure/ChatProcessor.java b/src/main/java/io/papermc/paper/adventure/ChatProcessor.java
 index 14e412ebf75b0e06ab53a1c8f9dd1be6ad1e2680..70715c578198a1039a297731b081b2a13d7d9c5e 100644

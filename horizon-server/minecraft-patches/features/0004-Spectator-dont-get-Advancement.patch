@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 14:06:09 +0300
 Subject: [PATCH] Spectator dont get Advancement
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
 index 10e5469df1800bcdfb3f8cb4045ee25a4bafc58c..72caca93f69cc6b447851f9705cc139596cac426 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Thu, 27 Feb 2025 16:19:17 +0300
 Subject: [PATCH] Extra Yggdrasil Service
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 index 8c3151c25c172b846f0d028b5100718ada2d09d7..10166aa16fd1c5c557f03647b33d784b11106bc7 100644

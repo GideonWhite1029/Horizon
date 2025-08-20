@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 20 Jul 2025 23:13:03 +0300
 Subject: [PATCH] REI Protocol
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
 index d3892cc9ef3ab66a45fe3ab72e8a5ef8b904b7c0..9768e23f03e84a878b8c38997102d5f2f0f5f151 100644

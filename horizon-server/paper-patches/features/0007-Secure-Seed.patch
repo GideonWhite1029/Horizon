@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 23:16:38 +0300
 Subject: [PATCH] Secure Seed
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 index 400e632208d133a3f49fc7f14bceb48a1026769b..2025012eb6ae3086436179a372da2864c1370c92 100644

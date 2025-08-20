@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 15:34:12 +0300
 Subject: [PATCH] Disable Packet Limit
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 index 3f5e76e4df8ff8152060449f89b522910adee834..1cb8091e9f66b6717dcc89e4d63fa181757fc17f 100644

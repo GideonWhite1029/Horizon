@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 14:59:48 +0300
 Subject: [PATCH] Virtual Thread for async scheduler
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
 index c5414ce54f2bca766472246267aba11020c39316..91929915194e18cef531c2b03265bf036801c72a 100644

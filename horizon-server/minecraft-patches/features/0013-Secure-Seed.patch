@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 23:16:16 +0300
 Subject: [PATCH] Secure Seed
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/dedicated/DedicatedServerProperties.java b/net/minecraft/server/dedicated/DedicatedServerProperties.java
 index b286dc17cda16fca3af9374d2a4a8bd137c24450..a7e085ec30b4c03d147f7d64644d1bbe5d1ea5cf 100644

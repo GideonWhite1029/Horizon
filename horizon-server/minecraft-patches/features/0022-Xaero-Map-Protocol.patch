@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 26 Feb 2025 21:33:27 +0300
 Subject: [PATCH] Xaero Map Protocol
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
 index 7edc854687bcdbd5ad34d2e582063650f1e25d2f..ebe161898c30677e9746f8e9ba5699219b300f14 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Wed, 26 Feb 2025 22:26:57 +0300
 Subject: [PATCH] Syncmatica Protocol
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 index dc89df3498e91e8ac0b72469572d2ce4c841b40a..deb2542de195618addcfbded4b3c05211936f491 100644

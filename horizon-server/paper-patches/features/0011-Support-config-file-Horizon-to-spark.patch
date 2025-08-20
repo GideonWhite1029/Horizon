@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 4 May 2025 11:03:47 +0300
 Subject: [PATCH] Support config file Horizon to spark
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/io/papermc/paper/SparksFly.java b/src/main/java/io/papermc/paper/SparksFly.java
 index 62e2d5704c348955bc8284dc2d54c933b7bcdd06..d1761b9c2bb11ac81675e621b3a634d80522627a 100644

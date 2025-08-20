@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 18 May 2025 18:29:01 +0300
 Subject: [PATCH] Vanilla Hopper
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 index 800b7e78ae989868ed0b9e060c80dcd002759412..5daf9bf6d2f26cd907094f1e616111a2ca76e899 100644

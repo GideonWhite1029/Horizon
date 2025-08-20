@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 14:43:43 +0300
 Subject: [PATCH] Horizon Protocol Core
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 index 6aa6832b65837399656bfa8f565d7a3cfd47b081..3e50d6cec8ee11d017f887a8fd34a20a64ad68d4 100644

@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Mon, 20 Jan 2025 21:23:12 +0300
 Subject: [PATCH] Disable moved wrongly threshold
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 index d8c2b2d86ba3e380cca32427fb7ceaaa012801f6..b43c0a3b6e0a6dd9c1e86aa113f69565b73134db 100644

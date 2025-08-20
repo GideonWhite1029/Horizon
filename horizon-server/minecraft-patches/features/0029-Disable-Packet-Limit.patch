@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 5 Apr 2025 21:57:12 +0300
 Subject: [PATCH] Disable Packet Limit
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
 index dfb14a238bc4658a8e8a30cebcd10a5651539283..75eb1dd83512a5976c40b474836ab6a4789a1044 100644

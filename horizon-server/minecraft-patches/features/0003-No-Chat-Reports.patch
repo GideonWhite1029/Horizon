@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 19 Jan 2025 20:52:42 +0300
 Subject: [PATCH] No Chat Reports
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/commands/arguments/ArgumentSignatures.java b/net/minecraft/commands/arguments/ArgumentSignatures.java
 index 47cb25aa9c37bd84d156288c397321009f1d9ae2..7a1f9b698ee2ae5f1819976c299d8d82e56dbc1f 100644

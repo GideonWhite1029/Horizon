@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Tue, 21 Jan 2025 23:55:14 +0300
 Subject: [PATCH] C2ME Optimization
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/levelgen/feature/OreFeature.java b/net/minecraft/world/level/levelgen/feature/OreFeature.java
 index c7b46efd4f08067e2c9c5c8b0e8b71a94a79823d..cd93f3dded63422376607a5aaab07a3355767408 100644

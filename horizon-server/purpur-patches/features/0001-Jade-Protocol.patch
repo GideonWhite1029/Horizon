@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sun, 20 Jul 2025 22:57:45 +0300
 Subject: [PATCH] Jade Protocol
 
+Original license: GPLv3
+Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java b/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java
 index 77a18f3048b18d38c5bd0129065efff27fa774fa..2193a6a9989dcbbd00d23e9d6985d638487a7d60 100644

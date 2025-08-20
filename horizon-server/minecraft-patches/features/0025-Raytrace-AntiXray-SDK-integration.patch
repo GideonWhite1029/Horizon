@@ -3,6 +3,8 @@ From: GideonWhite1029 <gideonwhite1029@gmail.com>
 Date: Sat, 22 Mar 2025 22:06:41 +0300
 Subject: [PATCH] Raytrace AntiXray SDK integration
 
+Original license: MIT
+Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
 index c4a4f08272b34f72dea4feaaeb66d153b2aab8c8..be5da5a81246b4f4abe19f7c0cf68990d6bdf5bd 100644
