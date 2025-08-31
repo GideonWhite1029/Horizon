@@ -234,12 +234,11 @@ public class Recorder extends Connection {
     }
 
     private void savePacket(Packet<?> packet, final ConnectionProtocol protocol) {
+        final long timestamp = getCurrentTimeAndUpdate();
         try {
-            final long timestamp = getCurrentTimeAndUpdate();
             replayFile.savePacket(timestamp, packet, protocol);
         } catch (Exception e) {
-            LOGGER.severe("Error saving packet");
-            e.printStackTrace();
+            LOGGER.severe("Error saving packet on thread " + Thread.currentThread() + ". Are you using some plugin that modify data asynchronously?", e);
         }
     }
 
