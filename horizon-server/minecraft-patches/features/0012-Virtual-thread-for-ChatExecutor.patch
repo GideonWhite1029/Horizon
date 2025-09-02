@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 4dadfb7828ed25ca5f07b10789cfb4d102f281be..28140a8b28acddebab571f5b52b4adb079a72af1 100644
+index 80ed2a30da37dd4d94442ad4e2c82549d4c86975..ad2da2ccbad9b7d03bdcf33b202ca24a75bf2f9e 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -2761,7 +2761,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2762,7 +2762,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
