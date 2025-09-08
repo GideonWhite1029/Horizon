@@ -45,7 +45,7 @@ jobs:
           path: "horizon-server/build/libs/*.jar"
       - name: Create Release
         if: "!contains(github.event.commits[0].message, '[release skip]')"
-        uses: ncipollo/release-action@v1.18.0
+        uses: ncipollo/release-action@v1.20.0
         with:
           tag: ${{ env.tag }}
           name: ${{ env.project_id_b }} ${{ env.mcversion }} - ${{ env.commit_id }}
