@@ -35,10 +35,10 @@ index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..3010983ea5f001984d2d3f8d84760316
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 35433626270e635963eff9dec304fe04d760dfba..4dadfb7828ed25ca5f07b10789cfb4d102f281be 100644
+index fc381020bbc2042a11b0868fbd0ada225e020ad0..80ed2a30da37dd4d94442ad4e2c82549d4c86975 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1774,6 +1774,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1775,6 +1775,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
@@ -48,7 +48,7 @@ index 35433626270e635963eff9dec304fe04d760dfba..4dadfb7828ed25ca5f07b10789cfb4d1
              this.tickables.get(i).run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index fe97a6fabaf2e9d60ef3ffc0fa964696dc9b2ffa..ff08e597a3de164e222932ac75a397a85173813a 100644
+index 62d3c8b895dbbbb22305149b06c6696c2e7762cf..f26cade2f3d870b6da5b8a3d7efd24b02778a349 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -62,6 +62,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack

@@ -22,10 +22,10 @@ index 4535858701b2bb232b9d2feb2af6551526232ddc..b175f366568c505bd86f9830f1261831
                          if (var4 instanceof ReportedException reportedException && reportedException.getCause() instanceof OutOfMemoryError) {
                              throw makeReportedException(var4, packet, processor);
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 9ad342eb46097436190742e1aa40c1d2c1c5dd04..c47f83700c574bccd6dd3ba6cc077ddeef64d5f9 100644
+index acf3394400c127e4cebe689dfb1ba138b2396703..55a353e964bfb65c7b6c87200967a71afa52e40e 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1761,6 +1761,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1762,6 +1762,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
              try {
                  serverLevel.tick(hasTimeLeft);
@@ -37,7 +37,7 @@ index 9ad342eb46097436190742e1aa40c1d2c1c5dd04..c47f83700c574bccd6dd3ba6cc077dde
                  CrashReport crashReport = CrashReport.forThrowable(var7, "Exception ticking world");
                  serverLevel.fillReportDetails(crashReport);
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 45a94e399cf728e3204258326e3836f914b77aab..962cb82ba3a99689428f5ac0cd40c4f2d24dbada 100644
+index ce6c6bafb55ee40b0c00372f6d2b5545336bacab..dff01dce44d9adfbd47abd4d7e36f888123d9ab6 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
 @@ -919,7 +919,13 @@ public abstract class Level implements LevelAccessor, UUIDLookup<Entity>, AutoCl
