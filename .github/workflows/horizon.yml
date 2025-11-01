@@ -2,7 +2,7 @@ name: Horizon CI
 
 on:
   push:
-    branches: [ "ver/1.21.8" ]
+    branches: [ "ver/1.21.10" ]
   repository_dispatch:
     types: [upstream-updated]
 
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.0.0
+          gradle-version: 9.1.0
           add-job-summary: never
           cache-read-only: false
       - name: Set up JDK

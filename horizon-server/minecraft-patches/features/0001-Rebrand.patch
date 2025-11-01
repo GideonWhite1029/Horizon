@@ -5,35 +5,38 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 9dbf05636429821b17c4269e3981a0bedbc6e6a3..24bf9707d091ce3d680252a4de187ccb033cda79 100644
+index 2c7039281854cc9b21e2badb62389522a5c1728e..e49a78a816215ae1fd01e420e8d0a62869f08dc2 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1204,15 +1204,6 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-             long tickSection = Util.getNanos();
-             long currentTime;
-             // Paper end - further improve server tick loop
--            // Paper start - Add onboarding message for initial server start
--            if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
--                LOGGER.info("*************************************************************************************");
--                LOGGER.info("This is the first time you're starting this server.");
--                LOGGER.info("It's recommended you read our 'Getting Started' documentation for guidance.");
--                LOGGER.info("View this and more helpful information here: https://docs.papermc.io/paper/next-steps");
--                LOGGER.info("*************************************************************************************");
--            }
--            // Paper end - Add onboarding message for initial server start
- 
+@@ -1299,6 +1299,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+             // Paper end
+             org.spigotmc.WatchdogThread.hasStarted = true; // Paper
+             // Paper start - Add onboarding message for initial server start
++            // Horizon start
++            /*
+             if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
+                 LOGGER.info("*************************************************************************************");
+                 LOGGER.info("This is the first time you're starting this server.");
+@@ -1307,7 +1309,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+                 LOGGER.info("*************************************************************************************");
+             }
+             // Paper end - Add onboarding message for initial server start
+-
++            */
++            // Horizon end
              // Purpur start - config for startup commands
              if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
+                 LOGGER.info("Purpur: Running startup commands specified in purpur.yml.");
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 77db68349aa73d33b86a867099c9395c96d5a02d..963de016fe0477e3aaf5f2da4ddcc7dea306bd82 100644
+index 0e6222214f4b5407705dcbdf4dcf574111bcf366..68758a5274229248a48bb5b9c67c2866d9037c0d 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-@@ -308,7 +308,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -309,7 +309,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
      // Paper start
      private static void printOversizedLog(String msg, Path file, int x, int z) {
 -        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PURPUR - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand
-+        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO HORIZON - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand // Horizon
++        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO Horizon - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand // Horizon - Rebrand
      }
  
      private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {

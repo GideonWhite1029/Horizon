@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 874338d80ff3dbf8a6a7bb2ec0d25a41672a6aa9..a3bb3bd546fbea79742a1eba25e458da31640eb3 100644
+index 066c7446ee086925bfa1c37449ed8ea3e8023111..10e68294ec8dee40f23841c9a33574f36a26881e 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -432,6 +432,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -446,6 +446,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private boolean tpsBar = false; // Purpur - Implement TPSBar
      private boolean compassBar = false; // Purpur - Add compass command
      private boolean ramBar = false; // Purpur - Implement rambar commands
@@ -19,24 +19,21 @@ index 874338d80ff3dbf8a6a7bb2ec0d25a41672a6aa9..a3bb3bd546fbea79742a1eba25e458da
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index ebe161898c30677e9746f8e9ba5699219b300f14..fe77f43584ba3a0fe18a25ebd347eb6be0a8f060 100644
+index b7ed72166165fb3db13f03b584e092af5deaea2e..3da6cc3293a18d506588996eb53c254f1855d19a 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -893,11 +893,11 @@ public abstract class PlayerList {
-         byte b = (byte)(keepInventory ? 1 : 0);
+@@ -785,8 +785,8 @@ public abstract class PlayerList {
+         byte b = keepInventory ? ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS : 0;
          ServerLevel serverLevel = serverPlayer.level();
          LevelData levelData = serverLevel.getLevelData();
 -        serverPlayer.connection.send(new ClientboundRespawnPacket(serverPlayer.createCommonSpawnInfo(serverLevel), b));
-+        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight((ServerLevel) fromWorld, level)) serverPlayer.connection.send(new ClientboundRespawnPacket(serverPlayer.createCommonSpawnInfo(serverLevel), b)); // Horizon
-         // serverPlayer.connection.teleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot());
-         serverPlayer.connection.send(new ClientboundSetChunkCacheRadiusPacket(serverLevel.spigotConfig.viewDistance)); // Spigot
-         serverPlayer.connection.send(new ClientboundSetSimulationDistancePacket(serverLevel.spigotConfig.simulationDistance)); // Spigot
--        serverPlayer.connection.teleport(org.bukkit.craftbukkit.util.CraftLocation.toBukkit(serverPlayer.position(), serverLevel.getWorld(), serverPlayer.getYRot(), serverPlayer.getXRot())); // CraftBukkit
-+        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight((ServerLevel) fromWorld, level)) serverPlayer.connection.teleport(org.bukkit.craftbukkit.util.CraftLocation.toBukkit(serverPlayer.position(), serverLevel.getWorld(), serverPlayer.getYRot(), serverPlayer.getXRot())); // CraftBukkit // Horizon
-         serverPlayer.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
+-        serverPlayer.connection.internalTeleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot()); // Paper
++        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight(serverLevel, level)) serverPlayer.connection.send(new ClientboundRespawnPacket(serverPlayer.createCommonSpawnInfo(serverLevel), b)); // Horizon
++        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight(serverLevel, level)) serverPlayer.connection.internalTeleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot()); // Paper // Horizon
+         serverPlayer.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
          serverPlayer.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
          serverPlayer.connection
-@@ -984,6 +984,8 @@ public abstract class PlayerList {
+@@ -856,6 +856,8 @@ public abstract class PlayerList {
          return serverPlayer;
      }
  

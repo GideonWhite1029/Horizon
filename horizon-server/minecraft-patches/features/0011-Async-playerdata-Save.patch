@@ -7,11 +7,11 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/storage/LevelStorageSource.java b/net/minecraft/world/level/storage/LevelStorageSource.java
-index 3b40822ea6ec9783fe3cb8eaba069a8d626d8382..a4cab1f31353e9a647c2b132727373ef887c07cd 100644
+index 85cddc7ccb9c73e2464a764d61f46f974ce255e3..14b902eed47c177b6e490ad38dbdf9917cb9cc7a 100644
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
 @@ -515,7 +515,10 @@ public class LevelStorageSource {
-             CompoundTag compoundTag = serverConfiguration.createTag(registries, hostPlayerNBT);
+             CompoundTag compoundTag = serverConfiguration.createTag(registries, singlePlayerTag);
              CompoundTag compoundTag1 = new CompoundTag();
              compoundTag1.put("Data", compoundTag);
 -            this.saveLevelData(compoundTag1);
@@ -35,10 +35,10 @@ index 3b40822ea6ec9783fe3cb8eaba069a8d626d8382..a4cab1f31353e9a647c2b132727373ef
  
          public long makeWorldBackup() throws IOException {
 diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
-index fe44d8d17d2622b3d6021c11579af85ef96737bb..4690c02b84d736d8759da1833b6a637618adecb7 100644
+index 02f72bf880e2c162e94a9ebea32890cb25738758..d40009deae9fb904cd35d1a40063197e77a876e5 100644
 --- a/net/minecraft/world/level/storage/PlayerDataStorage.java
 +++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
-@@ -33,6 +33,13 @@ public class PlayerDataStorage {
+@@ -34,6 +34,13 @@ public class PlayerDataStorage {
  
      public void save(Player player) {
          if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot

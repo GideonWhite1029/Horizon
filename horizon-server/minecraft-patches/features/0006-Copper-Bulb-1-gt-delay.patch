@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraft/world/level/block/CopperBulbBlock.java
-index 25caeb117d9a49fa00f46ec895a35dee8242aacd..92b92300dbd4e0266e60c871c3ae20d732d4f8ff 100644
+index 153af604a49d243bc64ffbbb4e11932f3dfdb373..521fc0f2ac753081a2ed8e2125c797d24ac4d762 100644
 --- a/net/minecraft/world/level/block/CopperBulbBlock.java
 +++ b/net/minecraft/world/level/block/CopperBulbBlock.java
-@@ -32,16 +32,37 @@ public class CopperBulbBlock extends Block {
+@@ -33,16 +33,37 @@ public class CopperBulbBlock extends Block {
      @Override
      protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
          if (oldState.getBlock() != state.getBlock() && level instanceof ServerLevel serverLevel) {

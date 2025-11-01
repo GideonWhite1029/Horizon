@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index dc89df3498e91e8ac0b72469572d2ce4c841b40a..deb2542de195618addcfbded4b3c05211936f491 100644
+index cb53a5df156416bd01df2181e0dec7e5400e78b6..2b97091713dc3f6ac6911616dd1177518083b502 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -324,8 +324,11 @@ public class ServerGamePacketListenerImpl
+@@ -327,8 +327,11 @@ public class ServerGamePacketListenerImpl
          this.chatMessageChain = new FutureChain(server.chatExecutor); // CraftBukkit - async chat
          this.tickEndEvent = new io.papermc.paper.event.packet.ClientTickEndEvent(player.getBukkitEntity()); // Paper - add client tick end event
          this.playerGameConnection =  new io.papermc.paper.connection.PaperPlayerGameConnection(this); // Paper

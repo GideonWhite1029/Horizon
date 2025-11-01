@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/src/main/java/com/destroystokyo/paper/Metrics.java b/src/main/java/com/destroystokyo/paper/Metrics.java
-index dc49ba7b833b0d2edc8959ebe8cbecdad720bf06..bde7f7aa98f35d4411287160bed5d541d8cb1c11 100644
+index 6194d6d8952864c71cc4017a639b818e4ecccea9..f2cd033afc919b2b430341078419f51862a25843 100644
 --- a/src/main/java/com/destroystokyo/paper/Metrics.java
 +++ b/src/main/java/com/destroystokyo/paper/Metrics.java
 @@ -593,7 +593,7 @@ public class Metrics {
@@ -109,7 +109,7 @@ index bc7e4e5560708fea89c584b1d8b471f4966f311a..95fe0f46afd5b83ca4980dd19f9ccdb6
                  .completer(new ConsoleCommandCompleter(this.server))
                  .option(LineReader.Option.COMPLETE_IN_WORD, true);
 diff --git a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
-index b678ca41f7fb1f4aa10c012fb2b432f5e65b2a91..deed6a7f7b8e4415331ed8b36313bbf11c98d467 100644
+index 1b0ee48e28aaa68ddb1f28c23d3c5f5f40505c98..deed6a7f7b8e4415331ed8b36313bbf11c98d467 100644
 --- a/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 +++ b/src/main/java/io/papermc/paper/ServerBuildInfoImpl.java
 @@ -32,6 +32,7 @@ public record ServerBuildInfoImpl(
@@ -136,13 +136,13 @@ index b678ca41f7fb1f4aa10c012fb2b432f5e65b2a91..deed6a7f7b8e4415331ed8b36313bbf1
  
      @Override
      public boolean isBrandCompatible(final @NotNull Key brandId) {
--        return brandId.equals(this.brandId) || brandId.equals(BRAND_PAPER_ID); // Purpur - Rebrand
+-        return brandId.equals(this.brandId) || brandId.equals(BRAND_PAPER_ID); // Purpur - Fix pufferfish issues // Purpur - Rebrand
 +        return brandId.equals(this.brandId) || brandId.equals(BRAND_HORIZON_ID); // Purpur - Fix pufferfish issues // Purpur - Rebrand // Horizon
      }
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
-index 2e7c3d4befeb6256ce81ecaa9ed4e8fbcb21651e..c59f196d7a517ccb46b0536d932c2b5aa013772e 100644
+index 554fc2c53b5028c8f89a0ae69a75e075ba4f4435..31cbfd695f40a70bb5e7cf41a4796b0f2da41fa5 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftScheduler.java
 @@ -491,7 +491,7 @@ public class CraftScheduler implements BukkitScheduler {
@@ -169,7 +169,7 @@ index e34ceaa77c7e538c8d6bc341c4c6f450488ce426..80d33095c18524f47a591b9fd4bcfcd3
  
          if (stream != null) {
 diff --git a/src/main/java/org/spigotmc/WatchdogThread.java b/src/main/java/org/spigotmc/WatchdogThread.java
-index 39493810336442e74c0fc99fdeb5e073a8f4e95e..1be6a8db8c6938f4a6df3e886a741a46a965440c 100644
+index bf0cda94d87e46149a21505fc67ddb9ad9af0838..756bdaf59a2e5f755b9b03fdf2afa0d581026d8b 100644
 --- a/src/main/java/org/spigotmc/WatchdogThread.java
 +++ b/src/main/java/org/spigotmc/WatchdogThread.java
 @@ -75,14 +75,14 @@ public class WatchdogThread extends ca.spottedleaf.moonrise.common.util.TickThre

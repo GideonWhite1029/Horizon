@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index c5414ce54f2bca766472246267aba11020c39316..91929915194e18cef531c2b03265bf036801c72a 100644
+index f76e89b639a502f02910de0f1a40d75a69159955..f40d3922f77e5a7aaa2ce638095f14f309478f86 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -252,7 +252,7 @@ public class Main {
@@ -20,23 +20,15 @@ index c5414ce54f2bca766472246267aba11020c39316..91929915194e18cef531c2b03265bf03
  
                  io.papermc.paper.PaperBootstrap.boot(options);
 diff --git a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
-index 0ca279fb71d39c81b1f608e0ee9ba3e498d55fa3..9fab42aea95033d685ef716679913cba3b84f7de 100644
+index 27562fd66ae9d091837cab74057706c8a6b6521c..6fb0c143f7e92c1ba10abaee6c47d9f9156483ca 100644
 --- a/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
 +++ b/src/main/java/org/bukkit/craftbukkit/scheduler/CraftAsyncScheduler.java
-@@ -25,6 +25,7 @@ package org.bukkit.craftbukkit.scheduler;
- 
- import com.destroystokyo.paper.ServerSchedulerReportingWrapper;
- import com.google.common.util.concurrent.ThreadFactoryBuilder;
-+import dev.gideonwhite1029.horizon.HorizonConfig;
- import org.bukkit.plugin.Plugin;
- 
- import java.util.ArrayList;
-@@ -38,17 +39,39 @@ import java.util.concurrent.TimeUnit;
+@@ -38,17 +38,39 @@ import java.util.concurrent.TimeUnit;
  
  public class CraftAsyncScheduler extends CraftScheduler {
  
 -    private final ThreadPoolExecutor executor = new ThreadPoolExecutor(
--            4, Integer.MAX_VALUE,30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+-            4, Integer.MAX_VALUE, 30L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 -            new ThreadFactoryBuilder().setNameFormat("Craft Scheduler Thread - %1$d").build());
 +    private final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(getClass().getName()); // Horizon - Class logger
 +    private final Executor executor; // Horizon - use super class
@@ -49,7 +41,7 @@ index 0ca279fb71d39c81b1f608e0ee9ba3e498d55fa3..9fab42aea95033d685ef716679913cba
 -        executor.allowCoreThreadTimeOut(true);
 -        executor.prestartAllCoreThreads();
 +        // Horizon start - Ability to use Virtual Thread for async scheduler
-+        if (HorizonConfig.useVirtualThreadForAsyncScheduler) {
++        if (dev.gideonwhite1029.horizon.HorizonConfig.useVirtualThreadForAsyncScheduler) {
 +            executor = new ThreadPoolExecutor(
 +                    0, Integer.MAX_VALUE, 10L, TimeUnit.SECONDS, new SynchronousQueue<>(), // Use 10s for keepalive time
 +                    Thread.ofVirtual()

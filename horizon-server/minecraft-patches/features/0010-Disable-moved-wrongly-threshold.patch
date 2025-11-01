@@ -7,28 +7,28 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index d8c2b2d86ba3e380cca32427fb7ceaaa012801f6..b43c0a3b6e0a6dd9c1e86aa113f69565b73134db 100644
+index cb8d0109932116776dd3be33986d1e1ef775d121..42beb2200c45ab3ea602e67beff387ec98374404 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -607,7 +607,7 @@ public class ServerGamePacketListenerImpl
+@@ -616,7 +616,7 @@ public class ServerGamePacketListenerImpl
                      return;
                  }
                  // Paper end - Prevent moving into unloaded chunks
 -                if (d7 - d6 > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) {
 +                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && d7 - d6 > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) { // Horizon
                      // CraftBukkit end
-                     LOGGER.warn(
-                         "{} (vehicle of {}) moved too quickly! {},{},{}", rootVehicle.getName().getString(), this.player.getName().getString(), d3, d4, d5
-@@ -637,7 +637,7 @@ public class ServerGamePacketListenerImpl
+                     LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", rootVehicle.getPlainTextName(), this.player.getPlainTextName(), d3, d4, d5);
+                     this.send(ClientboundMoveVehiclePacket.fromEntity(rootVehicle));
+@@ -644,7 +644,7 @@ public class ServerGamePacketListenerImpl
                  d5 = d2 - rootVehicle.getZ();
                  d7 = d3 * d3 + d4 * d4 + d5 * d5;
                  boolean flag1 = false;
 -                if (d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot
-+                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot
++                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot // Horizon
                      flag1 = true; // Paper - diff on change, this should be moved wrongly
-                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getName().getString(), this.player.getName().getString(), Math.sqrt(d7));
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(d7));
                  }
-@@ -1544,6 +1544,9 @@ public class ServerGamePacketListenerImpl
+@@ -1550,6 +1550,9 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_INTO_UNLOADED_CHUNK,
                                                  toX, toY, toZ, toYaw, toPitch, false);
                                          if (!event.isAllowed()) {
@@ -38,13 +38,12 @@ index d8c2b2d86ba3e380cca32427fb7ceaaa012801f6..b43c0a3b6e0a6dd9c1e86aa113f69565
                                              this.internalTeleport(PositionMoveRotation.of(this.player), Collections.emptySet());
                                              return;
                                          }
-@@ -1627,7 +1630,8 @@ public class ServerGamePacketListenerImpl
+@@ -1633,7 +1636,7 @@ public class ServerGamePacketListenerImpl
                                  d5 = d2 - this.player.getZ();
                                  d7 = d3 * d3 + d4 * d4 + d5 * d5;
                                  boolean movedWrongly = false; // Paper - Add fail move event; rename
 -                                if (!this.player.isChangingDimension()
 +                                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && !this.player.isChangingDimension() // Horizon
-+                                    && !this.player.isChangingDimension()
                                      && d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold // Spigot
                                      && !this.player.isSleeping()
                                      && !this.player.isCreative()

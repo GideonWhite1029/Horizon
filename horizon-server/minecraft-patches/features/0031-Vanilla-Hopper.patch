@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 800b7e78ae989868ed0b9e060c80dcd002759412..5daf9bf6d2f26cd907094f1e616111a2ca76e899 100644
+index 28348e3881c3c8591053a01b193fb2a956f79726..3c5752776178575cecdf2f6592223fe6a06cf4b6 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-@@ -270,36 +270,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
+@@ -271,36 +271,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
          ItemStack movedItem = origItemStack;
          final int originalItemCount = origItemStack.getCount();
          final int movedItemCount = Math.min(level.spigotConfig.hopperAmount, originalItemCount);

@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 6aa6832b65837399656bfa8f565d7a3cfd47b081..3e50d6cec8ee11d017f887a8fd34a20a64ad68d4 100644
+index 8b06c17215a1c34abaa2654fcad5bdef04e5e528..43018c136ae32a036dee3cb9a40608642ae43db7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -511,6 +511,7 @@ public final class CraftServer implements Server {
+@@ -499,6 +499,7 @@ public final class CraftServer implements Server {
          this.potionBrewer = new io.papermc.paper.potion.PaperPotionBrewer(console); // Paper - custom potion mixes
          datapackManager = new io.papermc.paper.datapack.PaperDatapackManager(console.getPackRepository()); // Paper
          this.spark = new io.papermc.paper.SparksFly(this); // Paper - spark
@@ -18,7 +18,7 @@ index 6aa6832b65837399656bfa8f565d7a3cfd47b081..3e50d6cec8ee11d017f887a8fd34a20a
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1100,6 +1101,7 @@ public final class CraftServer implements Server {
+@@ -1045,6 +1046,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur - Purpur config files
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

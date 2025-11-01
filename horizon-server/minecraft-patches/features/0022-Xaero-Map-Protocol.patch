@@ -7,14 +7,14 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 7edc854687bcdbd5ad34d2e582063650f1e25d2f..ebe161898c30677e9746f8e9ba5699219b300f14 100644
+index 7d8f764e255ffce1bd2b6bd03bc44538161d88f6..b7ed72166165fb3db13f03b584e092af5deaea2e 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1294,6 +1294,7 @@ public abstract class PlayerList {
+@@ -1175,6 +1175,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
          player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
-         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getSharedSpawnPos(), level.getSharedSpawnAngle()));
+         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
 +        dev.gideonwhite1029.horizon.protocol.MinimapsProtocol.sendXaeroServerInfo(player); // Horizon
-         if (level.isRaining()) {
-             // CraftBukkit start - handle player weather
-             // player.connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
+         // Paper start
+         player.connection.send(new ClientboundSetChunkCacheRadiusPacket(level.spigotConfig.viewDistance));
+         player.connection.send(new ClientboundSetSimulationDistancePacket(level.spigotConfig.simulationDistance));

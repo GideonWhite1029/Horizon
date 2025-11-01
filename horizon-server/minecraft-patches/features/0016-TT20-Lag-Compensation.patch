@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index ad2da2ccbad9b7d03bdcf33b202ca24a75bf2f9e..ce50f67b70af73d88a0676d8d9b1c5d68217865d 100644
+index 0653cc355c286c08e6b58f7d2cdc986afad30499..f02dc7cb887c66388e69e3076e059ba57fb99f73 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1555,6 +1555,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1649,6 +1649,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.server.spark.tickStart(); // Paper - spark
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
@@ -25,10 +25,10 @@ index ad2da2ccbad9b7d03bdcf33b202ca24a75bf2f9e..ce50f67b70af73d88a0676d8d9b1c5d6
          this.tickRateManager.tick();
          this.tickChildren(hasTimeLeft);
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
-index 43cdc2f8fdfdeb1426e386e0084087779ef62754..ec3715b9af882f732eb857153de860a6bc15345d 100644
+index 4df0dad91a5beeb0443ac1849e7783c470aae3d3..bc18659fd484e6e5a12ca7ad7fd7b23043e6f5bb 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
-@@ -189,7 +189,13 @@ public abstract class LavaFluid extends FlowingFluid {
+@@ -192,7 +192,13 @@ public abstract class LavaFluid extends FlowingFluid {
  
      @Override
      public int getTickDelay(LevelReader level) {
@@ -44,7 +44,7 @@ index 43cdc2f8fdfdeb1426e386e0084087779ef62754..ec3715b9af882f732eb857153de860a6
  
      @Override
 diff --git a/net/minecraft/world/level/material/WaterFluid.java b/net/minecraft/world/level/material/WaterFluid.java
-index b248fe1d66940c05d56fc322df61c52ece72e77f..13ea2cc03ad0f474ce7fd9e693fef5a9e816a1a3 100644
+index 19505eafb8b3aa09d7f889ecb62bcc28d835b4c8..f4accf10a18801318a8a053a0a441d9d552517ab 100644
 --- a/net/minecraft/world/level/material/WaterFluid.java
 +++ b/net/minecraft/world/level/material/WaterFluid.java
 @@ -126,7 +126,13 @@ public abstract class WaterFluid extends FlowingFluid {

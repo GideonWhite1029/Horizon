@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index d3892cc9ef3ab66a45fe3ab72e8a5ef8b904b7c0..9768e23f03e84a878b8c38997102d5f2f0f5f151 100644
+index e4bcd4a3cbbc8942d52e5f3c7a4fb1572fdef91c..7e731b0328cbd44389da2bb097ef3d2a6ac5e5f9 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -162,7 +162,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -164,7 +164,7 @@ public final class ItemStack implements DataComponentHolder {
      @Deprecated
      @Nullable
      private Item item;

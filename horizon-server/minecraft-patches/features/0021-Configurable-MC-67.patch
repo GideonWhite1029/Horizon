@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index d4ce191d8ae581a5f5de6b15d3d35e40e8c882c5..5a6f03070dd341c694a212a8ecaef3e9986a74e8 100644
+index b4004136c9545309ea1a7d381a8a41772227c71f..89d8386146e43dcb64243d54b6f5ff904f3c1dac 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4228,6 +4228,7 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+@@ -4273,6 +4273,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
      }
  
      public boolean canTeleport(Level fromLevel, Level toLevel) {

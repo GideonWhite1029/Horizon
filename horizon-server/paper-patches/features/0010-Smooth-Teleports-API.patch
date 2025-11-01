@@ -7,11 +7,11 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 0c7e2bc3a27465d83cac3eb445162ebc87a30e4f..3de69b5ce14c78ce6953528f37ff8edc9d42074c 100644
+index 310fb65c91824c9e8455023f761053b11f652ca7..f55ab6837e29c36b251c3ed99ae296afa702f45b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1405,6 +1405,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
-         // Paper end - Teleportation API
+@@ -1374,6 +1374,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+         this.getHandle().lookAt(toNmsAnchor(playerAnchor), ((CraftEntity) entity).getHandle(), toNmsAnchor(entityAnchor));
      }
  
 +    // Horizon start
@@ -26,5 +26,5 @@ index 0c7e2bc3a27465d83cac3eb445162ebc87a30e4f..3de69b5ce14c78ce6953528f37ff8edc
 +    // Horizon end
 +
      @Override
-     public boolean teleport(Location location, PlayerTeleportEvent.TeleportCause cause) {
-         // Paper start - Teleport API
+     protected boolean teleport0(Location location, org.bukkit.event.player.PlayerTeleportEvent.TeleportCause cause, io.papermc.paper.entity.TeleportFlag... flags) {
+         if (this.getHandle().connection == null) {

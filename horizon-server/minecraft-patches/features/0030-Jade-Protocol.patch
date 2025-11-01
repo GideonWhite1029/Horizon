@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/entity/animal/armadillo/Armadillo.java b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-index 0da5c51c4830cf1826261f4d8877303b34c6cb87..e4578193f58417c7ef2776bb3d831ba55c553aec 100644
+index cf5e963d3ad0b5e22909a90dfe66d0a74ceff202..1ad2b942b3e9ba25c75d41b4cd21a58d43002289 100644
 --- a/net/minecraft/world/entity/animal/armadillo/Armadillo.java
 +++ b/net/minecraft/world/entity/animal/armadillo/Armadillo.java
-@@ -63,7 +63,7 @@ public class Armadillo extends Animal {
+@@ -64,7 +64,7 @@ public class Armadillo extends Animal {
      public final AnimationState rollOutAnimationState = new AnimationState();
      public final AnimationState rollUpAnimationState = new AnimationState();
      public final AnimationState peekAnimationState = new AnimationState();
@@ -18,12 +18,12 @@ index 0da5c51c4830cf1826261f4d8877303b34c6cb87..e4578193f58417c7ef2776bb3d831ba5
 +    public int scuteTime;
      private boolean peekReceivedClient = false;
  
-     public Armadillo(EntityType<? extends Animal> entityType, Level level) {
+     public Armadillo(EntityType<? extends Animal> type, Level level) {
 diff --git a/net/minecraft/world/entity/animal/frog/Tadpole.java b/net/minecraft/world/entity/animal/frog/Tadpole.java
-index 6932e85b3db0205f9a69d9ef965a934f100e6bcf..3bb197054f5197c0b8c4e2d4714d695255d5ecfa 100644
+index 790194e3b618f95a003ba8eb6104f765a7dfddaa..13b44b9560d46b351c4751aab189cc01c61d768d 100644
 --- a/net/minecraft/world/entity/animal/frog/Tadpole.java
 +++ b/net/minecraft/world/entity/animal/frog/Tadpole.java
-@@ -292,7 +292,7 @@ public class Tadpole extends AbstractFish {
+@@ -285,7 +285,7 @@ public class Tadpole extends AbstractFish {
          }
      }
  

@@ -7,21 +7,21 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/commands/CommandSourceStack.java
-index 51caf352e77df49fc04bf84f1fab29b6f4f4fc14..4fa10b43e21ca2fb6f20cc5a2a6adc94a86090bd 100644
+index d3d967cd922a6e5129546cad9d8fa5565960f6a5..d0ad46b5761934f2bf313ebb0211207ca5e0b3ae 100644
 --- a/net/minecraft/commands/CommandSourceStack.java
 +++ b/net/minecraft/commands/CommandSourceStack.java
 @@ -617,9 +617,16 @@ public class CommandSourceStack implements ExecutionCommandSource<CommandSourceS
  
      @Override
      public Collection<String> getOnlinePlayerNames() {
--        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
-+        return this.entity instanceof ServerPlayer sourcePlayer && !(sourcePlayer instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players // Horizon - only real player
+-        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().name()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
++        return this.entity instanceof ServerPlayer sourcePlayer && !(sourcePlayer instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().name()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players // Horizon - only real player
      }
  
 +    // Horizon start - skip photographer
 +    @Override
 +    public Collection<String> getOnlineRealPlayerNames() {
-+        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> !(serverPlayer instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().getName()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
++        return this.entity instanceof ServerPlayer sourcePlayer && !sourcePlayer.getBukkitEntity().hasPermission("paper.bypass-visibility.tab-completion") ? this.getServer().getPlayerList().getPlayers().stream().filter(serverPlayer -> !(serverPlayer instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && sourcePlayer.getBukkitEntity().canSee(serverPlayer.getBukkitEntity())).map(serverPlayer -> serverPlayer.getGameProfile().name()).toList() : Lists.newArrayList(this.server.getPlayerNames()); // Paper - Make CommandSourceStack respect hidden players
 +    }
 +    // Horizon end - skip photographer
 +
@@ -55,10 +55,10 @@ index 8f6a1788b5ca396b79a638955fc6a6b3a276337f..5013d29d3b31837fe9f80566854514d4
                          ? onlinePlayerNames
                          : Iterables.concat(onlinePlayerNames, sharedSuggestionProvider.getSelectedEntities()));
 diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net/minecraft/commands/arguments/selector/EntitySelector.java
-index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8e1fe40b1 100644
+index a65ca0b1a44f8c993fad7f230a9c0b11a474e358..554a163505868b6d5637fd6c2ed9194addd755d2 100644
 --- a/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/net/minecraft/commands/arguments/selector/EntitySelector.java
-@@ -128,11 +128,12 @@ public class EntitySelector {
+@@ -129,11 +129,12 @@ public class EntitySelector {
              return this.findPlayers(source);
          } else if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -72,7 +72,7 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
                      if (entity.getType().isEnabled(source.enabledFeatures())) {
                          return List.of(entity);
                      }
-@@ -146,7 +147,7 @@ public class EntitySelector {
+@@ -147,7 +148,7 @@ public class EntitySelector {
              AABB absoluteAabb = this.getAbsoluteAabb(vec3);
              if (this.currentEntity) {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, null);
@@ -81,7 +81,7 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
              } else {
                  Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, source.enabledFeatures());
                  List<Entity> list = new ObjectArrayList<>();
-@@ -157,6 +158,7 @@ public class EntitySelector {
+@@ -158,6 +159,7 @@ public class EntitySelector {
                          this.addEntities(list, serverLevel1, absoluteAabb, predicate);
                      }
                  }
@@ -89,7 +89,7 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
  
                  return this.sortAndLimit(vec3, list);
              }
-@@ -192,27 +194,29 @@ public class EntitySelector {
+@@ -193,27 +195,28 @@ public class EntitySelector {
          this.checkPermissions(source);
          if (this.playerName != null) {
              ServerPlayer playerByName = source.getServer().getPlayerList().getPlayerByName(this.playerName);
@@ -105,7 +105,6 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
              Predicate<Entity> predicate = this.getPredicate(vec3, absoluteAabb, null);
              if (this.currentEntity) {
 -                return source.getEntity() instanceof ServerPlayer serverPlayer && predicate.test(serverPlayer) && canSee(source, serverPlayer) ? List.of(serverPlayer) : List.of(); // Purpur - Hide hidden players from entity selector
-+                // return source.getEntity() instanceof ServerPlayer serverPlayer && predicate.test(serverPlayer) && canSee(source, serverPlayer) ? List.of(serverPlayer) : List.of(); // Purpur - Hide hidden players from entity selector
 +                return source.getEntity() instanceof ServerPlayer serverPlayer && predicate.test(serverPlayer) && !(serverPlayer instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && canSee(source, serverPlayer) ? List.of(serverPlayer) : List.of(); // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
              } else {
                  int resultLimit = this.getResultLimit();
@@ -124,10 +123,10 @@ index b305ba9bab617bf4e52d0e6ddf160bacc5751a94..d5605cc157ec0aaf9fa3da94de7de2e8
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index ce50f67b70af73d88a0676d8d9b1c5d68217865d..e50ced5cbe22e8bb7f1c68e3515e1cf29377cc2f 100644
+index f02dc7cb887c66388e69e3076e059ba57fb99f73..db7519b81330212fa1a5a7552568925e49caf5ff 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1672,7 +1672,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1760,7 +1760,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -153,7 +152,7 @@ index 72caca93f69cc6b447851f9705cc139596cac426..31e752cf0cd5049c25dbcac6b5e98711
          if (HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
              return false;
 diff --git a/net/minecraft/server/commands/OpCommand.java b/net/minecraft/server/commands/OpCommand.java
-index f2286b96b8f40b4588f817913c42ae7b4a92340f..684e77adad8ecb1ac4d6c3ee79d55d162485c17e 100644
+index 4c7bccc00b9e84c4744f6cdc2c2e574a33ffe324..9ad75db43e0cf12a333ec56e608639bd10083905 100644
 --- a/net/minecraft/server/commands/OpCommand.java
 +++ b/net/minecraft/server/commands/OpCommand.java
 @@ -25,7 +25,7 @@ public class OpCommand {
@@ -161,15 +160,15 @@ index f2286b96b8f40b4588f817913c42ae7b4a92340f..684e77adad8ecb1ac4d6c3ee79d55d16
                                  PlayerList playerList = commandContext.getSource().getServer().getPlayerList();
                                  return SharedSuggestionProvider.suggest(
 -                                    playerList.getPlayers()
-+                                    playerList.realPlayers // Horizon - skip
++                                        playerList.realPlayers // Horizon - skip
                                          .stream()
-                                         .filter(serverPlayer -> !playerList.isOp(serverPlayer.getGameProfile()))
-                                         .map(serverPlayer -> serverPlayer.getGameProfile().getName()),
+                                         .filter(serverPlayer -> !playerList.isOp(serverPlayer.nameAndId()))
+                                         .map(serverPlayer -> serverPlayer.getGameProfile().name()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892215c90a6 100644
+index 91916a9f781fbf2d6b0d2b1eea0590c8785008d3..a2f09abdb68c54717e45e0a3b330e06815d0a68f 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -217,6 +217,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -225,6 +225,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
      public boolean hasEntityMoveEvent; // Paper - Add EntityMoveEvent
      private final alternate.current.wire.WireHandler wireHandler = new alternate.current.wire.WireHandler(this); // Paper - optimize redstone (Alternate Current)
      public boolean hasRidableMoveEvent = false; // Purpur - Ridables
@@ -177,7 +176,7 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
  
      @Override
      public @Nullable LevelChunk getChunkIfLoaded(int x, int z) {
-@@ -697,6 +698,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -721,6 +722,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
          this.preciseTime = this.serverLevelData.getDayTime(); // Purpur - Configurable daylight cycle
@@ -185,7 +184,7 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
      }
  
      // Paper start
-@@ -2758,6 +2760,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2825,6 +2827,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              // ServerLevel.this.getChunkSource().addEntity(entity); // Paper - ignore and warn about illegal addEntity calls instead of crashing server; moved down below valid=true
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.add(serverPlayer);
@@ -197,7 +196,7 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
                  if (serverPlayer.isReceivingWaypoints()) {
                      ServerLevel.this.getWaypointManager().addPlayer(serverPlayer);
                  }
-@@ -2836,6 +2843,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2903,6 +2910,11 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
              ServerLevel.this.getChunkSource().removeEntity(entity);
              if (entity instanceof ServerPlayer serverPlayer) {
                  ServerLevel.this.players.remove(serverPlayer);
@@ -210,10 +209,10 @@ index 8812fc6c3aa04f6df75fa29abc2398ee944258e2..cececce5fbfc1643a262592af0a6d892
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 577bb59afb4e059523e68af6c3515d64f0b9e559..874338d80ff3dbf8a6a7bb2ec0d25a41672a6aa9 100644
+index eb234fa15325d865ccd7c91026f83911a2c422d5..066c7446ee086925bfa1c37449ed8ea3e8023111 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -218,8 +218,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -227,8 +227,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private static final boolean DEFAULT_SEEN_CREDITS = false;
      private static final boolean DEFAULT_SPAWN_EXTRA_PARTICLES_ON_FALL = false;
      public ServerGamePacketListenerImpl connection;
@@ -224,19 +223,28 @@ index 577bb59afb4e059523e68af6c3515d64f0b9e559..874338d80ff3dbf8a6a7bb2ec0d25a41
      private final PlayerAdvancements advancements;
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
+@@ -525,7 +525,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+         // Paper start - Expand PlayerGameModeChangeEvent
+         this.loadGameTypes(input);
+     }
+-    private void loadGameTypes(ValueInput input) {
++    public void loadGameTypes(ValueInput input) {
+         if (this.server.getForcedGameType() != null && this.server.getForcedGameType() != readPlayerMode(input, "playerGameType")) {
+             if (new org.bukkit.event.player.PlayerGameModeChangeEvent(this.getBukkitEntity(), org.bukkit.GameMode.getByValue(this.server.getDefaultGameType().getId()), org.bukkit.event.player.PlayerGameModeChangeEvent.Cause.DEFAULT_GAMEMODE, null).callEvent()) {
+                 this.gameMode.setGameModeForPlayer(this.server.getForcedGameType(), GameType.DEFAULT_MODE);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650f1e25d2f 100644
+index 1df9360949c4b65851d61520c76ae15eef081f19..7d8f764e255ffce1bd2b6bd03bc44538161d88f6 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -130,6 +130,7 @@ public abstract class PlayerList {
+@@ -126,6 +126,7 @@ public abstract class PlayerList {
+     private int simulationDistance;
      private boolean allowCommandsForAllPlayers;
-     private static final boolean ALLOW_LOGOUTIVATOR = false;
      private int sendAllPlayerInfoIn;
 +    public final List<ServerPlayer> realPlayers = new java.util.concurrent.CopyOnWriteArrayList(); // Horizon - replay api
  
      // CraftBukkit start
      private org.bukkit.craftbukkit.CraftServer cserver;
-@@ -148,6 +149,110 @@ public abstract class PlayerList {
+@@ -149,6 +150,110 @@ public abstract class PlayerList {
  
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
@@ -285,7 +293,7 @@ index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650
 +        this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
 +        this.playersByUUID.put(player.getUUID(), player);
 +
-+        player.supressTrackerForLogin = true;
++        player.suppressTrackerForLogin = true;
 +        worldserver1.addNewPlayer(player);
 +        this.server.getCustomBossEvents().onPlayerConnect(player);
 +        org.bukkit.craftbukkit.entity.CraftPlayer bukkitPlayer = player.getBukkitEntity();
@@ -316,7 +324,7 @@ index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650
 +        }
 +
 +        player.sentListPacket = true;
-+        player.supressTrackerForLogin = false;
++        player.suppressTrackerForLogin = false;
 +        ((ServerLevel) player.level()).getChunkSource().chunkMap.addEntity(player);
 +
 +        this.sendLevelInfo(player, worldserver1);
@@ -347,28 +355,28 @@ index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650
      public void placeNewPlayer(Connection connection, ServerPlayer player, CommonListenerCookie cookie) {
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -310,6 +415,7 @@ public abstract class PlayerList {
+@@ -216,6 +321,7 @@ public abstract class PlayerList {
  
-             // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
-             this.players.add(player);
-+            this.realPlayers.add(player); // Horizon - replay api
-             this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
-             this.playersByUUID.put(player.getUUID(), player);
-             // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
-@@ -368,6 +474,12 @@ public abstract class PlayerList {
-                     continue;
-                 }
- 
-+                // Horizon start - skip photographer
-+                if (entityplayer1 instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) {
-+                    continue;
-+                }
-+                // Horizon end - skip photographer
-+
-                 onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
+         // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
+         this.players.add(player);
++        this.realPlayers.add(player); // Horizon - replay api
+         this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
+         this.playersByUUID.put(player.getUUID(), player);
+         // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
+@@ -272,6 +378,12 @@ public abstract class PlayerList {
+                 continue;
              }
-             // Paper start - Use single player info update packet on join
-@@ -505,6 +617,43 @@ public abstract class PlayerList {
+ 
++            // Horizon start - skip photographer
++            if (entityplayer1 instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) {
++                continue;
++            }
++            // Horizon end - skip photographer
++
+             onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
+         }
+         // Paper start - Use single player info update packet on join
+@@ -422,6 +534,43 @@ public abstract class PlayerList {
          }
      }
  
@@ -412,7 +420,7 @@ index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650
      public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -579,6 +728,7 @@ public abstract class PlayerList {
+@@ -496,6 +645,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -420,22 +428,22 @@ index 0bdbae9bdc14b2390813fd0df4f9822c819fee54..7edc854687bcdbd5ad34d2e582063650
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -1030,7 +1180,7 @@ public abstract class PlayerList {
+@@ -911,7 +1061,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
-     public LoginResult canBypassFullServerLogin(final GameProfile profile, final LoginResult currentResult) {
--        final boolean shouldKick = this.players.size() >= this.maxPlayers && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(profile)); // Purpur - Allow player join full server by permission TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
-+        final boolean shouldKick = this.realPlayers.size() >= this.maxPlayers && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(profile)); // Purpur - Allow player join full server by permission // Horizon - only real player TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
+     public LoginResult canBypassFullServerLogin(final NameAndId nameAndId, final LoginResult currentResult) {
+-        final boolean shouldKick = this.players.size() >= this.getMaxPlayers() && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(nameAndId)); // Purpur - Allow player join full server by permission TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
++        final boolean shouldKick = this.realPlayers.size() >= this.getMaxPlayers() && !(/*player.hasPermission("purpur.joinfullserver") || */this.canBypassPlayerLimit(nameAndId)); // Purpur - Allow player join full server by permission // Horizon - Replay API TODO: this hasn't worked for a while, so comment it out until we can reliably check perms of the player joining
          final io.papermc.paper.event.player.PlayerServerFullCheckEvent fullCheckEvent = new io.papermc.paper.event.player.PlayerServerFullCheckEvent(
-             com.destroystokyo.paper.profile.CraftPlayerProfile.asBukkitMirror(profile),
+             new com.destroystokyo.paper.profile.CraftPlayerProfile(nameAndId),
              io.papermc.paper.adventure.PaperAdventure.asAdventure(currentResult.message),
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
-index a6bb436dc80daf6901dc027a6011ead4b3ed27e2..9a8d7d4c4041ec83edfe0ac450d6ee858cfdd25b 100644
+index 41e59f3739945ca7f6ab710c993b5c0f15fcd529..c8e987f9b26ce5e5859928afa8fd31d1cf49e89e 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -52,7 +52,7 @@ public class Inventory implements Container, Nameable {
-         )
+@@ -53,7 +53,7 @@ public class Inventory implements Container, Nameable {
      );
+     private static final Component DEFAULT_NAME = Component.translatable("container.inventory");
      private final NonNullList<ItemStack> items = NonNullList.withSize(36, ItemStack.EMPTY);
 -    private int selected;
 +    public int selected;

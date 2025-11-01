@@ -103,22 +103,11 @@ index 09fd99c9cbd23b5f3c899bfb00c9b89651948ed8..e19ad7e0146a62293549b5f2c2fe7f76
 +
 +    @Override public <T> void compact(Palette<T> srcPalette, Palette<T> dstPalette, short[] out) {}  // Horizon - faster chunk serialization
  }
-diff --git a/net/minecraft/world/level/chunk/PaletteResize.java b/net/minecraft/world/level/chunk/PaletteResize.java
-index c723606fa0be811e580ba47de8c9c575583cc930..885b66c7f240eb065fbe0b9f8f456b366edb3afd 100644
---- a/net/minecraft/world/level/chunk/PaletteResize.java
-+++ b/net/minecraft/world/level/chunk/PaletteResize.java
-@@ -1,5 +1,5 @@
- package net.minecraft.world.level.chunk;
- 
--interface PaletteResize<T> {
-+public interface PaletteResize<T> { // Horizon
-     int onResize(int bits, T objectAdded);
- }
 diff --git a/net/minecraft/world/level/chunk/PalettedContainer.java b/net/minecraft/world/level/chunk/PalettedContainer.java
-index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c72204de2 100644
+index 54d71bd666a946bdf6eece520e080c3f96003452..000e503b9206c390fab3bc46c8822af13a6e0eba 100644
 --- a/net/minecraft/world/level/chunk/PalettedContainer.java
 +++ b/net/minecraft/world/level/chunk/PalettedContainer.java
-@@ -3,6 +3,8 @@ package net.minecraft.world.level.chunk;
+@@ -4,6 +4,8 @@ import com.google.common.annotations.VisibleForTesting;
  import com.mojang.serialization.Codec;
  import com.mojang.serialization.DataResult;
  import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -127,7 +116,7 @@ index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c
  import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
  import it.unimi.dsi.fastutil.ints.IntArraySet;
  import it.unimi.dsi.fastutil.ints.IntSet;
-@@ -24,6 +26,21 @@ import net.minecraft.util.ThreadingDetector;
+@@ -23,6 +25,21 @@ import net.minecraft.util.ThreadingDetector;
  import net.minecraft.util.ZeroBitStorage;
  
  public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainerRO<T> {
@@ -147,15 +136,31 @@ index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c
 +    // Horizon end - faster chunk serialization
 +
      private static final int MIN_PALETTE_BITS = 0;
-     private final PaletteResize<T> dummyPaletteResize = (bits, objectAdded) -> 0;
-     public final IdMap<T> registry;
-@@ -342,29 +359,76 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+     public volatile PalettedContainer.Data<T> data; // Paper - optimise collisions - public
+     private final Strategy<T> strategy;
+@@ -337,30 +354,74 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
      @Override
-     public synchronized PalettedContainerRO.PackedData<T> pack(IdMap<T> registry, PalettedContainer.Strategy strategy) { // Paper - synchronize
+     public synchronized PalettedContainerRO.PackedData<T> pack(Strategy<T> strategy) { // Paper - synchronize
          this.acquire();
+-
+-        PalettedContainerRO.PackedData var14;
+-        try {
+-            BitStorage bitStorage = this.data.storage;
+-            Palette<T> palette = this.data.palette;
+-            HashMapPalette<T> hashMapPalette = new HashMapPalette<>(bitStorage.getBits());
+-            int entryCount = strategy.entryCount();
+-            int[] ints = reencodeContents(bitStorage, palette, hashMapPalette);
+-            Configuration configurationForPaletteSize = strategy.getConfigurationForPaletteSize(hashMapPalette.getSize());
+-            int i = configurationForPaletteSize.bitsInStorage();
+-            Optional<LongStream> optional;
+-            if (i != 0) {
+-                SimpleBitStorage simpleBitStorage = new SimpleBitStorage(i, entryCount, ints);
+-                optional = Optional.of(Arrays.stream(simpleBitStorage.getRaw()));
+-            } else {
+-                optional = Optional.empty();
 +        // Horizon start - faster chunk serialization
 +        if (!HorizonConfig.fasterChunkSerialization) {
-+            PalettedContainerRO.PackedData var12;
++            PalettedContainerRO.PackedData var14;
 +            try {
 +                HashMapPalette<T> hashMapPalette = new HashMapPalette<>(registry, this.data.storage.getBits(), this.dummyPaletteResize);
 +                int i = strategy.size();
@@ -172,37 +177,17 @@ index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c
 +                } else {
 +                    optional = Optional.empty();
 +                }
- 
--        PalettedContainerRO.PackedData var12;
--        try {
--            HashMapPalette<T> hashMapPalette = new HashMapPalette<>(registry, this.data.storage.getBits(), this.dummyPaletteResize);
--            int size = strategy.size();
--            int[] ints = new int[size];
--            this.data.storage.unpack(ints);
--            swapPalette(ints, id -> hashMapPalette.idFor(this.data.palette.valueFor(id)));
--            int i = strategy.calculateBitsForSerialization(registry, hashMapPalette.getSize());
--            Optional<LongStream> optional;
--            if (i != 0) {
--                SimpleBitStorage simpleBitStorage = new SimpleBitStorage(i, size, ints);
--                optional = Optional.of(Arrays.stream(simpleBitStorage.getRaw()));
--            } else {
--                optional = Optional.empty();
-+                var12 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional);
++                var14 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional);
 +            } finally {
 +                this.release();
              }
--
--            var12 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional);
--        } finally {
--            this.release();
-+            return var12;
++            return var14;
 +        } else {
 +            Optional<LongStream> data = Optional.empty();
 +            List<T> elements = null;
 +            try {
 +                // The palette that will be serialized
 +                LithiumHashPalette<T> hashPalette = null;
-+
 +                final Palette<T> palette = this.data.palette();
 +                final BitStorage storage = this.data.storage();
 +                if (storage instanceof ZeroBitStorage || palette.getSize() == 1) {
@@ -214,9 +199,14 @@ index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c
 +                if (elements == null) {
 +                    LithiumHashPalette<T> compactedPalette = new LithiumHashPalette<>(registry, storage.getBits(), this.dummyPaletteResize);
 +                    short[] array = this.getOrCreate(strategy.size());
-+
+ 
+-            var14 = new PalettedContainerRO.PackedData<>(hashMapPalette.getEntries(), optional, i);
+-        } finally {
+-            this.release();
+-        }
 +                    storage.compact(this.data.palette(), compactedPalette, array);
-+
+ 
+-        return var14;
 +                    // If the palette didn't change during compaction, do a simple copy of the data array
 +                    if (hashPalette != null && hashPalette.getSize() == compactedPalette.getSize() && storage.getBits() == strategy.calculateBitsForSerialization(registry, hashPalette.getSize())) { // paletteSize can de-sync from palette - see https://github.com/CaffeineMC/lithium-fabric/issues/279
 +                        data = this.asOptional(storage.getRaw().clone());
@@ -239,14 +229,12 @@ index a251ba67644cd02a0b00d7c8b0e2c64aa5e26291..98ac7c12425adf3efdd8deb76a31f38c
 +                this.release();
 +            }
 +            return new PalettedContainerRO.PackedData<>(elements, data);
-         }
--
--        return var12;
++        }
 +        // Leaves end - faster chunk serialization
      }
  
-     private static <T> void swapPalette(int[] bits, IntUnaryOperator operator) {
-@@ -404,12 +468,45 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
+     private static <T> int[] reencodeContents(BitStorage bitStorage, Palette<T> oldPalette, Palette<T> newPalette) {
+@@ -410,12 +471,45 @@ public class PalettedContainer<T> implements PaletteResize<T>, PalettedContainer
  
      @Override
      public void count(PalettedContainer.CountConsumer<T> countConsumer) {

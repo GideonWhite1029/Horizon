@@ -117,9 +117,6 @@ public final class HorizonConfig {
     @GlobalConfig(name = "async-player-data-saving", category = {"optimization"})
     public static boolean asyncPlayerDataSaving = false;
 
-    @GlobalConfig(name = "use_virtual_thread_for_chat_executor", category = {"utils"})
-    public static boolean useVirtualThreadForChatExecutor = false;
-
     @GlobalConfig(name = "secure-seed", category = {"features"})
     public static boolean secureSeed = false;
 
@@ -303,50 +300,6 @@ public final class HorizonConfig {
 
     @GlobalConfig(name = "async-chunk-send", category = {"optimization"})
     public static boolean AsyncChunkSend = false;
-
-    // Horizon start - AsyncPacketSending
-    @GlobalConfig(name = "async-packet-sending", category = {"optimization", "packet-sending"})
-    public static boolean asyncPacketSending = false;
-
-    @GlobalConfig(name = "thread-pool-size", category = {"optimization", "packet-sending"})
-    public static int threadPoolSize = 4;
-
-    @GlobalConfig(name = "queue-capacity", category = {"optimization", "packet-sending"})
-    public static int queueCapacity = 4096;
-
-    @GlobalConfig(name = "prioritize-movement-packets", category = {"optimization", "packet-sending"})
-    public static boolean prioritizeMovementPackets = true;
-
-    @GlobalConfig(name = "prioritize-chat-packets", category = {"optimization", "packet-sending"})
-    public static boolean prioritizeChatPackets = true;
-
-    @GlobalConfig(name = "spin-wait-for-ready-packets", category = {"optimization", "packet-sending"})
-    public static boolean spinWaitForReadyPackets = true;
-
-    @GlobalConfig(name = "spin-time-nanos", category = {"optimization", "packet-sending"})
-    public static long spinTimeNanos = 1000;
-
-    @GlobalConfig(name = "batch-processing", category = {"optimization", "packet-sending"})
-    public static boolean batchProcessing = true;
-
-    @GlobalConfig(name = "batch-size", category = {"optimization", "packet-sending"})
-    public static int batchSize = 128;
-    // Horizon end - AsyncPacketSending
-
-    @GlobalConfig(name = "instant-block-updater-reintroduced", category = {"old-minecraft"})
-    public static boolean instantBlockUpdaterReintroduced = false;
-
-    @GlobalConfig(name = "redstone-dont-cant-on-trapdoor", category = {"old-minecraft"})
-    public static boolean redstoneDontCantOnTrapDoor = false;
-
-    @GlobalConfig(name = "cce-update-suppression", category = {"old-minecraft"})
-    public static boolean cceUpdateSuppression = false;
-
-    @GlobalConfig(name = "update-suppression-crash-fix", category = {"old-minecraft"})
-    public static boolean updateSuppressionCrashFix = false;
-
-    @GlobalConfig(name = "old-block-entity-behaviour", category = {"old-minecraft"})
-    public static boolean oldBlockEntityBehaviour = false;
 
     @GlobalConfig(name = "sentry-dsn", category = {"features", "sentry"}, verify = SentryDsnVerify.class)
     public static String sentryDsn = "";

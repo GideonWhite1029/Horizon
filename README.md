@@ -26,7 +26,7 @@ Maven
 <dependency>
     <groupId>dev.gideonwhite1029.horizon</groupId>
     <artifactId>horizon-api</artifactId>
-    <version>1.21.8-R0.1-SNAPSHOT</version>
+    <version>1.21.10-R0.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ repositories {
 ```
 ```kotlin
 dependencies {
-    compileOnly("dev.gideonwhite1029.horizon:horizon-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("dev.gideonwhite1029.horizon:horizon-api:1.21.10-R0.1-SNAPSHOT")
 }
 ```
 
