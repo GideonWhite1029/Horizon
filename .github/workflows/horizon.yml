@@ -14,7 +14,7 @@ jobs:
     environment: default
     steps:
       - name: Checkout Git Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.ref || github.ref }}
       - name: Validate Gradle wrapper
