@@ -33,7 +33,7 @@ index 42841fdc7e64311ba9217789a3dc758a351cf674..e910b34af0f59f3d7ff29106070253c7
              String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index db7519b81330212fa1a5a7552568925e49caf5ff..0af20b5cc3a98a38106f02f90590c4f183777981 100644
+index 748b3dab801a0ca0282c64752a9293e702ce6965..cd769be7b4a454b74e6ee1b332ca83249344f1db 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -242,7 +242,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

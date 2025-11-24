@@ -50,7 +50,7 @@ public class CommunicationManager implements HorizonProtocol {
         final VersionHandshakeServer hi = new VersionHandshakeServer(newPlayer);
         playerMap.put(newPlayer, player);
         final GameProfile profile = player.getGameProfile();
-        SyncmaticaProtocol.getPlayerIdentifierProvider().updateName(profile.getId(), profile.getName());
+        SyncmaticaProtocol.getPlayerIdentifierProvider().updateName(profile.id(), profile.name());
         startExchangeUnchecked(hi);
     }
 
@@ -144,7 +144,7 @@ public class CommunicationManager implements HorizonProtocol {
             final UUID placementId = packetBuf.readUUID();
             final ServerPlacement placement = SyncmaticaProtocol.getSyncmaticManager().getPlacement(placementId);
             if (placement != null) {
-                if (!getGameProfile(source).getId().equals(placement.getOwner().uuid)) {
+                if (!getGameProfile(source).id().equals(placement.getOwner().uuid)) {
                     return;
                 }
 

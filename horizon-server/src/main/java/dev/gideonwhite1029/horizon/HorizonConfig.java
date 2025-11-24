@@ -5,8 +5,11 @@ import dev.gideonwhite1029.horizon.commands.GlobalConfigManager;
 import dev.gideonwhite1029.horizon.commands.HorizonCommand;
 import dev.gideonwhite1029.horizon.config.ConfigVerify;
 import dev.gideonwhite1029.horizon.config.GlobalConfig;
+import dev.gideonwhite1029.horizon.config.RemovedConfig;
+import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol;
 import dev.gideonwhite1029.horizon.region.EnumRegionFileExtension;
 import dev.gideonwhite1029.horizon.region.HorizonRegionFile;
+import dev.gideonwhite1029.horizon.util.sentry.SentryManager;
 import dev.gideonwhite1029.horizon.yggdrasil.HorizonMinecraftSessionService;
 import io.papermc.paper.configuration.GlobalConfiguration;
 import net.minecraft.server.MinecraftServer;
@@ -17,6 +20,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.logging.Level;
 
@@ -81,7 +85,7 @@ public final class HorizonConfig {
     }
 
     public static void unregisterCommand(String name) {
-        name = name.toLowerCase(java.util.Locale.ENGLISH).trim();
+        name = name.toLowerCase(Locale.ENGLISH).trim();
         MinecraftServer.getServer().server.getCommandMap().getKnownCommands().remove(name);
         MinecraftServer.getServer().server.getCommandMap().getKnownCommands().remove("horizon:" + name);
         MinecraftServer.getServer().server.syncCommands();
@@ -108,14 +112,19 @@ public final class HorizonConfig {
     @GlobalConfig(name = "disable-packet-limit", category = {"features"})
     public static boolean disablePacketLimit = false;
 
-    @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
-    public static boolean fasterChunkSerialization = false;
+    // @GlobalConfig(name = "fasterChunkSerialization", category = {"optimization"})
+    // public static boolean fasterChunkSerialization = false;
+
+    @RemovedConfig(name = "fasterChunkSerialization", category = {"optimization"})
 
     @GlobalConfig(name = "disableMovedWronglyThreshold", category = {"features"})
     public static boolean disableMovedWronglyThreshold = false;
 
     @GlobalConfig(name = "async-player-data-saving", category = {"optimization"})
     public static boolean asyncPlayerDataSaving = false;
+
+    @GlobalConfig(name = "use_virtual_thread_for_chat_executor", category = {"utils"})
+    public static boolean useVirtualThreadForChatExecutor = false;
 
     @GlobalConfig(name = "secure-seed", category = {"features"})
     public static boolean secureSeed = false;
@@ -152,7 +161,7 @@ public final class HorizonConfig {
 
     // Horizon start - region
     @GlobalConfig(name = "format", category = "region", lock = true, verify = RegionFormatVerify.class)
-    public static dev.gideonwhite1029.horizon.region.EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
+    public static EnumRegionFileExtension regionFormat = EnumRegionFileExtension.MCA;
 
     private static class RegionFormatVerify extends ConfigVerify.EnumConfigVerify<EnumRegionFileExtension> {
         @Override
@@ -221,8 +230,10 @@ public final class HorizonConfig {
     public static int syncTickInterval = 20;
 
     // Jade
-    @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
-    public static boolean jadeEnable = false;
+    // @GlobalConfig(name = "jade-enable", category = {"protocols", "jade"})
+    // public static boolean jadeEnable = false;
+
+    @RemovedConfig(name = "jade-enable", category = {"protocols", "jade"})
 
     // REI
     @GlobalConfig(name = "rei-enable", category = {"protocols", "rei"})
@@ -263,7 +274,7 @@ public final class HorizonConfig {
         @Override
         public String check(Boolean old, Boolean value) {
             if (value) {
-                dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaProtocol.init(true);
+                SyncmaticaProtocol.init(true);
             }
             return null;
         }
@@ -315,7 +326,7 @@ public final class HorizonConfig {
             sentryDsn = finalDsn;
             if (finalDsn != null && !finalDsn.isBlank()) {
                 try {
-                    dev.gideonwhite1029.horizon.util.sentry.SentryManager.init(org.apache.logging.log4j.Level.WARN);
+                    SentryManager.init(org.apache.logging.log4j.Level.WARN);
                     HorizonLogger.LOGGER.info("Sentry initialized with DSN");
                 } catch (Exception ex) {
                     HorizonLogger.LOGGER.warning("Failed to initialize Sentry", ex);

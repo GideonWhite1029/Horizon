@@ -56,7 +56,7 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 0af20b5cc3a98a38106f02f90590c4f183777981..f7b58861b15c9f826edfb6e14b07e28766974098 100644
+index cd769be7b4a454b74e6ee1b332ca83249344f1db..1fa92ad1d02edb5397d02f5806ad378d3adb0876 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -961,10 +961,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

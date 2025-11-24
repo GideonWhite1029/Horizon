@@ -68,7 +68,7 @@ public class MinimapsProtocol implements HorizonProtocol {
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_MINI + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
     public static void onXaeroMinimapRegisterConfig(Context context, ResourceLocation channelId) {
-        String playerName = context.profile().getName();
+        String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has Xaero's Minimap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
 
@@ -80,7 +80,7 @@ public class MinimapsProtocol implements HorizonProtocol {
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_WORLD + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
     public static void onXaeroWorldmapRegisterConfig(Context context, ResourceLocation channelId) {
-        String playerName = context.profile().getName();
+        String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has Xaero's Worldmap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
 
@@ -92,7 +92,7 @@ public class MinimapsProtocol implements HorizonProtocol {
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_JOURNEY + ":perm_req", stage = ProtocolHandler.Stage.CONFIGURATION)
     public static void onJourneyMapRegisterConfig(Context context, ResourceLocation channelId) {
-        String playerName = context.profile().getName();
+        String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has JourneyMap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "JourneyMap");
 

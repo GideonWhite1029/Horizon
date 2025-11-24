@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 0653cc355c286c08e6b58f7d2cdc986afad30499..f02dc7cb887c66388e69e3076e059ba57fb99f73 100644
+index 0653cc355c286c08e6b58f7d2cdc986afad30499..b517b64640ec50fdc8a90bc9837bfb762aa6ed4f 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1649,6 +1649,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -16,7 +16,7 @@ index 0653cc355c286c08e6b58f7d2cdc986afad30499..f02dc7cb887c66388e69e3076e059ba5
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
 +
 +        // Horizon start - Lag compensation
-+        if (HorizonConfig.tt20LagCompensation) {
++        if (dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensation) {
 +            dev.gideonwhite1029.horizon.util.optimization.LagCompensation.TPSCalculator.onTick();
 +        }
 +        // Horizon end - Lag Compensation
@@ -24,6 +24,15 @@ index 0653cc355c286c08e6b58f7d2cdc986afad30499..f02dc7cb887c66388e69e3076e059ba5
          this.tickCount++;
          this.tickRateManager.tick();
          this.tickChildren(hasTimeLeft);
+@@ -2889,7 +2896,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+     }
+ 
+     public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
+-            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").setThreadFactory(HorizonConfig.useVirtualThreadForChatExecutor ? Thread.ofVirtual().factory() : java.util.concurrent.Executors.defaultThreadFactory()).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper // Horizon - Virtual thread for ChatExecutor
++            new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").setThreadFactory(dev.gideonwhite1029.horizon.HorizonConfig.useVirtualThreadForChatExecutor ? Thread.ofVirtual().factory() : java.util.concurrent.Executors.defaultThreadFactory()).setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper // Horizon - Virtual thread for ChatExecutor
+     public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
+ 
+     public ChatDecorator getChatDecorator() {
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
 index 4df0dad91a5beeb0443ac1849e7783c470aae3d3..bc18659fd484e6e5a12ca7ad7fd7b23043e6f5bb 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java

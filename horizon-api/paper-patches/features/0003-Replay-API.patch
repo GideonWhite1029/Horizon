@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index e93a99d654e63354864c5d6c6dcab19a93877085..0fd3e17df38ebc70d5da904edf229bf9422389af 100644
+index 7a7e704f35671f66a3ba66b23899c010607aabde..17e56e38304a97f7ef201ff40be09143ff90c981 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3154,4 +3154,20 @@ public final class Bukkit {
+@@ -3155,4 +3155,20 @@ public final class Bukkit {
          server.clearBlockHighlights();
      }
      // Purpur end - Debug Marker API
@@ -32,11 +32,11 @@ index e93a99d654e63354864c5d6c6dcab19a93877085..0fd3e17df38ebc70d5da904edf229bf9
 +    // Horizon end - Photographer API
  }
 diff --git a/src/main/java/org/bukkit/Server.java b/src/main/java/org/bukkit/Server.java
-index 7550b9f93c908fe95a157e2c445b320fcb4d3a57..dd201d2ecb4753e7460e6d51eef6ad1214042098 100644
+index a384ce09dd4f9823c1d2bf3f63c2ab506810524d..d970a0bac5de15829bfaa3b0b074335e9a9fd43a 100644
 --- a/src/main/java/org/bukkit/Server.java
 +++ b/src/main/java/org/bukkit/Server.java
-@@ -2849,4 +2849,18 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
-      */
+@@ -2901,4 +2901,18 @@ public interface Server extends PluginMessageRecipient, net.kyori.adventure.audi
+     @Deprecated
      void clearBlockHighlights();
      // Purpur end - Debug Marker API
 +

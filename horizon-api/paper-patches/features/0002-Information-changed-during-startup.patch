@@ -24,10 +24,10 @@ index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee9
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 1c735d025c2d0fd75e850b44e721147dd69e8d34..261f3da54e4deb410461bcf62b1d5454067a440e 100644
+index 01481db67a78f60048af6737791b140d0adce028..7a7e704f35671f66a3ba66b23899c010607aabde 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -124,8 +124,17 @@ public final class Bukkit {
+@@ -123,8 +123,17 @@ public final class Bukkit {
      @NotNull
      public static String getVersionMessage() {
          final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();

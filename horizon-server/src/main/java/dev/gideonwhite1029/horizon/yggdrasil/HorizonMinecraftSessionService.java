@@ -14,6 +14,7 @@ import com.mojang.authlib.yggdrasil.response.ProfileAction;
 import dev.gideonwhite1029.horizon.HorizonConfig;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.InetAddress;
@@ -54,9 +55,9 @@ public class HorizonMinecraftSessionService extends PaperMinecraftSessionService
                 arguments.put("ip", address.getHostAddress());
             }
 
-            GameProfile cache = null;
+            NameAndId cache = null;
             if (HorizonConfig.loginProtect) {
-                cache = MinecraftServer.getServer().services.profileCache().getProfileIfCached(profileName);
+                cache = MinecraftServer.getServer().services.nameToIdCache().getIfCached(profileName);
             }
 
             for (URL checkUrl : extraYggdrasilList) {
@@ -65,14 +66,14 @@ public class HorizonMinecraftSessionService extends PaperMinecraftSessionService
                     final HasJoinedMinecraftServerResponse response = client.get(url, HasJoinedMinecraftServerResponse.class);
                     if (response != null && response.id() != null) {
                         if (HorizonConfig.loginProtect && cache != null) {
-                            if (!response.id().equals(cache.getId())) {
+                            if (!response.id().equals(cache.id())) {
                                 continue;
                             }
                         }
 
                         final GameProfile result1 = new GameProfile(response.id(), profileName);
                         if (response.properties() != null) {
-                            result1.getProperties().putAll(response.properties());
+                            result1.properties().putAll(response.properties());
                         }
 
                         final Set<ProfileActionType> profileActions = response.profileActions().stream()

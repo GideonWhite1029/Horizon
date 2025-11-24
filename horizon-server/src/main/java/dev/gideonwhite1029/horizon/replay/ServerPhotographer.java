@@ -71,7 +71,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.tick();
         super.doTick();
 
-        if (this.getServer().getTickCount() % 10 == 0) {
+        if (this.server.getTickCount() % 10 == 0) {
             connection.resetPosition();
             this.level().chunkSource.move(this);
         }
@@ -117,7 +117,7 @@ public class ServerPhotographer extends ServerPlayer {
         super.remove(RemovalReason.KILLED);
         photographers.remove(this);
         this.recorder.stop();
-        this.getServer().getPlayerList().removePhotographer(this);
+        this.server.getPlayerList().removePhotographer(this);
 
         HorizonLogger.LOGGER.info("Photographer " + createState.id + " removed");
 

@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/util/Mth.java b/net/minecraft/util/Mth.java
-index 73e04606e2cc5f30377550d1f2a5aa355b173257..f2f802f7ce380a771aecad0021f4263b04668409 100644
+index 9343d5b933c96a70bac9b33a0e9a061d99fabb0b..c0bc7fcfa7ffc75e76fc39b11a1912655775ccb5 100644
 --- a/net/minecraft/util/Mth.java
 +++ b/net/minecraft/util/Mth.java
 @@ -29,7 +29,7 @@ public class Mth {

@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 24 Nov 2025 16:26:18 +0300
+Subject: [PATCH] REI Protocol
+
+
+diff --git a/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java b/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java
+index 77a18f3048b18d38c5bd0129065efff27fa774fa..298beb528316ef45533267294f1ecb0f464d37a4 100644
+--- a/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java
++++ b/src/main/java/org/purpurmc/purpur/util/MinecraftInternalPlugin.java
+@@ -21,6 +21,8 @@ import java.util.List;
+ public class MinecraftInternalPlugin extends PluginBase {
+     private boolean enabled = true;
+ 
++    public static final MinecraftInternalPlugin INSTANCE = new MinecraftInternalPlugin();
++
+     private final String pluginName;
+     private PluginDescriptionFile pdf;
+ 

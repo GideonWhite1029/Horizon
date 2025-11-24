@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-index 8697528095ebed543ee1bb3b6b617a26a800bd5d..a3e1ff21859953426e67c37ec4a7bd48b346bfcf 100644
+index 8697528095ebed543ee1bb3b6b617a26a800bd5d..74bf8a9c96f9b3c17125b7f7e704cafe14822f6f 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 @@ -17,21 +17,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskSchedule
@@ -114,8 +114,8 @@ index 8697528095ebed543ee1bb3b6b617a26a800bd5d..a3e1ff21859953426e67c37ec4a7bd48
 +                            }
 +
 +                            // Send POI packets if needed
-+                            ChunkPos pos = chunk.getPos();
-+                            DebugPackets.sendPoiPacketsForChunk(serverLevel, pos);
++                            // ChunkPos pos = chunk.getPos();
++                            // DebugPackets.sendPoiPacketsForChunk(serverLevel, pos);
 +                        });
 +                    } catch (Exception e) {
 +                        // Log the exception
