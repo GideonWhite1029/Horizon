@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 2c7039281854cc9b21e2badb62389522a5c1728e..e49a78a816215ae1fd01e420e8d0a62869f08dc2 100644
+index 614f725bee3b3047402543a12896935faeea877d..dc05fdd2814a158a04a8f62b4c5a4e0baf45a44e 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1299,6 +1299,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1294,6 +1294,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper end
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              // Paper start - Add onboarding message for initial server start
@@ -17,7 +17,7 @@ index 2c7039281854cc9b21e2badb62389522a5c1728e..e49a78a816215ae1fd01e420e8d0a628
              if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
-@@ -1307,7 +1309,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1302,7 +1304,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start

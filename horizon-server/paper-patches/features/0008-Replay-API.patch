@@ -23,7 +23,7 @@ index 7ce9ebba8ce304d1f3f21d4f15ee5f3560d7700b..2eb029ef329a0d592e0ff34bb2cc13b2
          HandlerList handlers = event.getHandlers();
          RegisteredListener[] listeners = handlers.getRegisteredListeners();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 56bb5a36608e1276f07acd347f74faff74a43918..e92fab747e3100cb28cf1c37fdb037bed6af78ef 100644
+index 652e39c9f04e25d84d361026da294979eaa376da..bb501a4f4989bef7a46a40a50278daae12885051 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -311,6 +311,8 @@ public final class CraftServer implements Server {
@@ -44,7 +44,7 @@ index 56bb5a36608e1276f07acd347f74faff74a43918..e92fab747e3100cb28cf1c37fdb037be
              @Override
              public CraftPlayer apply(ServerPlayer player) {
                  return player.getBukkitEntity();
-@@ -3074,4 +3076,11 @@ public final class CraftServer implements Server {
+@@ -3073,4 +3075,11 @@ public final class CraftServer implements Server {
          return getServer().lagging;
      }
      // Purpur end - Lagging threshold
@@ -70,10 +70,10 @@ index 6ac0f9d208c41182b7c596ab809de41f07f265a9..37c37ebcd241bd5f4c6f66a06f715541
          if (entity instanceof EnderDragonPart complexPart) {
              if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 56bbaab57432a78e85bc0013cd7f991f662f0cd2..310fb65c91824c9e8455023f761053b11f652ca7 100644
+index bc5fac66b3c4ebce77b0b84e0ec5a525e2efec62..d01fed4fd05bbb45ab8f069c5b5b24dec66937fa 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2118,7 +2118,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -2135,7 +2135,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
  
      @Override
      public boolean canSee(Player player) {

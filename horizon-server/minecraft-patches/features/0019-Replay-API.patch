@@ -123,10 +123,10 @@ index a65ca0b1a44f8c993fad7f230a9c0b11a474e358..554a163505868b6d5637fd6c2ed9194a
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index b517b64640ec50fdc8a90bc9837bfb762aa6ed4f..748b3dab801a0ca0282c64752a9293e702ce6965 100644
+index 8ac6f2492c101e33def314bbb7ff7d621965a7c7..b24c080ef8ee1e4283d2e83c1a977ca9eebe6b78 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1760,7 +1760,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1755,7 +1755,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -165,7 +165,7 @@ index 4c7bccc00b9e84c4744f6cdc2c2e574a33ffe324..9ad75db43e0cf12a333ec56e608639bd
                                          .filter(serverPlayer -> !playerList.isOp(serverPlayer.nameAndId()))
                                          .map(serverPlayer -> serverPlayer.getGameProfile().name()),
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 91916a9f781fbf2d6b0d2b1eea0590c8785008d3..a2f09abdb68c54717e45e0a3b330e06815d0a68f 100644
+index 22aebfeef3727b8a1ce7c7fc144b3c1d446cc113..5f93dc698772128eeda8eb73e1f99e26670a0dd3 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -225,6 +225,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe

@@ -5,10 +5,10 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index e49a78a816215ae1fd01e420e8d0a62869f08dc2..63ac98ee2415acc49494b5d94ff86eef9f4dece6 100644
+index dc05fdd2814a158a04a8f62b4c5a4e0baf45a44e..b898e79d42a248bd336b6812eb65c9ed8a89bdba 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1097,6 +1097,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1098,6 +1098,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - rewrite chunk system
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();

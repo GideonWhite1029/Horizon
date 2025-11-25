@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 8b06c17215a1c34abaa2654fcad5bdef04e5e528..43018c136ae32a036dee3cb9a40608642ae43db7 100644
+index 71ba7b25632e7411759f77a61793cf6fdd7e35e2..d04b449631af873d959856fbbc0a346cec15e349 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -499,6 +499,7 @@ public final class CraftServer implements Server {
@@ -18,7 +18,7 @@ index 8b06c17215a1c34abaa2654fcad5bdef04e5e528..43018c136ae32a036dee3cb9a4060864
      }
  
      public boolean getCommandBlockOverride(String command) {
-@@ -1045,6 +1046,7 @@ public final class CraftServer implements Server {
+@@ -1044,6 +1045,7 @@ public final class CraftServer implements Server {
          org.purpurmc.purpur.PurpurConfig.registerCommands(); // Purpur - Purpur config files
          this.overrideAllCommandBlockCommands = this.commandsConfiguration.getStringList("command-block-overrides").contains("*");
          this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");

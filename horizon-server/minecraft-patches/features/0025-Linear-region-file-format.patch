@@ -23,10 +23,10 @@ index a814512fcfb85312474ae2c2c21443843bf57831..27145419344acabbdc7499f1969006f4
      public MoonriseRegionFileIO.RegionDataController.WriteData moonrise$startWrite(
              final int chunkX, final int chunkZ, final CompoundTag compound
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
-index b83ccf7bbd134e97e14bfe8331cc9d2a26b9ec9c..46630f509ce925e5c00d52d3b6392263613e488a 100644
+index aa3d5a6ea59ac77665f2cfaa56a7d383016d08d0..bc09c9296733f5dc3d8d038678d58e08eee1aa39 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
-@@ -1261,7 +1261,7 @@ public final class MoonriseRegionFileIO {
+@@ -1274,7 +1274,7 @@ public final class MoonriseRegionFileIO {
                  this.regionDataController.finishWrite(this.chunkX, this.chunkZ, writeData);
                  // Paper start - flush regionfiles on save
                  if (this.world.paperConfig().chunks.flushRegionsOnSave) {
@@ -35,7 +35,7 @@ index b83ccf7bbd134e97e14bfe8331cc9d2a26b9ec9c..46630f509ce925e5c00d52d3b6392263
                      if (regionFile != null) {
                          regionFile.flush();
                      } // else: evicted from cache, which should have called flush
-@@ -1477,7 +1477,7 @@ public final class MoonriseRegionFileIO {
+@@ -1490,7 +1490,7 @@ public final class MoonriseRegionFileIO {
  
          public static interface IORunnable {
  
@@ -56,10 +56,10 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index cd769be7b4a454b74e6ee1b332ca83249344f1db..1fa92ad1d02edb5397d02f5806ad378d3adb0876 100644
+index 5debc8e0cca4cfbecef223d0122670b07cf7bf07..a84e0dc2b6c94e4025402cc192b3d890aa37c81c 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -961,10 +961,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -962,10 +962,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // CraftBukkit end
          if (flush) {
              for (ServerLevel serverLevel : this.getAllLevels()) {
