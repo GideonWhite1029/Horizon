@@ -13,7 +13,7 @@
 - **and more in future**
 
 ## API
-### [Javadoc](https://repo.timelesswaffle.su/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/1.21.8-R0.1-SNAPSHOT)
+### [Javadoc](https://repo.timelesswaffle.su/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/1.21.10-R0.1-SNAPSHOT)
 ### Dependency Information
 Maven
 ```xml

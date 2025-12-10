@@ -4,8 +4,8 @@ import dev.gideonwhite1029.horizon.protocol.core.HorizonProtocol;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 public abstract class AbstractInvokerHolder<T> {
 
@@ -28,19 +28,19 @@ public abstract class AbstractInvokerHolder<T> {
     protected void validateMethodSignature() {
         if (returnType != null && !returnType.isAssignableFrom(invoker.getReturnType())) {
             throw new IllegalArgumentException("Return type mismatch in " + owner.getClass().getName() + "#" + invoker.getName() +
-                ": expected " + returnType.getName() + " but found " + invoker.getReturnType().getName());
+                    ": expected " + returnType.getName() + " but found " + invoker.getReturnType().getName());
         }
 
         Class<?>[] methodParamTypes = invoker.getParameterTypes();
         if (methodParamTypes.length != parameterTypes.length) {
             throw new IllegalArgumentException("Parameter count mismatch in " + owner.getClass().getName() + "#" + invoker.getName() +
-                ": expected " + parameterTypes.length + " but found " + methodParamTypes.length);
+                    ": expected " + parameterTypes.length + " but found " + methodParamTypes.length);
         }
 
         for (int i = 0; i < parameterTypes.length; i++) {
             if (!parameterTypes[i].isAssignableFrom(methodParamTypes[i])) {
                 throw new IllegalArgumentException("Parameter type mismatch in " + owner.getClass().getName() + "#" + invoker.getName() +
-                    " at index " + i + ": expected " + parameterTypes[i].getName() + " but found " + methodParamTypes[i].getName());
+                        " at index " + i + ": expected " + parameterTypes[i].getName() + " but found " + methodParamTypes[i].getName());
             }
         }
     }
@@ -58,11 +58,9 @@ public abstract class AbstractInvokerHolder<T> {
             return null;
         }
         try {
-            if (Modifier.isStatic(invoker.getModifiers())) {
-                return invoker.invoke(null, args);
-            } else {
-                return invoker.invoke(owner, args);
-            }
+            return invoker.invoke(owner, args);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e.getCause());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

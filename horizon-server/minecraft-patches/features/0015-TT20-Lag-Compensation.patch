@@ -34,19 +34,27 @@ index c57b707d2f63eb735b16e2b2648383b17f0caf06..8ac6f2492c101e33def314bbb7ff7d62
  
      public ChatDecorator getChatDecorator() {
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
-index 4df0dad91a5beeb0443ac1849e7783c470aae3d3..bc18659fd484e6e5a12ca7ad7fd7b23043e6f5bb 100644
+index 4283a1a0c75c183afc26adecada75894a5b663cf..f410b3badb0798dd3678a2f57888f68e8b9a2054 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
-@@ -192,7 +192,13 @@ public abstract class LavaFluid extends FlowingFluid {
+@@ -192,7 +192,21 @@ public abstract class LavaFluid extends FlowingFluid {
  
      @Override
      public int getTickDelay(LevelReader level) {
--        return level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether; // Purpur - Make lava flow speed configurable
+-        return level.getWorldBorder().world != null ? (level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether) : (level.dimensionType().ultraWarm() ? 10 : 30); // Purpur - Make lava flow speed configurable
 +        // Horizon start - Lag compensation
 +        if (dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensation && dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensationLava) {
-+            return level.dimensionType().ultraWarm() ? dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNether, true) : dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether, true); // Horizon
++            if (level.getWorldBorder().world != null) {
++                return level.dimensionType().ultraWarm()
++                        ? dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNether, true)
++                        : dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether, true); // Horizon
++            } else {
++                return dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.dimensionType().ultraWarm() ? 10 : 30, true); // default speeds when world is null
++            }
 +        } else {
-+            return level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether; // Purpur - Make lava flow speed configurable
++            return level.getWorldBorder().world != null
++                    ? (level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether)
++                    : (level.dimensionType().ultraWarm() ? 10 : 30); // Purpur - Make lava flow speed configurable
 +        }
 +        // Horizon end - Lag compensation
      }

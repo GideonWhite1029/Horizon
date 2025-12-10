@@ -48,16 +48,11 @@ subprojects {
         }
     }
 
-    dependencies {
-        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
-    }
-
     tasks.withType<JavaCompile> {
         options.encoding = Charsets.UTF_8.name()
         options.release = 21
         options.isFork = true
         options.compilerArgs.addAll(listOf("-Xlint:-deprecation", "-Xlint:-removal"))
-        options.forkOptions.memoryMaximumSize = "4g"
     }
     tasks.withType<Javadoc> {
         options.encoding = Charsets.UTF_8.name()
@@ -82,7 +77,6 @@ subprojects {
         maven(paperMavenPublicUrl)
         maven(purpurMavenPublicUrl)
         maven("https://jitpack.io")
-        maven("https://repo.timelesswaffle.su/snapshots")
     }
 
     extensions.configure<PublishingExtension> {

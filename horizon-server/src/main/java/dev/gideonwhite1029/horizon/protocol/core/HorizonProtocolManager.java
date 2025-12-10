@@ -200,7 +200,12 @@ public class HorizonProtocolManager {
         if (codec == null) {
             return null;
         }
-        return codec.decode(ProtocolUtils.decorate(buf));
+        try {
+            return codec.decode(ProtocolUtils.decorate(buf));
+        } catch (Exception e) {
+            LOGGER.severe("Failed to decode payload " + location, e);
+            throw e;
+        }
     }
 
     public static void encode(FriendlyByteBuf buf, HorizonCustomPayload payload) {
@@ -209,8 +214,13 @@ public class HorizonProtocolManager {
         if (location == null || codec == null) {
             throw new IllegalArgumentException("Payload " + payload.getClass() + " is not configured correctly " + location + " " + codec);
         }
-        buf.writeResourceLocation(location);
-        codec.encode(ProtocolUtils.decorate(buf), payload);
+        try {
+            buf.writeResourceLocation(location);
+            codec.encode(ProtocolUtils.decorate(buf), payload);
+        } catch (Exception e) {
+            LOGGER.severe("Failed to encode payload " + location, e);
+            throw e;
+        }
     }
 
     public static void handlePayload(IdentifierSelector selector, HorizonCustomPayload payload) {
