@@ -7,14 +7,14 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 7d8f764e255ffce1bd2b6bd03bc44538161d88f6..b7ed72166165fb3db13f03b584e092af5deaea2e 100644
+index f70ab92b309acdc56bb294f9a7d66f7c40a48e25..734b21ed8e339d550b746bf08243471f05b6c8da 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1175,6 +1175,7 @@ public abstract class PlayerList {
+@@ -1178,6 +1178,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
-         player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)));
+         player.connection.send(new ClientboundSetTimePacket(level.getGameTime(), level.getDayTime(), level.getGameRules().get(GameRules.ADVANCE_TIME)));
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
 +        dev.gideonwhite1029.horizon.protocol.MinimapsProtocol.sendXaeroServerInfo(player); // Horizon
-         // Paper start
-         player.connection.send(new ClientboundSetChunkCacheRadiusPacket(level.spigotConfig.viewDistance));
-         player.connection.send(new ClientboundSetSimulationDistancePacket(level.spigotConfig.simulationDistance));
+         // Paper start - view distances
+         //player.connection.send(new ClientboundSetChunkCacheRadiusPacket(io.papermc.paper.FeatureHooks.getViewDistance(level))); // Paper - rewrite chunk system
+         //player.connection.send(new ClientboundSetSimulationDistancePacket(io.papermc.paper.FeatureHooks.getSimulationDistance(level))); // Paper - rewrite chunk system

@@ -3,7 +3,7 @@ package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -15,13 +15,13 @@ public class VersionHandshakeServer extends FeatureExchange {
     }
 
     @Override
-    public boolean checkPacket(final @NotNull ResourceLocation id, final FriendlyByteBuf packetBuf) {
+    public boolean checkPacket(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
         return id.equals(PacketType.REGISTER_VERSION.identifier)
             || super.checkPacket(id, packetBuf);
     }
 
     @Override
-    public void handle(final @NotNull ResourceLocation id, final FriendlyByteBuf packetBuf) {
+    public void handle(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
         if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
             String partnerVersion = packetBuf.readUtf();
             if (partnerVersion.equals("0.0.1")) {

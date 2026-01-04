@@ -5,11 +5,10 @@ import dev.gideonwhite1029.horizon.protocol.core.Context;
 import dev.gideonwhite1029.horizon.protocol.core.HorizonProtocol;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolHandler;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.food.FoodData;
-import net.minecraft.world.level.GameRules;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,9 +23,9 @@ public class AppleSkinProtocol implements HorizonProtocol {
 
     public static final String PROTOCOL_ID = "appleskin";
 
-    private static final ResourceLocation SATURATION_KEY = id("saturation");
-    private static final ResourceLocation EXHAUSTION_KEY = id("exhaustion");
-    private static final ResourceLocation NATURAL_REGENERATION_KEY = id("natural_regeneration");
+    private static final Identifier SATURATION_KEY = id("saturation");
+    private static final Identifier EXHAUSTION_KEY = id("exhaustion");
+    private static final Identifier NATURAL_REGENERATION_KEY = id("natural_regeneration");
 
     private static final float MINIMUM_EXHAUSTION_CHANGE_THRESHOLD = 0.01F;
 
@@ -37,8 +36,8 @@ public class AppleSkinProtocol implements HorizonProtocol {
     private static final Map<UUID, Set<String>> subscribedChannels = new HashMap<>();
 
     @Contract("_ -> new")
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(PROTOCOL_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(PROTOCOL_ID, path);
     }
 
     @ProtocolHandler.PlayerJoin
@@ -53,7 +52,7 @@ public class AppleSkinProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(onlyNamespace = true)
-    public static void onPlayerSubscribed(@NotNull Context context, ResourceLocation id) {
+    public static void onPlayerSubscribed(@NotNull Context context, Identifier id) {
         subscribedChannels.computeIfAbsent(context.profile().id(), k -> new HashSet<>()).add(id.getPath());
     }
 
@@ -87,7 +86,7 @@ public class AppleSkinProtocol implements HorizonProtocol {
                     }
 
                     case "natural_regeneration" -> {
-                        boolean regeneration = player.level().getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
+                        boolean regeneration = player.level().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.NATURAL_HEALTH_REGENERATION);
                         Boolean previousRegeneration = previousNaturalRegeneration.get(player);
                         if (previousRegeneration == null || regeneration != previousRegeneration) {
                             ProtocolUtils.sendBytebufPacket(player, NATURAL_REGENERATION_KEY, buf -> buf.writeBoolean(regeneration));

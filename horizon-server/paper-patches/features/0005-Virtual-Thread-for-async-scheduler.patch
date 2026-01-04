@@ -7,15 +7,15 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index f76e89b639a502f02910de0f1a40d75a69159955..f40d3922f77e5a7aaa2ce638095f14f309478f86 100644
+index 015bb4afbc9ae4220bed13a961ec6de6b1583975..88835a6e9acb11a0b5d55f307b71b465241ea2a7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -252,7 +252,7 @@ public class Main {
-                     }
+@@ -237,7 +237,7 @@ public class Main {
+                     System.setProperty(net.minecrell.terminalconsole.TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false"); // Paper
                  }
  
 -                System.setProperty("library.jansi.version", "Paper"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows
-+                System.setProperty("org.jline.terminal.disableDeprecatedProviderWarning", "true"); // Horizon - Ignore terminal provider warning
++                System.setProperty("library.jansi.version", "Horizon"); // Paper - set meaningless jansi version to prevent git builds from crashing on Windows // Horizon
                  System.setProperty("jdk.console", "java.base"); // Paper - revert default console provider back to java.base so we can have our own jline
  
                  io.papermc.paper.PaperBootstrap.boot(options);

@@ -4,7 +4,7 @@ import dev.gideonwhite1029.horizon.commands.subcommands.ConfigCommand;
 import dev.gideonwhite1029.horizon.commands.subcommands.ReloadCommand;
 import io.papermc.paper.command.CommandUtil;
 import it.unimi.dsi.fastutil.Pair;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;

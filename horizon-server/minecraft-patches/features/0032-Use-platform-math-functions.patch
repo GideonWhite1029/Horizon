@@ -101,10 +101,10 @@ public class Main {
 ```
 
 diff --git a/net/minecraft/util/Mth.java b/net/minecraft/util/Mth.java
-index c0bc7fcfa7ffc75e76fc39b11a1912655775ccb5..025097daef937f65c6b6cdc469011c12da590558 100644
+index cfb2378745037cb23884d65f5be4e75ec93f089b..aaea828d5bb40035a20fb9a06e0606aed35d40e2 100644
 --- a/net/minecraft/util/Mth.java
 +++ b/net/minecraft/util/Mth.java
-@@ -58,18 +58,15 @@ public class Mth {
+@@ -60,18 +60,15 @@ public class Mth {
      }
  
      public static int floor(float value) {
@@ -126,7 +126,7 @@ index c0bc7fcfa7ffc75e76fc39b11a1912655775ccb5..025097daef937f65c6b6cdc469011c12
      }
  
      public static float abs(float value) {
-@@ -81,13 +78,11 @@ public class Mth {
+@@ -83,13 +80,11 @@ public class Mth {
      }
  
      public static int ceil(float value) {

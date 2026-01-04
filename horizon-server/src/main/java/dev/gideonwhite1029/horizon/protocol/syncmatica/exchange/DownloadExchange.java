@@ -3,7 +3,7 @@ package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -33,7 +33,7 @@ public class DownloadExchange extends AbstractExchange {
     }
 
     @Override
-    public boolean checkPacket(final @NotNull ResourceLocation id, final FriendlyByteBuf packetBuf) {
+    public boolean checkPacket(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
         if (id.equals(PacketType.SEND_LITEMATIC.identifier)
             || id.equals(PacketType.FINISHED_LITEMATIC.identifier)
             || id.equals(PacketType.CANCEL_LITEMATIC.identifier)) {
@@ -43,7 +43,7 @@ public class DownloadExchange extends AbstractExchange {
     }
 
     @Override
-    public void handle(final @NotNull ResourceLocation id, final @NotNull FriendlyByteBuf packetBuf) {
+    public void handle(final @NotNull Identifier id, final @NotNull FriendlyByteBuf packetBuf) {
         packetBuf.readUUID();
         if (id.equals(PacketType.SEND_LITEMATIC.identifier)) {
             final int size = packetBuf.readInt();

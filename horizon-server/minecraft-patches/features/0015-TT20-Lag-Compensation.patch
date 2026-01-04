@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index c57b707d2f63eb735b16e2b2648383b17f0caf06..8ac6f2492c101e33def314bbb7ff7d621965a7c7 100644
+index a6f752226496c317ba876ee0efc3929d9e13e6a7..090a171d6e2e980fdc844c503b759b790d9dc3da 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1644,6 +1644,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1654,6 +1654,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.server.spark.tickStart(); // Paper - spark
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
@@ -24,7 +24,7 @@ index c57b707d2f63eb735b16e2b2648383b17f0caf06..8ac6f2492c101e33def314bbb7ff7d62
          this.tickCount++;
          this.tickRateManager.tick();
          this.tickChildren(hasTimeLeft);
-@@ -2884,7 +2891,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2886,7 +2893,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
@@ -34,37 +34,37 @@ index c57b707d2f63eb735b16e2b2648383b17f0caf06..8ac6f2492c101e33def314bbb7ff7d62
  
      public ChatDecorator getChatDecorator() {
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
-index 4283a1a0c75c183afc26adecada75894a5b663cf..f410b3badb0798dd3678a2f57888f68e8b9a2054 100644
+index 3e81c98e2e6b0f1424429ab52aa43d229c867cc7..f7991304a44aace877984c451ef714d2ab9ca171 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
-@@ -192,7 +192,21 @@ public abstract class LavaFluid extends FlowingFluid {
+@@ -190,7 +190,21 @@ public abstract class LavaFluid extends FlowingFluid {
  
      @Override
      public int getTickDelay(LevelReader level) {
--        return level.getWorldBorder().world != null ? (level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether) : (level.dimensionType().ultraWarm() ? 10 : 30); // Purpur - Make lava flow speed configurable
+-        return level.getWorldBorder().world != null ? (isFastLava(level) ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether) : (isFastLava(level) ? 10 : 30); // Purpur - Make lava flow speed configurable
 +        // Horizon start - Lag compensation
 +        if (dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensation && dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensationLava) {
 +            if (level.getWorldBorder().world != null) {
-+                return level.dimensionType().ultraWarm()
++                return isFastLava(level)
 +                        ? dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNether, true)
 +                        : dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether, true); // Horizon
 +            } else {
-+                return dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(level.dimensionType().ultraWarm() ? 10 : 30, true); // default speeds when world is null
++                return dev.gideonwhite1029.horizon.util.optimization.LagCompensation.tt20(isFastLava(level) ? 10 : 30, true); // default speeds when world is null
 +            }
 +        } else {
 +            return level.getWorldBorder().world != null
-+                    ? (level.dimensionType().ultraWarm() ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether)
-+                    : (level.dimensionType().ultraWarm() ? 10 : 30); // Purpur - Make lava flow speed configurable
++                    ? (isFastLava(level) ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether)
++                    : (isFastLava(level) ? 10 : 30); // Purpur - Make lava flow speed configurable
 +        }
 +        // Horizon end - Lag compensation
      }
  
      @Override
 diff --git a/net/minecraft/world/level/material/WaterFluid.java b/net/minecraft/world/level/material/WaterFluid.java
-index 19505eafb8b3aa09d7f889ecb62bcc28d835b4c8..f4accf10a18801318a8a053a0a441d9d552517ab 100644
+index 4533d9f76f4ea21cee3c3114bcfcded40fe7321b..a8ea16f5d86f4d87d442e666f2973ec9b35ef531 100644
 --- a/net/minecraft/world/level/material/WaterFluid.java
 +++ b/net/minecraft/world/level/material/WaterFluid.java
-@@ -126,7 +126,13 @@ public abstract class WaterFluid extends FlowingFluid {
+@@ -125,7 +125,13 @@ public abstract class WaterFluid extends FlowingFluid {
  
      @Override
      public int getTickDelay(LevelReader level) {

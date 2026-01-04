@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/storage/LevelStorageSource.java b/net/minecraft/world/level/storage/LevelStorageSource.java
-index 85cddc7ccb9c73e2464a764d61f46f974ce255e3..14b902eed47c177b6e490ad38dbdf9917cb9cc7a 100644
+index 140630186c3b0324c248cc2a2f31d3b906557b9c..50b16c200a77f728fafb2f6f7d3cfe824e9ea904 100644
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
-@@ -515,7 +515,10 @@ public class LevelStorageSource {
+@@ -510,7 +510,10 @@ public class LevelStorageSource {
              CompoundTag compoundTag = serverConfiguration.createTag(registries, singlePlayerTag);
              CompoundTag compoundTag1 = new CompoundTag();
              compoundTag1.put("Data", compoundTag);
@@ -22,7 +22,7 @@ index 85cddc7ccb9c73e2464a764d61f46f974ce255e3..14b902eed47c177b6e490ad38dbdf991
          }
  
          private void saveLevelData(CompoundTag tag) {
-@@ -602,7 +605,10 @@ public class LevelStorageSource {
+@@ -597,7 +600,10 @@ public class LevelStorageSource {
              this.checkLock();
              CompoundTag levelDataTagRaw = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
              modifier.accept(levelDataTagRaw.getCompoundOrEmpty("Data"));
@@ -35,10 +35,10 @@ index 85cddc7ccb9c73e2464a764d61f46f974ce255e3..14b902eed47c177b6e490ad38dbdf991
  
          public long makeWorldBackup() throws IOException {
 diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
-index 02f72bf880e2c162e94a9ebea32890cb25738758..d40009deae9fb904cd35d1a40063197e77a876e5 100644
+index b8ef50bc3d07890c9da2c98d5f009a3adc52f4b0..a7d42fdf977b139036616e258748316ba5a1675b 100644
 --- a/net/minecraft/world/level/storage/PlayerDataStorage.java
 +++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
-@@ -34,6 +34,13 @@ public class PlayerDataStorage {
+@@ -32,6 +32,13 @@ public class PlayerDataStorage {
  
      public void save(Player player) {
          if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot

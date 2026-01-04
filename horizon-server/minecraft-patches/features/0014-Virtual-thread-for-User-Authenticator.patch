@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-index ace65f36d6562988665c530dd3fdbfaa5d2e2071..f686488bd5a47e0cdcbe59981111e00a82a724ba 100644
+index e16bb386ae500bc290970f8cba33c5999cf0a58d..c8323e4db5128530a10ec9c31fac6fdcbe4046ee 100644
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -54,7 +54,7 @@ import org.bukkit.event.player.PlayerPreLoginEvent;
+@@ -55,7 +55,7 @@ import org.bukkit.event.player.PlayerPreLoginEvent;
  public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener {
      private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
      static final Logger LOGGER = LogUtils.getLogger();

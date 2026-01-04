@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 614f725bee3b3047402543a12896935faeea877d..dc05fdd2814a158a04a8f62b4c5a4e0baf45a44e 100644
+index fc56c5cace242821b8d40847e01081ee41c61ef6..398666cb3f0acd0972e9497731fc4eecc723566f 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1294,6 +1294,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1297,6 +1297,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper end
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              // Paper start - Add onboarding message for initial server start
@@ -17,18 +17,17 @@ index 614f725bee3b3047402543a12896935faeea877d..dc05fdd2814a158a04a8f62b4c5a4e0b
              if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
-@@ -1302,7 +1304,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1305,6 +1307,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
--
-+            */
++             */
 +            // Horizon end
-             // Purpur start - config for startup commands
-             if (!Boolean.getBoolean("Purpur.IReallyDontWantStartupCommands") && !org.purpurmc.purpur.PurpurConfig.startupCommands.isEmpty()) {
-                 LOGGER.info("Purpur: Running startup commands specified in purpur.yml.");
+             // Paper start - Improve outdated version checking
+             if (false && System.getProperty("paper.disableStartupVersionCheck") == null && io.papermc.paper.configuration.GlobalConfiguration.get().updateChecker.enabled) { // Purpur - disable paper startup check
+                 CompletableFuture.runAsync(com.destroystokyo.paper.PaperVersionFetcher::getUpdateStatusStartupMessage, io.papermc.paper.util.MCUtil.ASYNC_EXECUTOR);
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 0e6222214f4b5407705dcbdf4dcf574111bcf366..68758a5274229248a48bb5b9c67c2866d9037c0d 100644
+index e7e71018a4d328832fe44eef595e78265ee720ae..ddb54dea634fd11230408586fdc7c60e44dfaebb 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -309,7 +309,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise

@@ -7,22 +7,22 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/commands/SeedCommand.java b/net/minecraft/server/commands/SeedCommand.java
-index 7c1e18d8362be5ae885c32b05e98b9ef45942d93..550abfcb3aacf4d456dc390d2f49bfe173289281 100644
+index 68a27436bae245a31470483f92a116fa029f3d4e..d2329e0cb41cab17fe01ac3f887cb12fe0ace290 100644
 --- a/net/minecraft/server/commands/SeedCommand.java
 +++ b/net/minecraft/server/commands/SeedCommand.java
-@@ -12,6 +12,15 @@ public class SeedCommand {
-             long seed = commandContext.getSource().getLevel().getSeed();
-             Component component = ComponentUtils.copyOnClickText(String.valueOf(seed));
-             commandContext.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
-+            // Horizon start - Secure Seed Command
-+            if (dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) {
-+                dev.gideonwhite1029.horizon.matter.Globals.setupGlobals(commandContext.getSource().getLevel());
-+                String seedStr = dev.gideonwhite1029.horizon.matter.Globals.seedToString(dev.gideonwhite1029.horizon.matter.Globals.worldSeed);
-+                Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
+@@ -15,6 +15,15 @@ public class SeedCommand {
+                     long seed = commandContext.getSource().getLevel().getSeed();
+                     Component component = ComponentUtils.copyOnClickText(String.valueOf(seed));
+                     commandContext.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
++                    // Horizon start - Secure Seed Command
++                    if (dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) {
++                        dev.gideonwhite1029.horizon.matter.Globals.setupGlobals(commandContext.getSource().getLevel());
++                        String seedStr = dev.gideonwhite1029.horizon.matter.Globals.seedToString(dev.gideonwhite1029.horizon.matter.Globals.worldSeed);
++                        Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
 +
-+                commandContext.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
-+            }
-+            // Horizon end - Secure Seed Command
-             return (int)seed;
-         }));
-     }
++                        commandContext.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
++                    }
++                    // Horizon end - Secure Seed Command
+                     return (int)seed;
+                 })
+         );

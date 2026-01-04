@@ -7,23 +7,23 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index e4bcd4a3cbbc8942d52e5f3c7a4fb1572fdef91c..7e731b0328cbd44389da2bb097ef3d2a6ac5e5f9 100644
+index 3e31abbca1426c9332ecb02613648383c8b27cce..2ca0767451f14854afb013cb5700e8f4b403bf56 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -164,7 +164,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -170,7 +170,7 @@ public final class ItemStack implements DataComponentHolder {
+     private int popTime;
      @Deprecated
-     @Nullable
-     private Item item;
+     private @Nullable Item item;
 -    PatchedDataComponentMap components;
 +    public PatchedDataComponentMap components; // Horizon - public
-     @Nullable
-     private Entity entityRepresentation;
+     private @Nullable Entity entityRepresentation;
  
+     public static DataResult<ItemStack> validateStrict(ItemStack stack) {
 diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
-index 9bc0a9c3577d63a0ad5489bfd4c07d5006245c5f..0cefb53cdc0788e72e8e1650f5ca206f9422be11 100644
+index d02609198253b51f632db46c40afd737d686c520..6b60b213bad8a0fe60963f9ea55abacef9e0b30e 100644
 --- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
 +++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
-@@ -83,6 +83,12 @@ public class SmithingTransformRecipe implements SmithingRecipe {
+@@ -82,6 +82,12 @@ public class SmithingTransformRecipe implements SmithingRecipe {
          );
      }
  
@@ -37,10 +37,10 @@ index 9bc0a9c3577d63a0ad5489bfd4c07d5006245c5f..0cefb53cdc0788e72e8e1650f5ca206f
      @Override
      public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
 diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
-index c324896afc2ee28ebb4d426ce4a469ee847ce24d..0bd16820ce1d5edce88edaedba769527d0646229 100644
+index 6582370cfa3d58a7ac08d574e26e7a93d243bdaa..d1b143f4328cb31cf5c6075c9ca4ae613424d695 100644
 --- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
 +++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
-@@ -85,6 +85,12 @@ public class SmithingTrimRecipe implements SmithingRecipe {
+@@ -84,6 +84,12 @@ public class SmithingTrimRecipe implements SmithingRecipe {
          return Optional.of(this.addition);
      }
  

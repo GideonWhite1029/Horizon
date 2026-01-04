@@ -20,10 +20,10 @@ index 9e5757391ea32e37b2aac52cc1bb38259a2cc497..cd96d96ff3f5853501a3b3cfad203a72
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index 42841fdc7e64311ba9217789a3dc758a351cf674..e910b34af0f59f3d7ff29106070253c7c8bccd8c 100644
+index 272e2871aca8d283229cc5618e3051146db56681..607f85281fd8b48d7b077df10258831a2690ea68 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -183,7 +183,7 @@ public class Main {
+@@ -181,7 +181,7 @@ public class Main {
                  file = new File(bukkitConfiguration.getString("settings.world-container", "."));
              }
              // Paper end - fix SPIGOT-5824
@@ -33,15 +33,15 @@ index 42841fdc7e64311ba9217789a3dc758a351cf674..e910b34af0f59f3d7ff29106070253c7
              String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 748b3dab801a0ca0282c64752a9293e702ce6965..cd769be7b4a454b74e6ee1b332ca83249344f1db 100644
+index 0f80ed80dcb831915b97a9ea3cb417806f88ca08..f019510b5e66a2cb233f2130ccaa47b0011e5759 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -242,7 +242,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private boolean isDemo;
      private volatile boolean isReady;
      private long lastOverloadWarningNanos;
 -    protected final Services services;
 +    public final Services services; // Horizon
      private final NotificationManager notificationManager;
+     private final ServerActivityMonitor serverActivityMonitor;
      private long lastServerStatus;
-     public final Thread serverThread;

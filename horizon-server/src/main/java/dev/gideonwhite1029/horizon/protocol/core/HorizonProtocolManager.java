@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.io.File;
@@ -35,9 +35,9 @@ public class HorizonProtocolManager {
     private static final HorizonLogger LOGGER = HorizonLogger.LOGGER;
 
     private static final Map<Class<? extends HorizonCustomPayload>, PayloadReceiverInvokerHolder> PAYLOAD_RECEIVERS = new HashMap<>();
-    private static final Map<Class<? extends HorizonCustomPayload>, ResourceLocation> IDS = new HashMap<>();
+    private static final Map<Class<? extends HorizonCustomPayload>, Identifier> IDS = new HashMap<>();
     private static final Map<Class<? extends HorizonCustomPayload>, StreamCodec<? super RegistryFriendlyByteBuf, HorizonCustomPayload>> CODECS = new HashMap<>();
-    private static final Map<ResourceLocation, StreamCodec<? super RegistryFriendlyByteBuf, HorizonCustomPayload>> ID2CODEC = new HashMap<>();
+    private static final Map<Identifier, StreamCodec<? super RegistryFriendlyByteBuf, HorizonCustomPayload>> ID2CODEC = new HashMap<>();
 
     private static final Map<String, BytebufReceiverInvokerHolder> STRICT_BYTEBUF_RECEIVERS = new HashMap<>();
     private static final Map<String, BytebufReceiverInvokerHolder> NAMESPACED_BYTEBUF_RECEIVERS = new HashMap<>();
@@ -65,8 +65,8 @@ public class HorizonProtocolManager {
                     }
                     try {
                         final HorizonCustomPayload.ID id = field.getAnnotation(HorizonCustomPayload.ID.class);
-                        if (id != null && field.getType().equals(ResourceLocation.class)) {
-                            IDS.put((Class<? extends HorizonCustomPayload>) clazz, (ResourceLocation) field.get(null));
+                        if (id != null && field.getType().equals(Identifier.class)) {
+                            IDS.put((Class<? extends HorizonCustomPayload>) clazz, (Identifier) field.get(null));
                         }
                         final HorizonCustomPayload.Codec codec = field.getAnnotation(HorizonCustomPayload.Codec.class);
                         if (codec != null && field.getType().equals(StreamCodec.class)) {
@@ -195,7 +195,7 @@ public class HorizonProtocolManager {
         }
     }
 
-    public static HorizonCustomPayload decode(ResourceLocation location, FriendlyByteBuf buf) {
+    public static HorizonCustomPayload decode(Identifier location, FriendlyByteBuf buf) {
         var codec = ID2CODEC.get(location);
         if (codec == null) {
             return null;
@@ -215,7 +215,7 @@ public class HorizonProtocolManager {
             throw new IllegalArgumentException("Payload " + payload.getClass() + " is not configured correctly " + location + " " + codec);
         }
         try {
-            buf.writeResourceLocation(location);
+            buf.writeIdentifier(location);
             codec.encode(ProtocolUtils.decorate(buf), payload);
         } catch (Exception e) {
             LOGGER.severe("Failed to encode payload " + location, e);
@@ -230,7 +230,7 @@ public class HorizonProtocolManager {
         }
     }
 
-    public static boolean handleBytebuf(IdentifierSelector selector, ResourceLocation location, ByteBuf buf) {
+    public static boolean handleBytebuf(IdentifierSelector selector, Identifier location, ByteBuf buf) {
         RegistryFriendlyByteBuf buf1 = ProtocolUtils.decorate(buf);
         BytebufReceiverInvokerHolder holder;
         if ((holder = STRICT_BYTEBUF_RECEIVERS.get(location.toString())) != null) {
@@ -284,7 +284,7 @@ public class HorizonProtocolManager {
     }
 
     public static void handleMinecraftRegister(String channelId, IdentifierSelector selector) {
-        ResourceLocation location = ResourceLocation.tryParse(channelId);
+        Identifier location = Identifier.tryParse(channelId);
         if (location == null) {
             return;
         }
@@ -314,7 +314,7 @@ public class HorizonProtocolManager {
                 set.add(key);
             }
         });
-        ProtocolUtils.sendBytebufPacket(player, ResourceLocation.fromNamespaceAndPath("minecraft", "register"), buf -> {
+        ProtocolUtils.sendBytebufPacket(player, Identifier.fromNamespaceAndPath("minecraft", "register"), buf -> {
             for (String channel : set) {
                 buf.writeBytes(channel.getBytes(StandardCharsets.US_ASCII));
                 buf.writeByte(0);

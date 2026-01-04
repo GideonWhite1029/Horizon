@@ -1,7 +1,7 @@
 package dev.gideonwhite1029.horizon.util;
 
 import dev.gideonwhite1029.horizon.HorizonConfig;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;

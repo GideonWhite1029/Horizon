@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
-index fad600f343ee0983efc183f083b1507648987575..9bbcffc77dcf0e062a7f3464aee7f8d0563a440f 100644
+index 9b9cdb23a55b82efbeea3ba68b8144c15791dff0..e9c58fc9bb16f8605410fe85971a7d4b1c3d3915 100644
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -316,6 +316,12 @@ public class ServerPlayerGameMode {
+@@ -313,6 +313,12 @@ public class ServerPlayerGameMode {
                  org.bukkit.craftbukkit.event.CraftEventFactory.callBlockDamageAbortEvent(this.player, pos, this.player.getInventory().getSelectedItem()); // CraftBukkit
              }
          }
@@ -24,10 +24,10 @@ index fad600f343ee0983efc183f083b1507648987575..9bbcffc77dcf0e062a7f3464aee7f8d0
      }
  
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 1eac6ee2d3bb584a94a999f4f88c46b4d4a19977..459e53e815676a2c4caadf3fc30df7726e5b0e19 100644
+index 2aef6067266035b10ce2516f3008b3653d37d8fb..fe598f6be8b6aeb90c9c4f2e3f5d03c85cd80f16 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1120,6 +1120,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1127,6 +1127,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
                  snapshot.setFlags(flags); // Paper - always set the flag of the most recent call to mitigate issues with multiple update at the same pos with different flags
              }
              BlockState blockState = chunkAt.setBlockState(pos, state, flags);

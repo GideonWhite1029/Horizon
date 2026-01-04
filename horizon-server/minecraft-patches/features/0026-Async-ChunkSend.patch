@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-index 8697528095ebed543ee1bb3b6b617a26a800bd5d..74bf8a9c96f9b3c17125b7f7e704cafe14822f6f 100644
+index 7129c5e1920008ac54f3a8ac83f5589396f4e4e9..0eb330afec81a6323c810eb32f246702fc32d297 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 @@ -17,21 +17,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskSchedule
@@ -34,8 +34,8 @@ index 8697528095ebed543ee1bb3b6b617a26a800bd5d..74bf8a9c96f9b3c17125b7f7e704cafe
  import net.minecraft.server.network.PlayerChunkSender;
 +import net.minecraft.server.network.ServerGamePacketListenerImpl;
  import net.minecraft.world.level.ChunkPos;
- import net.minecraft.world.level.GameRules;
  import net.minecraft.world.level.chunk.ChunkAccess;
+ import net.minecraft.world.level.chunk.LevelChunk;
 @@ -413,18 +413,90 @@ public final class RegionizedPlayerChunkLoader {
              this.delayedTicketOps.addLast(op);
          }
@@ -84,7 +84,7 @@ index 8697528095ebed543ee1bb3b6b617a26a800bd5d..74bf8a9c96f9b3c17125b7f7e704cafe
 +            // Check if async chunk sending is enabled
 +            if (HorizonConfig.AsyncChunkSend) {
 +                // Async implementation
-+                net.minecraft.Util.backgroundExecutor().execute(() -> {
++                net.minecraft.util.Util.backgroundExecutor().execute(() -> {
 +                    try {
 +                        // Create and send the chunk packet asynchronously
 +                        final ServerGamePacketListenerImpl connection = this.player.connection;

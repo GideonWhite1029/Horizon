@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -29,8 +29,8 @@ public class CarpetServerProtocol implements HorizonProtocol {
     private static final String HELLO = "420";
 
     @Contract("_ -> new")
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.tryBuild(PROTOCOL_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.tryBuild(PROTOCOL_ID, path);
     }
 
     @ProtocolHandler.PlayerJoin
@@ -102,7 +102,7 @@ public class CarpetServerProtocol implements HorizonProtocol {
 
     public record CarpetPayload(CompoundTag nbt) implements HorizonCustomPayload {
         @ID
-        private static final ResourceLocation HELLO_ID = CarpetServerProtocol.id("hello");
+        private static final Identifier HELLO_ID = CarpetServerProtocol.id("hello");
 
         @Codec
         private static final StreamCodec<FriendlyByteBuf, CarpetPayload> CODEC = StreamCodec.composite(

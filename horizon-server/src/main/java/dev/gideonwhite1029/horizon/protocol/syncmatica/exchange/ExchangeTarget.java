@@ -4,7 +4,7 @@ import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.FeatureSet;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.SyncmaticaPayload;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class ExchangeTarget {
         this.client = client;
     }
 
-    public void sendPacket(final ResourceLocation id, final FriendlyByteBuf packetBuf) {
+    public void sendPacket(final Identifier id, final FriendlyByteBuf packetBuf) {
         ProtocolUtils.sendPayloadPacket(client.player, new SyncmaticaPayload(id, packetBuf));
     }
 

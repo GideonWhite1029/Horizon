@@ -24,10 +24,30 @@ index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee9
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 01481db67a78f60048af6737791b140d0adce028..7a7e704f35671f66a3ba66b23899c010607aabde 100644
+index 01481db67a78f60048af6737791b140d0adce028..7e771d2553734488d3f9f4ebd61a1b978a6d760c 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -123,8 +123,17 @@ public final class Bukkit {
+@@ -15,7 +15,11 @@ import java.util.UUID;
+ import java.util.function.Consumer;
+ import java.util.logging.Logger;
+ import io.papermc.paper.configuration.ServerConfiguration;
++import net.kyori.adventure.key.Key;
+ import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.format.NamedTextColor;
++import net.kyori.adventure.text.format.TextColor;
++import net.kyori.adventure.text.format.TextDecoration;
+ import org.bukkit.Warning.WarningState;
+ import org.bukkit.advancement.Advancement;
+ import org.bukkit.block.data.BlockData;
+@@ -115,6 +119,7 @@ public final class Bukkit {
+         // Paper start - add git information
+         server.getLogger().info(getVersionMessage());
+     }
++
+     /**
+       * Gets message describing the version server is running.
+       *
+@@ -123,10 +128,41 @@ public final class Bukkit {
      @NotNull
      public static String getVersionMessage() {
          final io.papermc.paper.ServerBuildInfo version = io.papermc.paper.ServerBuildInfo.buildInfo();
@@ -44,9 +64,33 @@ index 01481db67a78f60048af6737791b140d0adce028..7a7e704f35671f66a3ba66b23899c010
 +                "  \u001b[38;5;105m Version: \u001B[0m" + getVersion() + "\n" +
 +                "  \u001b[38;5;105m API version: \u001B[0m" + getBukkitVersion() + "\n";
 +        // Horizon stop
++    }
++
++    /**
++     * Gets message describing the version server is running.
++     *
++     * @return message describing the version server is running
++     */
++    @NotNull
++    public static Component getVersionComponent() {
++        return Component.textOfChildren(
++                Component.newline(),
++                Component.text("Server name: ", TextColor.color(0x5F5FFF)),
++                Component. text(getName(), NamedTextColor.WHITE),
++                Component. newline(),
++                Component.text("Version: ", TextColor.color(0x5F5FFF)),
++                Component.text(getVersion(), NamedTextColor.WHITE),
++                Component.newline(),
++                Component.text("API version: ", TextColor.color(0x5F5FFF)),
++                Component.text(getBukkitVersion(), NamedTextColor.WHITE),
++                Component. newline()
++        );
      }
  
++
      /**
+      * Gets the name of this server implementation.
+      *
 diff --git a/src/main/java/org/bukkit/command/defaults/VersionCommand.java b/src/main/java/org/bukkit/command/defaults/VersionCommand.java
 index 424b01d6fc013148f19b039ca7ade9ff484796ee..578026a18453998faefd2f3a6ddb9075fe06b1fc 100644
 --- a/src/main/java/org/bukkit/command/defaults/VersionCommand.java

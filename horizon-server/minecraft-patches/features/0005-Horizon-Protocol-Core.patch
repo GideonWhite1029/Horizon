@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..3010983ea5f001984d2d3f8d847603162654c516 100644
+index 1da034752064312962a4144f91be5265a9a08997..19f88780f2c6a83e9accecd23f53bdef932eed29 100644
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 @@ -40,13 +40,22 @@ public interface CustomPacketPayload {
@@ -25,30 +25,30 @@ index fb263fa1f30a7dfcb7ec2656abfb38e5fe88eac9..3010983ea5f001984d2d3f8d84760316
  
              @Override
              public CustomPacketPayload decode(B buffer) {
-                 ResourceLocation resourceLocation = buffer.readResourceLocation();
--                return (CustomPacketPayload)this.findCodec(resourceLocation).decode(buffer);
+                 Identifier identifier = buffer.readIdentifier();
+-                return (CustomPacketPayload)this.findCodec(identifier).decode(buffer);
 +                // Horizon start - protocol core
-+                var payload = dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.decode(resourceLocation, buffer);
-+                return java.util.Objects.requireNonNullElseGet(payload, () -> this.findCodec(resourceLocation).decode(buffer));
++                var payload = dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.decode(identifier, buffer);
++                return java.util.Objects.requireNonNullElseGet(payload, () -> this.findCodec(identifier).decode(buffer));
 +                // Horizon end - protocol core
              }
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index b898e79d42a248bd336b6812eb65c9ed8a89bdba..62f95e7f068e6e91d0bf84ab99692e5e936cb7c0 100644
+index b477c1cf5090f7d98b2c3f7b7f68982652a6c93b..c15861a8076f412a5d5794be8af20360b0ee86cc 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1862,6 +1862,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1891,6 +1891,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profilerFiller.popPush("server gui refresh");
  
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleTick(tickCount); // Horizon - protocol
 +
-         for (int i = 0; i < this.tickables.size(); i++) {
-             this.tickables.get(i).run();
+         for (Runnable runnable : this.tickables) {
+             runnable.run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index e98400719a4ab43dc0ce90cdca19ba86e4849720..cb42cb2f9c4567256fcd99e0d46051e726d6b2c3 100644
+index 02c6733ce1de543dab3bf558148879039e501257..dacbb40315e2bd24c96712d85edc5068f4ca3c0b 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -63,6 +63,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -72,11 +72,11 @@ index e98400719a4ab43dc0ce90cdca19ba86e4849720..cb42cb2f9c4567256fcd99e0d46051e7
      @Override
      public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
 +        // Horizon start - protocol
-+        if (packet.payload() instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload leavesPayload) {
-+            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils.createSelector(this), leavesPayload);
++        if (packet.payload() instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload horizonPayload) {
++            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils.createSelector(this), horizonPayload);
 +            return;
 +        }
-+        if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.DiscardedPayload(net.minecraft.resources.ResourceLocation id, byte[] data)) {
++        if (packet.payload() instanceof net.minecraft.network.protocol.common.custom.DiscardedPayload(net.minecraft.resources.Identifier id, byte[] data)) {
 +            if (dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleBytebuf(dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils.createSelector(this), id, io.netty.buffer.Unpooled.wrappedBuffer(data))) {
 +                return;
 +            }
@@ -94,27 +94,27 @@ index e98400719a4ab43dc0ce90cdca19ba86e4849720..cb42cb2f9c4567256fcd99e0d46051e7
              bridge.removeChannel(channel);
          }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 92f67eec8aeb6e59a34f34f6111ad9c71f9c5768..1df9360949c4b65851d61520c76ae15eef081f19 100644
+index c29082cdb8f1d109673559dbf1bee20e12b92764..540a7a473890013b807be6c6c2e56c8be872ea86 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -239,6 +239,8 @@ public abstract class PlayerList {
+@@ -244,6 +244,8 @@ public abstract class PlayerList {
              return;
          }
  
-+            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerJoin(player); // Horizon - protocol
++        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerJoin(player); // Horizon - protocol
 +
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -425,6 +427,7 @@ public abstract class PlayerList {
+@@ -431,6 +433,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
-     public @Nullable net.kyori.adventure.text.Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
+     public net.kyori.adventure.text.@Nullable Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerLeave(player); // Horizon - protocol
          // Paper end - Fix kick event leave message not being sent
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar
          ServerLevel serverLevel = player.level();
-@@ -1317,6 +1320,7 @@ public abstract class PlayerList {
+@@ -1324,6 +1327,7 @@ public abstract class PlayerList {
              serverPlayer.connection.send(clientboundUpdateRecipesPacket);
              serverPlayer.getRecipeBook().sendInitialRecipeBook(serverPlayer);
          }

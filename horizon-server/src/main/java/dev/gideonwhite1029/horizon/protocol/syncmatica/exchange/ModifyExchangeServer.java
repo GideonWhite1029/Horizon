@@ -3,7 +3,7 @@ package dev.gideonwhite1029.horizon.protocol.syncmatica.exchange;
 import dev.gideonwhite1029.horizon.protocol.syncmatica.*;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -20,12 +20,12 @@ public class ModifyExchangeServer extends AbstractExchange {
     }
 
     @Override
-    public boolean checkPacket(final @NotNull ResourceLocation id, final FriendlyByteBuf packetBuf) {
+    public boolean checkPacket(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
         return id.equals(PacketType.MODIFY_FINISH.identifier) && checkUUID(packetBuf, placement.getId());
     }
 
     @Override
-    public void handle(final @NotNull ResourceLocation id, final @NotNull FriendlyByteBuf packetBuf) {
+    public void handle(final @NotNull Identifier id, final @NotNull FriendlyByteBuf packetBuf) {
         packetBuf.readUUID();
         if (id.equals(PacketType.MODIFY_FINISH.identifier)) {
             CommunicationManager.receivePositionData(placement, packetBuf, getPartner());

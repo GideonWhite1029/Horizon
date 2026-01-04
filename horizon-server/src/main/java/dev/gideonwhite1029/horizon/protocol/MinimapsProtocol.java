@@ -7,7 +7,7 @@ import dev.gideonwhite1029.horizon.protocol.core.HorizonProtocol;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolHandler;
 import dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.jetbrains.annotations.Contract;
@@ -25,27 +25,27 @@ public class MinimapsProtocol implements HorizonProtocol {
     public static final String PROTOCOL_ID_XAERO_WORLD = "xaeroworldmap";
     public static final String PROTOCOL_ID_JOURNEY = "journeymap";
 
-    private static final ResourceLocation XAERO_MINIMAP_KEY = idXaeroMini("main");
-    private static final ResourceLocation XAERO_WORLDMAP_KEY = idXaeroWorld("main");
-    private static final ResourceLocation JOURNEYMAP_PERM_REQ = idJourneyMap("perm_req");
+    private static final Identifier XAERO_MINIMAP_KEY = idXaeroMini("main");
+    private static final Identifier XAERO_WORLDMAP_KEY = idXaeroWorld("main");
+    private static final Identifier JOURNEYMAP_PERM_REQ = idJourneyMap("perm_req");
 
     private static final String KICK_MESSAGE = HorizonConfig.blockMinimapsMessage;
 
     private static final Map<String, String> PLAYERS_WITH_MINIMAPS = new HashMap<>();
 
     @Contract("_ -> new")
-    public static ResourceLocation idXaeroMini(String path) {
-        return ResourceLocation.tryBuild(PROTOCOL_ID_XAERO_MINI, path);
+    public static Identifier idXaeroMini(String path) {
+        return Identifier.tryBuild(PROTOCOL_ID_XAERO_MINI, path);
     }
 
     @Contract("_ -> new")
-    public static ResourceLocation idXaeroWorld(String path) {
-        return ResourceLocation.tryBuild(PROTOCOL_ID_XAERO_WORLD, path);
+    public static Identifier idXaeroWorld(String path) {
+        return Identifier.tryBuild(PROTOCOL_ID_XAERO_WORLD, path);
     }
 
     @Contract("_ -> new")
-    public static ResourceLocation idJourneyMap(String path) {
-        return ResourceLocation.tryBuild(PROTOCOL_ID_JOURNEY, path);
+    public static Identifier idJourneyMap(String path) {
+        return Identifier.tryBuild(PROTOCOL_ID_JOURNEY, path);
     }
 
     @ProtocolHandler.Init
@@ -67,7 +67,7 @@ public class MinimapsProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_MINI + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
-    public static void onXaeroMinimapRegisterConfig(Context context, ResourceLocation channelId) {
+    public static void onXaeroMinimapRegisterConfig(Context context, Identifier channelId) {
         String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has Xaero's Minimap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
@@ -79,7 +79,7 @@ public class MinimapsProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_WORLD + ":main", stage = ProtocolHandler.Stage.CONFIGURATION)
-    public static void onXaeroWorldmapRegisterConfig(Context context, ResourceLocation channelId) {
+    public static void onXaeroWorldmapRegisterConfig(Context context, Identifier channelId) {
         String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has Xaero's Worldmap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
@@ -91,7 +91,7 @@ public class MinimapsProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_JOURNEY + ":perm_req", stage = ProtocolHandler.Stage.CONFIGURATION)
-    public static void onJourneyMapRegisterConfig(Context context, ResourceLocation channelId) {
+    public static void onJourneyMapRegisterConfig(Context context, Identifier channelId) {
         String playerName = context.profile().name();
         LOGGER.info("Player " + playerName + " has JourneyMap installed (config stage)");
         PLAYERS_WITH_MINIMAPS.put(playerName, "JourneyMap");
@@ -104,7 +104,7 @@ public class MinimapsProtocol implements HorizonProtocol {
 
     // Обработчики для стадии GAME используют ServerPlayer
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_MINI + ":main", stage = ProtocolHandler.Stage.GAME)
-    public static void onXaeroMinimapRegister(ServerPlayer player, ResourceLocation channelId) {
+    public static void onXaeroMinimapRegister(ServerPlayer player, Identifier channelId) {
         String playerName = player.getScoreboardName();
         LOGGER.info("Player " + playerName + " has Xaero's Minimap installed");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
@@ -116,7 +116,7 @@ public class MinimapsProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_XAERO_WORLD + ":main", stage = ProtocolHandler.Stage.GAME)
-    public static void onXaeroWorldmapRegister(ServerPlayer player, ResourceLocation channelId) {
+    public static void onXaeroWorldmapRegister(ServerPlayer player, Identifier channelId) {
         String playerName = player.getScoreboardName();
         LOGGER.info("Player " + playerName + " has Xaero's Worldmap installed");
         PLAYERS_WITH_MINIMAPS.put(playerName, "Xaero's Map");
@@ -128,7 +128,7 @@ public class MinimapsProtocol implements HorizonProtocol {
     }
 
     @ProtocolHandler.MinecraftRegister(key = PROTOCOL_ID_JOURNEY + ":perm_req", stage = ProtocolHandler.Stage.GAME)
-    public static void onJourneyMapRegister(ServerPlayer player, ResourceLocation channelId) {
+    public static void onJourneyMapRegister(ServerPlayer player, Identifier channelId) {
         String playerName = player.getScoreboardName();
         LOGGER.info("Player " + playerName + " has JourneyMap installed");
         PLAYERS_WITH_MINIMAPS.put(playerName, "JourneyMap");
