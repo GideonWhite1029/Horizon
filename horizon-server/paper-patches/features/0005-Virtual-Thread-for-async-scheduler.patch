@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
-index 015bb4afbc9ae4220bed13a961ec6de6b1583975..88835a6e9acb11a0b5d55f307b71b465241ea2a7 100644
+index b7a4594ec03521f329766503c001c533a6ee6064..6e4c548eff35c7105aa532e3a4a896040089be9e 100644
 --- a/src/main/java/org/bukkit/craftbukkit/Main.java
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
-@@ -237,7 +237,7 @@ public class Main {
+@@ -244,7 +244,7 @@ public class Main {
                      System.setProperty(net.minecrell.terminalconsole.TerminalConsoleAppender.JLINE_OVERRIDE_PROPERTY, "false"); // Paper
                  }
  
