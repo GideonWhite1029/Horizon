@@ -123,10 +123,10 @@ index fbab3e2f4e3a9cdc1c148fc794036c5655368666..f6feb7dc950dd62cdb9374323bda34e4
                              if (players.size() >= resultLimit) {
                                  return players;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 090a171d6e2e980fdc844c503b759b790d9dc3da..0f80ed80dcb831915b97a9ea3cb417806f88ca08 100644
+index 7f1531b48b52f57edb92be9e5ba37d2f9c4211ac..204811ebeccf850c244c9eec8ab4ed51bd56ccd2 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1784,7 +1784,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1782,7 +1782,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -209,7 +209,7 @@ index dd0bf891800cb678e3cfa3eaa3a9927a614ccf8f..3f6ae59f76d5c42a16f41eceae5f0ee3
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index fe281052a6623d52544997b4f7cbf376c0075434..b3b9fa87dd45bbd1cb1195c8ebd5af5dff06de4a 100644
+index 1a6da393cf83c86d24085ecf6aa4c523fde1c3b7..51f8d0b62ff36a60a2d8f176ee086fc3c7543ae6 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
 @@ -226,8 +226,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc

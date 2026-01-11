@@ -70,10 +70,10 @@ index d04ff11b293c458fd4f18f04336421e5e183c3f4..b3d37aee15134702c633de99bfb4dbe2
          if (entity instanceof EnderDragonPart complexPart) {
              if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index dd0dcc6ae5cfb72df0483417b22eddd90febc9e6..9083bf8864104b372be7172bbb73e0098eaba3a8 100644
+index 225a88c6976de91b9115471e7942e5585e392ec4..2a1c9508d2028173c878a36c4b2bf0be055601a2 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2137,7 +2137,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -2131,7 +2131,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
  
      @Override
      public boolean canSee(Player player) {

@@ -56,10 +56,10 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index f019510b5e66a2cb233f2130ccaa47b0011e5759..34d65ae08b7ec2d8ab35d383d7512517640c1e04 100644
+index 2276fb5d4f0a193bafd69e59d5bf2fe9c43bb3f5..43f7000daf2173db7aa9e214b3a02b677470e214 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -965,10 +965,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -963,10 +963,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // CraftBukkit end
          if (flush) {
              for (ServerLevel serverLevel : this.getAllLevels()) {

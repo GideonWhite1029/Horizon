@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Sun, 11 Jan 2026 12:01:20 +0300
+Subject: [PATCH] Rebrand
+
+
+diff --git a/src/main/java/org/purpurmc/purpur/PurpurVersionFetcher.java b/src/main/java/org/purpurmc/purpur/PurpurVersionFetcher.java
+index f2c22af968fbdbbea1bbd07712733c74e0b42333..5997e5c47a2f3f2e72fce4cf7959b631da31afd7 100644
+--- a/src/main/java/org/purpurmc/purpur/PurpurVersionFetcher.java
++++ b/src/main/java/org/purpurmc/purpur/PurpurVersionFetcher.java
+@@ -36,17 +36,12 @@ public class PurpurVersionFetcher implements VersionFetcher {
+     private static final Logger LOGGER = LogUtils.getClassLogger();
+     private static final int DISTANCE_ERROR = -1;
+     private static final int DISTANCE_UNKNOWN = -2;
+-    private static final String DOWNLOAD_PAGE = "https://purpurmc.org/downloads";
+-    private static final String REPOSITORY = "PurpurMC/Purpur";
+-    private static final ServerBuildInfo BUILD_INFO;
+-    private static final String USER_AGENT;
++    private static final String DOWNLOAD_PAGE = "https://github.com/GideonWhite1029/Horizon";
++    private static final String REPOSITORY = "GideonWhite1029/Horizon";
++    private static final ServerBuildInfo BUILD_INFO = ServerBuildInfo.buildInfo();
++    private static final String USER_AGENT = BUILD_INFO.brandName() + "/" + BUILD_INFO.asString(VERSION_SIMPLE);
+     private static final Gson GSON = new Gson();
+ 
+-    static {
+-        BUILD_INFO = ServerBuildInfo.buildInfo();
+-        USER_AGENT = BUILD_INFO.brandName() + "/" + BUILD_INFO.asString(VERSION_SIMPLE) + " (https://purpurmc.org)";
+-    }
+-
+     private static int distance = DISTANCE_UNKNOWN;
+     public int distance() {
+         return distance;
