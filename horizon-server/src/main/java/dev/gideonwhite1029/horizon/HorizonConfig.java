@@ -339,4 +339,48 @@ public final class HorizonConfig {
         }
     }
 
+    @GlobalConfig(name = "enable", category = {"security", "obfuscation-detection"})
+    public static boolean obfuscationDetectionEnabled = true;
+
+    @GlobalConfig(name = "suspicious-name-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double suspiciousNameThreshold = 0.30;
+
+    @GlobalConfig(name = "short-name-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double shortNameThreshold = 0.20;
+
+    @GlobalConfig(name = "advanced-obfuscation-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double advancedObfuscationThreshold = 0.10;
+
+    @GlobalConfig(name = "encrypted-string-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double encryptedStringThreshold = 0.15;
+
+    @GlobalConfig(name = "anti-debug-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double antiDebugThreshold = 0.05;
+
+    @GlobalConfig(name = "access-obfuscation-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double accessObfuscationThreshold = 0.25;
+
+    @GlobalConfig(name = "arithmetic-obfuscation-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double arithmeticObfuscationThreshold = 0.20;
+
+    @GlobalConfig(name = "crypto-usage-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double cryptoUsageThreshold = 0.10;
+
+    @GlobalConfig(name = "small-plugin-short-name-threshold", category = {"security", "obfuscation-detection"}, verify = ThresholdVerify.class)
+    public static double smallPluginShortNameThreshold = 0.40;
+
+    @GlobalConfig(name = "minimum-classes-for-large-plugin", category = {"security", "obfuscation-detection"}, verify = ConfigVerify.IntConfigVerify.class)
+    public static int minimumClassesForLargePlugin = 10;
+
+    public static class ThresholdVerify extends ConfigVerify.DoubleConfigVerify {
+        @Override
+        public String check(Double old, Double value) {
+            if (value < 0.0 || value > 1.0) {
+                HorizonLogger.LOGGER.warning("Obfuscation detection threshold must be between 0.0 and 1.0. Falling back to default.");
+                return "Threshold must be between 0.0 and 1.0";
+            }
+            return null;
+        }
+    }
+
 }

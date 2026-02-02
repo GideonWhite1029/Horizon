@@ -1,0 +1,349 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: GideonWhite1029 <gideonwhite1029@gmail.com>
+Date: Mon, 2 Feb 2026 17:30:50 +0300
+Subject: [PATCH] Obfuscation detection
+
+This patch implements advanced obfuscation detection capabilities for
+Minecraft server plugins. It analyzes JAR files during plugin loading
+to identify potentially obfuscated or malicious code by examining:
+    - Class naming patterns (short names, sequential patterns, confusion)
+    - Package structure anomalies
+    - Encrypted strings and string decryption methods
+    - Anti-debugging techniques
+    - Excessive use of synthetic/bridge methods
+    - Arithmetic and bitwise operation obfuscation
+    - Cryptographic API usage patterns
+
+The detection system uses configurable thresholds and multiple heuristics
+to identify obfuscated plugins while minimizing false positives.
+
+Author: GideonWhite1029
+License: GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
+
+diff --git a/src/main/java/io/papermc/paper/plugin/provider/type/spigot/SpigotPluginProvider.java b/src/main/java/io/papermc/paper/plugin/provider/type/spigot/SpigotPluginProvider.java
+index 0fd1040ed376f19c6d5326767baaf3048ce1bfb4..106cc6b4989585308fa0322bdc3627b7c615adc3 100644
+--- a/src/main/java/io/papermc/paper/plugin/provider/type/spigot/SpigotPluginProvider.java
++++ b/src/main/java/io/papermc/paper/plugin/provider/type/spigot/SpigotPluginProvider.java
+@@ -2,6 +2,7 @@ package io.papermc.paper.plugin.provider.type.spigot;
+ 
+ import com.destroystokyo.paper.util.SneakyThrow;
+ import com.destroystokyo.paper.utils.PaperPluginLogger;
++import dev.gideonwhite1029.horizon.HorizonConfig;
+ import io.papermc.paper.plugin.manager.PaperPluginManagerImpl;
+ import io.papermc.paper.plugin.provider.configuration.LoadOrderConfiguration;
+ import io.papermc.paper.plugin.provider.entrypoint.DependencyContext;
+@@ -22,15 +23,26 @@ import org.bukkit.plugin.java.PluginClassLoader;
+ import org.jetbrains.annotations.NotNull;
+ 
+ import java.io.File;
++import java.io.InputStream;
+ import java.nio.file.Path;
+ import java.util.ArrayList;
++import java.util.Enumeration;
+ import java.util.HashSet;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Set;
++import java.util.jar.JarEntry;
+ import java.util.jar.JarFile;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
++import java.util.regex.Pattern;
++import org.objectweb.asm.ClassReader;
++import org.objectweb.asm.tree.ClassNode;
++import org.objectweb.asm.tree.MethodNode;
++import org.objectweb.asm.tree.AbstractInsnNode;
++import org.objectweb.asm.tree.MethodInsnNode;
++import org.objectweb.asm.tree.InsnNode;
++import org.objectweb.asm.Opcodes;
+ 
+ public class SpigotPluginProvider implements PluginProvider<JavaPlugin>, ProviderStatusHolder, DependencyContextHolder {
+ 
+@@ -133,6 +145,15 @@ public class SpigotPluginProvider implements PluginProvider<JavaPlugin>, Provide
+             // We must provide a temporary context in order to properly handle dependencies on the plugin classloader constructor.
+             loader.dependencyContext = PaperPluginManagerImpl.getInstance();
+ 
++            // Horizon start - Obfuscation detection
++            if (HorizonConfig.obfuscationDetectionEnabled && isObfuscated(this.jarFile)) {
++                server.getLogger().warning(String.format(
++                    "[SECURITY WARNING] Plugin '%s' (%s) appears to be obfuscated! This may indicate malicious code or anti-decompilation measures.",
++                    this.description.getFullName(),
++                    this.path.getFileName()
++                ));
++            }
++            // Horizon end - Obfuscation detection
+ 
+             this.status = ProviderStatus.INITIALIZED;
+             return loader.getPlugin();
+@@ -196,4 +217,271 @@ public class SpigotPluginProvider implements PluginProvider<JavaPlugin>, Provide
+             ", dependencyContext=" + dependencyContext +
+             '}';
+     }
++
++    // Horizon start - Obfuscation detection
++    /**
++     * Checks if the plugin JAR contains obfuscated code.
++     *
++     * @param jarFile the plugin JAR file to analyze
++     * @return true if obfuscation is detected, false otherwise
++     */
++    private boolean isObfuscated(JarFile jarFile) {
++        Pattern shortNamePattern = Pattern.compile("^[a-zA-Z]{1,2}$");
++        Pattern sequentialPattern = Pattern.compile("^[a-zA-Z]+\\d+$");
++        Pattern singleLetterPackage = Pattern.compile("^[a-zA-Z]/[a-zA-Z]/.*$");
++        Pattern confusionPattern = Pattern.compile("^[Il1O0]{3,}$");
++        Pattern unicodePattern = Pattern.compile(".*[\\u0080-\\uFFFF].*");
++
++        int totalClasses = 0;
++        int suspiciousClasses = 0;
++        int shortNameClasses = 0;
++        int advancedObfuscationSignatures = 0;
++        int encryptedStrings = 0;
++        int antiDebugPatterns = 0;
++        int excessiveAccessModifiers = 0;
++        int arithmeticObfuscation = 0;
++        int cryptoUsage = 0;
++
++        try {
++            Enumeration<JarEntry> entries = jarFile.entries();
++
++            while (entries.hasMoreElements()) {
++                JarEntry entry = entries.nextElement();
++                String name = entry.getName();
++
++                if (name.endsWith(".class") && !name.contains("$")) {
++                    totalClasses++;
++
++                    String className = name.substring(name.lastIndexOf('/') + 1, name.length() - 6);
++
++                    if (shortNamePattern.matcher(className).matches()) {
++                        shortNameClasses++;
++                        suspiciousClasses++;
++                    } else if (sequentialPattern.matcher(className).matches()) {
++                        suspiciousClasses++;
++                    } else if (confusionPattern.matcher(className).matches()) {
++                        advancedObfuscationSignatures++;
++                        suspiciousClasses++;
++                    } else if (unicodePattern.matcher(className).matches()) {
++                        advancedObfuscationSignatures++;
++                        suspiciousClasses++;
++                    }
++
++                    if (singleLetterPackage.matcher(name).matches()) {
++                        suspiciousClasses++;
++                    }
++
++                    try (InputStream is = jarFile.getInputStream(entry)) {
++                        ClassReader reader = new ClassReader(is);
++                        ClassNode classNode = new ClassNode();
++                        reader.accept(classNode, ClassReader.SKIP_FRAMES);
++
++                        if (hasEncryptedStrings(classNode)) {
++                            encryptedStrings++;
++                        }
++                        if (hasAntiDebugging(classNode)) {
++                            antiDebugPatterns++;
++                        }
++                        if (hasExcessiveAccessObfuscation(classNode)) {
++                            excessiveAccessModifiers++;
++                        }
++                        if (hasArithmeticObfuscation(classNode)) {
++                            arithmeticObfuscation++;
++                        }
++                        if (hasCryptographicOperations(classNode)) {
++                            cryptoUsage++;
++                        }
++                    } catch (Exception e) {
++                    }
++                }
++            }
++
++            if (totalClasses >= HorizonConfig.minimumClassesForLargePlugin) {
++                double suspiciousPercentage = (double) suspiciousClasses / totalClasses;
++                double shortNamePercentage = (double) shortNameClasses / totalClasses;
++                double advancedObfuscationPercentage = (double) advancedObfuscationSignatures / totalClasses;
++                double encryptedStringPercentage = (double) encryptedStrings / totalClasses;
++
++                return suspiciousPercentage > HorizonConfig.suspiciousNameThreshold
++                    || shortNamePercentage > HorizonConfig.shortNameThreshold
++                    || advancedObfuscationPercentage > HorizonConfig.advancedObfuscationThreshold
++                    || encryptedStringPercentage > HorizonConfig.encryptedStringThreshold
++                    || (double) antiDebugPatterns / totalClasses > HorizonConfig.antiDebugThreshold
++                    || (double) excessiveAccessModifiers / totalClasses > HorizonConfig.accessObfuscationThreshold
++                    || (double) arithmeticObfuscation / totalClasses > HorizonConfig.arithmeticObfuscationThreshold
++                    || (double) cryptoUsage / totalClasses > HorizonConfig.cryptoUsageThreshold;
++            } else if (totalClasses > 0) {
++                return (double) shortNameClasses / totalClasses > HorizonConfig.smallPluginShortNameThreshold || advancedObfuscationSignatures > 0;
++            }
++
++        } catch (Exception e) {
++            this.logger.log(Level.WARNING, "Failed to check plugin for obfuscation: " + e.getMessage());
++        }
++
++        return false;
++    }
++
++    private boolean hasEncryptedStrings(ClassNode classNode) {
++        if (classNode.methods == null) return false;
++
++        for (MethodNode method : classNode.methods) {
++            if (method.instructions == null) continue;
++
++            String methodName = method.name.toLowerCase();
++            if (methodName.contains("decrypt") || methodName.contains("decode") ||
++                methodName.contains("deobf") || methodName.contains("string")) {
++                return true;
++            }
++
++            if (method.name.equals("<clinit>") && method.instructions.size() > 100) {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    private boolean hasAntiDebugging(ClassNode classNode) {
++        if (classNode.methods == null) return false;
++
++        for (MethodNode method : classNode.methods) {
++            String methodName = method.name.toLowerCase();
++
++            if (methodName.contains("debug") || methodName.contains("jbyte") ||
++                methodName.contains("recaf") || methodName.contains("attach") ||
++                methodName.contains("agent") || methodName.contains("instrument")) {
++                return true;
++            }
++        }
++
++        return false;
++    }
++
++    private boolean hasExcessiveAccessObfuscation(ClassNode classNode) {
++        if (classNode.methods == null) return false;
++
++        int syntheticCount = 0;
++        int totalMethods = classNode.methods.size();
++
++        for (MethodNode method : classNode.methods) {
++            if ((method.access & 0x1000) != 0 || (method.access & 0x0040) != 0) {
++                syntheticCount++;
++            }
++        }
++
++        return totalMethods > 0 && (double) syntheticCount / totalMethods > 0.30;
++    }
++
++    private boolean hasArithmeticObfuscation(ClassNode classNode) {
++        if (classNode.methods == null) return false;
++
++        for (MethodNode method : classNode.methods) {
++            if (method.instructions == null) continue;
++
++            int arithmeticOps = 0;
++            int xorOps = 0;
++            int shiftOps = 0;
++            int totalInstructions = 0;
++
++            for (AbstractInsnNode insn : method.instructions) {
++                totalInstructions++;
++
++                if (insn instanceof InsnNode) {
++                    int opcode = insn.getOpcode();
++
++                    if (opcode == Opcodes.IXOR || opcode == Opcodes.LXOR) {
++                        xorOps++;
++                        arithmeticOps++;
++                    } else if (opcode == Opcodes.ISHL || opcode == Opcodes.ISHR || opcode == Opcodes.IUSHR ||
++                             opcode == Opcodes.LSHL || opcode == Opcodes.LSHR || opcode == Opcodes.LUSHR) {
++                        shiftOps++;
++                        arithmeticOps++;
++                    } else if (opcode == Opcodes.IAND || opcode == Opcodes.LAND ||
++                             opcode == Opcodes.IOR || opcode == Opcodes.LOR ||
++                             opcode == Opcodes.IADD || opcode == Opcodes.LADD ||
++                             opcode == Opcodes.ISUB || opcode == Opcodes.LSUB ||
++                             opcode == Opcodes.IMUL || opcode == Opcodes.LMUL ||
++                             opcode == Opcodes.IDIV || opcode == Opcodes.LDIV ||
++                             opcode == Opcodes.IREM || opcode == Opcodes.LREM) {
++                        arithmeticOps++;
++                    }
++                }
++            }
++
++            if (totalInstructions > 20) {
++                double arithmeticRatio = (double) arithmeticOps / totalInstructions;
++                double xorRatio = (double) xorOps / totalInstructions;
++                double shiftRatio = (double) shiftOps / totalInstructions;
++
++                if (arithmeticRatio > 0.40 || xorRatio > 0.15 || shiftRatio > 0.15) {
++                    return true;
++                }
++            }
++        }
++
++        return false;
++    }
++
++    private boolean hasCryptographicOperations(ClassNode classNode) {
++        if (classNode.methods == null) return false;
++
++        String className = classNode.name.toLowerCase();
++        if (className.contains("cipher") || className.contains("crypto") ||
++            className.contains("encrypt") || className.contains("decrypt") ||
++            className.contains("aes") || className.contains("des") || className.contains("rsa")) {
++            return true;
++        }
++
++        for (MethodNode method : classNode.methods) {
++            if (method.instructions == null) continue;
++
++            for (AbstractInsnNode insn : method.instructions) {
++                if (insn instanceof MethodInsnNode) {
++                    MethodInsnNode methodInsn = (MethodInsnNode) insn;
++                    String owner = methodInsn.owner;
++                    String name = methodInsn.name;
++
++                    if (owner.startsWith("javax/crypto/")) {
++                        return true;
++                    }
++
++                    if (owner.equals("javax/crypto/Cipher") ||
++                        owner.equals("javax/crypto/spec/SecretKeySpec") ||
++                        owner.equals("javax/crypto/spec/IvParameterSpec")) {
++                        return true;
++                    }
++
++                    if (owner.equals("java/security/MessageDigest")) {
++                        return true;
++                    }
++
++                    if (owner.equals("javax/crypto/KeyGenerator") ||
++                        owner.equals("java/security/KeyPairGenerator")) {
++                        return true;
++                    }
++
++                    if (owner.equals("java/util/Base64") ||
++                        owner.equals("java/util/Base64$Encoder") ||
++                        owner.equals("java/util/Base64$Decoder")) {
++                        if (name.toLowerCase().contains("encrypt") ||
++                            name.toLowerCase().contains("decrypt") ||
++                            name.toLowerCase().contains("encode") ||
++                            name.toLowerCase().contains("decode")) {
++                            return true;
++                        }
++                    }
++
++                    String methodName = method.name.toLowerCase();
++                    if (methodName.contains("cipher") || methodName.contains("encrypt") ||
++                        methodName.contains("decrypt") || methodName.contains("aes") ||
++                        methodName.contains("des") || methodName.contains("rsa")) {
++                        return true;
++                    }
++                }
++            }
++        }
++
++        return false;
++    }
++    // Horizon end - Obfuscation detection
+ }
