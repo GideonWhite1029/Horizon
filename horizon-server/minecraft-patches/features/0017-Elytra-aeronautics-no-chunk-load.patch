@@ -29,10 +29,10 @@ index ab8893163ac85971a470e4a4d6fa76bd174e2bae..b8200a90559cfa6b3e1ad8eb96ab03c4
  
          SectionPos lastSectionPos = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 8629795e0688c884376b0bff1f5fad279b7a2a6d..992e22e8df514d7e2dfbe010506f329670561322 100644
+index f5f99d4adf831afd2bca2cfa55364b7da1ca9914..861d0c46b1e6656486f4dba3576e098b3e79a9b2 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -618,7 +618,7 @@ public class ServerGamePacketListenerImpl
+@@ -619,7 +619,7 @@ public class ServerGamePacketListenerImpl
                  speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
  
                  // Paper start - Prevent moving into unloaded chunks
@@ -42,7 +42,7 @@ index 8629795e0688c884376b0bff1f5fad279b7a2a6d..992e22e8df514d7e2dfbe010506f3296
                          !serverLevel.areChunksLoadedForMove(rootVehicle.getBoundingBox().expandTowards(new Vec3(toX, toY, toZ).subtract(rootVehicle.position())))
                  )) {
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 5c75d1e1e6d8b0d10eaba206203f086f25641959..e8d163d0591f1b6969056c08a51b1459186d3def 100644
+index 41506648031e9c7a1acf12f56ba02b4aadec344c..fd5b102741124ebf079bca2edd9e2e5009a0aaae 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
@@ -76,7 +76,7 @@ index 5c75d1e1e6d8b0d10eaba206203f086f25641959..e8d163d0591f1b6969056c08a51b1459
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 9312a20c37329f2892e0b6231566bb1f96e1e7ac..62358c62c264c0832ee1b2f32980d0564b9fc61c 100644
+index b0d2ddd2b2abf2e2980b9440f7109c32e8606c04..7138081db3303db6be2a1e08e3eab046ac0bf49a 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -182,6 +182,7 @@ public abstract class Player extends Avatar implements ContainerUser {
