@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index f64fb48b7496a616427271a249829a6abf3ec95b..7f1531b48b52f57edb92be9e5ba37d2f9c4211ac 100644
+index 64973adb3395cd0f16553cd959ac20e82a94f7a4..e0e97aa104a64342ca27d39a8687f09102e2f2fc 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1652,6 +1652,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1647,6 +1647,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.server.spark.tickStart(); // Paper - spark
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
@@ -24,7 +24,7 @@ index f64fb48b7496a616427271a249829a6abf3ec95b..7f1531b48b52f57edb92be9e5ba37d2f
          this.tickCount++;
          this.tickRateManager.tick();
          this.tickChildren(hasTimeLeft);
-@@ -2884,7 +2891,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2879,7 +2886,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(

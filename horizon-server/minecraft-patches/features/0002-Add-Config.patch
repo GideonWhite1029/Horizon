@@ -5,7 +5,7 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index c4c693b94533ccfe2ce04bc7b9b18ca7cd3f4958..33c548d7d62c3e33483ee55dbc1e64e7285aa21f 100644
+index 667dc1fa02f1baffa3a42a6fb40c96a84451594e..217676a4de9ecfcef61e5b43190c4f7a5d8221bb 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -1099,6 +1099,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -13,9 +13,9 @@ index c4c693b94533ccfe2ce04bc7b9b18ca7cd3f4958..33c548d7d62c3e33483ee55dbc1e64e7
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
 +        dev.gideonwhite1029.horizon.HorizonConfig.createWorldSections = false; // Horizon
-         try {
-             net.minecrell.terminalconsole.TerminalConsoleAppender.close(); // Paper - Use TerminalConsoleAppender
-         } catch (final Exception ignored) {
+         this.onServerExit();
+         // Paper end - Improved watchdog support - move final shutdown items here
+     }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
 index 19a25ee84a4211256a1dbb614db9ebf2ce53182f..c1f04f9e0ec8442656802c700d5ccd450589801d 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
