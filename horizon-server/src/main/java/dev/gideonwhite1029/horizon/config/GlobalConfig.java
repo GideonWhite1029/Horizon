@@ -15,4 +15,6 @@ public @interface GlobalConfig {
     boolean lock() default false;
 
     Class<? extends ConfigVerify<?>> verify() default ConfigVerify.BooleanConfigVerify.class;
+
+    String[] comment() default {};
 }

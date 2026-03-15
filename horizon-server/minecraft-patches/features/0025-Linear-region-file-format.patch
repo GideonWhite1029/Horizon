@@ -56,7 +56,7 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 2276fb5d4f0a193bafd69e59d5bf2fe9c43bb3f5..43f7000daf2173db7aa9e214b3a02b677470e214 100644
+index f79fa48d54a39b24402c8512a6ae7089a7af676e..88579674dd0510ad46864f78bccee90a28630fbb 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -963,10 +963,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -72,6 +72,14 @@ index 2276fb5d4f0a193bafd69e59d5bf2fe9c43bb3f5..43f7000daf2173db7aa9e214b3a02b67
          }
  
          return flag;
+@@ -1100,6 +1100,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         // Paper start - Improved watchdog support - move final shutdown items here
+         Util.shutdownExecutors();
+         dev.gideonwhite1029.horizon.HorizonConfig.createWorldSections = false; // Horizon
++        dev.gideonwhite1029.horizon.region.LinearRegionFileFlusher.INSTANCE.shutdown(); // Horizon - shutdown Linear I/O flusher
+         this.onServerExit();
+         // Paper end - Improved watchdog support - move final shutdown items here
+     }
 diff --git a/net/minecraft/util/worldupdate/WorldUpgrader.java b/net/minecraft/util/worldupdate/WorldUpgrader.java
 index 2fa99d5e092c14733da1acf00d9f0cc126f6f04d..ccec2239996802edb35ee68316370690470de0b4 100644
 --- a/net/minecraft/util/worldupdate/WorldUpgrader.java

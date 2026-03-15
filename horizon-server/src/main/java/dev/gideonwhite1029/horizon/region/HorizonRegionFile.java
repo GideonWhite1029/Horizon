@@ -18,7 +18,8 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 
 import net.jpountz.lz4.LZ4Compressor;
@@ -32,9 +33,6 @@ import org.slf4j.Logger;
 import net.openhft.hashing.LongHashFunction;
 import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import net.minecraft.world.level.chunk.storage.RegionFileVersion;
-
-import java.util.concurrent.locks.LockSupport;
-import java.util.concurrent.locks.ReentrantLock;
 
 // LinearRegionFile_implementation_version_0_5byXymb
 // Just gonna use this string to inform other forks about updates ;-)
@@ -51,13 +49,13 @@ public class HorizonRegionFile implements IRegionFile {
 
     private final long[] chunkTimestamps = new long[1024];
     private final boolean[] chunkExistenceBitmap = new boolean[1024];
-    private final Object markedToSaveLock = new Object();
-
     private final LZ4Compressor compressor;
     private final LZ4FastDecompressor decompressor;
 
-    private boolean markedToSave = false;
-    private boolean close = false;
+    private final AtomicBoolean markedToSave = new AtomicBoolean(false);
+    private volatile long lastWritten = 0; // System.nanoTime() of last write
+    private volatile boolean closed = false;
+    private final AtomicBoolean flushing = new AtomicBoolean(false);
 
     public final ReentrantLock fileLock = new ReentrantLock(true);
     public Path regionFile;
@@ -65,7 +63,6 @@ public class HorizonRegionFile implements IRegionFile {
     private final int compressionLevel;
     private int gridSize = 8;
     private int bucketSize = 4;
-    private final Thread bindThread;
 
     public Path getRegionFile() {
         return this.regionFile;
@@ -133,7 +130,31 @@ public class HorizonRegionFile implements IRegionFile {
         }
     }
 
-    public boolean regionFileOpen = false;
+    public volatile boolean regionFileOpen = false;
+
+    public boolean isMarkedToSave() {
+        return this.markedToSave.get();
+    }
+
+    public long getLastWritten() {
+        return this.lastWritten;
+    }
+
+    public boolean isClosedVolatile() {
+        return this.closed;
+    }
+
+    public boolean tryMarkFlushing() {
+        return this.flushing.compareAndSet(false, true);
+    }
+
+    public void syncIfNeeded() throws IOException {
+        try {
+            flush();
+        } finally {
+            this.flushing.set(false);
+        }
+    }
 
     private synchronized void openRegionFile() {
         if (regionFileOpen) return;
@@ -142,7 +163,6 @@ public class HorizonRegionFile implements IRegionFile {
         File regionFile = new File(this.regionFile.toString());
 
         if(!regionFile.canRead()) {
-            this.bindThread.start();
             return;
         }
 
@@ -162,8 +182,6 @@ public class HorizonRegionFile implements IRegionFile {
             } else {
                 throw new RuntimeException("Invalid version: " + version + " file " + this.regionFile);
             }
-
-            this.bindThread.start();
         } catch (IOException e) {
             throw new RuntimeException("Failed to open region file " + this.regionFile, e);
         }
@@ -272,63 +290,17 @@ public class HorizonRegionFile implements IRegionFile {
     }
 
     public HorizonRegionFile(RegionStorageInfo storageKey, Path path, Path directory, RegionFileVersion compressionFormat, boolean dsync, int compressionLevel) throws IOException {
-        Runnable flushCheck = () -> {
-            while (!close) {
-                synchronized (saveLock) {
-                    if (markedToSave && activeSaveThreads < SAVE_THREAD_MAX_COUNT) {
-                        activeSaveThreads++;
-                        Runnable flushOperation = () -> {
-                            try {
-                                flush();
-                            } catch (IOException ex) {
-                                LOGGER.error("Region file {} flush failed", this.regionFile.toAbsolutePath(), ex);
-                            } finally {
-                                synchronized (saveLock) {
-                                    activeSaveThreads--;
-                                }
-                            }
-                        };
-
-                        Thread saveThread = USE_VIRTUAL_THREAD ?
-                                Thread.ofVirtual().name("Linear IO - " + HorizonRegionFile.this.hashCode()).unstarted(flushOperation) :
-                                Thread.ofPlatform().name("Linear IO - " + HorizonRegionFile.this.hashCode()).unstarted(flushOperation);
-                        saveThread.setPriority(Thread.NORM_PRIORITY - 3);
-                        saveThread.start();
-                    }
-                }
-                LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(SAVE_DELAY_MS));
-            }
-        };
-        this.bindThread = USE_VIRTUAL_THREAD ? Thread.ofVirtual().unstarted(flushCheck) : Thread.ofPlatform().unstarted(flushCheck);
-        this.bindThread.setName("Linear IO Schedule - " + this.hashCode());
         this.regionFile = path;
         this.compressionLevel = compressionLevel;
-
         this.compressor = LZ4Factory.fastestInstance().fastCompressor();
         this.decompressor = LZ4Factory.fastestInstance().fastDecompressor();
+        LinearRegionFileFlusher.INSTANCE.addFile(this);
     }
 
-    private synchronized void markToSave() {
-        synchronized(markedToSaveLock) {
-            markedToSave = true;
-        }
+    private void markToSave() {
+        this.markedToSave.set(true);
+        this.lastWritten = System.nanoTime();
     }
-
-    private synchronized boolean isMarkedToSave() {
-        synchronized(markedToSaveLock) {
-            if(markedToSave) {
-                markedToSave = false;
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public static int SAVE_THREAD_MAX_COUNT = 6;
-    public static int SAVE_DELAY_MS = 100;
-    public static boolean USE_VIRTUAL_THREAD = true;
-    private static final Object saveLock = new Object();
-    private static int activeSaveThreads = 0;
 
     public synchronized boolean doesChunkExist(ChunkPos pos) throws Exception {
         openRegionFile();
@@ -336,7 +308,7 @@ public class HorizonRegionFile implements IRegionFile {
     }
 
     public synchronized void flush() throws IOException {
-        if(!isMarkedToSave()) return;
+        if (!this.markedToSave.compareAndSet(true, false)) return;
 
         openRegionFile();
 
@@ -575,11 +547,14 @@ public class HorizonRegionFile implements IRegionFile {
     }
 
     public synchronized void close() throws IOException {
+        LinearRegionFileFlusher.INSTANCE.removeFile(this);
+        this.closed = true;
+
         openRegionFile();
-        close = true;
+        this.markedToSave.set(true);
         try {
             flush();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new IOException("Region flush IOException " + e + " " + this.regionFile);
         }
     }

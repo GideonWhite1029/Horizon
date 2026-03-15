@@ -11,7 +11,11 @@ import org.bukkit.Bukkit;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +56,10 @@ public class GlobalConfigManager {
                         Object defValue = isEnumConfig ? field.get(null).toString() : field.get(null);
                         HorizonConfig.config.addDefault(verifiedConfig.path, defValue);
 
+                        List<String> commentLines = buildCommentLines(globalConfig.comment());
+                        HorizonConfig.config.setComments(verifiedConfig.path,
+                                commentLines.isEmpty() ? null : commentLines);
+
                         try {
                             Object savedValue = HorizonConfig.config.get(verifiedConfig.path);
                             if (isEnumConfig) {
@@ -81,6 +89,16 @@ public class GlobalConfigManager {
 
         firstLoad = false;
         HorizonConfig.save();
+    }
+
+    public static List<String> buildCommentLines(String[] rawComments) {
+        if (rawComments.length == 0) return Collections.emptyList();
+        List<String> lines = new ArrayList<>();
+        for (String raw : rawComments) {
+            String[] parts = raw.split("\n", -1);
+            Collections.addAll(lines, parts);
+        }
+        return lines;
     }
 
     public static VerifiedConfig getVerifiedConfig(String path) {

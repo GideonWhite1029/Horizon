@@ -8,13 +8,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
+import java.util.List;
 
 public class GlobalConfigCreator {
 
     public static void main(String[] args) {
         YamlConfiguration config = new YamlConfiguration();
         config.options().setHeader(HorizonConfig.CONFIG_HEADER);
+        config.options().parseComments(true);
 
         config.set("config-version", HorizonConfig.CURRENT_CONFIG_VERSION);
 
@@ -34,6 +35,11 @@ public class GlobalConfigCreator {
 
                         Object defValue = isEnumConfig ? field.get(null).toString() : field.get(null);
                         config.set(verifiedConfig.path(), defValue);
+
+                        List<String> commentLines = GlobalConfigManager.buildCommentLines(globalConfig.comment());
+                        if (!commentLines.isEmpty()) {
+                            config.setComments(verifiedConfig.path(), commentLines);
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
