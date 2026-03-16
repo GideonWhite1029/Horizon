@@ -1,8 +1,8 @@
-package dev. gideonwhite1029.horizon.matter;
+package dev.gideonwhite1029.horizon.matter;
 
-import net. minecraft.util.Mth;
-import net.minecraft.util. RandomSource;
-import net.minecraft.world.level.levelgen. LegacyRandomSource;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +29,7 @@ public class WorldgenCryptoRandom extends WorldgenRandom {
     }
 
     public void setSecureSeed(int x, int z, Globals.Salt typeSalt, long salt) {
-        System.arraycopy(Globals. worldSeed, 0, this.worldSeed, 0, Globals.WORLD_SEED_LONGS);
+        System.arraycopy(Globals.worldSeed, 0, this.worldSeed, 0, Globals.WORLD_SEED_LONGS);
 
         // Compact message packing
         message[0] = ((long) x << 32) | (z & 0xFFFFFFFFL);
@@ -91,7 +91,7 @@ public class WorldgenCryptoRandom extends WorldgenRandom {
         WorldgenCryptoRandom fork = new WorldgenCryptoRandom(0, 0, null, 0);
         System.arraycopy(this.worldSeed, 0, fork.worldSeed, 0, Globals.WORLD_SEED_LONGS);
         System.arraycopy(this.message, 0, fork.message, 0, 4);
-        fork.randomBitIndex = this. randomBitIndex;
+        fork.randomBitIndex = this.randomBitIndex;
         fork.counter = this.counter;
         fork.nextLong(); // Advance state
         return fork;
@@ -140,14 +140,14 @@ public class WorldgenCryptoRandom extends WorldgenRandom {
 
     @Override
     public long setDecorationSeed(long worldSeed, int blockX, int blockZ) {
-        setSecureSeed(blockX, blockZ, Globals.Salt. POPULATION, 0);
+        setSecureSeed(blockX, blockZ, Globals.Salt.POPULATION, 0);
         return ((long) blockX << 32) | (blockZ & 0xFFFFFFFFL);
     }
 
     @Override
     public void setFeatureSeed(long populationSeed, int index, int step) {
         setSecureSeed((int) (populationSeed >> 32), (int) populationSeed,
-                Globals.Salt. DECORATION, index + 10000L * step);
+                Globals.Salt.DECORATION, index + 10000L * step);
     }
 
     public static RandomSource seedSlimeChunk(int chunkX, int chunkZ) {

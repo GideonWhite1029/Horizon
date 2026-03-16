@@ -36,7 +36,7 @@ import net.minecraft.world.level.chunk.storage.RegionFileVersion;
 
 // LinearRegionFile_implementation_version_0_5byXymb
 // Just gonna use this string to inform other forks about updates ;-)
-public class HorizonRegionFile implements IRegionFile {
+public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
     private static final long SUPERBLOCK = 0xc3ff13183cca9d9aL;
     private static final byte VERSION = 3;
     private static final int HEADER_SIZE = 27;

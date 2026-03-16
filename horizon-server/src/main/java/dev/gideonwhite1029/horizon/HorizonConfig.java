@@ -346,9 +346,11 @@ public final class HorizonConfig {
         verify = RegionFormatVerify.class,
         comment = {
             "Region file format used to store world chunk data.",
-            "MCA  - Standard Minecraft Anvil format (.mca). Compatible with all tools and editors.",
-            "LINEAR - Custom linear format (.linear). Uses ZSTD/LZ4 compression per chunk,",
-            "         resulting in significantly smaller world files (typically 30-60% size reduction).",
+            "MCA      - Standard Minecraft Anvil format (.mca). Compatible with all tools and editors.",
+            "LINEAR   - Custom linear format (.linear). Uses ZSTD/LZ4 compression per chunk,",
+            "           resulting in significantly smaller world files (typically 30-60% size reduction).",
+            "BUFFERED - Buffered sector format (.b_linear). Append-only NIO writes with ZSTD compression",
+            "           and XXHash32 per-chunk integrity checks. Auto-compacts on close and periodically.",
             "WARNING: Changing this value after world creation requires a full region file conversion.",
             "This setting is locked after the first server start."
         }

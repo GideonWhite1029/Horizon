@@ -16,7 +16,7 @@ public class LinearRegionFileFlusher implements Runnable {
 
     public static final LinearRegionFileFlusher INSTANCE = new LinearRegionFileFlusher();
 
-    private final Set<HorizonRegionFile> inManagement = new HashSet<>();
+    private final Set<IFlushableRegionFile> inManagement = new HashSet<>();
     private ScheduledFuture<?> flusherChecker;
     private ExecutorService ioWorkerPool;
 
@@ -26,7 +26,6 @@ public class LinearRegionFileFlusher implements Runnable {
         if (this.flusherChecker != null) return;
 
         int ioThreads = dev.gideonwhite1029.horizon.HorizonConfig.linearIoThreadCount;
-        long checkIntervalMs = dev.gideonwhite1029.horizon.HorizonConfig.linearIoFlushDelayMs;
 
         this.ioWorkerPool = Executors.newFixedThreadPool(
             Math.max(1, ioThreads),
@@ -42,8 +41,9 @@ public class LinearRegionFileFlusher implements Runnable {
                 .setDaemon(true)
                 .build()
         );
+        // Fixed 20ms check interval; actual flush delay is enforced inside run()
         this.flusherChecker = scheduler.scheduleWithFixedDelay(
-            this, checkIntervalMs, checkIntervalMs, TimeUnit.MILLISECONDS
+            this, 20L, 20L, TimeUnit.MILLISECONDS
         );
     }
 
@@ -67,13 +67,16 @@ public class LinearRegionFileFlusher implements Runnable {
 
     @Override
     public void run() {
-        final HorizonRegionFile[] copied;
+        final long flushDelayMs = dev.gideonwhite1029.horizon.HorizonConfig.linearIoFlushDelayMs;
+        final long nowNanos = System.nanoTime();
+
+        final IFlushableRegionFile[] copied;
         synchronized (this) {
-            copied = this.inManagement.toArray(new HorizonRegionFile[0]);
+            copied = this.inManagement.toArray(new IFlushableRegionFile[0]);
         }
 
-        final List<HorizonRegionFile> toRemove = new ArrayList<>();
-        for (HorizonRegionFile file : copied) {
+        final List<IFlushableRegionFile> toRemove = new ArrayList<>();
+        for (IFlushableRegionFile file : copied) {
             if (file.isClosedVolatile()) {
                 toRemove.add(file);
                 continue;
@@ -81,13 +84,16 @@ public class LinearRegionFileFlusher implements Runnable {
 
             if (!file.isMarkedToSave()) continue;
 
+            long elapsedMs = (nowNanos - file.getLastWritten()) / 1_000_000L;
+            if (elapsedMs < flushDelayMs) continue;
+
             if (!file.tryMarkFlushing()) continue;
 
             this.ioWorkerPool.execute(() -> {
                 try {
                     file.syncIfNeeded();
                 } catch (IOException e) {
-                    LOGGER.error("Failed to sync linear region file {}: ", file.getRegionFile(), e);
+                    LOGGER.error("Failed to sync region file {}: ", file.getPath(), e);
                 }
             });
         }
@@ -99,12 +105,12 @@ public class LinearRegionFileFlusher implements Runnable {
         }
     }
 
-    public synchronized void addFile(HorizonRegionFile file) {
+    public synchronized void addFile(IFlushableRegionFile file) {
         startIfNeeded();
         this.inManagement.add(file);
     }
 
-    public synchronized void removeFile(HorizonRegionFile file) {
+    public synchronized void removeFile(IFlushableRegionFile file) {
         this.inManagement.remove(file);
     }
 }
