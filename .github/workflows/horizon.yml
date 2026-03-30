@@ -18,9 +18,9 @@ jobs:
         with:
           ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.ref || github.ref }}
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: 9.2.1
           add-job-summary: never
