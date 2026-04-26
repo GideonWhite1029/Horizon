@@ -7,36 +7,36 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
-index 9b9cdb23a55b82efbeea3ba68b8144c15791dff0..e9c58fc9bb16f8605410fe85971a7d4b1c3d3915 100644
+index 61c4821aecf882bdab1d7df57acab060b839ef3e..5775b4f7cb0d8b7807b1eb51439c75da913e1a61 100644
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -313,6 +313,12 @@ public class ServerPlayerGameMode {
-                 org.bukkit.craftbukkit.event.CraftEventFactory.callBlockDamageAbortEvent(this.player, pos, this.player.getInventory().getSelectedItem()); // CraftBukkit
+@@ -322,6 +322,12 @@ public class ServerPlayerGameMode {
              }
          }
+         this.level.chunkPacketBlockController.onPlayerLeftClickBlock(this, pos, action, direction, maxY, sequence); // Paper - Anti-Xray
 +        // Imanity start - AntiXraySDK integration
 +        dev.imanity.antixray.sdk.AntiXrayAdapter adapter = dev.imanity.antixray.sdk.AntiXraySDK.getAdapter();
 +        if (adapter != null) {
 +            adapter.callPlayerLeftClickBlock(this.level.getWorld(), this.player.getBukkitEntity(), pos.getX(), pos.getY(), pos.getZ());
 +        }
 +        // Imanity end - AntiXraySDK integration
-         this.level.chunkPacketBlockController.onPlayerLeftClickBlock(this, pos, action, face, maxBuildHeight, sequence); // Paper - Anti-Xray
      }
  
+     public void destroyAndAck(final BlockPos pos, final int sequence, final String exitId) {
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 87ba05261739c64c1534df9721e0b067a6191af6..37a77cbfcdad631e7e15e3b6fa90c106402594c9 100644
+index 598c41cd825e9bce67c5dde16831055c213b64b5..482e4f19f6fba96cd8235bd0a859fd1803357474 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1126,6 +1126,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-                 snapshot.setFlags(flags); // Paper - always set the flag of the most recent call to mitigate issues with multiple update at the same pos with different flags
+@@ -1133,6 +1133,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              }
-             BlockState blockState = chunkAt.setBlockState(pos, state, flags);
+             // CraftBukkit end - capture blockstates
+             BlockState oldState = chunk.setBlockState(pos, blockState, updateFlags);
 +            // Imanity start - AntiXraySDK integration
 +            dev.imanity.antixray.sdk.AntiXrayAdapter adapter = dev.imanity.antixray.sdk.AntiXraySDK.getAdapter();
 +            if (adapter != null) {
-+                adapter.callBlockChange(world, pos.getX(), pos.getY(), pos.getZ(), state.getBukkitMaterial());
++                adapter.callBlockChange(world, pos.getX(), pos.getY(), pos.getZ(), blockState.getBukkitMaterial());
 +            }
 +            // Imanity end - AntiXraySDK integration
-             this.chunkPacketBlockController.onBlockChange(this, pos, state, blockState, flags, recursionLeft); // Paper - Anti-Xray
-             // CraftBukkit end
-             if (blockState == null) {
+             this.chunkPacketBlockController.onBlockChange(this, pos, blockState, oldState, updateFlags, updateLimit); // Paper - Anti-Xray
+             if (oldState == null) {
+                 // CraftBukkit start - remove blockstate if failed (or the same)

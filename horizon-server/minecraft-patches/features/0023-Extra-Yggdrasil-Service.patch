@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
-index 9e5757391ea32e37b2aac52cc1bb38259a2cc497..cd96d96ff3f5853501a3b3cfad203a7260997769 100644
+index 9e5757391ea32e37b2aac52cc1bb38259a2cc497..de256e49f14fa28ca26cefed4d268300ba11a62d 100644
 --- a/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 +++ b/com/mojang/authlib/yggdrasil/YggdrasilMinecraftSessionService.java
 @@ -48,7 +48,7 @@ import java.util.stream.Collectors;
@@ -15,33 +15,33 @@ index 9e5757391ea32e37b2aac52cc1bb38259a2cc497..cd96d96ff3f5853501a3b3cfad203a72
  public class YggdrasilMinecraftSessionService implements MinecraftSessionService {
      private static final Logger LOGGER = LoggerFactory.getLogger(YggdrasilMinecraftSessionService.class);
 -    private final MinecraftClient client;
-+    protected final MinecraftClient client; // Horizon
++    public final MinecraftClient client;
      private final ServicesKeySet servicesKeySet;
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index 272e2871aca8d283229cc5618e3051146db56681..607f85281fd8b48d7b077df10258831a2690ea68 100644
+index 0fddc5224b8a58d452860c5d4953db62a14843db..25cc82e7ff20f362207132de479afb91efc55af8 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -181,7 +181,7 @@ public class Main {
-                 file = new File(bukkitConfiguration.getString("settings.world-container", "."));
+@@ -186,7 +186,7 @@ public class Main {
+                 universePath = new File(bukkitConfiguration.getString("settings.world-container", "."));
              }
              // Paper end - fix SPIGOT-5824
--            Services services = Services.create(new com.destroystokyo.paper.profile.PaperAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container
-+            Services services = Services.create(new dev.gideonwhite1029.horizon.yggdrasil.HorizonAuthenticationService(Proxy.NO_PROXY), file, userCacheFile, optionSet); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container // Horizon - extra-yggdrasil-service
-             // CraftBukkit start
-             String string = Optional.ofNullable((String) optionSet.valueOf("world")).orElse(dedicatedServerSettings.getProperties().levelName);
-             LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
+-            Services services = Services.create(new com.destroystokyo.paper.profile.PaperAuthenticationService(Proxy.NO_PROXY), universePath, userCacheFile, options); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container
++            Services services = Services.create(new dev.gideonwhite1029.horizon.yggdrasil.HorizonAuthenticationService(Proxy.NO_PROXY), universePath, userCacheFile, options); // Paper - pass OptionSet to load paper config files; override authentication service; fix world-container // Horizon
+             String levelName = Optional.ofNullable((String) options.valueOf("world")).orElse(settings.getProperties().levelName); // CraftBukkit
+             LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(universePath.toPath());
+             LevelStorageSource.LevelStorageAccess access = levelStorageSource.validateAndCreateAccess(levelName);
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 0f80ed80dcb831915b97a9ea3cb417806f88ca08..f019510b5e66a2cb233f2130ccaa47b0011e5759 100644
+index 4159d0d983f505a11977402c35a8f2537bc4f8c0..23cd26eecc6fde38ac0d4941761d17260453b63c 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -246,7 +246,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -256,7 +256,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private boolean isDemo;
      private volatile boolean isReady;
      private long lastOverloadWarningNanos;
 -    protected final Services services;
-+    public final Services services; // Horizon
++    public final Services services;
      private final NotificationManager notificationManager;
      private final ServerActivityMonitor serverActivityMonitor;
      private long lastServerStatus;

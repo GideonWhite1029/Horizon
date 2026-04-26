@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
-index 7efe22484451a756f0a5b85db5ca86aae1fd4b03..b4bd51ee668fcf595b29ea781028797684af77e3 100644
+index 33062054e17f47a88b99de85f638e204fdbd8be7..98fd3245caaae082e302e34be2bc0089021eb547 100644
 --- a/src/main/java/org/bukkit/entity/Player.java
 +++ b/src/main/java/org/bukkit/entity/Player.java
-@@ -3785,6 +3785,20 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
+@@ -3788,6 +3788,20 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      String getClientBrandName();
      // Paper end
  

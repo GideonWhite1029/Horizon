@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-index 09baa8c13a56e0f503815a436042b7b79b1698e4..1b6a6b02521ad55fe8d000c99a9e4227acadf26c 100644
+index c8d179d936d57e8222d87b7fd943dbddfa8446a0..d720d56944fd21cd139453ef0b1e096b5c974bc7 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftChunk.java
 @@ -192,8 +192,13 @@ public class CraftChunk implements Chunk {
@@ -27,19 +27,19 @@ index 09baa8c13a56e0f503815a436042b7b79b1698e4..1b6a6b02521ad55fe8d000c99a9e4227
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index d04b449631af873d959856fbbc0a346cec15e349..652e39c9f04e25d84d361026da294979eaa376da 100644
+index da8676cc9e4f066870304095a07ef9c04084fcd4..1ad9e3a8ffb5b28eb26b76a3fe27c62cde846e23 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1254,7 +1254,11 @@ public final class CraftServer implements Server {
-             registryAccess = levelDataAndDimensions.dimensions().dimensionsRegistryAccess();
-         } else {
-             LevelSettings levelSettings;
+@@ -1251,7 +1251,11 @@ public final class CraftServer implements Server {
+             .result()
+             .orElse(null);
+         if (worldGenSettings == null) {
 -            WorldOptions worldOptions = new WorldOptions(creator.seed(), creator.generateStructures(), creator.bonusChest());
 +            // Horizon start - Feature Secure Seed
 +            WorldOptions worldOptions = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
 +                    ? new WorldOptions(creator.seed(), dev.gideonwhite1029.horizon.matter.Globals.createRandomWorldSeed(), creator.generateStructures(), creator.bonusChest())
 +                    : new WorldOptions(creator.seed(), creator.generateStructures(), creator.bonusChest());
 +            // Horizon end - Feature Secure Seed
-             WorldDimensions worldDimensions;
  
              DedicatedServerProperties.WorldDimensionData properties = new DedicatedServerProperties.WorldDimensionData(GsonHelper.parse((creator.generatorSettings().isEmpty()) ? "{}" : creator.generatorSettings()), creator.type().name().toLowerCase(Locale.ROOT));
+             WorldDimensions worldDimensions = properties.create(context.datapackWorldgen());

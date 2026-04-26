@@ -7,29 +7,29 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/item/ItemStack.java b/net/minecraft/world/item/ItemStack.java
-index 3e31abbca1426c9332ecb02613648383c8b27cce..2ca0767451f14854afb013cb5700e8f4b403bf56 100644
+index 2e511d2adaedef5e954532783beb8a77b3e000d4..4b894bae4f7dc4abd9fe83778eb8f5894b84dfe2 100644
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -170,7 +170,7 @@ public final class ItemStack implements DataComponentHolder {
+@@ -156,7 +156,7 @@ public final class ItemStack implements DataComponentHolder, ItemInstance {
      private int popTime;
      @Deprecated
-     private @Nullable Item item;
--    PatchedDataComponentMap components;
-+    public PatchedDataComponentMap components; // Horizon - public
-     private @Nullable Entity entityRepresentation;
+     private @Nullable Holder<Item> item;
+-    private PatchedDataComponentMap components;
++    public PatchedDataComponentMap components;
  
-     public static DataResult<ItemStack> validateStrict(ItemStack stack) {
+     public static DataResult<ItemStack> validateStrict(final ItemStack itemStack) {
+         DataResult<?> result = validateComponents(itemStack.getComponents());
 diff --git a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
-index d02609198253b51f632db46c40afd737d686c520..6b60b213bad8a0fe60963f9ea55abacef9e0b30e 100644
+index 33f9870a4f966a887023b1debd4ab9ef9d24378f..3096903db8a7c1aa7560cae85c1bafba3f7b5b23 100644
 --- a/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
 +++ b/net/minecraft/world/item/crafting/SmithingTransformRecipe.java
-@@ -82,6 +82,12 @@ public class SmithingTransformRecipe implements SmithingRecipe {
+@@ -115,6 +115,12 @@ public class SmithingTransformRecipe extends SimpleSmithingRecipe {
          );
      }
  
 +    // Horizon start - REI
 +    public SlotDisplay getResult() {
-+        return this.result.display();
++        return new SlotDisplay.ItemStackSlotDisplay(this.result);
 +    }
 +    // Horizon end - REI
 +
@@ -37,10 +37,10 @@ index d02609198253b51f632db46c40afd737d686c520..6b60b213bad8a0fe60963f9ea55abace
      @Override
      public org.bukkit.inventory.Recipe toBukkitRecipe(org.bukkit.NamespacedKey id) {
 diff --git a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
-index 6582370cfa3d58a7ac08d574e26e7a93d243bdaa..d1b143f4328cb31cf5c6075c9ca4ae613424d695 100644
+index f9fa7d0eaf9f32959a4bd12b82e5a49ea808a44c..b488e1f96a793ed86e7e193eee5533c73304fc98 100644
 --- a/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
 +++ b/net/minecraft/world/item/crafting/SmithingTrimRecipe.java
-@@ -84,6 +84,12 @@ public class SmithingTrimRecipe implements SmithingRecipe {
+@@ -109,6 +109,12 @@ public class SmithingTrimRecipe extends SimpleSmithingRecipe {
          return Optional.of(this.addition);
      }
  
@@ -52,4 +52,4 @@ index 6582370cfa3d58a7ac08d574e26e7a93d243bdaa..d1b143f4328cb31cf5c6075c9ca4ae61
 +
      @Override
      public RecipeSerializer<SmithingTrimRecipe> getSerializer() {
-         return RecipeSerializer.SMITHING_TRIM;
+         return SERIALIZER;

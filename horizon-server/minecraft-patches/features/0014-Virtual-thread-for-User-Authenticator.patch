@@ -7,15 +7,17 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-index e16bb386ae500bc290970f8cba33c5999cf0a58d..c8323e4db5128530a10ec9c31fac6fdcbe4046ee 100644
+index b645eff7024d64d8afeee64dd40127daf130dd3c..d09a1aae64db11a5103a1f6e30967c4e43f03dc0 100644
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -55,7 +55,7 @@ import org.bukkit.event.player.PlayerPreLoginEvent;
+@@ -54,8 +54,8 @@ import org.bukkit.event.player.PlayerPreLoginEvent;
+ 
  public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener {
      private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
-     static final Logger LOGGER = LogUtils.getLogger();
+-    private static final Logger LOGGER = LogUtils.getLogger();
 -    private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("User Authenticator #%d").setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build()); // Paper - Cache authenticator threads
++    static final Logger LOGGER = LogUtils.getLogger();
 +    private static final java.util.concurrent.ExecutorService authenticatorPool = java.util.concurrent.Executors.newCachedThreadPool(new com.google.common.util.concurrent.ThreadFactoryBuilder().setNameFormat("User Authenticator #%d").setThreadFactory(dev.gideonwhite1029.horizon.HorizonConfig.useVirtualThreadForUserAuthenticator ? Thread.ofVirtual().factory() : java.util.concurrent.Executors.defaultThreadFactory()).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build()); // Paper - Cache authenticator threads // Horizon - Virtual thread for User Authenticator
      private static final int MAX_TICKS_BEFORE_LOGIN = 600;
      private final byte[] challenge;
-     final MinecraftServer server;
+     private final MinecraftServer server;

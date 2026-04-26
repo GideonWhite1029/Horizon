@@ -7,7 +7,7 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
-index 7129c5e1920008ac54f3a8ac83f5589396f4e4e9..0eb330afec81a6323c810eb32f246702fc32d297 100644
+index 0743659c9f1122088adad4992b93649efc9ba873..65a1252e186b022215517495e2c3970241afe6fc 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/player/RegionizedPlayerChunkLoader.java
 @@ -17,21 +17,21 @@ import ca.spottedleaf.moonrise.patches.chunk_system.scheduling.ChunkTaskSchedule
@@ -36,7 +36,7 @@ index 7129c5e1920008ac54f3a8ac83f5589396f4e4e9..0eb330afec81a6323c810eb32f246702
  import net.minecraft.world.level.ChunkPos;
  import net.minecraft.world.level.chunk.ChunkAccess;
  import net.minecraft.world.level.chunk.LevelChunk;
-@@ -413,18 +413,90 @@ public final class RegionizedPlayerChunkLoader {
+@@ -431,18 +431,90 @@ public final class RegionizedPlayerChunkLoader {
              this.delayedTicketOps.addLast(op);
          }
  

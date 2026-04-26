@@ -7,29 +7,29 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/util/Mth.java b/net/minecraft/util/Mth.java
-index dbd26242a523ef0a29ba2255238852f1dca76b8f..cfb2378745037cb23884d65f5be4e75ec93f089b 100644
+index 64d5190c68ff7a08d15762e958344813a7336bba..dd9769bcf31139a2ad98b6e93d09ac977f33eaf6 100644
 --- a/net/minecraft/util/Mth.java
 +++ b/net/minecraft/util/Mth.java
 @@ -31,7 +31,7 @@ public class Mth {
      private static final int SIN_MASK = 65535;
      private static final int COS_OFFSET = 16384;
      private static final double SIN_SCALE = 10430.378350470453;
--    private static final float[] SIN = Util.make(new float[65536], floats -> {
-+    public static final float[] SIN = Util.make(new float[65536], floats -> { // Horizon - public
-         for (int i1 = 0; i1 < floats.length; i1++) {
-             floats[i1] = (float)Math.sin(i1 / 10430.378350470453);
+-    private static final float[] SIN = Util.make(new float[65536], sin -> {
++    public static final float[] SIN = Util.make(new float[65536], sin -> { // Horizon - public
+         for (int i = 0; i < sin.length; i++) {
+             sin[i] = (float)Math.sin(i / 10430.378350470453);
          }
-@@ -48,11 +48,11 @@ public class Mth {
+@@ -47,11 +47,11 @@ public class Mth {
      private static final double[] COS_TAB = new double[257];
  
-     public static float sin(double value) {
--        return SIN[(int)((long)(value * 10430.378350470453) & 65535L)];
-+        return dev.gideonwhite1029.horizon.util.CompactSineLUT.sin((float) value); // Horizon - CompactSineLUT
+     public static float sin(final double i) {
+-        return SIN[(int)((long)(i * 10430.378350470453) & 65535L)];
++        return dev.gideonwhite1029.horizon.util.CompactSineLUT.sin((float) i); // Horizon - CompactSineLUT
      }
  
-     public static float cos(double value) {
--        return SIN[(int)((long)(value * 10430.378350470453 + 16384.0) & 65535L)];
-+        return dev.gideonwhite1029.horizon.util.CompactSineLUT.cos((float) value); // Horizon - CompactSineLUT
+     public static float cos(final double i) {
+-        return SIN[(int)((long)(i * 10430.378350470453 + 16384.0) & 65535L)];
++        return dev.gideonwhite1029.horizon.util.CompactSineLUT.cos((float) i); // Horizon - CompactSineLUT
      }
  
-     public static float sqrt(float value) {
+     public static float sqrt(final float x) {

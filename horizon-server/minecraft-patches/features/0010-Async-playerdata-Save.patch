@@ -7,40 +7,40 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/storage/LevelStorageSource.java b/net/minecraft/world/level/storage/LevelStorageSource.java
-index 140630186c3b0324c248cc2a2f31d3b906557b9c..50b16c200a77f728fafb2f6f7d3cfe824e9ea904 100644
+index 432e32b6853d9d860a7d52385d236519cf9c3ce6..ed659ef9e76dbf5636ccc0feca26600a8028ae2b 100644
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
-@@ -510,7 +510,10 @@ public class LevelStorageSource {
-             CompoundTag compoundTag = serverConfiguration.createTag(registries, singlePlayerTag);
-             CompoundTag compoundTag1 = new CompoundTag();
-             compoundTag1.put("Data", compoundTag);
--            this.saveLevelData(compoundTag1);
+@@ -592,7 +592,10 @@ public class LevelStorageSource {
+             CompoundTag dataTag = levelData.createTag(singleplayerUUID);
+             CompoundTag root = new CompoundTag();
+             root.put("Data", dataTag);
+-            this.saveLevelData(root);
 +            // Horizon start - Async playerdata save
-+            Runnable runnable = () -> this.saveLevelData(compoundTag1);
++            Runnable runnable = () -> this.saveLevelData(root);
 +            dev.gideonwhite1029.horizon.util.AsyncPlayerDataSaving.saveAsync(runnable);
 +            // Horizon end - Async playerdata save
          }
  
-         private void saveLevelData(CompoundTag tag) {
-@@ -597,7 +600,10 @@ public class LevelStorageSource {
+         public void saveLevelData(final Dynamic<?> tag) {
+@@ -690,7 +693,10 @@ public class LevelStorageSource {
              this.checkLock();
-             CompoundTag levelDataTagRaw = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
-             modifier.accept(levelDataTagRaw.getCompoundOrEmpty("Data"));
--            this.saveLevelData(levelDataTagRaw);
+             CompoundTag root = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
+             updater.accept(root.getCompoundOrEmpty("Data"));
+-            this.saveLevelData(root);
 +            // Horizon start - Async playerdata save
-+            Runnable runnable = () -> this.saveLevelData(levelDataTagRaw);
++            Runnable runnable = () -> this.saveLevelData(root);
 +            dev.gideonwhite1029.horizon.util.AsyncPlayerDataSaving.saveAsync(runnable);
 +            // Horizon end - Async playerdata save
          }
  
          public long makeWorldBackup() throws IOException {
 diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
-index b8ef50bc3d07890c9da2c98d5f009a3adc52f4b0..a7d42fdf977b139036616e258748316ba5a1675b 100644
+index c5898bfb8b4f075b08090cba2e9f980174e0a326..612d8c023db6c0b4bd5c147f8c49067d49d84e9f 100644
 --- a/net/minecraft/world/level/storage/PlayerDataStorage.java
 +++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
 @@ -32,6 +32,13 @@ public class PlayerDataStorage {
  
-     public void save(Player player) {
+     public void save(final Player player) {
          if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot
 +        // Horizon start - Async playerdata save
 +        Runnable runnable = () -> save0(player);
@@ -49,6 +49,6 @@ index b8ef50bc3d07890c9da2c98d5f009a3adc52f4b0..a7d42fdf977b139036616e258748316b
 +
 +    private void save0(Player player) {
 +        // Horizon end - Async playerdata save
-         try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(player.problemPath(), LOGGER)) {
-             TagValueOutput tagValueOutput = TagValueOutput.createWithContext(scopedCollector, player.registryAccess());
-             player.saveWithoutId(tagValueOutput);
+         try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(player.problemPath(), LOGGER)) {
+             TagValueOutput output = TagValueOutput.createWithContext(reporter, player.registryAccess());
+             player.saveWithoutId(output);

@@ -7,14 +7,14 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index fd5b102741124ebf079bca2edd9e2e5009a0aaae..687cdfc37a1cbd99d15d7ecd9a40b597a4a44bdb 100644
+index a5970c3f3309b0ad2d8a0528be6f151814162b7e..7c64d01e81d05027c43e9e8b8ff6df1fa2723895 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4294,6 +4294,7 @@ public abstract class Entity implements SyncedDataHolder, DebugValueSource, Name
+@@ -4307,6 +4307,7 @@ public abstract class Entity
      }
  
-     public boolean canTeleport(Level fromLevel, Level toLevel) {
+     public boolean canTeleport(final Level from, final Level to) {
 +        if (!dev.gideonwhite1029.horizon.HorizonConfig.allowEntityPortalWithPassenger && (this.isPassenger() || this.isVehicle())) return false; // Horizon - allowEntityPortalWithPassenger
          if (!this.isAlive() || !this.valid) return false; // Paper - Fix item duplication and teleport issues
-         if (fromLevel.dimension() == Level.END && toLevel.dimension() == Level.OVERWORLD) {
-             for (Entity entity : this.getPassengers()) {
+         if (from.dimension() == Level.END && to.dimension() == Level.OVERWORLD) {
+             for (Entity passenger : this.getPassengers()) {

@@ -1,8 +1,9 @@
 package dev.gideonwhite1029.horizon.replay;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RecordMetaData {
 
@@ -18,6 +19,5 @@ public class RecordMetaData {
     public int protocol;
     public String generator;
     public int selfId = -1;
-
-    public Set<UUID> players = new HashSet<>();
+    public Set<UUID> players = Collections.newSetFromMap(new ConcurrentHashMap<>());
 }

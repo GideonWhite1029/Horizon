@@ -1,19 +1,18 @@
 --- a/purpur-server/build.gradle.kts
 +++ b/purpur-server/build.gradle.kts
-@@ -13,6 +_,7 @@
+@@ -14,6 +_,7 @@
  }
  
  val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
 +val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/" // Horizon - Initial build
  
  dependencies {
-     mache("io.papermc:mache:1.21.11+build.1")
-@@ -32,7 +_,30 @@
+     mache("io.papermc:mache:26.1.2+build.1")
+@@ -33,7 +_,29 @@
              outputDir = rootDirectory.dir("paper-server")
          }
      }
 -    activeFork = purpur
-+
 +    // Horizon start - Initial build
 +    val horizon = forks.register("horizon") {
 +        forks = purpur
@@ -39,8 +38,8 @@
 +    // Horizon end - Initial build
      // Purpur end - Rebrand
  
-     spigot {
-@@ -62,6 +_,7 @@
+     /*updatingMinecraft { // Purpur start - TODO - snapshot - we don't need this
+@@ -45,6 +_,7 @@
      libraryRepositories.addAll(
          "https://repo.maven.apache.org/maven2/",
          paperMavenPublicUrl,
@@ -48,7 +47,7 @@
      )
  }
  
-@@ -122,10 +_,14 @@
+@@ -105,10 +_,14 @@
      main {
          java { srcDir("../paper-server/src/main/java") }
          resources { srcDir("../paper-server/src/main/resources") }
@@ -63,21 +62,21 @@
      }
  }
  val log4jPlugins = sourceSets.create("log4jPlugins") {
-@@ -154,7 +_,12 @@
+@@ -137,7 +_,12 @@
  }
  
  dependencies {
 -    implementation(project(":purpur-api")) // Purpur
 +    implementation(project(":horizon-api")) // Purpur // Horizon
 +    // Horizon start
-+    implementation("com.github.luben:zstd-jni:1.5.7-3")
-+    implementation("at.yawk.lz4:lz4-java:1.10.1")
-+    implementation("net.openhft:zero-allocation-hashing:0.16")
++    implementation("com.github.luben:zstd-jni:1.5.7-7")
++    implementation("at.yawk.lz4:lz4-java:1.11.0")
++    implementation("net.openhft:zero-allocation-hashing:2026.0")
 +    // Horizon end
-     implementation("ca.spottedleaf:concurrentutil:0.0.8")
+     implementation("ca.spottedleaf:concurrentutil:0.0.10")
      implementation("org.jline:jline-terminal-ffm:3.27.1") // use ffm on java 22+
      implementation("org.jline:jline-terminal-jni:3.27.1") // fall back to jni on java 21
-@@ -217,6 +_,14 @@
+@@ -191,6 +_,14 @@
      implementation("me.lucko:spark-paper:1.10.152")
  }
  
@@ -92,7 +91,7 @@
  tasks.jar {
      manifest {
          val git = Git(rootProject.layout.projectDirectory.path)
-@@ -229,14 +_,14 @@
+@@ -203,14 +_,14 @@
          val gitBranch = git.exec(providers, "rev-parse", "--abbrev-ref", "HEAD").get().trim()
          attributes(
              "Main-Class" to "org.bukkit.craftbukkit.Main",

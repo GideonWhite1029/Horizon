@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 4af19f9f5152e9f6386e375a1ac5280ce00f48ea..667dc1fa02f1baffa3a42a6fb40c96a84451594e 100644
+index a653755f70f5f37b60bdd71f0ef51632cfc00186..3cec6b8013d0fe130456cbdabfbf686b4b246e04 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1290,6 +1290,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1328,6 +1328,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper end
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              // Paper start - Add onboarding message for initial server start
@@ -17,7 +17,7 @@ index 4af19f9f5152e9f6386e375a1ac5280ce00f48ea..667dc1fa02f1baffa3a42a6fb40c96a8
              if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
-@@ -1298,6 +1300,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1336,6 +1338,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
@@ -27,38 +27,39 @@ index 4af19f9f5152e9f6386e375a1ac5280ce00f48ea..667dc1fa02f1baffa3a42a6fb40c96a8
              if (false && System.getProperty("paper.disableStartupVersionCheck") == null && io.papermc.paper.configuration.GlobalConfiguration.get().updateChecker.enabled) { // Purpur - disable paper startup check
                  CompletableFuture.runAsync(com.destroystokyo.paper.PaperVersionFetcher::getUpdateStatusStartupMessage, io.papermc.paper.util.MCUtil.ASYNC_EXECUTOR);
 diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/server/gui/MinecraftServerGui.java
-index 614c7d9f673c926562acc8fa3b3788623900db41..05c6ce0382e476517179fe0d655b94c8b192a450 100644
+index 2612c6dfb9c9605a4bdd1da6d0d44d2013728089..08fafba3b8a3e46b58447de76b5713b5e0e5d5f6 100644
 --- a/net/minecraft/server/gui/MinecraftServerGui.java
 +++ b/net/minecraft/server/gui/MinecraftServerGui.java
-@@ -51,7 +51,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -51,8 +51,7 @@ public class MinecraftServerGui extends JComponent {
+             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
          } catch (Exception var3) {
          }
- 
--        final JFrame jFrame = new JFrame("Purpur Minecraft server"); // Purpur - Improve GUI
-+        final JFrame jFrame = new JFrame("Horizon Minecraft server"); // Purpur - Improve GUI // Horizon
-         final MinecraftServerGui minecraftServerGui = new MinecraftServerGui(server);
-         jFrame.setDefaultCloseOperation(2);
-         jFrame.add(minecraftServerGui);
-@@ -59,7 +59,7 @@ public class MinecraftServerGui extends JComponent {
-         jFrame.setLocationRelativeTo(null);
-         jFrame.setVisible(true);
+-
+-        final JFrame frame = new JFrame("Purpur Minecraft server"); // Purpur - Improve GUI
++        final JFrame frame = new JFrame("Horizon Minecraft server"); // Purpur - Improve GUI // Horizon
+         final MinecraftServerGui gui = new MinecraftServerGui(server);
+         frame.setDefaultCloseOperation(2);
+         frame.add(gui);
+@@ -60,7 +59,7 @@ public class MinecraftServerGui extends JComponent {
+         frame.setLocationRelativeTo(null);
+         frame.setVisible(true);
          // Paper start - Improve ServerGUI
--        jFrame.setName("Purpur Minecraft server"); // Purpur - Improve GUI
-+        jFrame.setName("Horizon Minecraft server"); // Purpur - Improve GUI // Horizon
+-        frame.setName("Purpur Minecraft server"); // Purpur - Improve GUI
++        frame.setName("Horizon Minecraft server"); // Purpur - Improve GUI // Horizon
          try {
-             jFrame.setIconImage(javax.imageio.ImageIO.read(java.util.Objects.requireNonNull(MinecraftServerGui.class.getClassLoader().getResourceAsStream("logo.png"))));
+             frame.setIconImage(javax.imageio.ImageIO.read(java.util.Objects.requireNonNull(MinecraftServerGui.class.getClassLoader().getResourceAsStream("logo.png"))));
          } catch (java.io.IOException ignore) {
-@@ -69,7 +69,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -70,7 +69,7 @@ public class MinecraftServerGui extends JComponent {
              @Override
-             public void windowClosing(WindowEvent event) {
-                 if (!minecraftServerGui.isClosing.getAndSet(true)) {
--                    jFrame.setTitle("Purpur Minecraft server - shutting down!"); // Purpur - Improve GUI
-+                    jFrame.setTitle("Horizon Minecraft server - shutting down!"); // Purpur - Improve GUI // Horizon
+             public void windowClosing(final WindowEvent event) {
+                 if (!gui.isClosing.getAndSet(true)) {
+-                    frame.setTitle("Purpur Minecraft server - shutting down!"); // Purpur - Improve GUI
++                    frame.setTitle("Horizon Minecraft server - shutting down!"); // Purpur - Improve GUI // Horizond
                      server.halt(true);
-                     minecraftServerGui.runFinalizers();
+                     gui.runFinalizers();
                  }
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index e7e71018a4d328832fe44eef595e78265ee720ae..ddb54dea634fd11230408586fdc7c60e44dfaebb 100644
+index 9004b010d9fbdf0a2d786481293c5c0b0d896e4a..f01af8207cbc827cee9ab887578716a865cd4b5e 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -309,7 +309,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise

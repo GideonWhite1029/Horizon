@@ -65,15 +65,15 @@ public class Recorder extends Connection {
     private final RecordMetaData metaData;
     private final AtomicBoolean isSaving = new AtomicBoolean(false);
 
-    private boolean stopped = false;
-    private boolean paused = false;
-    private boolean resumeOnNextPacket = true;
+    private volatile boolean stopped = false;
+    private volatile boolean paused = false;
+    private volatile boolean resumeOnNextPacket = true;
 
     private long startTime;
     private long lastPacket;
-    private long timeShift = 0;
+    private volatile long timeShift = 0;
 
-    private boolean isSaved;
+    private volatile boolean isSaved;
     private ConnectionProtocol state = ConnectionProtocol.LOGIN;
 
     public Recorder(ServerPhotographer photographer, RecorderOption recorderOption, File replayFile) throws IOException {
@@ -93,6 +93,7 @@ public class Recorder extends Connection {
         metaData.serverName = recorderOption.serverName;
         metaData.date = startTime;
         metaData.mcversion = SharedConstants.getCurrentVersion().name();
+        metaData.selfId = photographer.getId();
 
         // TODO start event
         this.savePacket(new ClientboundLoginFinishedPacket(photographer.getGameProfile()), ConnectionProtocol.LOGIN);
@@ -199,10 +200,6 @@ public class Recorder extends Connection {
             }
             default -> {
             }
-        }
-
-        if (recorderOption.forceDayTime != -1 && packet instanceof ClientboundSetTimePacket packet1) {
-            packet = new ClientboundSetTimePacket(packet1.dayTime(), recorderOption.forceDayTime, false);
         }
 
         if (recorderOption.forceWeather != null && packet instanceof ClientboundGameEventPacket packet1) {

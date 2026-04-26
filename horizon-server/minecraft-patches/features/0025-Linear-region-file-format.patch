@@ -23,10 +23,10 @@ index a814512fcfb85312474ae2c2c21443843bf57831..27145419344acabbdc7499f1969006f4
      public MoonriseRegionFileIO.RegionDataController.WriteData moonrise$startWrite(
              final int chunkX, final int chunkZ, final CompoundTag compound
 diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
-index aa3d5a6ea59ac77665f2cfaa56a7d383016d08d0..bc09c9296733f5dc3d8d038678d58e08eee1aa39 100644
+index 3bb9b58ee97464687e348e23b99159226415c267..95ffaab64c5273aa51847056c961b13eff100fa3 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/io/MoonriseRegionFileIO.java
-@@ -1274,7 +1274,7 @@ public final class MoonriseRegionFileIO {
+@@ -1273,7 +1273,7 @@ public final class MoonriseRegionFileIO {
                  this.regionDataController.finishWrite(this.chunkX, this.chunkZ, writeData);
                  // Paper start - flush regionfiles on save
                  if (this.world.paperConfig().chunks.flushRegionsOnSave) {
@@ -35,7 +35,7 @@ index aa3d5a6ea59ac77665f2cfaa56a7d383016d08d0..bc09c9296733f5dc3d8d038678d58e08
                      if (regionFile != null) {
                          regionFile.flush();
                      } // else: evicted from cache, which should have called flush
-@@ -1490,7 +1490,7 @@ public final class MoonriseRegionFileIO {
+@@ -1489,7 +1489,7 @@ public final class MoonriseRegionFileIO {
  
          public static interface IORunnable {
  
@@ -56,23 +56,24 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index f79fa48d54a39b24402c8512a6ae7089a7af676e..88579674dd0510ad46864f78bccee90a28630fbb 100644
+index 23cd26eecc6fde38ac0d4941761d17260453b63c..b49398e5ba7048f03d00ea83a1344732c34f233b 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -963,10 +963,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
-         // CraftBukkit end
+@@ -978,11 +978,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
          if (flush) {
-             for (ServerLevel serverLevel : this.getAllLevels()) {
--                LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", serverLevel.getChunkSource().chunkMap.getStorageName());
-+                LOGGER.info("ThreadedChunkStorage ({}): All chunks are saved", serverLevel.getChunkSource().chunkMap.getStorageName()); // Horizon - configurable region format
+             for (ServerLevel level : this.getAllLevels()) {
+-                String storageName = level.getChunkSource().chunkMap.getStorageName();
+-                LOGGER.info("ThreadedAnvilChunkStorage ({}): All chunks are saved", LEGACY_WORLD_NAMES_FOR_REALMS_LOG.getOrDefault(storageName, storageName));
++                LOGGER.info("ThreadedChunkStorage ({}): All chunks are saved", level.getChunkSource().chunkMap.getStorageName()); // Horizon - configurable region format
              }
  
 -            LOGGER.info("ThreadedAnvilChunkStorage: All dimensions are saved");
 +            LOGGER.info("ThreadedChunkStorage: All dimensions are saved"); // Horizon - configurable region format
          }
  
-         return flag;
-@@ -1100,6 +1100,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         return result;
+@@ -1134,6 +1133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
          dev.gideonwhite1029.horizon.HorizonConfig.createWorldSections = false; // Horizon
@@ -80,60 +81,60 @@ index f79fa48d54a39b24402c8512a6ae7089a7af676e..88579674dd0510ad46864f78bccee90a
          this.onServerExit();
          // Paper end - Improved watchdog support - move final shutdown items here
      }
-diff --git a/net/minecraft/util/worldupdate/WorldUpgrader.java b/net/minecraft/util/worldupdate/WorldUpgrader.java
-index 2fa99d5e092c14733da1acf00d9f0cc126f6f04d..ccec2239996802edb35ee68316370690470de0b4 100644
---- a/net/minecraft/util/worldupdate/WorldUpgrader.java
-+++ b/net/minecraft/util/worldupdate/WorldUpgrader.java
-@@ -77,7 +77,7 @@ public class WorldUpgrader implements AutoCloseable {
-     volatile int skipped;
-     final Reference2FloatMap<ResourceKey<Level>> progressMap = Reference2FloatMaps.synchronize(new Reference2FloatOpenHashMap<>());
-     volatile Component status = Component.translatable("optimizeWorld.stage.counting");
--    static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
-+    static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\\\"+ net.minecraft.world.level.chunk.storage.RegionFileStorage.getExtensionName() +"$"); // Horizon - Configurable region file format
-     final DimensionDataStorage overworldDataStorage;
- 
-     public WorldUpgrader(
-@@ -270,7 +270,7 @@ public class WorldUpgrader implements AutoCloseable {
-         }
- 
-         private static List<WorldUpgrader.FileToUpgrade> getAllChunkPositions(RegionStorageInfo regionStorageInfo, Path path) {
--            File[] files = path.toFile().listFiles((directory, filename) -> filename.endsWith(".mca"));
-+            File[] files = path.toFile().listFiles((directory, filename) -> filename.endsWith(net.minecraft.world.level.chunk.storage.RegionFileStorage.getExtensionName())); // Horizon - Configurable region file format
-             if (files == null) {
-                 return List.of();
-             } else {
-@@ -283,7 +283,7 @@ public class WorldUpgrader implements AutoCloseable {
-                         int i1 = Integer.parseInt(matcher.group(2)) << 5;
-                         List<ChunkPos> list1 = Lists.newArrayList();
- 
--                        try (RegionFile regionFile = new RegionFile(regionStorageInfo, file.toPath(), path, true)) {
-+                        try (dev.gideonwhite1029.horizon.region.IRegionFile regionFile = net.minecraft.world.level.chunk.storage.RegionFileStorage.createNew(regionStorageInfo, file.toPath(), path, true)) {  // Horizon - Configurable region file format
-                             for (int i2 = 0; i2 < 32; i2++) {
-                                 for (int i3 = 0; i3 < 32; i3++) {
-                                     ChunkPos chunkPos = new ChunkPos(i2 + i, i3 + i1);
-@@ -331,7 +331,7 @@ public class WorldUpgrader implements AutoCloseable {
- 
-         protected abstract boolean tryProcessOnePosition(SimpleRegionStorage regionStorage, ChunkPos chunkPos, ResourceKey<Level> dimension);
- 
--        private void onFileFinished(RegionFile regionFile) {
-+        private void onFileFinished(dev.gideonwhite1029.horizon.region.IRegionFile regionFile) { // Horizon - Configurable region file format
-             if (WorldUpgrader.this.recreateRegionFiles) {
-                 if (this.previousWriteFuture != null) {
-                     this.previousWriteFuture.join();
-@@ -441,7 +441,7 @@ public class WorldUpgrader implements AutoCloseable {
-         }
+diff --git a/net/minecraft/util/worldupdate/RegionStorageUpgrader.java b/net/minecraft/util/worldupdate/RegionStorageUpgrader.java
+index c23fc1254ae54ca3996aec8a4a7ffe66c1e8d8f9..4f4580620b009e13d1e48f8af0f547a804fa04cc 100644
+--- a/net/minecraft/util/worldupdate/RegionStorageUpgrader.java
++++ b/net/minecraft/util/worldupdate/RegionStorageUpgrader.java
+@@ -36,7 +36,7 @@ import org.slf4j.Logger;
+ public class RegionStorageUpgrader {
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private static final String NEW_DIRECTORY_PREFIX = "new_";
+-    private static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\.mca$");
++    private static final Pattern REGEX = Pattern.compile("^r\\.(-?[0-9]+)\\.(-?[0-9]+)\\." + net.minecraft.world.level.chunk.storage.RegionFileStorage.getExtensionName() + "$"); // Horizon - Configurable region file format
+     private final DataFixer dataFixer;
+     private final UpgradeProgress upgradeProgress;
+     private final String type;
+@@ -160,7 +160,7 @@ public class RegionStorageUpgrader {
      }
  
--    record FileToUpgrade(RegionFile file, List<ChunkPos> chunksToUpgrade) {
-+    record FileToUpgrade(dev.gideonwhite1029.horizon.region.IRegionFile file, List<ChunkPos> chunksToUpgrade) { // Horizon - Configurable region file format
+     private static List<FileToUpgrade> getAllChunkPositions(final RegionStorageInfo info, final Path regionFolder) {
+-        File[] files = regionFolder.toFile().listFiles((dir, name) -> name.endsWith(".mca"));
++        File[] files = regionFolder.toFile().listFiles((dir, name) -> name.endsWith(net.minecraft.world.level.chunk.storage.RegionFileStorage.getExtensionName())); // Horizon - Configurable region file format
+         if (files == null) {
+             return List.of();
+         } else {
+@@ -173,7 +173,7 @@ public class RegionStorageUpgrader {
+                     int zOffset = Integer.parseInt(regex.group(2)) << 5;
+                     List<ChunkPos> chunkPositions = Lists.newArrayList();
+ 
+-                    try (RegionFile regionSource = new RegionFile(info, regionFile.toPath(), regionFolder, true)) {
++                    try (dev.gideonwhite1029.horizon.region.IRegionFile regionSource = net.minecraft.world.level.chunk.storage.RegionFileStorage.createNew(info, regionFile.toPath(), regionFolder, true)) { // Horizon - Configurable region file format
+                         for (int x = 0; x < 32; x++) {
+                             for (int z = 0; z < 32; z++) {
+                                 ChunkPos pos = new ChunkPos(x + xOffset, z + zOffset);
+@@ -251,7 +251,7 @@ public class RegionStorageUpgrader {
+         return storage.upgradeChunkTag(chunkTag, this.defaultVersion, this.dataFixContextTag, targetVersion);
      }
  
-     class PoiUpgrader extends WorldUpgrader.SimpleRegionStorageUpgrader {
+-    private void onFileFinished(final RegionFile regionFile) {
++    private void onFileFinished(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) { // Horizon - Configurable region file format
+         if (this.recreateRegionFiles) {
+             if (this.previousWriteFuture != null) {
+                 this.previousWriteFuture.join();
+@@ -278,6 +278,8 @@ public class RegionStorageUpgrader {
+         return directoryPath.resolveSibling("new_" + directoryPath.getFileName().toString());
+     }
+ 
++    record FileToUpgrade(dev.gideonwhite1029.horizon.region.IRegionFile file, List<ChunkPos> chunksToUpgrade) {} // Horizon - Configurable region file format
++
+     public static class Builder {
+         private final DataFixer dataFixer;
+         private @Nullable DataFixTypes dataFixType;
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFile.java b/net/minecraft/world/level/chunk/storage/RegionFile.java
-index c6adcb44bc96eaeba74bfc228a6a61765b1628e7..e3f0aabe8eef52a0052ea4618a67afbaf5e40572 100644
+index e077797cefffcb9db627cab12c7d88245e5baa69..9684dd2c2ee068aa0a72f4640d89723edaf121b8 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFile.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFile.java
-@@ -22,7 +22,7 @@ import net.minecraft.world.level.ChunkPos;
+@@ -23,7 +23,7 @@ import net.minecraft.world.level.ChunkPos;
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
@@ -142,7 +143,7 @@ index c6adcb44bc96eaeba74bfc228a6a61765b1628e7..e3f0aabe8eef52a0052ea4618a67afba
      private static final Logger LOGGER = LogUtils.getLogger();
      public static final int MAX_CHUNK_SIZE = 500 * 1024 * 1024; // Paper - don't write garbage data to disk if writing serialization fails
      private static final int SECTOR_BYTES = 4096;
-@@ -130,7 +130,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+@@ -131,7 +131,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
          return this.recalculateCount.get();
      }
  
@@ -151,16 +152,16 @@ index c6adcb44bc96eaeba74bfc228a6a61765b1628e7..e3f0aabe8eef52a0052ea4618a67afba
          if (!this.canRecalcHeader) {
              return false;
          }
-@@ -791,7 +791,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+@@ -790,7 +790,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
          }
      }
  
--    protected synchronized void write(ChunkPos chunkPos, ByteBuffer chunkData) throws IOException {
-+    public synchronized void write(ChunkPos chunkPos, ByteBuffer chunkData) throws IOException { // Horizon - Configurable region file format
-         int offsetIndex = getOffsetIndex(chunkPos);
-         int i = this.offsets.get(offsetIndex);
-         int sectorNumber = getSectorNumber(i);
-@@ -909,7 +909,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
+-    protected synchronized void write(final ChunkPos pos, final ByteBuffer data) throws IOException {
++    public synchronized void write(final ChunkPos pos, final ByteBuffer data) throws IOException { // Horizon - Configurable region file format
+         int offsetIndex = getOffsetIndex(pos);
+         int offset = this.offsets.get(offsetIndex);
+         int sectorNumber = getSectorNumber(offset);
+@@ -908,7 +908,7 @@ public class RegionFile implements AutoCloseable, ca.spottedleaf.moonrise.patche
          }
  
          @Override
@@ -193,7 +194,7 @@ index c6adcb44bc96eaeba74bfc228a6a61765b1628e7..e3f0aabe8eef52a0052ea4618a67afba
          try (DataInputStream out = new DataInputStream(new java.io.BufferedInputStream(new java.util.zip.InflaterInputStream(Files.newInputStream(file))))) {
              return net.minecraft.nbt.NbtIo.read((java.io.DataInput) out);
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a6e91a20d 100644
+index f01af8207cbc827cee9ab887578716a865cd4b5e..208edc627fdb8304c0c89ad9470acffe5295a161 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -19,7 +19,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
@@ -205,7 +206,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
      private final RegionStorageInfo info;
      private final Path folder;
      private final boolean sync;
-@@ -59,9 +59,29 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -55,9 +55,28 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
      private static final int MAX_NON_EXISTING_CACHE = 1024 * 4;
      private final it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet nonExistingRegionFiles = new it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet();
      private static String getRegionFileName(final int chunkX, final int chunkZ) {
@@ -221,7 +222,6 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
 +        final String extensionName = fullNameSplit[fullNameSplit.length - 1];
 +
 +        if (!regionFormat.getArgument().equalsIgnoreCase(extensionName)) {
-+            net.minecraft.server.MinecraftServer.setFatalException(new RuntimeException("Invalid region file format: " + extensionName + " expected " + regionFormat.getArgument()));
 +            throw new IOException("Invalid region file format: " + extensionName + " expected " + regionFormat.getArgument());
 +        }
 +
@@ -236,26 +236,26 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
      private boolean doesRegionFilePossiblyExist(final long position) {
          synchronized (this.nonExistingRegionFiles) {
              if (this.nonExistingRegionFiles.contains(position)) {
-@@ -94,15 +114,15 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -90,15 +109,15 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
      }
  
      @Override
 -    public synchronized final RegionFile moonrise$getRegionFileIfLoaded(final int chunkX, final int chunkZ) {
 +    public synchronized final dev.gideonwhite1029.horizon.region.IRegionFile moonrise$getRegionFileIfLoaded(final int chunkX, final int chunkZ) { // Horizon - Configurable region file format
-         return this.regionCache.getAndMoveToFirst(ChunkPos.asLong(chunkX >> REGION_SHIFT, chunkZ >> REGION_SHIFT));
+         return this.regionCache.getAndMoveToFirst(ChunkPos.pack(chunkX >> REGION_SHIFT, chunkZ >> REGION_SHIFT));
      }
  
      @Override
 -    public synchronized final RegionFile moonrise$getRegionFileIfExists(final int chunkX, final int chunkZ) throws IOException {
 +    public synchronized final dev.gideonwhite1029.horizon.region.IRegionFile moonrise$getRegionFileIfExists(final int chunkX, final int chunkZ) throws IOException { // Horizon - Configurable region file format
-         final long key = ChunkPos.asLong(chunkX >> REGION_SHIFT, chunkZ >> REGION_SHIFT);
+         final long key = ChunkPos.pack(chunkX >> REGION_SHIFT, chunkZ >> REGION_SHIFT);
  
 -        RegionFile ret = this.regionCache.getAndMoveToFirst(key);
 +        dev.gideonwhite1029.horizon.region.IRegionFile ret = this.regionCache.getAndMoveToFirst(key); // Horizon - Configurable region file format
          if (ret != null) {
              return ret;
          }
-@@ -126,7 +146,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -124,7 +143,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
          FileUtil.createDirectoriesSafe(this.folder);
  
@@ -264,7 +264,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
  
          this.regionCache.putAndMoveToFirst(key, ret);
  
-@@ -145,7 +165,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -143,7 +162,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          }
  
          final ChunkPos pos = new ChunkPos(chunkX, chunkZ);
@@ -273,7 +273,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
  
          // note: not required to keep regionfile loaded after this call, as the write param takes a regionfile as input
          // (and, the regionfile parameter is unused for writing until the write call)
-@@ -179,7 +199,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -177,7 +196,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
      ) throws IOException {
          final ChunkPos pos = new ChunkPos(chunkX, chunkZ);
          if (writeData.result() == ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.WriteData.WriteResult.DELETE) {
@@ -282,7 +282,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
              if (regionFile != null) {
                  regionFile.clear(pos);
              } // else: didn't exist
-@@ -194,7 +214,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -192,7 +211,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
      public final ca.spottedleaf.moonrise.patches.chunk_system.io.MoonriseRegionFileIO.RegionDataController.ReadData moonrise$readData(
          final int chunkX, final int chunkZ
      ) throws IOException {
@@ -291,7 +291,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
  
          final DataInputStream input = regionFile == null ? null : regionFile.getChunkDataInputStream(new ChunkPos(chunkX, chunkZ));
  
-@@ -239,7 +259,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -237,7 +256,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
              final ChunkPos pos = new ChunkPos(chunkX, chunkZ);
              final ChunkPos headerChunkPos = SerializableChunkData.getChunkCoordinate(ret);
@@ -300,7 +300,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
  
              if (regionFile.getRecalculateCount() != readData.recalculateCount()) {
                  return null;
-@@ -263,7 +283,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -261,7 +280,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
      }
      // Paper end - rewrite chunk system
      // Paper start - rewrite chunk system
@@ -309,25 +309,25 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
          return this.getRegionFile(chunkcoordintpair, false);
      }
      // Paper end - rewrite chunk system
-@@ -275,7 +295,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
-         this.isChunkData = isChunkDataFolder(this.folder); // Paper - recalculate region file headers
+@@ -273,7 +292,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+         this.isChunkData = info.dfuType()[0] == net.minecraft.util.datafix.DataFixTypes.CHUNK; // Paper - recalculate region file headers
      }
  
--    @org.jetbrains.annotations.Contract("_, false -> !null") @Nullable private RegionFile getRegionFile(ChunkPos chunkPos, boolean existingOnly) throws IOException { // CraftBukkit
-+    @org.jetbrains.annotations.Contract("_, false -> !null") private dev.gideonwhite1029.horizon.region.IRegionFile getRegionFile(ChunkPos chunkPos, boolean existingOnly) throws IOException { // CraftBukkit
+-    @org.jetbrains.annotations.Contract("_, false -> !null") private @Nullable RegionFile getRegionFile(final ChunkPos pos, boolean existingOnly) throws IOException { // CraftBukkit
++    @org.jetbrains.annotations.Contract("_, false -> !null") private dev.gideonwhite1029.horizon.region.IRegionFile getRegionFile(final ChunkPos pos, boolean existingOnly) throws IOException { // CraftBukkit // Horizon - Configurable region file format
          // Paper start - rewrite chunk system
          if (existingOnly) {
-             return this.moonrise$getRegionFileIfExists(chunkPos.x, chunkPos.z);
-@@ -283,7 +303,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+             return this.moonrise$getRegionFileIfExists(pos.x(), pos.z());
+@@ -281,7 +300,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          synchronized (this) {
-             final long key = ChunkPos.asLong(chunkPos.x >> REGION_SHIFT, chunkPos.z >> REGION_SHIFT);
+             final long key = ChunkPos.pack(pos.x() >> REGION_SHIFT, pos.z() >> REGION_SHIFT);
  
 -            RegionFile ret = this.regionCache.getAndMoveToFirst(key);
 +            dev.gideonwhite1029.horizon.region.IRegionFile ret = this.regionCache.getAndMoveToFirst(key); // Horizon - Configurable region file format
              if (ret != null) {
                  return ret;
              }
-@@ -298,7 +318,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -298,7 +317,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
              FileUtil.createDirectoriesSafe(this.folder);
  
@@ -336,7 +336,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
  
              this.regionCache.putAndMoveToFirst(key, ret);
  
-@@ -312,7 +332,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -312,7 +331,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO Horizon - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand // Horizon - Rebrand
      }
  
@@ -344,35 +344,35 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
 +    private static CompoundTag readOversizedChunk(dev.gideonwhite1029.horizon.region.IRegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {  // Horizon - Configurable region file format
          synchronized (regionfile) {
              try (DataInputStream datainputstream = regionfile.getChunkDataInputStream(chunkCoordinate)) {
-                 CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x, chunkCoordinate.z);
-@@ -346,7 +366,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+                 CompoundTag oversizedData = regionfile.getOversizedData(chunkCoordinate.x(), chunkCoordinate.z());
+@@ -346,7 +365,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
-     public @Nullable CompoundTag read(ChunkPos chunkPos) throws IOException {
+     public @Nullable CompoundTag read(final ChunkPos pos) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
--        RegionFile regionFile = this.getRegionFile(chunkPos, true);
-+        dev.gideonwhite1029.horizon.region.IRegionFile regionFile = this.getRegionFile(chunkPos, true); // Horizon - Configurable region file format
-         if (regionFile == null) {
+-        RegionFile region = this.getRegionFile(pos, true);
++        dev.gideonwhite1029.horizon.region.IRegionFile region = this.getRegionFile(pos, true); // Horizon - Configurable region file format
+         if (region == null) {
              return null;
          }
-@@ -385,7 +405,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -385,7 +404,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
-     public void scanChunk(ChunkPos chunkPos, StreamTagVisitor visitor) throws IOException {
+     public void scanChunk(final ChunkPos pos, final StreamTagVisitor scanner) throws IOException {
          // CraftBukkit start - SPIGOT-5680: There's no good reason to preemptively create files on read, save that for writing
--        RegionFile regionFile = this.getRegionFile(chunkPos, true);
-+        dev.gideonwhite1029.horizon.region.IRegionFile regionFile = this.getRegionFile(chunkPos, true); // Horizon - Configurable region file format
-         if (regionFile == null) {
+-        RegionFile region = this.getRegionFile(pos, true);
++        dev.gideonwhite1029.horizon.region.IRegionFile region = this.getRegionFile(pos, true); // Horizon - Configurable region file format
+         if (region == null) {
              return;
          }
-@@ -400,7 +420,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -400,7 +419,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
-     public void write(ChunkPos chunkPos, @Nullable CompoundTag chunkData) throws IOException { // Paper - rewrite chunk system - public
+     public void write(final ChunkPos pos, final @Nullable CompoundTag value) throws IOException { // Paper - rewrite chunk system - public
          if (!SharedConstants.DEBUG_DONT_SAVE_WORLD) {
--            RegionFile regionFile = this.getRegionFile(chunkPos, chunkData == null); // CraftBukkit // Paper - rewrite chunk system
-+            dev.gideonwhite1029.horizon.region.IRegionFile regionFile = this.getRegionFile(chunkPos, chunkData == null); // CraftBukkit // Paper - rewrite chunk system // Horizon - Configurable region file format
+-            RegionFile region = this.getRegionFile(pos, value == null); // CraftBukkit // Paper - rewrite chunk system
++            dev.gideonwhite1029.horizon.region.IRegionFile region = this.getRegionFile(pos, value == null); // CraftBukkit // Paper - rewrite chunk system // Horizon - Configurable region file format
              // Paper start - rewrite chunk system
-             if (regionFile == null) {
+             if (region == null) {
                  // if the RegionFile doesn't exist, no point in deleting from it
-@@ -431,7 +451,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -432,7 +451,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          // Paper start - rewrite chunk system
          synchronized (this) {
              final ExceptionCollector<IOException> exceptionCollector = new ExceptionCollector<>();
@@ -381,7 +381,7 @@ index ddb54dea634fd11230408586fdc7c60e44dfaebb..381149d6219e3a09e52028c5913ca88a
                  try {
                      regionFile.close();
                  } catch (final IOException ex) {
-@@ -447,7 +467,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
+@@ -448,7 +467,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
          // Paper start - rewrite chunk system
          synchronized (this) {
              final ExceptionCollector<IOException> exceptionCollector = new ExceptionCollector<>();

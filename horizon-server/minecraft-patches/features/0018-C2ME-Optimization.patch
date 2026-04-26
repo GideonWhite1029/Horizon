@@ -7,15 +7,15 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/levelgen/feature/OreFeature.java b/net/minecraft/world/level/levelgen/feature/OreFeature.java
-index c7b46efd4f08067e2c9c5c8b0e8b71a94a79823d..cd93f3dded63422376607a5aaab07a3355767408 100644
+index 87a17aad0e5d3f66b1177a628d82fa890e4a7707..199713d3d4c42dfd89083878c20e44786f0e6af1 100644
 --- a/net/minecraft/world/level/levelgen/feature/OreFeature.java
 +++ b/net/minecraft/world/level/levelgen/feature/OreFeature.java
 @@ -69,7 +69,7 @@ public class OreFeature extends Feature<OreConfiguration> {
-         int height
+         final int sizeY
      ) {
-         int i = 0;
--        BitSet bitSet = new BitSet(width * height * width);
-+        BitSet bitSet = dev.gideonwhite1029.horizon.util.optimization.ObjectCachingUtils.getCachedOrNewBitSet(width * height * width); // Horizon
-         BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
-         int i1 = config.size;
-         double[] doubles = new double[i1 * 4];
+         int placed = 0;
+-        BitSet tested = new BitSet(sizeXZ * sizeY * sizeXZ);
++        BitSet tested = dev.gideonwhite1029.horizon.util.optimization.ObjectCachingUtils.getCachedOrNewBitSet(sizeXZ * sizeY * sizeXZ); // Horizon
+         BlockPos.MutableBlockPos orePos = new BlockPos.MutableBlockPos();
+         int size = config.size;
+         double[] data = new double[size * 4];

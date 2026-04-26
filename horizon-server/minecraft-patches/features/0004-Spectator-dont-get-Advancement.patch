@@ -7,18 +7,18 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
-index 9612e9dd36010ffcc0e038301233d90b3ed7aeed..1052e62239cd7eca8f5e3b21062e6bb5088a7a9e 100644
+index 6ced43c403344e811058f84d0c29eed23e8ce391..e8b770c2e9a6a13ae16a0316b2c0b4c396de1f0e 100644
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -167,6 +167,11 @@ public class PlayerAdvancements {
+@@ -169,6 +169,11 @@ public class PlayerAdvancements {
      }
  
-     public boolean award(AdvancementHolder advancement, String criterionKey) {
+     public boolean award(final AdvancementHolder holder, final String criterion) {
 +        // Horizon start - spectator don't get advancement
 +        if (dev.gideonwhite1029.horizon.HorizonConfig.spectatorDontGetAdvancement && player.gameMode.getGameModeForPlayer() == net.minecraft.world.level.GameType.SPECTATOR) {
 +            return false;
 +        }
 +        // Horizon end - spectator don't get advancement
-         boolean flag = false;
-         AdvancementProgress orStartProgress = this.getOrStartProgress(advancement);
-         boolean isDone = orStartProgress.isDone();
+         boolean result = false;
+         AdvancementProgress progress = this.getOrStartProgress(holder);
+         boolean wasDone = progress.isDone();

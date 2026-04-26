@@ -24,7 +24,7 @@ index fb1fe2651e53a9bf46b3632c638e13eea9dcda93..54c4a2e3e7739300b6f2aa6889e80ee9
       * Gets the {@code ServerBuildInfo}.
       *
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 01481db67a78f60048af6737791b140d0adce028..7e771d2553734488d3f9f4ebd61a1b978a6d760c 100644
+index 7ce03418a04ea275a81a504322d0c0b2f6de1b74..7247b9d23d1f41a01603766acc8fd8b4fad9bb88 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
 @@ -15,7 +15,11 @@ import java.util.UUID;
@@ -62,7 +62,7 @@ index 01481db67a78f60048af6737791b140d0adce028..7e771d2553734488d3f9f4ebd61a1b97
 +                "\n" +
 +                "  \u001b[38;5;105m Server name: \u001B[0m" + getName() + "\n"+
 +                "  \u001b[38;5;105m Version: \u001B[0m" + getVersion() + "\n" +
-+                "  \u001b[38;5;105m API version: \u001B[0m" + getBukkitVersion() + "\n";
++                "  \u001b[38;5;105m API version: \u001B[0m" + getMinecraftVersion() + "\n";
 +        // Horizon stop
 +    }
 +

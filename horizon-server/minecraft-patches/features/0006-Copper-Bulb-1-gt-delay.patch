@@ -7,12 +7,12 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/CopperBulbBlock.java b/net/minecraft/world/level/block/CopperBulbBlock.java
-index 153af604a49d243bc64ffbbb4e11932f3dfdb373..521fc0f2ac753081a2ed8e2125c797d24ac4d762 100644
+index cc07d62b43908ab65c5b739633faef27c134f706..615686e0e027f4db7c0c125f6a3c9a34677cb522 100644
 --- a/net/minecraft/world/level/block/CopperBulbBlock.java
 +++ b/net/minecraft/world/level/block/CopperBulbBlock.java
-@@ -33,16 +33,37 @@ public class CopperBulbBlock extends Block {
+@@ -33,18 +33,39 @@ public class CopperBulbBlock extends Block {
      @Override
-     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+     protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
          if (oldState.getBlock() != state.getBlock() && level instanceof ServerLevel serverLevel) {
 -            this.checkAndFlip(state, serverLevel, pos);
 +            // Horizon start - copper bulb 1 gt delay
@@ -26,7 +26,10 @@ index 153af604a49d243bc64ffbbb4e11932f3dfdb373..521fc0f2ac753081a2ed8e2125c797d2
      }
  
      @Override
-     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+     protected void neighborChanged(
+-        final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
++            final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
+     ) {
          if (level instanceof ServerLevel serverLevel) {
 -            this.checkAndFlip(state, serverLevel, pos);
 +            // Horizon start - copper bulb 1 gt delay
@@ -48,5 +51,5 @@ index 153af604a49d243bc64ffbbb4e11932f3dfdb373..521fc0f2ac753081a2ed8e2125c797d2
      }
 +    // Horizon end - copper bulb 1 gt delay
  
-     public void checkAndFlip(BlockState state, ServerLevel level, BlockPos pos) {
-         boolean hasNeighborSignal = level.hasNeighborSignal(pos);
+     public void checkAndFlip(final BlockState state, final ServerLevel level, final BlockPos pos) {
+         boolean signal = level.hasNeighborSignal(pos);

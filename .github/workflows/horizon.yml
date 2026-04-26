@@ -2,7 +2,7 @@ name: Horizon CI
 
 on:
   push:
-    branches: [ "ver/1.21.11" ]
+    branches: [ "ver/26.1.2" ]
   repository_dispatch:
     types: [upstream-updated]
 
@@ -18,18 +18,18 @@ jobs:
         with:
           ref: ${{ github.event_name == 'repository_dispatch' && github.event.client_payload.ref || github.ref }}
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: 9.2.1
+          gradle-version: 9.4.1
           add-job-summary: never
           cache-read-only: false
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
       - name: Setup Git Config
         run: git config --global user.email "action@github.com" && git config --global user.name "Github Action"
       - name: Apply Patches
@@ -39,13 +39,13 @@ jobs:
       - name: Get Release Info
         run: sh scripts/ReleaseInfo.sh
       - name: Upload Artifact
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "${{ env.project_id_b }} CI Artifacts"
           path: "horizon-server/build/libs/*.jar"
       - name: Create Release
         if: "!contains(github.event.commits[0].message, '[release skip]')"
-        uses: ncipollo/release-action@v1.20.0
+        uses: ncipollo/release-action@v1.21.0
         with:
           tag: ${{ env.tag }}
           name: ${{ env.project_id_b }} ${{ env.mcversion }} - ${{ env.commit_id }}

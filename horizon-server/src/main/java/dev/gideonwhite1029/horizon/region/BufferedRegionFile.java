@@ -342,7 +342,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
     public @Nullable DataInputStream getChunkDataInputStream(@NotNull ChunkPos pos) throws IOException {
         this.fileAccessLock.readLock().lock();
         try {
-            final ByteBuffer data = this.readChunk(pos.x, pos.z);
+            final ByteBuffer data = this.readChunk(pos.x(), pos.z());
             if (data == null) return null;
             final byte[] bytes = new byte[data.remaining()];
             data.get(bytes);
@@ -356,7 +356,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
     public boolean doesChunkExist(@NotNull ChunkPos pos) {
         this.fileAccessLock.readLock().lock();
         try {
-            return this.sectors[getChunkIndex(pos.x, pos.z)].hasData;
+            return this.sectors[getChunkIndex(pos.x(), pos.z())].hasData;
         } finally {
             this.fileAccessLock.readLock().unlock();
         }
@@ -371,7 +371,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
     public void write(@NotNull ChunkPos pos, ByteBuffer buf) throws IOException {
         this.fileAccessLock.writeLock().lock();
         try {
-            this.writeChunk(pos.x, pos.z, buf);
+            this.writeChunk(pos.x(), pos.z(), buf);
         } finally {
             this.fileAccessLock.writeLock().unlock();
         }
@@ -381,7 +381,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
     public void clear(@NotNull ChunkPos pos) throws IOException {
         this.fileAccessLock.writeLock().lock();
         try {
-            this.clearChunk(getChunkIndex(pos.x, pos.z));
+            this.clearChunk(getChunkIndex(pos.x(), pos.z()));
         } finally {
             this.fileAccessLock.writeLock().unlock();
         }
@@ -391,7 +391,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
     public boolean hasChunk(@NotNull ChunkPos pos) {
         this.fileAccessLock.readLock().lock();
         try {
-            return this.sectors[getChunkIndex(pos.x, pos.z)].hasData;
+            return this.sectors[getChunkIndex(pos.x(), pos.z())].hasData;
         } finally {
             this.fileAccessLock.readLock().unlock();
         }
@@ -524,7 +524,7 @@ public class BufferedRegionFile implements IRegionFile, IFlushableRegionFile {
         public void close() throws IOException {
             BufferedRegionFile.this.fileAccessLock.writeLock().lock();
             try {
-                BufferedRegionFile.this.writeChunk(this.pos.x, this.pos.z, ByteBuffer.wrap(this.buf, 0, this.count));
+                BufferedRegionFile.this.writeChunk(this.pos.x(), this.pos.z(), ByteBuffer.wrap(this.buf, 0, this.count));
             } finally {
                 BufferedRegionFile.this.fileAccessLock.writeLock().unlock();
             }

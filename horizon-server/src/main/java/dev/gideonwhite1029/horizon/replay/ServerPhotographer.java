@@ -53,8 +53,8 @@ public class ServerPhotographer extends ServerPlayer {
         photographer.saveFile = new File("replay", state.id + ".mcpr");
         photographer.createState = state;
 
-        photographer.recorder.start();
         MinecraftServer.getServer().getPlayerList().placeNewPhotographer(photographer.recorder, photographer, world);
+        photographer.recorder.start();
         photographer.level().chunkSource.move(photographer);
         photographer.setInvisible(true);
         photographers.add(photographer);
@@ -77,12 +77,15 @@ public class ServerPhotographer extends ServerPlayer {
         }
 
         if (this.followPlayer != null) {
-            if (this.getCamera() == this || this.getCamera().level() != this.level()) {
-                this.getBukkitPlayer().teleport(this.getCamera().getBukkitEntity().getLocation());
-                this.setCamera(followPlayer);
-            }
-            if (lastPos.distanceToSqr(this.position()) > 1024D) {
-                this.getBukkitPlayer().teleport(this.getCamera().getBukkitEntity().getLocation());
+            if (!this.followPlayer.isAlive()) {
+                this.followPlayer = null;
+                this.setCamera(this);
+                lastPos = this.position();
+            } else if (this.getCamera() != this.followPlayer || this.getCamera().level() != this.level()) {
+                this.getBukkitPlayer().teleport(this.followPlayer.getBukkitEntity().getLocation());
+                this.setCamera(this.followPlayer);
+            } else if (this.followPlayer.position().distanceToSqr(this.position()) > 1024D) {
+                this.getBukkitPlayer().teleport(this.followPlayer.getBukkitEntity().getLocation());
             }
         }
 

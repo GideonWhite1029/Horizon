@@ -22,14 +22,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.Fireworks;
-import net.minecraft.world.item.component.ProvidesTrimMaterial;
 import net.minecraft.world.item.crafting.FireworkRocketRecipe;
+import net.minecraft.world.item.crafting.ImbueRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.MapCloningRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 import net.minecraft.world.item.crafting.SmithingTrimRecipe;
-import net.minecraft.world.item.crafting.TippedArrowRecipe;
 import net.minecraft.world.item.crafting.TransmuteRecipe;
 import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay;
@@ -106,7 +104,7 @@ public abstract class Display {
      * see me.shedaniel.rei.plugin.client.categories.crafting.filler.TippedArrowRecipeFiller#apply
      */
     @NotNull
-    public static Collection<Display> ofTippedArrowRecipe(@NotNull RecipeHolder<TippedArrowRecipe> recipeHolder) {
+    public static Collection<Display> ofTippedArrowRecipe(@NotNull RecipeHolder<ImbueRecipe> recipeHolder) {
         EntryIngredient arrowIngredient = EntryIngredient.of(Items.ARROW);
         Set<Identifier> registeredPotions = new HashSet<>();
         List<Display> displays = new ArrayList<>();
@@ -157,7 +155,7 @@ public abstract class Display {
      * see me.shedaniel.rei.plugin.client.categories.crafting.filler.MapCloningRecipeFiller#apply
      */
     @NotNull
-    public static Collection<Display> ofMapCloningRecipe(@NotNull RecipeHolder<MapCloningRecipe> recipeHolder) {
+    public static Collection<Display> ofMapCloningRecipe(@NotNull RecipeHolder<?> recipeHolder) {
         return Collections.singleton(
             new ShapelessDisplay(
                 List.of(EntryIngredient.of(Items.FILLED_MAP), EntryIngredient.of(Items.MAP)),
@@ -189,11 +187,10 @@ public abstract class Display {
     @SuppressWarnings("deprecation")
     @NotNull
     public static Collection<Display> ofSmithingTrimRecipe(@NotNull RecipeHolder<SmithingTrimRecipe> recipeHolder) {
-        RegistryAccess registryAccess = MinecraftServer.getServer().registryAccess();
         SmithingTrimRecipe recipe = recipeHolder.value();
         List<Display> displays = new ArrayList<>();
         for (Holder<Item> additionStack : (Iterable<Holder<Item>>) recipe.additionIngredient().map(Ingredient::items).orElse(Stream.of())::iterator) {
-            Holder<TrimMaterial> trimMaterial = getMaterialFromIngredient(registryAccess, additionStack).orElse(null);
+            Holder<TrimMaterial> trimMaterial = getMaterialFromIngredient(additionStack).orElse(null);
             if (trimMaterial == null) {
                 continue;
             }
@@ -209,16 +206,16 @@ public abstract class Display {
         return displays;
     }
 
-    private static Optional<Holder<TrimMaterial>> getMaterialFromIngredient(HolderLookup.Provider provider, Holder<Item> item) {
-        ProvidesTrimMaterial providesTrimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
-        return providesTrimMaterial != null ? providesTrimMaterial.unwrap(provider) : Optional.empty();
+    private static Optional<Holder<TrimMaterial>> getMaterialFromIngredient(Holder<Item> item) {
+        Holder<TrimMaterial> trimMaterial = new ItemStack(item).get(DataComponents.PROVIDES_TRIM_MATERIAL);
+        return Optional.ofNullable(trimMaterial);
     }
 
     public static EntryIngredient ofSlotDisplay(SlotDisplay slot) {
         return switch (slot) {
             case SlotDisplay.Empty ignored -> EntryIngredient.empty();
             case SlotDisplay.ItemSlotDisplay s -> EntryIngredient.of(s.item().value());
-            case SlotDisplay.ItemStackSlotDisplay s -> EntryIngredient.of(s.stack());
+            case SlotDisplay.ItemStackSlotDisplay s -> EntryIngredient.of(new ItemStack(s.stack().item(), s.stack().count(), s.stack().components()));
             case SlotDisplay.TagSlotDisplay s -> ofItemTag(s.tag());
             case SlotDisplay.Composite s -> {
                 ArrayList<ItemStack> list = new ArrayList<>();

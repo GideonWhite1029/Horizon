@@ -7,196 +7,161 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/commands/SeedCommand.java b/net/minecraft/server/commands/SeedCommand.java
-index 68a27436bae245a31470483f92a116fa029f3d4e..d2329e0cb41cab17fe01ac3f887cb12fe0ace290 100644
+index 86ee3b3ae028597576b9549bc4954dfcbaa6732c..dd965687f5d180844e477d1deb4f01b4777e59b5 100644
 --- a/net/minecraft/server/commands/SeedCommand.java
 +++ b/net/minecraft/server/commands/SeedCommand.java
-@@ -15,6 +15,15 @@ public class SeedCommand {
-                     long seed = commandContext.getSource().getLevel().getSeed();
-                     Component component = ComponentUtils.copyOnClickText(String.valueOf(seed));
-                     commandContext.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", component), false);
-+                    // Horizon start - Secure Seed Command
-+                    if (dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) {
-+                        dev.gideonwhite1029.horizon.matter.Globals.setupGlobals(commandContext.getSource().getLevel());
-+                        String seedStr = dev.gideonwhite1029.horizon.matter.Globals.seedToString(dev.gideonwhite1029.horizon.matter.Globals.worldSeed);
-+                        Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
-+
-+                        commandContext.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
-+                    }
-+                    // Horizon end - Secure Seed Command
-                     return (int)seed;
-                 })
+@@ -13,6 +13,14 @@ public class SeedCommand {
+                 long seed = c.getSource().getLevel().getSeed();
+                 Component seedText = ComponentUtils.copyOnClickText(String.valueOf(seed));
+                 c.getSource().sendSuccess(() -> Component.translatable("commands.seed.success", seedText), false);
++                // Horizon start - Secure Seed Command
++                if (dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) {
++                    dev.gideonwhite1029.horizon.matter.Globals.setupGlobals(c.getSource().getLevel());
++                    String seedStr = dev.gideonwhite1029.horizon.matter.Globals.seedToString(dev.gideonwhite1029.horizon.matter.Globals.worldSeed);
++                    Component featureSeedComponent = ComponentUtils.copyOnClickText(seedStr);
++                    c.getSource().sendSuccess(() -> Component.translatable(("Feature seed: %s"), featureSeedComponent), false);
++                }
++                // Horizon end - Secure Seed Command
+                 return (int)seed;
+             })
          );
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java b/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
-index 5f2118f664c1013b99137c6d34a11c40c2559156..52aaf84440d89a8ca7ba79cf19e327266f25ba62 100644
+index 89ff918e1a7143e3c0348e490034bb1621f9dfea..32590fbe4214a00f165f91a6a79fbbe93976dc00 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/MineshaftStructure.java
-@@ -35,17 +35,21 @@ public class MineshaftStructure extends Structure {
+@@ -34,7 +34,12 @@ public class MineshaftStructure extends Structure {
  
      @Override
-     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
+     public Optional<Structure.GenerationStub> findGenerationPoint(final Structure.GenerationContext context) {
 -        context.random().nextDouble();
 +        // Horizon start - Feature Secure Seed
-+        WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.MINESHAFT_FEATURE, 0)
++        WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.MINESHAFT_FEATURE, 0)
 +                : context.random();
-+        if (!dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) worldgenRandom.nextDouble(); // vanilla compat
++        if (!dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) random.nextDouble(); // vanilla compat
 +        // Horizon end - Feature Secure Seed
          ChunkPos chunkPos = context.chunkPos();
-         BlockPos blockPos = new BlockPos(chunkPos.getMiddleBlockX(), 50, chunkPos.getMinBlockZ());
-         StructurePiecesBuilder structurePiecesBuilder = new StructurePiecesBuilder();
--        int i = this.generatePiecesAndAdjust(structurePiecesBuilder, context);
-+        int i = this.generatePiecesAndAdjust(structurePiecesBuilder, context, worldgenRandom);
-         return Optional.of(new Structure.GenerationStub(blockPos.offset(0, i, 0), Either.right(structurePiecesBuilder)));
-     }
- 
--    private int generatePiecesAndAdjust(StructurePiecesBuilder builder, Structure.GenerationContext context) {
-+    private int generatePiecesAndAdjust(StructurePiecesBuilder builder, Structure.GenerationContext context, WorldgenRandom worldgenRandom) {
-         ChunkPos chunkPos = context.chunkPos();
--        WorldgenRandom worldgenRandom = context.random();
-         ChunkGenerator chunkGenerator = context.chunkGenerator();
-         MineshaftPieces.MineShaftRoom mineShaftRoom = new MineshaftPieces.MineShaftRoom(
-             0, worldgenRandom, chunkPos.getBlockX(2), chunkPos.getBlockZ(2), this.type
+         BlockPos startPos = new BlockPos(chunkPos.getMiddleBlockX(), 50, chunkPos.getMinBlockZ());
+         StructurePiecesBuilder mineshaftPiecesBuilder = new StructurePiecesBuilder();
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/NetherFortressStructure.java b/net/minecraft/world/level/levelgen/structure/structures/NetherFortressStructure.java
-index 0a3b0b28641f18937240b77545997637f1d21b4c..6e3b97fa522148cba7bba862bce6b7665412100c 100644
+index 13820f1e7d4b06ec1c895bea88d6ebe34ab3a05c..641f7795eaaf3fb06ac30f2b5dfbf822b6d40cf5 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/NetherFortressStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/NetherFortressStructure.java
-@@ -29,26 +29,31 @@ public class NetherFortressStructure extends Structure {
+@@ -8,6 +8,7 @@ import net.minecraft.util.random.WeightedList;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.biome.MobSpawnSettings;
++import net.minecraft.world.level.levelgen.WorldgenRandom;
+ import net.minecraft.world.level.levelgen.structure.Structure;
+ import net.minecraft.world.level.levelgen.structure.StructurePiece;
+ import net.minecraft.world.level.levelgen.structure.StructureType;
+@@ -29,6 +30,11 @@ public class NetherFortressStructure extends Structure {
  
      @Override
-     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
+     public Optional<Structure.GenerationStub> findGenerationPoint(final Structure.GenerationContext context) {
 +        // Horizon start - Feature Secure Seed
-+        net.minecraft.world.level.levelgen.WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.NETHER_FORTRESS_FEATURE, 0)
++        WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.NETHER_FORTRESS_FEATURE, 0)
 +                : context.random();
 +        // Horizon end - Feature Secure Seed
          ChunkPos chunkPos = context.chunkPos();
-         BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), 64, chunkPos.getMinBlockZ());
--        return Optional.of(new Structure.GenerationStub(blockPos, structurePiecesBuilder -> generatePieces(structurePiecesBuilder, context)));
-+        return Optional.of(new Structure.GenerationStub(blockPos, structurePiecesBuilder -> generatePieces(structurePiecesBuilder, context, worldgenRandom)));
-     }
- 
--    private static void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context) {
-+    private static void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context, net.minecraft.world.level.levelgen.WorldgenRandom worldgenRandom) {
-         NetherFortressPieces.StartPiece startPiece = new NetherFortressPieces.StartPiece(
--            context.random(), context.chunkPos().getBlockX(2), context.chunkPos().getBlockZ(2)
-+            worldgenRandom, context.chunkPos().getBlockX(2), context.chunkPos().getBlockZ(2)
-         );
-         builder.addPiece(startPiece);
--        startPiece.addChildren(startPiece, builder, context.random());
-+        startPiece.addChildren(startPiece, builder, worldgenRandom);
-         List<StructurePiece> list = startPiece.pendingChildren;
- 
-         while (!list.isEmpty()) {
--            int randomInt = context.random().nextInt(list.size());
-+            int randomInt = worldgenRandom.nextInt(list.size());
-             StructurePiece structurePiece = list.remove(randomInt);
--            structurePiece.addChildren(startPiece, builder, context.random());
-+            structurePiece.addChildren(startPiece, builder, worldgenRandom);
-         }
- 
--        builder.moveInsideHeights(context.random(), 48, 70);
-+        builder.moveInsideHeights(worldgenRandom, 48, 70);
-     }
- 
-     @Override
+         BlockPos startPos = new BlockPos(chunkPos.getMinBlockX(), 64, chunkPos.getMinBlockZ());
+         return Optional.of(new Structure.GenerationStub(startPos, builder -> generatePieces(builder, context)));
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/NetherFossilStructure.java b/net/minecraft/world/level/levelgen/structure/structures/NetherFossilStructure.java
-index 1569bbcb4fd3a7018e466f8445974498e76f4bcf..a7c9539c2fe4967f56a504c4a8101cd526a5572c 100644
+index 32276c1ee4dcb71d21d10462601a2eae0c924b1a..ad23cf994a961287ee47d59efec06ee2c124e9d1 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/NetherFossilStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/NetherFossilStructure.java
-@@ -29,7 +29,11 @@ public class NetherFossilStructure extends Structure {
+@@ -28,7 +28,11 @@ public class NetherFossilStructure extends Structure {
  
      @Override
-     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
--        WorldgenRandom worldgenRandom = context.random();
+     public Optional<Structure.GenerationStub> findGenerationPoint(final Structure.GenerationContext context) {
+-        WorldgenRandom random = context.random();
 +        // Horizon start - Feature Secure Seed
-+        WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.NETHER_FOSSIL_FEATURE, 0)
++        WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.NETHER_FOSSIL_FEATURE, 0)
 +                : context.random();
 +        // Horizon end - Feature Secure Seed
-         int i = context.chunkPos().getMinBlockX() + worldgenRandom.nextInt(16);
-         int i1 = context.chunkPos().getMinBlockZ() + worldgenRandom.nextInt(16);
+         int blockX = context.chunkPos().getMinBlockX() + random.nextInt(16);
+         int blockZ = context.chunkPos().getMinBlockZ() + random.nextInt(16);
          int seaLevel = context.chunkGenerator().getSeaLevel();
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentStructure.java b/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentStructure.java
-index 6941b2c89df8a7c77166e3fb76150cbc852371d9..38a7cbb8f9ff04ffd83fcf44bdfa1ef60688cdd3 100644
+index 7db9297f4f8357e3191acd91f121101da78978bf..f8d4a16d27550c6ea4471802b7902224d29ac04a 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/OceanMonumentStructure.java
 @@ -49,15 +49,24 @@ public class OceanMonumentStructure extends Structure {
      }
  
-     private static void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context) {
+     private static void generatePieces(final StructurePiecesBuilder builder, final Structure.GenerationContext context) {
 -        builder.addPiece(createTopPiece(context.chunkPos(), context.random()));
 +        // Horizon start - Feature Secure Seed
-+        WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.OCEAN_MONUMENT_FEATURE, 0)
++        WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.OCEAN_MONUMENT_FEATURE, 0)
 +                : context.random();
 +        // Horizon end - Feature Secure Seed
-+        builder.addPiece(createTopPiece(context.chunkPos(), worldgenRandom));
++        builder.addPiece(createTopPiece(context.chunkPos(), random));
      }
  
-     public static PiecesContainer regeneratePiecesAfterLoad(ChunkPos chunkPos, long seed, PiecesContainer piecesContainer) {
-         if (piecesContainer.isEmpty()) {
-             return piecesContainer;
+     public static PiecesContainer regeneratePiecesAfterLoad(final ChunkPos chunkPos, final long seed, final PiecesContainer savedPieces) {
+         if (savedPieces.isEmpty()) {
+             return savedPieces;
          } else {
--            WorldgenRandom worldgenRandom = new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
--            worldgenRandom.setLargeFeatureSeed(seed, chunkPos.x, chunkPos.z);
+-            WorldgenRandom random = new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
+-            random.setLargeFeatureSeed(seed, chunkPos.x(), chunkPos.z());
 +            // Horizon start - Feature Secure Seed
-+            WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                    ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(chunkPos.x, chunkPos.z, dev.gideonwhite1029.horizon.matter.Globals.Salt.OCEAN_MONUMENT_FEATURE, seed)
++            WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                    ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(chunkPos.x(), chunkPos.z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.OCEAN_MONUMENT_FEATURE, seed)
 +                    : new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
-+            if (!dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) worldgenRandom.setLargeFeatureSeed(seed, chunkPos.x, chunkPos.z);
++            if (!dev.gideonwhite1029.horizon.HorizonConfig.secureSeed) random.setLargeFeatureSeed(seed, chunkPos.x(), chunkPos.z());
 +            // Horizon end - Feature Secure Seed
-             StructurePiece structurePiece = piecesContainer.pieces().get(0);
-             BoundingBox boundingBox = structurePiece.getBoundingBox();
-             int minX = boundingBox.minX();
+             StructurePiece oldTopPiece = savedPieces.pieces().get(0);
+             BoundingBox oldBoundingBox = oldTopPiece.getBoundingBox();
+             int west = oldBoundingBox.minX();
+@@ -75,4 +84,4 @@ public class OceanMonumentStructure extends Structure {
+     public StructureType<?> type() {
+         return StructureType.OCEAN_MONUMENT;
+     }
+-}
++}
+\ No newline at end of file
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/RuinedPortalStructure.java b/net/minecraft/world/level/levelgen/structure/structures/RuinedPortalStructure.java
-index a58921292156f83081fc2b2dd295b7b8a05ac217..1c64c233a5cfef565cf92c589c6c6e1cbc7bee0b 100644
+index 4c9da8a54cd5e2189a146e99cae7dffde6c532aa..d1fa8da3c5ca4952d0597f5ff884837b984a418f 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/RuinedPortalStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/RuinedPortalStructure.java
-@@ -69,7 +69,11 @@ public class RuinedPortalStructure extends Structure {
+@@ -66,7 +66,11 @@ public class RuinedPortalStructure extends Structure {
      @Override
-     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
+     public Optional<Structure.GenerationStub> findGenerationPoint(final Structure.GenerationContext context) {
          RuinedPortalPiece.Properties properties = new RuinedPortalPiece.Properties();
--        WorldgenRandom worldgenRandom = context.random();
+-        WorldgenRandom random = context.random();
 +        // Horizon start - Feature Secure Seed
-+        WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.RUINED_PORTAL_FEATURE, 0)
++        WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.RUINED_PORTAL_FEATURE, 0)
 +                : context.random();
 +        // Horizon end - Feature Secure Seed
-         RuinedPortalStructure.Setup setup = null;
+         RuinedPortalStructure.Setup chosenSetup = null;
          if (this.setups.size() > 1) {
-             float f = 0.0F;
+             float total = 0.0F;
 diff --git a/net/minecraft/world/level/levelgen/structure/structures/WoodlandMansionStructure.java b/net/minecraft/world/level/levelgen/structure/structures/WoodlandMansionStructure.java
-index 6e90f1fd987dec641fb4660384f5a1a67e17d611..725d81d640f42501981fc0713138bed0ab62889b 100644
+index 6d63ff285ae6570cca60f887e35b831a51528a51..798984f4301ee26023aa65a37a5176269dbba0d8 100644
 --- a/net/minecraft/world/level/levelgen/structure/structures/WoodlandMansionStructure.java
 +++ b/net/minecraft/world/level/levelgen/structure/structures/WoodlandMansionStructure.java
-@@ -28,21 +28,26 @@ public class WoodlandMansionStructure extends Structure {
+@@ -28,7 +28,12 @@ public class WoodlandMansionStructure extends Structure {
  
      @Override
-     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
--        Rotation random = Rotation.getRandom(context.random());
+     public Optional<Structure.GenerationStub> findGenerationPoint(final Structure.GenerationContext context) {
+-        Rotation rotation = Rotation.getRandom(context.random());
 +        // Horizon start - Feature Secure Seed
-+        net.minecraft.world.level.levelgen.WorldgenRandom worldgenRandom = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
-+                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x, context.chunkPos().z, dev.gideonwhite1029.horizon.matter.Globals.Salt.WOODLAND_MANSION_FEATURE, 0)
++        net.minecraft.world.level.levelgen.WorldgenRandom random = dev.gideonwhite1029.horizon.HorizonConfig.secureSeed
++                ? new dev.gideonwhite1029.horizon.matter.WorldgenCryptoRandom(context.chunkPos().x(), context.chunkPos().z(), dev.gideonwhite1029.horizon.matter.Globals.Salt.WOODLAND_MANSION_FEATURE, 0)
 +                : context.random();
 +        // Horizon end - Feature Secure Seed
-+        Rotation random = Rotation.getRandom(worldgenRandom);
-         BlockPos lowestYIn5by5BoxOffset7Blocks = this.getLowestYIn5by5BoxOffset7Blocks(context, random);
-         return lowestYIn5by5BoxOffset7Blocks.getY() < 60
++        Rotation rotation = Rotation.getRandom(random);
+         BlockPos startPos = this.getLowestYIn5by5BoxOffset7Blocks(context, rotation);
+         return startPos.getY() < 60
              ? Optional.empty()
-             : Optional.of(
-                 new Structure.GenerationStub(
-                     lowestYIn5by5BoxOffset7Blocks,
--                    structurePiecesBuilder -> this.generatePieces(structurePiecesBuilder, context, lowestYIn5by5BoxOffset7Blocks, random)
-+                    structurePiecesBuilder -> this.generatePieces(structurePiecesBuilder, context, lowestYIn5by5BoxOffset7Blocks, random, worldgenRandom)
-                 )
-             );
+@@ -79,4 +84,4 @@ public class WoodlandMansionStructure extends Structure {
+     public StructureType<?> type() {
+         return StructureType.WOODLAND_MANSION;
      }
- 
--    private void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context, BlockPos pos, Rotation rotation) {
-+    private void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context, BlockPos pos, Rotation rotation, net.minecraft.world.level.levelgen.WorldgenRandom worldgenRandom) {
-         List<WoodlandMansionPieces.WoodlandMansionPiece> list = Lists.newLinkedList();
--        WoodlandMansionPieces.generateMansion(context.structureTemplateManager(), pos, rotation, list, context.random());
-+        WoodlandMansionPieces.generateMansion(context.structureTemplateManager(), pos, rotation, list, worldgenRandom);
-         list.forEach(builder::addPiece);
-     }
- 
+-}
++}
+\ No newline at end of file

@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index cc1906ef871de6a4ff82039d8ddfcd764139f37d..abbf7e9ed1fa7bbaa5eaa26c43699fe98602dfed 100644
+index a0cf70f1ccbb78f058e8ac5fc95bcb5b03300cdc..265e33a9f169292970e09e2354d3e6a41c0f45df 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -272,7 +272,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -257,7 +257,7 @@ public class GlobalConfiguration extends ConfigurationPart {
              }
  
              public boolean isEnabled() {

@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/Connection.java b/net/minecraft/network/Connection.java
-index 21e891ecdb90a1828428441aef9c2593253751f8..e9f6da0c4b3e705579539a26381b49e4bdc3a7e3 100644
+index f052897b278ed626363f92da4d5f6b2127d92aa4..c5e865daf2c39803aa72b0a4807ad9abf494a447 100644
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
 @@ -221,8 +221,8 @@ public class Connection extends SimpleChannelInboundHandler<Packet<?>> {
@@ -22,11 +22,11 @@ index 21e891ecdb90a1828428441aef9c2593253751f8..e9f6da0c4b3e705579539a26381b49e4
                      synchronized (PACKET_LIMIT_LOCK) {
                          if (this.allPacketCounts != null) {
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index ccda48d6a9435396bc77de074caa7899488faff5..ffbeba9768db27431b2dd5462fb95ba7608086c6 100644
+index a857ca301c2e773a90b078936f3bfe5d7b93f119..c96de9f9c4c5cffc99447f481e89a4be1e5364cc 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -858,7 +858,7 @@ public class ServerGamePacketListenerImpl
-     public void handleCustomCommandSuggestions(ServerboundCommandSuggestionPacket packet) {
+@@ -868,7 +868,7 @@ public class ServerGamePacketListenerImpl
+     public void handleCustomCommandSuggestions(final ServerboundCommandSuggestionPacket packet) {
          // PacketUtils.ensureRunningOnSameThread(packet, this, this.player.level()); // Paper - AsyncTabCompleteEvent; run this async
          // CraftBukkit start
 -        if (!this.tabSpamThrottler.isIncrementAndUnderThreshold() && !this.server.getPlayerList().isOp(this.player.nameAndId()) && !this.server.isSingleplayerOwner(this.player.nameAndId())) { // Paper - configurable tab spam limits
@@ -34,7 +34,7 @@ index ccda48d6a9435396bc77de074caa7899488faff5..ffbeba9768db27431b2dd5462fb95ba7
              this.disconnectAsync(Component.translatable("disconnect.spam"), org.bukkit.event.player.PlayerKickEvent.Cause.SPAM); // Paper - Kick event cause // Paper - add proper async disconnect
              return;
          }
-@@ -2135,6 +2135,7 @@ public class ServerGamePacketListenerImpl
+@@ -2185,6 +2185,7 @@ public class ServerGamePacketListenerImpl
  
          final int threshold = io.papermc.paper.configuration.GlobalConfiguration.get().spamLimiter.incomingPacketThreshold.intValue();
  
@@ -42,7 +42,7 @@ index ccda48d6a9435396bc77de074caa7899488faff5..ffbeba9768db27431b2dd5462fb95ba7
          if (this.lastLimitedPacket != -1 && timestamp - this.lastLimitedPacket < threshold && this.limitedPackets++ >= 8) {
              return false;
          }
-@@ -2685,6 +2686,7 @@ public class ServerGamePacketListenerImpl
+@@ -2742,6 +2743,7 @@ public class ServerGamePacketListenerImpl
  
      // Spigot start - spam exclusions
      private void detectRateSpam(String message) {
@@ -50,9 +50,9 @@ index ccda48d6a9435396bc77de074caa7899488faff5..ffbeba9768db27431b2dd5462fb95ba7
          // CraftBukkit start - replaced with thread safe throttle
          if (org.spigotmc.SpigotConfig.enableSpamExclusions) {
              for (String exclude : org.spigotmc.SpigotConfig.spamExclusions) {
-@@ -3424,7 +3426,7 @@ public class ServerGamePacketListenerImpl
+@@ -3493,7 +3495,7 @@ public class ServerGamePacketListenerImpl
      @Override
-     public void handlePlaceRecipe(ServerboundPlaceRecipePacket packet) {
+     public void handlePlaceRecipe(final ServerboundPlaceRecipePacket packet) {
          // Paper start - auto recipe limit
 -        if (!org.bukkit.Bukkit.isPrimaryThread()) {
 +        if (!dev.gideonwhite1029.horizon.HorizonConfig.disablePacketLimit && !org.bukkit.Bukkit.isPrimaryThread()) { // Horizon - can disable

@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 64973adb3395cd0f16553cd959ac20e82a94f7a4..e0e97aa104a64342ca27d39a8687f09102e2f2fc 100644
+index 2a5e39237ba6baf2e5b4aef6f6979008a9f19a25..3578edc73b8cd2ce1adeee391579b46e5a5bfd58 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1647,6 +1647,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1681,6 +1681,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          this.server.spark.tickStart(); // Paper - spark
          new com.destroystokyo.paper.event.server.ServerTickStartEvent(this.tickCount+1).callEvent(); // Paper - Server Tick Events
@@ -23,8 +23,8 @@ index 64973adb3395cd0f16553cd959ac20e82a94f7a4..e0e97aa104a64342ca27d39a8687f091
 +
          this.tickCount++;
          this.tickRateManager.tick();
-         this.tickChildren(hasTimeLeft);
-@@ -2879,7 +2886,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+         this.tickChildren(haveTime);
+@@ -2933,7 +2940,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
@@ -34,13 +34,13 @@ index 64973adb3395cd0f16553cd959ac20e82a94f7a4..e0e97aa104a64342ca27d39a8687f091
  
      public ChatDecorator getChatDecorator() {
 diff --git a/net/minecraft/world/level/material/LavaFluid.java b/net/minecraft/world/level/material/LavaFluid.java
-index 3e81c98e2e6b0f1424429ab52aa43d229c867cc7..f7991304a44aace877984c451ef714d2ab9ca171 100644
+index a99bea7ac0610fbf9427568d57c554fd26f35f9d..0a145f0b5984efead50107738e9a62b5895ed2df 100644
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
-@@ -190,7 +190,21 @@ public abstract class LavaFluid extends FlowingFluid {
+@@ -191,7 +191,21 @@ public abstract class LavaFluid extends FlowingFluid {
  
      @Override
-     public int getTickDelay(LevelReader level) {
+     public int getTickDelay(final LevelReader level) {
 -        return level.getWorldBorder().world != null ? (isFastLava(level) ? level.getWorldBorder().world.purpurConfig.lavaSpeedNether : level.getWorldBorder().world.purpurConfig.lavaSpeedNotNether) : (isFastLava(level) ? 10 : 30); // Purpur - Make lava flow speed configurable
 +        // Horizon start - Lag compensation
 +        if (dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensation && dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensationLava) {
@@ -61,13 +61,13 @@ index 3e81c98e2e6b0f1424429ab52aa43d229c867cc7..f7991304a44aace877984c451ef714d2
  
      @Override
 diff --git a/net/minecraft/world/level/material/WaterFluid.java b/net/minecraft/world/level/material/WaterFluid.java
-index 4533d9f76f4ea21cee3c3114bcfcded40fe7321b..a8ea16f5d86f4d87d442e666f2973ec9b35ef531 100644
+index e52362ae20646f0311262853af0cdc690a603b52..c8557bf25e4ed1dcc6887cffd5739edfb9fa4bdd 100644
 --- a/net/minecraft/world/level/material/WaterFluid.java
 +++ b/net/minecraft/world/level/material/WaterFluid.java
 @@ -125,7 +125,13 @@ public abstract class WaterFluid extends FlowingFluid {
  
      @Override
-     public int getTickDelay(LevelReader level) {
+     public int getTickDelay(final LevelReader level) {
 -        return 5;
 +        // Horizon start - Lag compensation
 +        if (dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensation && dev.gideonwhite1029.horizon.HorizonConfig.tt20LagCompensationWater) {

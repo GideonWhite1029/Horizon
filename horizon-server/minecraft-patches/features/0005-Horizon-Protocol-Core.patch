@@ -7,48 +7,48 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-index 1da034752064312962a4144f91be5265a9a08997..19f88780f2c6a83e9accecd23f53bdef932eed29 100644
+index e9f86409bf9351e85ed31e747d9350dbf0cc441f..d7f8fb6de867c68e640f96a7bb2a4226f7561fd3 100644
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 @@ -40,13 +40,22 @@ public interface CustomPacketPayload {
  
              @Override
-             public void encode(B buffer, CustomPacketPayload value) {
+             public void encode(final B output, final CustomPacketPayload value) {
 +                // Horizon start - protocol core
 +                if (value instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload payload) {
-+                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.encode(buffer, payload);
++                    dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.encode(output, payload);
 +                    return;
 +                }
 +                // Horizon end - protocol core
-                 this.writeCap(buffer, value.type(), value);
+                 this.writeCap(output, value.type(), value);
              }
  
              @Override
-             public CustomPacketPayload decode(B buffer) {
-                 Identifier identifier = buffer.readIdentifier();
--                return (CustomPacketPayload)this.findCodec(identifier).decode(buffer);
+             public CustomPacketPayload decode(final B input) {
+                 Identifier identifier = input.readIdentifier();
+-                return (CustomPacketPayload)this.findCodec(identifier).decode(input);
 +                // Horizon start - protocol core
-+                var payload = dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.decode(identifier, buffer);
-+                return java.util.Objects.requireNonNullElseGet(payload, () -> this.findCodec(identifier).decode(buffer));
++                var payload = dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.decode(identifier, input);
++                return java.util.Objects.requireNonNullElseGet(payload, () -> this.findCodec(identifier).decode(input));
 +                // Horizon end - protocol core
              }
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 217676a4de9ecfcef61e5b43190c4f7a5d8221bb..30dcd59cd45f71d692c4501175393b99ee27deb6 100644
+index 2dc7b9eaa9375e98f7c64c441d0527c432ba28eb..0533ccba7d1a869298c8427e01b440e0d2d127bd 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1884,6 +1884,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1909,6 +1909,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
-         profilerFiller.popPush("server gui refresh");
+         profiler.popPush("server gui refresh");
  
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleTick(tickCount); // Horizon - protocol
 +
-         for (Runnable runnable : this.tickables) {
-             runnable.run();
+         for (Runnable tickable : this.tickables) {
+             tickable.run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 02c6733ce1de543dab3bf558148879039e501257..dacbb40315e2bd24c96712d85edc5068f4ca3c0b 100644
+index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657e6d819b8 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -63,6 +63,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -57,7 +57,7 @@ index 02c6733ce1de543dab3bf558148879039e501257..dacbb40315e2bd24c96712d85edc5068
      // Paper end - retain certain values
 +    public final GameProfile profile; // Horizon - protocol core
  
-     public ServerCommonPacketListenerImpl(MinecraftServer server, Connection connection, CommonListenerCookie cookie) {
+     public ServerCommonPacketListenerImpl(final MinecraftServer server, final Connection connection, final CommonListenerCookie cookie) {
          this.server = server;
 @@ -76,6 +77,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
          this.pluginMessagerChannels = cookie.channels();
@@ -70,7 +70,7 @@ index 02c6733ce1de543dab3bf558148879039e501257..dacbb40315e2bd24c96712d85edc5068
 @@ -167,6 +169,17 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      @Override
-     public void handleCustomPayload(ServerboundCustomPayloadPacket packet) {
+     public void handleCustomPayload(final ServerboundCustomPayloadPacket packet) {
 +        // Horizon start - protocol
 +        if (packet.payload() instanceof dev.gideonwhite1029.horizon.protocol.core.HorizonCustomPayload horizonPayload) {
 +            dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePayload(dev.gideonwhite1029.horizon.protocol.core.ProtocolUtils.createSelector(this), horizonPayload);
@@ -94,10 +94,10 @@ index 02c6733ce1de543dab3bf558148879039e501257..dacbb40315e2bd24c96712d85edc5068
              bridge.removeChannel(channel);
          }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index c29082cdb8f1d109673559dbf1bee20e12b92764..540a7a473890013b807be6c6c2e56c8be872ea86 100644
+index 5a1e069acaeb8a26b317c231a766d114060544e2..33123088a070e05e54ac39788f4400ab6fe0ffea 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -244,6 +244,8 @@ public abstract class PlayerList {
+@@ -246,6 +246,8 @@ public abstract class PlayerList {
              return;
          }
  
@@ -106,17 +106,17 @@ index c29082cdb8f1d109673559dbf1bee20e12b92764..540a7a473890013b807be6c6c2e56c8b
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -431,6 +433,7 @@ public abstract class PlayerList {
+@@ -437,6 +439,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
-     public net.kyori.adventure.text.@Nullable Component remove(ServerPlayer player, net.kyori.adventure.text.Component leaveMessage) {
+     public net.kyori.adventure.text.@Nullable Component remove(final ServerPlayer player, final net.kyori.adventure.text.Component leaveMessage) {
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handlePlayerLeave(player); // Horizon - protocol
          // Paper end - Fix kick event leave message not being sent
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar
-         ServerLevel serverLevel = player.level();
-@@ -1324,6 +1327,7 @@ public abstract class PlayerList {
-             serverPlayer.connection.send(clientboundUpdateRecipesPacket);
-             serverPlayer.getRecipeBook().sendInitialRecipeBook(serverPlayer);
+         ServerLevel level = player.level();
+@@ -1330,6 +1333,7 @@ public abstract class PlayerList {
+             player.connection.send(recipes);
+             player.getRecipeBook().sendInitialRecipeBook(player);
          }
 +        dev.gideonwhite1029.horizon.protocol.core.HorizonProtocolManager.handleDataPackReload(); // Horizon - protocol core
      }

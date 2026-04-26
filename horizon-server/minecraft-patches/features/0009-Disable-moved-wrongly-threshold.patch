@@ -7,43 +7,43 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 91f9739bf34b824c5955ad0a9ef04dcb7c2e6736..f5f99d4adf831afd2bca2cfa55364b7da1ca9914 100644
+index 8ec1aa8fdd2745d2269d73a9cfbb5f489408b91d..0e621bab3e3d85b8b23318587ae365cd4ddebee7 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -627,7 +627,7 @@ public class ServerGamePacketListenerImpl
+@@ -635,7 +635,7 @@ public class ServerGamePacketListenerImpl
                      return;
                  }
                  // Paper end - Prevent moving into unloaded chunks
--                if (d7 - d6 > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) {
-+                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && d7 - d6 > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) { // Horizon
+-                if (movedDist - expectedDist > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) {
++                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && movedDist - expectedDist > Math.max(100.0, Mth.square(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed)) && !this.isSingleplayerOwner()) { // Horizon
                      // CraftBukkit end
-                     LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", rootVehicle.getPlainTextName(), this.player.getPlainTextName(), d3, d4, d5);
-                     this.send(ClientboundMoveVehiclePacket.fromEntity(rootVehicle));
-@@ -655,7 +655,7 @@ public class ServerGamePacketListenerImpl
-                 d5 = d2 - rootVehicle.getZ();
-                 d7 = d3 * d3 + d4 * d4 + d5 * d5;
-                 boolean flag1 = false;
--                if (d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot
-+                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot // Horizon
-                     flag1 = true; // Paper - diff on change, this should be moved wrongly
-                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", rootVehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(d7));
+                     LOGGER.warn(
+                         "{} (vehicle of {}) moved too quickly! {},{},{}", vehicle.getPlainTextName(), this.player.getPlainTextName(), xDist, yDist, zDist
+@@ -665,7 +665,7 @@ public class ServerGamePacketListenerImpl
+                 zDist = targetZ - vehicle.getZ();
+                 movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
+                 boolean fail = false;
+-                if (movedDist > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot
++                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && movedDist > org.spigotmc.SpigotConfig.movedWronglyThreshold) { // Spigot // Horizon
+                     fail = true;
+                     LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", vehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(movedDist));
                  }
-@@ -1568,6 +1568,9 @@ public class ServerGamePacketListenerImpl
+@@ -1608,6 +1608,9 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_INTO_UNLOADED_CHUNK,
-                                                 toX, toY, toZ, toYaw, toPitch, false);
+                                                 targetX, targetY, targetZ, targetYRot, targetXRot, false);
                                          if (!event.isAllowed()) {
 +                                            if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && event.getLogWarning()) { // Horizon
-+                                                LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d3, d4, d5);
++                                                LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), xDist, yDist, zDist);
 +                                            }
                                              this.internalTeleport(PositionMoveRotation.of(this.player), Collections.emptySet());
                                              return;
                                          }
-@@ -1651,7 +1654,7 @@ public class ServerGamePacketListenerImpl
-                                 d5 = d2 - this.player.getZ();
-                                 d7 = d3 * d3 + d4 * d4 + d5 * d5;
+@@ -1691,7 +1694,7 @@ public class ServerGamePacketListenerImpl
+                                 zDist = targetZ - this.player.getZ();
+                                 movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
                                  boolean movedWrongly = false; // Paper - Add fail move event; rename
 -                                if (!this.player.isChangingDimension()
 +                                if (!dev.gideonwhite1029.horizon.HorizonConfig.disableMovedWronglyThreshold && !this.player.isChangingDimension() // Horizon
-                                     && d7 > org.spigotmc.SpigotConfig.movedWronglyThreshold // Spigot
+                                     && movedDist > org.spigotmc.SpigotConfig.movedWronglyThreshold // Spigot
                                      && !this.player.isSleeping()
                                      && !this.player.isCreative()

@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 2a1c9508d2028173c878a36c4b2bf0be055601a2..2cbe1c03aa747af4cb9944f2fccd1011acc0eae5 100644
+index 3e22ce71420623d11f16ee66e32d560e27a11f40..089f134743b30b41fbdc326879df9e00c4ce3c76 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -1381,6 +1381,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -1387,6 +1387,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
          this.getHandle().lookAt(toNmsAnchor(playerAnchor), ((CraftEntity) entity).getHandle(), toNmsAnchor(entityAnchor));
      }
  

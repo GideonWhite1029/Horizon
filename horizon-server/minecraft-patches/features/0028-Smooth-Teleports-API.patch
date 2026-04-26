@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index b3b9fa87dd45bbd1cb1195c8ebd5af5dff06de4a..1036016c8fcbcd1ddbbbc2e5ddf142f1023098b7 100644
+index 4e73f9539da81fdb56ed402afadfff38f904cdb8..952ac7192724fac8aa039b65866ad2112b7d07eb 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -436,6 +436,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -457,6 +457,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private boolean tpsBar = false; // Purpur - Implement TPSBar
      private boolean compassBar = false; // Purpur - Add compass command
      private boolean ramBar = false; // Purpur - Implement rambar commands
@@ -19,26 +19,26 @@ index b3b9fa87dd45bbd1cb1195c8ebd5af5dff06de4a..1036016c8fcbcd1ddbbbc2e5ddf142f1
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 734b21ed8e339d550b746bf08243471f05b6c8da..ef5f0eda7ff0056fe9b3827efa62946e503ab359 100644
+index 4c63aa0fa78afa23d5aa7b1c08707dfe4f66792f..5f09802f40b0ecc2b480dad3a215be9baf0372ef 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -791,8 +791,8 @@ public abstract class PlayerList {
-         byte b = keepInventory ? ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS : 0;
-         ServerLevel serverLevel = serverPlayer.level();
-         LevelData levelData = serverLevel.getLevelData();
--        serverPlayer.connection.send(new ClientboundRespawnPacket(serverPlayer.createCommonSpawnInfo(serverLevel), b));
--        serverPlayer.connection.internalTeleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot()); // Paper
-+        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight(serverLevel, level)) serverPlayer.connection.send(new ClientboundRespawnPacket(serverPlayer.createCommonSpawnInfo(serverLevel), b)); // Horizon
-+        if (!serverPlayer.smoothWorldTeleport || !isSameLogicalHeight(serverLevel, level)) serverPlayer.connection.internalTeleport(serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot()); // Paper // Horizon
-         serverPlayer.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
-         serverPlayer.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
-         serverPlayer.connection
-@@ -862,6 +862,8 @@ public abstract class PlayerList {
-         return serverPlayer;
+@@ -794,8 +794,8 @@ public abstract class PlayerList {
+         byte dataToKeep = keepAllPlayerData ? ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS : 0;
+         ServerLevel playerLevel = player.level();
+         LevelData levelData = playerLevel.getLevelData();
+-        player.connection.send(new ClientboundRespawnPacket(player.createCommonSpawnInfo(playerLevel), dataToKeep));
+-        player.connection.internalTeleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot()); // Paper
++        if (!player.smoothWorldTeleport || !isSameLogicalHeight(playerLevel, level)) player.connection.send(new ClientboundRespawnPacket(player.createCommonSpawnInfo(playerLevel), dataToKeep)); // Horizon
++        if (!player.smoothWorldTeleport || !isSameLogicalHeight(playerLevel, level)) player.connection.internalTeleport(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot()); // Paper // Horizon
+         player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
+         player.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
+         player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
+@@ -864,6 +864,8 @@ public abstract class PlayerList {
+         return player;
      }
  
 +    public static boolean isSameLogicalHeight(ServerLevel fromLevel, ServerLevel toLevel) { return fromLevel.getLogicalHeight() == toLevel.getLogicalHeight(); } // Horizon - Check world height before smooth teleport
 +
-     public void sendActivePlayerEffects(ServerPlayer player) {
+     public void sendActivePlayerEffects(final ServerPlayer player) {
          this.sendActiveEffects(player, player.connection);
      }

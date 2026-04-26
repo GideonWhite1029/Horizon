@@ -124,7 +124,7 @@ public class ReplayFile {
         byte[] data = getPacketBytes(packet, protocol);
         saveService.execute(() -> {
             try {
-                packetStream.writeInt((int) timestamp);
+                packetStream.writeInt((int) Math.min(timestamp, Integer.MAX_VALUE));
                 packetStream.writeInt(data.length);
                 packetStream.write(data);
             } catch (Exception e) {
@@ -146,7 +146,9 @@ public class ReplayFile {
             for (String fileName : files) {
                 os.putNextEntry(new ZipEntry(fileName));
                 File f = new File(tmpDir, fileName);
-                copy(new FileInputStream(f), os);
+                try (FileInputStream fis = new FileInputStream(f)) {
+                    copy(fis, os);
+                }
             }
 
             os.putNextEntry(new ZipEntry(RECORDING_FILE_CRC32));
@@ -183,7 +185,6 @@ public class ReplayFile {
         while ((len = in.read(buffer)) > -1) {
             out.write(buffer, 0, len);
         }
-        in.close();
     }
 
     private static boolean deleteDir(File dir) {

@@ -286,7 +286,7 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
     }
 
     public HorizonRegionFile(RegionStorageInfo storageKey, Path directory, Path path, boolean dsync, int compressionLevel) throws IOException {
-        this(storageKey, directory, path, RegionFileVersion.getCompressionFormat(), dsync, compressionLevel);
+        this(storageKey, directory, path, RegionFileVersion.getSelected(), dsync, compressionLevel);
     }
 
     public HorizonRegionFile(RegionStorageInfo storageKey, Path path, Path directory, RegionFileVersion compressionFormat, boolean dsync, int compressionLevel) throws IOException {
@@ -304,7 +304,7 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
 
     public synchronized boolean doesChunkExist(ChunkPos pos) throws Exception {
         openRegionFile();
-        return chunkExistenceBitmap[getChunkIndex(pos.x, pos.z)];
+        return chunkExistenceBitmap[getChunkIndex(pos.x(), pos.z())];
     }
 
     public synchronized void flush() throws IOException {
@@ -425,7 +425,7 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
 
     public synchronized void write(ChunkPos pos, ByteBuffer buffer) {
         openRegionFile();
-        openBucket(pos.x, pos.z);
+        openBucket(pos.x(), pos.z());
         try {
             byte[] b = byteBufferToArray(buffer);
             int uncompressedSize = b.length;
@@ -440,7 +440,7 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
                 byte[] finalCompressed = new byte[compressedLength];
                 System.arraycopy(compressed, 0, finalCompressed, 0, compressedLength);
 
-                int index = getChunkIndex(pos.x, pos.z);
+                int index = getChunkIndex(pos.x(), pos.z());
                 this.buffer[index] = finalCompressed;
                 this.chunkTimestamps[index] = getTimestamp();
                 this.bufferUncompressedSize[index] = uncompressedSize;
@@ -454,7 +454,7 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
 
     public DataOutputStream getChunkDataOutputStream(ChunkPos pos) {
         openRegionFile();
-        openBucket(pos.x, pos.z);
+        openBucket(pos.x(), pos.z());
         return new DataOutputStream(new BufferedOutputStream(new HorizonRegionFile.ChunkBuffer(pos)));
     }
 
@@ -518,9 +518,9 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
     @Nullable
     public synchronized DataInputStream getChunkDataInputStream(ChunkPos pos) {
         openRegionFile();
-        openBucket(pos.x, pos.z);
+        openBucket(pos.x(), pos.z());
 
-        int idx = getChunkIndex(pos.x, pos.z);
+        int idx = getChunkIndex(pos.x(), pos.z());
         if(this.bufferUncompressedSize[idx] != 0 && this.chunkExistenceBitmap[idx]) {
             byte[] content = new byte[bufferUncompressedSize[idx]];
             this.decompressor.decompress(this.buffer[idx], 0, content, 0, bufferUncompressedSize[idx]);
@@ -531,8 +531,8 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
 
     public synchronized void clear(ChunkPos pos) {
         openRegionFile();
-        openBucket(pos.x, pos.z);
-        int i = getChunkIndex(pos.x, pos.z);
+        openBucket(pos.x(), pos.z());
+        int i = getChunkIndex(pos.x(), pos.z());
         this.buffer[i] = null;
         this.bufferUncompressedSize[i] = 0;
         this.chunkTimestamps[i] = 0;
@@ -542,8 +542,8 @@ public class HorizonRegionFile implements IRegionFile, IFlushableRegionFile {
 
     public synchronized boolean hasChunk(ChunkPos pos) {
         openRegionFile();
-        openBucket(pos.x, pos.z);
-        return this.bufferUncompressedSize[getChunkIndex(pos.x, pos.z)] > 0;
+        openBucket(pos.x(), pos.z());
+        return this.bufferUncompressedSize[getChunkIndex(pos.x(), pos.z())] > 0;
     }
 
     public synchronized void close() throws IOException {
