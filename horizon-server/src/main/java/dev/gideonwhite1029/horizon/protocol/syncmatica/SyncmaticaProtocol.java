@@ -103,7 +103,7 @@ public class SyncmaticaProtocol {
         return sanitized.toString().replaceAll(ILLEGAL_PATTERNS, "_");
     }
 
-    public static boolean isOverQuota(int sent) {
+    public static boolean isOverQuota(long sent) {
         return HorizonConfig.syncmaticaQuota && sent > HorizonConfig.syncmaticaQuotaLimit;
     }
 

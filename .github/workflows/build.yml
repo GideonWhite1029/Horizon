@@ -21,10 +21,10 @@ jobs:
       - name: Apply patches
         run: ./gradlew applyAllPatches --no-daemon --stacktrace
       - name: Build
-        run: ./gradlew createMojmapPaperclipJar --no-daemon --stacktrace
+        run: ./gradlew createPaperclipJar --no-daemon --stacktrace
       - name: Rebuild on Failure
         if: ${{ failure() }}
         run: |
           ./gradlew clean cleanCache --refresh-dependencies
           ./gradlew applyAllPatches --no-daemon --stacktrace 
-          ./gradlew createMojmapPaperclipJar --no-daemon --stacktrace
+          ./gradlew createPaperclipJar --no-daemon --stacktrace

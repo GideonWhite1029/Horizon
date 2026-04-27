@@ -23,7 +23,7 @@ index 7ce9ebba8ce304d1f3f21d4f15ee5f3560d7700b..2eb029ef329a0d592e0ff34bb2cc13b2
          HandlerList handlers = event.getHandlers();
          RegisteredListener[] listeners = handlers.getRegisteredListeners();
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 1ad9e3a8ffb5b28eb26b76a3fe27c62cde846e23..54c73849c8cb4c379c0f948f6d8f15f4db8e1ee0 100644
+index e6362ea3ebab4d3ca4b4d4e4f6254268d78f0ae4..a34ced60e80408fad1e3ae31ddfd91a94e986032 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 @@ -309,6 +309,8 @@ public final class CraftServer implements Server {
@@ -70,10 +70,10 @@ index 7db0454a8c9251faa815500c307d116b9303b236..ec5145acef626cb91cad5d91bfa58f07
          if (entity instanceof EnderDragonPart complexPart) {
              if (complexPart.parentMob instanceof EnderDragon) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 41a602c3a70f833ad3e718db95449c7e603d0bcb..3e22ce71420623d11f16ee66e32d560e27a11f40 100644
+index ec73dc1e227dca7722274fc3f439b28ae258f699..3722cb50adcc9c3f77034e483467aa649ed2a930 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-@@ -2144,7 +2144,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
+@@ -2132,7 +2132,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player, PluginMessa
  
      @Override
      public boolean canSee(Player player) {

@@ -21,7 +21,7 @@ public class DownloadExchange extends AbstractExchange {
     private final OutputStream outputStream;
     private final MessageDigest md5;
     private final File downloadFile;
-    private int bytesSent;
+    private long bytesSent;
 
     public DownloadExchange(final ServerPlacement syncmatic, final File downloadFile, final ExchangeTarget partner) throws IOException, NoSuchAlgorithmException {
         super(partner);
@@ -47,6 +47,10 @@ public class DownloadExchange extends AbstractExchange {
         packetBuf.readUUID();
         if (id.equals(PacketType.SEND_LITEMATIC.identifier)) {
             final int size = packetBuf.readInt();
+            if (size < 0) {
+                close(true);
+                return;
+            }
             bytesSent += size;
             if (SyncmaticaProtocol.isOverQuota(bytesSent)) {
                 close(true);

@@ -7,12 +7,12 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index d1f8ad8818dfc93edb457d4ade0775e0766b6c2b..4c63aa0fa78afa23d5aa7b1c08707dfe4f66792f 100644
+index 3ef106fe89321a829a5b84a06329284b67290c17..92ba166d849361b907953cb4a575923355dbdb06 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1187,6 +1187,7 @@ public abstract class PlayerList {
+@@ -1186,6 +1186,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
-         player.connection.send(this.server.clockManager().createFullSyncPacket());
+         player.connection.send(level.clockManager().createFullSyncPacket(player)); // Paper - per-world time; per-player time
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
 +        dev.gideonwhite1029.horizon.protocol.MinimapsProtocol.sendXaeroServerInfo(player); // Horizon
          // Paper start - view distances

@@ -21,6 +21,7 @@ public class ModifyExchangeServer extends AbstractExchange {
 
     @Override
     public boolean checkPacket(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
+        if (placement == null) return false;
         return id.equals(PacketType.MODIFY_FINISH.identifier) && checkUUID(packetBuf, placement.getId());
     }
 
@@ -71,7 +72,7 @@ public class ModifyExchangeServer extends AbstractExchange {
 
     @Override
     protected void onClose() {
-        if (CommunicationManager.getModifier(placement) == this) {
+        if (placement != null && CommunicationManager.getModifier(placement) == this) {
             CommunicationManager.setModifier(placement, null);
         }
     }

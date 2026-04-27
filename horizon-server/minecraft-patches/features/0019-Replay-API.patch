@@ -131,10 +131,10 @@ index 2e348bcb69769d5049b29d29c0b41c157ab90ea6..0d5e4a71668639ab46a26de0e9c29fae
 +}
 \ No newline at end of file
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 3578edc73b8cd2ce1adeee391579b46e5a5bfd58..4159d0d983f505a11977402c35a8f2537bc4f8c0 100644
+index 95d2dea8046c8cec7db95475d50c129fea73a4b7..43e9d8781e76c71130f9aafc7bb6b48e6df14533 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1813,7 +1813,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1823,7 +1823,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -187,10 +187,10 @@ index 636f56bfc0e9075b257e2eb14e858975bdedd801..ae735885314268594515ed3d5ee4b9da
                          .executes(c -> opPlayers(c.getSource(), GameProfileArgument.getGameProfiles(c, "targets")))
                  )
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 86ea07f2a7d24c7e7c6d1bcfe1f8ab499e09ef0e..77ae8f3192069a5cdae2ccaec5b51c5635e8862a 100644
+index 090edd44f9ee89e0980e02105d972966d4ea3b41..980c7995b55197394a3fb365e2045fa41f1ef18f 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -236,6 +236,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -237,6 +237,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
      public boolean hasEntityMoveEvent; // Paper - Add EntityMoveEvent
      private final alternate.current.wire.WireHandler wireHandler = new alternate.current.wire.WireHandler(this); // Paper - optimize redstone (Alternate Current)
      public boolean hasRidableMoveEvent = false; // Purpur - Ridables
@@ -198,7 +198,7 @@ index 86ea07f2a7d24c7e7c6d1bcfe1f8ab499e09ef0e..77ae8f3192069a5cdae2ccaec5b51c56
  
      @Override
      public @Nullable LevelChunk getChunkIfLoaded(int x, int z) {
-@@ -753,6 +754,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -760,6 +761,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
          this.preciseTime = this.serverLevelData.getGameTime(); // Purpur - Configurable daylight cycle
@@ -206,7 +206,7 @@ index 86ea07f2a7d24c7e7c6d1bcfe1f8ab499e09ef0e..77ae8f3192069a5cdae2ccaec5b51c56
      }
  
      // Paper start
-@@ -2920,6 +2922,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2930,6 +2932,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
              // ServerLevel.this.getChunkSource().addEntity(entity); // Paper - ignore and warn about illegal addEntity calls instead of crashing server; moved down below valid=true
              if (entity instanceof ServerPlayer player) {
                  ServerLevel.this.players.add(player);
@@ -218,7 +218,7 @@ index 86ea07f2a7d24c7e7c6d1bcfe1f8ab499e09ef0e..77ae8f3192069a5cdae2ccaec5b51c56
                  if (player.isReceivingWaypoints()) {
                      ServerLevel.this.getWaypointManager().addPlayer(player);
                  }
-@@ -2998,6 +3005,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -3008,6 +3015,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
              ServerLevel.this.getChunkSource().removeEntity(entity);
              if (entity instanceof ServerPlayer player) {
                  ServerLevel.this.players.remove(player);
@@ -255,7 +255,7 @@ index a41e8e61df1f3d7a861cd1b4060bc3ec424d45bd..4e73f9539da81fdb56ed402afadfff38
              if (new org.bukkit.event.player.PlayerGameModeChangeEvent(this.getBukkitEntity(), org.bukkit.GameMode.getByValue(this.server.getDefaultGameType().getId()), org.bukkit.event.player.PlayerGameModeChangeEvent.Cause.DEFAULT_GAMEMODE, null).callEvent()) {
                  this.gameMode.setGameModeForPlayer(this.server.getForcedGameType(), GameType.DEFAULT_MODE);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 33123088a070e05e54ac39788f4400ab6fe0ffea..d1f8ad8818dfc93edb457d4ade0775e0766b6c2b 100644
+index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b67290c17 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -130,6 +130,7 @@ public abstract class PlayerList {
@@ -442,7 +442,7 @@ index 33123088a070e05e54ac39788f4400ab6fe0ffea..d1f8ad8818dfc93edb457d4ade0775e0
      public net.kyori.adventure.text.@Nullable Component remove(final ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -508,6 +657,7 @@ public abstract class PlayerList {
+@@ -507,6 +656,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -450,7 +450,7 @@ index 33123088a070e05e54ac39788f4400ab6fe0ffea..d1f8ad8818dfc93edb457d4ade0775e0
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -745,8 +895,7 @@ public abstract class PlayerList {
+@@ -744,8 +894,7 @@ public abstract class PlayerList {
              // CraftBukkit start
              for (int i = 0; i < this.players.size(); ++i) {
                  final ServerPlayer target = this.players.get(i);
@@ -460,7 +460,7 @@ index 33123088a070e05e54ac39788f4400ab6fe0ffea..d1f8ad8818dfc93edb457d4ade0775e0
              }
              // CraftBukkit end
              this.sendAllPlayerInfoIn = 0;
-@@ -917,7 +1066,7 @@ public abstract class PlayerList {
+@@ -916,7 +1065,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
      public LoginResult canBypassFullServerLogin(final NameAndId nameAndId, final LoginResult currentResult) {
@@ -469,7 +469,7 @@ index 33123088a070e05e54ac39788f4400ab6fe0ffea..d1f8ad8818dfc93edb457d4ade0775e0
          final io.papermc.paper.event.player.PlayerServerFullCheckEvent fullCheckEvent = new io.papermc.paper.event.player.PlayerServerFullCheckEvent(
              new com.destroystokyo.paper.profile.CraftPlayerProfile(nameAndId),
              io.papermc.paper.adventure.PaperAdventure.asAdventure(currentResult.message),
-@@ -1076,7 +1225,7 @@ public abstract class PlayerList {
+@@ -1075,7 +1224,7 @@ public abstract class PlayerList {
      }
  
      public int getPlayerCount() {

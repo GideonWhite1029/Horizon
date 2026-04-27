@@ -36,6 +36,9 @@ public class CommunicationManager implements HorizonProtocol {
     protected static final Mirror[] mirOrdinals = Mirror.values();
     private static final Map<UUID, List<ServerPlacement>> downloadingFile = new HashMap<>();
     private static final Map<ExchangeTarget, ServerPlayer> playerMap = new HashMap<>();
+    private static final int MAX_SUBREGIONS = 1024;
+    private static final int MAX_PENDING_DOWNLOADS_PER_PLAYER = 10;
+    private static final Map<UUID, Integer> pendingDownloadsByPlayer = new HashMap<>();
 
     public CommunicationManager() {
     }
@@ -66,6 +69,7 @@ public class CommunicationManager implements HorizonProtocol {
         }
         broadcastTargets.remove(oldPlayer);
         playerMap.remove(oldPlayer);
+        pendingDownloadsByPlayer.remove(player.getUUID());
     }
 
     @ProtocolHandler.PayloadReceiver(payload = SyncmaticaPayload.class)
@@ -129,9 +133,25 @@ public class CommunicationManager implements HorizonProtocol {
                     downloadingFile.computeIfAbsent(placement.getHash(), key -> new ArrayList<>()).add(placement);
                     return;
                 }
+                final ServerPlayer sourcePlayer = playerMap.get(source);
+                final UUID playerUUID = sourcePlayer != null ? sourcePlayer.getUUID() : null;
+                if (playerUUID != null) {
+                    final int pending = pendingDownloadsByPlayer.getOrDefault(playerUUID, 0);
+                    if (pending >= MAX_PENDING_DOWNLOADS_PER_PLAYER) {
+                        cancelShare(source, placement);
+                        return;
+                    }
+                    pendingDownloadsByPlayer.merge(playerUUID, 1, Integer::sum);
+                }
                 try {
                     download(placement, source);
                 } catch (final Exception e) {
+                    if (playerUUID != null) {
+                        pendingDownloadsByPlayer.merge(playerUUID, -1, Integer::sum);
+                        if (pendingDownloadsByPlayer.getOrDefault(playerUUID, 0) <= 0) {
+                            pendingDownloadsByPlayer.remove(playerUUID);
+                        }
+                    }
                     e.printStackTrace();
                 }
                 return;
@@ -171,6 +191,15 @@ public class CommunicationManager implements HorizonProtocol {
     protected static void handleExchange(Exchange exchange) {
         if (exchange instanceof DownloadExchange) {
             final ServerPlacement p = ((DownloadExchange) exchange).getPlacement();
+
+            final ServerPlayer downloaderPlayer = playerMap.get(exchange.getPartner());
+            if (downloaderPlayer != null) {
+                final UUID playerUUID = downloaderPlayer.getUUID();
+                pendingDownloadsByPlayer.merge(playerUUID, -1, Integer::sum);
+                if (pendingDownloadsByPlayer.getOrDefault(playerUUID, 0) <= 0) {
+                    pendingDownloadsByPlayer.remove(playerUUID);
+                }
+            }
 
             if (exchange.isSuccessful()) {
                 addPlacement(exchange.getPartner(), p);
@@ -305,16 +334,37 @@ public class CommunicationManager implements HorizonProtocol {
     public static void receivePositionData(final @NotNull ServerPlacement placement, final @NotNull FriendlyByteBuf buf, final @NotNull ExchangeTarget exchangeTarget) {
         final BlockPos pos = buf.readBlockPos();
         final String dimensionId = buf.readUtf(32767);
-        final Rotation rot = rotOrdinals[buf.readInt()];
-        final Mirror mir = mirOrdinals[buf.readInt()];
-        placement.move(dimensionId, pos, rot, mir);
+
+        final int rotIdx = buf.readInt();
+        if (rotIdx < 0 || rotIdx >= rotOrdinals.length) {
+            throw new IllegalArgumentException("Invalid rotation ordinal: " + rotIdx);
+        }
+        final int mirIdx = buf.readInt();
+        if (mirIdx < 0 || mirIdx >= mirOrdinals.length) {
+            throw new IllegalArgumentException("Invalid mirror ordinal: " + mirIdx);
+        }
+        placement.move(dimensionId, pos, rotOrdinals[rotIdx], mirOrdinals[mirIdx]);
 
         if (exchangeTarget.getFeatureSet().hasFeature(Feature.CORE_EX)) {
             final SubRegionData subRegionData = placement.getSubRegionData();
             subRegionData.reset();
-            final int limit = buf.readInt();
+            final int rawLimit = buf.readInt();
+            if (rawLimit < 0) {
+                throw new IllegalArgumentException("Negative subregion count: " + rawLimit);
+            }
+            final int limit = Math.min(rawLimit, MAX_SUBREGIONS);
             for (int i = 0; i < limit; i++) {
-                subRegionData.modify(buf.readUtf(32767), buf.readBlockPos(), rotOrdinals[buf.readInt()], mirOrdinals[buf.readInt()]);
+                final String subName = buf.readUtf(32767);
+                final BlockPos subPos = buf.readBlockPos();
+                final int subRotIdx = buf.readInt();
+                if (subRotIdx < 0 || subRotIdx >= rotOrdinals.length) {
+                    throw new IllegalArgumentException("Invalid subregion rotation ordinal: " + subRotIdx);
+                }
+                final int subMirIdx = buf.readInt();
+                if (subMirIdx < 0 || subMirIdx >= mirOrdinals.length) {
+                    throw new IllegalArgumentException("Invalid subregion mirror ordinal: " + subMirIdx);
+                }
+                subRegionData.modify(subName, subPos, rotOrdinals[subRotIdx], mirOrdinals[subMirIdx]);
             }
         }
     }

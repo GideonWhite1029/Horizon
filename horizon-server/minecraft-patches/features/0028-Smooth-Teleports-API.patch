@@ -19,10 +19,10 @@ index 4e73f9539da81fdb56ed402afadfff38f904cdb8..952ac7192724fac8aa039b65866ad211
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 4c63aa0fa78afa23d5aa7b1c08707dfe4f66792f..5f09802f40b0ecc2b480dad3a215be9baf0372ef 100644
+index 92ba166d849361b907953cb4a575923355dbdb06..f18dff80487a97e3b982a4099ab7add07e721fda 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -794,8 +794,8 @@ public abstract class PlayerList {
+@@ -793,8 +793,8 @@ public abstract class PlayerList {
          byte dataToKeep = keepAllPlayerData ? ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS : 0;
          ServerLevel playerLevel = player.level();
          LevelData levelData = playerLevel.getLevelData();
@@ -33,7 +33,7 @@ index 4c63aa0fa78afa23d5aa7b1c08707dfe4f66792f..5f09802f40b0ecc2b480dad3a215be9b
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
          player.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
          player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
-@@ -864,6 +864,8 @@ public abstract class PlayerList {
+@@ -863,6 +863,8 @@ public abstract class PlayerList {
          return player;
      }
  

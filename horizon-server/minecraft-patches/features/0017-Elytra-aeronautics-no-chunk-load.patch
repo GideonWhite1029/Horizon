@@ -29,10 +29,10 @@ index 455e77bee02fb2d0907bf6f895fef99c186ac9bc..569334885f61cb999dfeae28b9511f45
  
          SectionPos oldSection = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 0e621bab3e3d85b8b23318587ae365cd4ddebee7..43b5af66c473528c5263e7f8597fbc976232297a 100644
+index 6b24d8593ecf2e17c04ae174dd9f563c2eca8bc4..bde8e8c0bb51a5df42cae3b63f6746e7bea5b2d1 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -627,9 +627,9 @@ public class ServerGamePacketListenerImpl
+@@ -626,9 +626,9 @@ public class ServerGamePacketListenerImpl
                  speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
  
                  // Paper start - Prevent moving into unloaded chunks
@@ -46,7 +46,7 @@ index 0e621bab3e3d85b8b23318587ae365cd4ddebee7..43b5af66c473528c5263e7f8597fbc97
                      this.connection.send(ClientboundMoveVehiclePacket.fromEntity(vehicle));
                      return;
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index f32ebfa15c4c56eee63c5c520aa6a65faccdc104..a5970c3f3309b0ad2d8a0528be6f151814162b7e 100644
+index a593c6408b007f67c2c8e534f0b40f6c17545d8d..b17bffd9ca07e273bec33c81068b52ff6734bfce 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Sets;

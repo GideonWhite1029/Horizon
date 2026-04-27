@@ -56,10 +56,10 @@ index 51c126735ace8fdde89ad97b5cab62f244212db0..1b2308608e0b445fb2a5f62db3c088f0
 +    public void moonrise$write(final dev.gideonwhite1029.horizon.region.IRegionFile regionFile) throws IOException; // Horizon
  }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 23cd26eecc6fde38ac0d4941761d17260453b63c..b49398e5ba7048f03d00ea83a1344732c34f233b 100644
+index ecafdbbf7204d4a705a9ee406c0e7422e22a1de1..c60134de2423529136f15587ebf58a9662617628 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -978,11 +978,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -988,11 +988,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          if (flush) {
              for (ServerLevel level : this.getAllLevels()) {
@@ -73,7 +73,7 @@ index 23cd26eecc6fde38ac0d4941761d17260453b63c..b49398e5ba7048f03d00ea83a1344732
          }
  
          return result;
-@@ -1134,6 +1133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1144,6 +1143,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
          dev.gideonwhite1029.horizon.HorizonConfig.createWorldSections = false; // Horizon

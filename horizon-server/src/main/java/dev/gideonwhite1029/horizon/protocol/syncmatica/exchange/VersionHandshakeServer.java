@@ -23,7 +23,7 @@ public class VersionHandshakeServer extends FeatureExchange {
     @Override
     public void handle(final @NotNull Identifier id, final FriendlyByteBuf packetBuf) {
         if (id.equals(PacketType.REGISTER_VERSION.identifier)) {
-            String partnerVersion = packetBuf.readUtf();
+            String partnerVersion = packetBuf.readUtf(32767);
             if (partnerVersion.equals("0.0.1")) {
                 close(false);
                 return;

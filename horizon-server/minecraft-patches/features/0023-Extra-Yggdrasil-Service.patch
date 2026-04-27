@@ -20,10 +20,10 @@ index 9e5757391ea32e37b2aac52cc1bb38259a2cc497..de256e49f14fa28ca26cefed4d268300
      private final String baseUrl;
      private final URL joinUrl;
 diff --git a/net/minecraft/server/Main.java b/net/minecraft/server/Main.java
-index 0fddc5224b8a58d452860c5d4953db62a14843db..25cc82e7ff20f362207132de479afb91efc55af8 100644
+index bcbb780c82fdb3283925359a04d8706087f86501..8ccdf3c133c436933c229a3a4184fc3080f9d235 100644
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -186,7 +186,7 @@ public class Main {
+@@ -185,7 +185,7 @@ public class Main {
                  universePath = new File(bukkitConfiguration.getString("settings.world-container", "."));
              }
              // Paper end - fix SPIGOT-5824
@@ -33,7 +33,7 @@ index 0fddc5224b8a58d452860c5d4953db62a14843db..25cc82e7ff20f362207132de479afb91
              LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(universePath.toPath());
              LevelStorageSource.LevelStorageAccess access = levelStorageSource.validateAndCreateAccess(levelName);
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 4159d0d983f505a11977402c35a8f2537bc4f8c0..23cd26eecc6fde38ac0d4941761d17260453b63c 100644
+index 43e9d8781e76c71130f9aafc7bb6b48e6df14533..ecafdbbf7204d4a705a9ee406c0e7422e22a1de1 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -256,7 +256,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 8ec1aa8fdd2745d2269d73a9cfbb5f489408b91d..0e621bab3e3d85b8b23318587ae365cd4ddebee7 100644
+index 0069b240b1be6b80a979bfa9784fb4fd634e7440..6b24d8593ecf2e17c04ae174dd9f563c2eca8bc4 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -635,7 +635,7 @@ public class ServerGamePacketListenerImpl
+@@ -634,7 +634,7 @@ public class ServerGamePacketListenerImpl
                      return;
                  }
                  // Paper end - Prevent moving into unloaded chunks
@@ -19,7 +19,7 @@ index 8ec1aa8fdd2745d2269d73a9cfbb5f489408b91d..0e621bab3e3d85b8b23318587ae365cd
                      // CraftBukkit end
                      LOGGER.warn(
                          "{} (vehicle of {}) moved too quickly! {},{},{}", vehicle.getPlainTextName(), this.player.getPlainTextName(), xDist, yDist, zDist
-@@ -665,7 +665,7 @@ public class ServerGamePacketListenerImpl
+@@ -664,7 +664,7 @@ public class ServerGamePacketListenerImpl
                  zDist = targetZ - vehicle.getZ();
                  movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
                  boolean fail = false;
@@ -28,7 +28,7 @@ index 8ec1aa8fdd2745d2269d73a9cfbb5f489408b91d..0e621bab3e3d85b8b23318587ae365cd
                      fail = true;
                      LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", vehicle.getPlainTextName(), this.player.getPlainTextName(), Math.sqrt(movedDist));
                  }
-@@ -1608,6 +1608,9 @@ public class ServerGamePacketListenerImpl
+@@ -1607,6 +1607,9 @@ public class ServerGamePacketListenerImpl
                                          io.papermc.paper.event.player.PlayerFailMoveEvent event = fireFailMove(io.papermc.paper.event.player.PlayerFailMoveEvent.FailReason.MOVED_INTO_UNLOADED_CHUNK,
                                                  targetX, targetY, targetZ, targetYRot, targetXRot, false);
                                          if (!event.isAllowed()) {
@@ -38,7 +38,7 @@ index 8ec1aa8fdd2745d2269d73a9cfbb5f489408b91d..0e621bab3e3d85b8b23318587ae365cd
                                              this.internalTeleport(PositionMoveRotation.of(this.player), Collections.emptySet());
                                              return;
                                          }
-@@ -1691,7 +1694,7 @@ public class ServerGamePacketListenerImpl
+@@ -1690,7 +1693,7 @@ public class ServerGamePacketListenerImpl
                                  zDist = targetZ - this.player.getZ();
                                  movedDist = xDist * xDist + yDist * yDist + zDist * zDist;
                                  boolean movedWrongly = false; // Paper - Add fail move event; rename

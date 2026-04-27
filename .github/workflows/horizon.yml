@@ -35,9 +35,13 @@ jobs:
       - name: Apply Patches
         run: gradle applyAllPatches
       - name: Create Jar
-        run: gradle createMojmapPaperclipJar
+        run: gradle createPaperclipJar
       - name: Get Release Info
         run: sh scripts/ReleaseInfo.sh
+      - name: Compute Checksums
+        run: |
+          echo "md5=$(md5sum ${{ env.jar_dir }} | awk '{print $1}')" >> $GITHUB_ENV
+          echo "sha256=$(sha256sum ${{ env.jar_dir }} | awk '{print $1}')" >> $GITHUB_ENV
       - name: Upload Artifact
         uses: "actions/upload-artifact@v7"
         with:
@@ -54,6 +58,11 @@ jobs:
             This release is automatically compiled by GitHub Actions
             ### Commit Message
             ${{ env.commit_msg }}
+            ### Checksums
+            | | `${{ env.jar }}` |
+            |---|---|
+            | **MD5** | `${{ env.md5 }}` |
+            | **SHA256** | `${{ env.sha256 }}` |
           artifacts: |
             ${{ env.jar_dir }}
             horizon-server/build/libs/${{ env.project_id }}-${{ env.mcversion }}-bundler.jar

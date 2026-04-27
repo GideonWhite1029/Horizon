@@ -25,6 +25,7 @@ public class PacketTransformer {
     private static final byte PART = 0x1;
     private static final byte END = 0x2;
     private static final byte ONLY = 0x3;
+    private static final int MAX_PARTS = 256;
 
     private final Map<UUID, PartData> cache = Collections.synchronizedMap(new HashMap<>());
 
@@ -41,9 +42,17 @@ public class PacketTransformer {
         switch (buf.readByte()) {
             case START -> {
                 int partsNum = buf.readInt();
+                if (partsNum < 1 || partsNum > MAX_PARTS) {
+                    HorizonLogger.LOGGER.warning("Received START packet with invalid partsNum=" + partsNum + " for " + id + ", ignoring");
+                    return;
+                }
                 data = new PartData(id, partsNum);
-                if (cache.put(key, data) != null) {
-                    HorizonLogger.LOGGER.warning("Received invalid START packet for SplitPacketTransformer with packet id " + id);
+                PartData old = cache.put(key, data);
+                if (old != null) {
+                    HorizonLogger.LOGGER.warning("Received duplicate START packet for SplitPacketTransformer with packet id " + id + ", releasing old buffers");
+                    for (RegistryFriendlyByteBuf part : old.parts) {
+                        part.release();
+                    }
                 }
                 buf.retain();
                 data.parts.add(buf);
@@ -61,6 +70,9 @@ public class PacketTransformer {
                         }
                     }
                     cache.remove(key);
+                } else if (data.parts.size() >= data.partsNum) {
+                    HorizonLogger.LOGGER.warning("Received excess PART packet for SplitPacketTransformer with packet id " + id + " (already have " + data.parts.size() + "/" + data.partsNum + ")");
+                    buf.release();
                 } else {
                     buf.retain();
                     data.parts.add(buf);

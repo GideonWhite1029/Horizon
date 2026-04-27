@@ -35,10 +35,10 @@ index e9f86409bf9351e85ed31e747d9350dbf0cc441f..d7f8fb6de867c68e640f96a7bb2a4226
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 2dc7b9eaa9375e98f7c64c441d0527c432ba28eb..0533ccba7d1a869298c8427e01b440e0d2d127bd 100644
+index 10662be6192814c6208e463c6e0e247686e329e5..edb300af047df0b76e5f789939edb3e0496a15e5 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1909,6 +1909,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1923,6 +1923,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profiler.popPush("server gui refresh");
  
@@ -48,10 +48,10 @@ index 2dc7b9eaa9375e98f7c64c441d0527c432ba28eb..0533ccba7d1a869298c8427e01b440e0
              tickable.run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657e6d819b8 100644
+index 42071e248d9d5c5a53d0807f8aa9dbf23fec77c5..3bf26e98d44efb21604a1d4d0c8d954a6a41d488 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-@@ -63,6 +63,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -62,6 +62,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
      public @Nullable String playerBrand;
      public final java.util.Set<String> pluginMessagerChannels;
      // Paper end - retain certain values
@@ -59,7 +59,7 @@ index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657
  
      public ServerCommonPacketListenerImpl(final MinecraftServer server, final Connection connection, final CommonListenerCookie cookie) {
          this.server = server;
-@@ -76,6 +77,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -75,6 +76,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
          this.pluginMessagerChannels = cookie.channels();
          this.keepAlive = cookie.keepAlive();
          // Paper end
@@ -67,7 +67,7 @@ index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657
      }
  
      // Paper start - configuration phase API
-@@ -167,6 +169,17 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -160,6 +162,17 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
  
      @Override
      public void handleCustomPayload(final ServerboundCustomPayloadPacket packet) {
@@ -85,7 +85,7 @@ index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657
          // Paper start
          if (!(packet.payload() instanceof final net.minecraft.network.protocol.common.custom.DiscardedPayload discardedPayload)) {
              return;
-@@ -232,6 +245,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
+@@ -225,6 +238,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
          final String channel = new String(data, from, length, java.nio.charset.StandardCharsets.US_ASCII);
          if (register) {
              bridge.addChannel(channel);
@@ -94,7 +94,7 @@ index 01a96467b94eeb817b88f91f056005be96c12d58..d9cdd8faa88df1b08a732b7fcc74b657
              bridge.removeChannel(channel);
          }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 5a1e069acaeb8a26b317c231a766d114060544e2..33123088a070e05e54ac39788f4400ab6fe0ffea 100644
+index 7054fe5613b741e54f429cd81af1da73b50ccd73..5c59bb7df0a10b20b2a47857ba307861db1ce019 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
 @@ -246,6 +246,8 @@ public abstract class PlayerList {
@@ -114,7 +114,7 @@ index 5a1e069acaeb8a26b317c231a766d114060544e2..33123088a070e05e54ac39788f4400ab
          // Paper end - Fix kick event leave message not being sent
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar
          ServerLevel level = player.level();
-@@ -1330,6 +1333,7 @@ public abstract class PlayerList {
+@@ -1329,6 +1332,7 @@ public abstract class PlayerList {
              player.connection.send(recipes);
              player.getRecipeBook().sendInitialRecipeBook(player);
          }

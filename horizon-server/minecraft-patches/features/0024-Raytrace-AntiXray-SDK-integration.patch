@@ -24,10 +24,10 @@ index 61c4821aecf882bdab1d7df57acab060b839ef3e..5775b4f7cb0d8b7807b1eb51439c75da
  
      public void destroyAndAck(final BlockPos pos, final int sequence, final String exitId) {
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 598c41cd825e9bce67c5dde16831055c213b64b5..482e4f19f6fba96cd8235bd0a859fd1803357474 100644
+index 16c10fb1b424b97287af6fcb74c5ed152ad4e8d6..e3f4acac5649ad0aff19281dec79151042f7d389 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1133,6 +1133,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+@@ -1134,6 +1134,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
              }
              // CraftBukkit end - capture blockstates
              BlockState oldState = chunk.setBlockState(pos, blockState, updateFlags);

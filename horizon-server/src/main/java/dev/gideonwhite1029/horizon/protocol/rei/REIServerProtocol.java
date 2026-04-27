@@ -288,6 +288,9 @@ public class REIServerProtocol implements HorizonProtocol {
 
     @ProtocolHandler.BytebufReceiver(key = "move_items_new")
     public static void handleMoveItem(ServerPlayer player, RegistryFriendlyByteBuf buf) {
+        if (!hasCheatPermission(player)) {
+            return;
+        }
         BiConsumer<Identifier, RegistryFriendlyByteBuf> consumer = (ignored, c2sWholeBuf) -> {
             FriendlyByteBuf tmpBuf = new FriendlyByteBuf(Unpooled.buffer()).writeBytes(c2sWholeBuf.readByteArray());
             AbstractContainerMenu container = player.containerMenu;
