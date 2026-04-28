@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Bukkit.java
-index 7247b9d23d1f41a01603766acc8fd8b4fad9bb88..5d67f76b842a59eef341a4ddfcb3d180bf2bfa4e 100644
+index 399ab1b3bc6b41637d1f7b92925ee319804d84c6..0f6ec164ae1f4600b34494da97d6383d3a73e718 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -3182,4 +3182,20 @@ public final class Bukkit {
+@@ -3185,4 +3185,20 @@ public final class Bukkit {
          server.clearBlockHighlights();
      }
      // Purpur end - Debug Marker API
