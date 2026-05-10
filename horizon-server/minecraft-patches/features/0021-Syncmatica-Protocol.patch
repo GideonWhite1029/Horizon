@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 43b5af66c473528c5263e7f8597fbc976232297a..a857ca301c2e773a90b078936f3bfe5d7b93f119 100644
+index bde8e8c0bb51a5df42cae3b63f6746e7bea5b2d1..13f6eb82c5c9ee42dd5218a9400869bcde1f5218 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -340,8 +340,11 @@ public class ServerGamePacketListenerImpl

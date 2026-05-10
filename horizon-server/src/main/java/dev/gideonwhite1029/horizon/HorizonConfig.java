@@ -223,16 +223,7 @@ public final class HorizonConfig {
     )
     public static boolean secureSeed = false;
 
-    @GlobalConfig(
-        name = "use_virtual_thread_for_user_authenticator",
-        category = {"utils"},
-        comment = {
-            "Use Java virtual threads for the user authentication service.",
-            "Authentication involves network I/O to Mojang's session servers, making it a good candidate",
-            "for virtual threads which park cheaply during blocking operations."
-        }
-    )
-    public static boolean useVirtualThreadForUserAuthenticator = false;
+    @RemovedConfig(name = "use_virtual_thread_for_user_authenticator", category = {"utils"})
 
     @GlobalConfig(
         name = "tt20-lag-compensation",

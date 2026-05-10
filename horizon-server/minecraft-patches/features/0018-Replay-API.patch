@@ -479,7 +479,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
  
      public int getMaxPlayers() {
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
-index da8bab81e135a9b240fbeac0e9e1d2aa12c6212d..ec55527265297296452adc972489f500adbc6cb1 100644
+index f004911c438e6f89d6e079437e3f4104d6cbacbd..6f2f9bbbe79965be26301f11ff1af888c09cf5b2 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
 @@ -53,7 +53,7 @@ public class Inventory implements Container, Nameable {

@@ -81,7 +81,7 @@ index a593c6408b007f67c2c8e534f0b40f6c17545d8d..b17bffd9ca07e273bec33c81068b52ff
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index fbf8d50b0e757b329818d868d86d4e8c4088ec07..7deee36904a7f934a69b3fcd3a29db5232462cad 100644
+index 3b67f40c84b9aa9190d09ea58448c511743603c3..f90e3126250423fe03beb572ac1e21e9e2cf31ed 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
 @@ -177,6 +177,7 @@ public abstract class Player extends Avatar implements ContainerUser {

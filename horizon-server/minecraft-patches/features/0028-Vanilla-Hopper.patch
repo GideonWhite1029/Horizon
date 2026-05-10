@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/block/entity/HopperBlockEntity.java b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
-index 28348e3881c3c8591053a01b193fb2a956f79726..3c5752776178575cecdf2f6592223fe6a06cf4b6 100644
+index 085ed0eecc47cf9c0fa9fc26b3f7b8522610a941..bcdb75ad645ff622a21520c239ad009f46035471 100644
 --- a/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/HopperBlockEntity.java
 @@ -271,36 +271,48 @@ public class HopperBlockEntity extends RandomizableContainerBlockEntity implemen
