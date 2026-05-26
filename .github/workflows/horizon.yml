@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "ver/26.1.2" ]
   repository_dispatch:
-    types: [upstream-updated]
+    types: [ upstream-updated ]
 
 permissions: write-all
 
@@ -70,3 +70,8 @@ jobs:
           prerelease: ${{ env.pre }}
           makeLatest: ${{ env.make_latest }}
           token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Publish to Maven repo
+        env:
+          HORIZON_USERNAME: ${{ secrets.REPO_USERNAME }}
+          HORIZON_PASSWORD: ${{ secrets.REPO_PASSWORD }}
+        run: ./gradlew publish

@@ -12,6 +12,36 @@
 - **Replay API** support (by [Leaves](https://github.com/LeavesMC/Leaves))
 - **and more in future**
 
+## API
+### [Javadoc](https://repo.timelesswaffle.ru/javadoc/snapshots/dev/gideonwhite1029/horizon/horizon-api/unspecified)
+### Dependency Information
+Maven
+```xml
+<repository>
+    <id>timelesswaffle-repository</id>
+    <url>https://repo.timelesswaffle.ru/snapshots</url>
+</repository>
+```
+```xml
+<dependency>
+    <groupId>dev.gideonwhite1029.horizon</groupId>
+    <artifactId>horizon-api</artifactId>
+    <version>unspecified</version>
+</dependency>
+```
+
+Gradle
+```kotlin
+repositories {
+    maven("https://repo.timelesswaffle.ru/snapshots")
+}
+```
+```kotlin
+dependencies {
+    compileOnly("dev.gideonwhite1029.horizon:horizon-api:unspecified")
+}
+```
+
 ## Build
 To build a paperclip jar, you need to run the following command. You can find the jar in build/libs(Note: JDK17 or JDK21 is needed)
 

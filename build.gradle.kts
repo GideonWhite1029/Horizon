@@ -77,11 +77,12 @@ subprojects {
         maven(paperMavenPublicUrl)
         maven(purpurMavenPublicUrl)
         maven("https://jitpack.io")
+        maven("https://repo.timelesswaffle.ru/snapshots")
     }
 
     extensions.configure<PublishingExtension> {
         repositories {
-            maven("https://repo.timelesswaffle.su/snapshots") {
+            maven("https://repo.timelesswaffle.ru/snapshots") {
                 name = "horizon"
                 credentials(PasswordCredentials::class) {
                     username = System.getenv("HORIZON_USERNAME")
