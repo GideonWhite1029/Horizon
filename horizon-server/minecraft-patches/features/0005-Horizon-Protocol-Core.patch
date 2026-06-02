@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
-index e9f86409bf9351e85ed31e747d9350dbf0cc441f..d7f8fb6de867c68e640f96a7bb2a4226f7561fd3 100644
+index 812649b85290068af1ccea2ca69afa1817e14427..e5085acb97837ab6d057ab0c40b0423fc97cb467 100644
 --- a/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 +++ b/net/minecraft/network/protocol/common/custom/CustomPacketPayload.java
 @@ -40,13 +40,22 @@ public interface CustomPacketPayload {
@@ -35,10 +35,10 @@ index e9f86409bf9351e85ed31e747d9350dbf0cc441f..d7f8fb6de867c68e640f96a7bb2a4226
          };
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 10662be6192814c6208e463c6e0e247686e329e5..edb300af047df0b76e5f789939edb3e0496a15e5 100644
+index e70729af40e51714f4519049f841c32d96b8c0d3..2b644c54e5189644ca787dcfac987b61d90e42d6 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1923,6 +1923,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1913,6 +1913,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
          profiler.popPush("server gui refresh");
  
@@ -48,7 +48,7 @@ index 10662be6192814c6208e463c6e0e247686e329e5..edb300af047df0b76e5f789939edb3e0
              tickable.run();
          }
 diff --git a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
-index 42071e248d9d5c5a53d0807f8aa9dbf23fec77c5..3bf26e98d44efb21604a1d4d0c8d954a6a41d488 100644
+index 9057ec887d136ea85ede153cd5ec76ae816f0239..8f20d019cf8ecc8ae5c821a1d658c0f44c2c0eff 100644
 --- a/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerCommonPacketListenerImpl.java
 @@ -62,6 +62,7 @@ public abstract class ServerCommonPacketListenerImpl implements ServerCommonPack
@@ -94,10 +94,10 @@ index 42071e248d9d5c5a53d0807f8aa9dbf23fec77c5..3bf26e98d44efb21604a1d4d0c8d954a
              bridge.removeChannel(channel);
          }
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 7054fe5613b741e54f429cd81af1da73b50ccd73..5c59bb7df0a10b20b2a47857ba307861db1ce019 100644
+index 87ea056db1a2bd4a790b4ddb1f3aec40e19350e0..6f844015da3871bf25316aad4df2b96bd556e1b4 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -246,6 +246,8 @@ public abstract class PlayerList {
+@@ -245,6 +245,8 @@ public abstract class PlayerList {
              return;
          }
  
@@ -106,7 +106,7 @@ index 7054fe5613b741e54f429cd81af1da73b50ccd73..5c59bb7df0a10b20b2a47857ba307861
          final net.kyori.adventure.text.Component jm = playerJoinEvent.joinMessage();
  
          if (jm != null && !jm.equals(net.kyori.adventure.text.Component.empty())) { // Paper - Adventure
-@@ -437,6 +439,7 @@ public abstract class PlayerList {
+@@ -432,6 +434,7 @@ public abstract class PlayerList {
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
      }
      public net.kyori.adventure.text.@Nullable Component remove(final ServerPlayer player, final net.kyori.adventure.text.Component leaveMessage) {
@@ -114,7 +114,7 @@ index 7054fe5613b741e54f429cd81af1da73b50ccd73..5c59bb7df0a10b20b2a47857ba307861
          // Paper end - Fix kick event leave message not being sent
          org.purpurmc.purpur.task.BossBarTask.removeFromAll(player.getBukkitEntity()); // Purpur - Implement TPSBar
          ServerLevel level = player.level();
-@@ -1329,6 +1332,7 @@ public abstract class PlayerList {
+@@ -1326,6 +1329,7 @@ public abstract class PlayerList {
              player.connection.send(recipes);
              player.getRecipeBook().sendInitialRecipeBook(player);
          }

@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/commands/CommandSourceStack.java b/net/minecraft/commands/CommandSourceStack.java
-index e76e3f1634bb152b063fed0f2b1eeb07c0cdefca..67aab4aea58fc3dccc2acf8bfa75dcfdd7f718eb 100644
+index 2e97b080452fae8f8410c209ecfa9da7b4633ae0..992be63940e79982a166e94ef5b3270a5d3dbf62 100644
 --- a/net/minecraft/commands/CommandSourceStack.java
 +++ b/net/minecraft/commands/CommandSourceStack.java
 @@ -599,9 +599,16 @@ public class CommandSourceStack implements SharedSuggestionProvider, ExecutionCo
@@ -29,7 +29,7 @@ index e76e3f1634bb152b063fed0f2b1eeb07c0cdefca..67aab4aea58fc3dccc2acf8bfa75dcfd
      public Collection<String> getAllTeams() {
          return this.server.getScoreboard().getTeamNames();
 diff --git a/net/minecraft/commands/SharedSuggestionProvider.java b/net/minecraft/commands/SharedSuggestionProvider.java
-index 751d63a86665626b19759bda3f3654731ac4a54f..aa762cbaa9ef7e24bf4008c08510f75eea49f9b3 100644
+index ce29240ba7948e4d7d61697099f70c7db9e27f08..6db4c6fa4635c617149f25990633915bc048aceb 100644
 --- a/net/minecraft/commands/SharedSuggestionProvider.java
 +++ b/net/minecraft/commands/SharedSuggestionProvider.java
 @@ -32,6 +32,8 @@ public interface SharedSuggestionProvider extends PermissionSetSupplier {
@@ -42,29 +42,31 @@ index 751d63a86665626b19759bda3f3654731ac4a54f..aa762cbaa9ef7e24bf4008c08510f75e
          return this.getOnlinePlayerNames();
      }
 diff --git a/net/minecraft/commands/arguments/EntityArgument.java b/net/minecraft/commands/arguments/EntityArgument.java
-index 1edb81251d7667d9932e2ac03d1e8392c5f2f18b..7fdc82974f3a4200090ca6050f95c618760b994f 100644
+index 2d20317d50c9b5602ab547ab1217a5fe3c26b381..a8c3e794adc9a232e7af8bc952a8b82f6b139731 100644
 --- a/net/minecraft/commands/arguments/EntityArgument.java
 +++ b/net/minecraft/commands/arguments/EntityArgument.java
-@@ -152,7 +152,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
-             return parser.fillSuggestions(
-                 builder,
-                 suggestions -> {
--                    Collection<String> onlinePlayerNames = source.getOnlinePlayerNames();
-+                    Collection<String> onlinePlayerNames = source.getOnlineRealPlayerNames();
-                     Iterable<String> suggestedNames = (Iterable<String>)(this.playersOnly
-                         ? onlinePlayerNames
-                         : Iterables.concat(onlinePlayerNames, source.getSelectedEntities()));
+@@ -149,7 +149,7 @@ public class EntityArgument implements ArgumentType<EntitySelector> {
+             }
+ 
+             return parser.fillSuggestions(builder, suggestions -> {
+-                Collection<String> onlinePlayerNames = source.getOnlinePlayerNames();
++                Collection<String> onlinePlayerNames = source.getOnlineRealPlayerNames(); // Horizon
+                 Iterable<String> suggestedNames = this.playersOnly ? onlinePlayerNames : Iterables.concat(onlinePlayerNames, source.getSelectedEntities());
+                 SharedSuggestionProvider.suggest(suggestedNames, suggestions);
+             });
 diff --git a/net/minecraft/commands/arguments/selector/EntitySelector.java b/net/minecraft/commands/arguments/selector/EntitySelector.java
-index 2e348bcb69769d5049b29d29c0b41c157ab90ea6..0d5e4a71668639ab46a26de0e9c29faedf8a2039 100644
+index f3a6955105b6826af82e6570cbf2d9175cb59859..3affdcb5d1e2cd61ac89dc1eda43bd9b98fa5105 100644
 --- a/net/minecraft/commands/arguments/selector/EntitySelector.java
 +++ b/net/minecraft/commands/arguments/selector/EntitySelector.java
-@@ -142,11 +142,12 @@ public class EntitySelector {
-             return this.findPlayers(sender);
-         } else if (this.playerName != null) {
+@@ -144,13 +144,14 @@ public class EntitySelector {
+ 
+         if (this.playerName != null) {
              ServerPlayer result = sender.getServer().getPlayerList().getPlayerByName(this.playerName);
 +            result = result instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer ? null : result; // Horizon - skip photographer
              return result == null ? List.of() : List.of(result);
-         } else if (this.entityUUID != null) {
+         }
+ 
+         if (this.entityUUID != null) {
              for (ServerLevel level : sender.getServer().getAllLevels()) {
                  Entity entity = level.getEntity(this.entityUUID);
 -                if (entity != null) {
@@ -72,69 +74,66 @@ index 2e348bcb69769d5049b29d29c0b41c157ab90ea6..0d5e4a71668639ab46a26de0e9c29fae
                      if (entity.getType().isEnabled(sender.enabledFeatures())) {
                          return List.of(entity);
                      }
-@@ -160,7 +161,7 @@ public class EntitySelector {
+@@ -164,7 +165,7 @@ public class EntitySelector {
              AABB absoluteAabb = this.getAbsoluteAabb(pos);
              if (this.currentEntity) {
                  Predicate<Entity> predicate = this.getPredicate(pos, absoluteAabb, null);
 -                return sender.getEntity() != null && predicate.test(sender.getEntity()) ? List.of(sender.getEntity()) : List.of();
 +                return sender.getEntity() != null && !(sender.getEntity() instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(sender.getEntity()) ? List.of(sender.getEntity()) : List.of(); // Horizon - skip photographer
-             } else {
-                 Predicate<Entity> predicate = this.getPredicate(pos, absoluteAabb, sender.enabledFeatures());
-                 List<Entity> result = new ObjectArrayList<>();
-@@ -171,6 +172,7 @@ public class EntitySelector {
-                         this.addEntities(result, levelx, absoluteAabb, predicate);
-                     }
-                 }
-+                result.removeIf(entity -> entity instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer); // Horizon - skip photographer
- 
-                 return this.sortAndLimit(pos, result);
              }
-@@ -206,27 +208,29 @@ public class EntitySelector {
+ 
+             Predicate<Entity> predicate = this.getPredicate(pos, absoluteAabb, sender.enabledFeatures());
+@@ -176,6 +177,7 @@ public class EntitySelector {
+                     this.addEntities(result, level, absoluteAabb, predicate);
+                 }
+             }
++            result.removeIf(entity -> entity instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer); // Horizon - skip photographer
+ 
+             return this.sortAndLimit(pos, result);
+         }
+@@ -210,11 +212,13 @@ public class EntitySelector {
          this.checkPermissions(sender);
          if (this.playerName != null) {
              ServerPlayer result = sender.getServer().getPlayerList().getPlayerByName(this.playerName);
 +            result = result instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer ? null : result; // Horizon - skip photographer
              return result == null || !canSee(sender, result) ? List.of() : List.of(result); // Purpur - Hide hidden players from entity selector
-         } else if (this.entityUUID != null) {
+         }
+ 
+         if (this.entityUUID != null) {
              ServerPlayer result = sender.getServer().getPlayerList().getPlayer(this.entityUUID);
 +            result = result instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer ? null : result; // Horizon - skip photographer
              return result == null || !canSee(sender, result) ? List.of() : List.of(result); // Purpur - Hide hidden players from entity selector
-         } else {
-             Vec3 pos = this.position.apply(sender.getPosition());
-             AABB absoluteAabb = this.getAbsoluteAabb(pos);
-             Predicate<Entity> predicate = this.getPredicate(pos, absoluteAabb, null);
-             if (this.currentEntity) {
--                return sender.getEntity() instanceof ServerPlayer player && predicate.test(player) && canSee(sender, player) ? List.of(player) : List.of(); // Purpur - Hide hidden players from entity selector
-+                return sender.getEntity() instanceof ServerPlayer player && !(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player) && canSee(sender, player) ? List.of(player) : List.of(); // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
-             } else {
-                 int limit = this.getResultLimit();
-                 List<ServerPlayer> result;
-                 if (this.isWorldLimited()) {
--                    result = sender.getLevel().getPlayers(predicate, limit);
--                    result.removeIf(entityplayer3 -> !canSee(sender, entityplayer3)); // Purpur - Hide hidden players from entity selector
-+                    result = sender.getLevel().getPlayers(player -> !(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player), limit); // Horizon - skip photographer
-+                    result.removeIf(player -> !canSee(sender, player)); // Purpur - Hide hidden players from entity selector
-                 } else {
-                     result = new ObjectArrayList<>();
+         }
  
-                     for (ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
--                        if (predicate.test(player) && canSee(sender, player)) { // Purpur - Hide hidden players from entity selector
-+                        if (!(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player) && canSee(sender, player)) { // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
-                             result.add(player);
-                             if (result.size() >= limit) {
-                                 return result;
-@@ -290,4 +294,4 @@ public class EntitySelector {
-         return !org.purpurmc.purpur.PurpurConfig.hideHiddenPlayersFromEntitySelector || !(sender.getEntity() instanceof ServerPlayer player) || player.getBukkitEntity().canSee(target.getBukkitEntity());
-     }
-     // Purpur end - Hide hidden players from entity selector
--}
-+}
-\ No newline at end of file
+@@ -222,19 +226,19 @@ public class EntitySelector {
+         AABB absoluteAabb = this.getAbsoluteAabb(pos);
+         Predicate<Entity> predicate = this.getPredicate(pos, absoluteAabb, null);
+         if (this.currentEntity) {
+-            return sender.getEntity() instanceof ServerPlayer player && predicate.test(player) && canSee(sender, player) ? List.of(player) : List.of(); // Purpur - Hide hidden players from entity selector
++            return sender.getEntity() instanceof ServerPlayer player && !(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player) && canSee(sender, player) ? List.of(player) : List.of(); // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
+         }
+ 
+         int limit = this.getResultLimit();
+         List<ServerPlayer> result;
+         if (this.isWorldLimited()) {
+-            result = sender.getLevel().getPlayers(predicate, limit);
+-                    result.removeIf(entityplayer3 -> !canSee(sender, entityplayer3)); // Purpur - Hide hidden players from entity selector
++            result = sender.getLevel().getPlayers(player -> !(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player), limit); // Horizon - skip photographer
++            result.removeIf(player -> !canSee(sender, player)); // Purpur - Hide hidden players from entity selector
+         } else {
+             result = new ObjectArrayList<>();
+ 
+             for (ServerPlayer player : sender.getServer().getPlayerList().getPlayers()) {
+-                if (predicate.test(player) && canSee(sender, player)) { // Purpur - Hide hidden players from entity selector
++                if (!(player instanceof dev.gideonwhite1029.horizon.replay.ServerPhotographer) && predicate.test(player) && canSee(sender, player)) { // Purpur - Hide hidden players from entity selector // Horizon - skip photographer
+                     result.add(player);
+                     if (result.size() >= limit) {
+                         return result;
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 95d2dea8046c8cec7db95475d50c129fea73a4b7..43e9d8781e76c71130f9aafc7bb6b48e6df14533 100644
+index 973fdddf10cefd0a56ded47caf26efcb1c3458dd..d588a8a0839c1b11f018256cd21a175a651b1bcc 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1823,7 +1823,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1813,7 +1813,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      }
  
      private ServerStatus.Players buildPlayerStatus() {
@@ -144,7 +143,7 @@ index 95d2dea8046c8cec7db95475d50c129fea73a4b7..43e9d8781e76c71130f9aafc7bb6b48e
          if (this.hidesOnlinePlayers()) {
              return new ServerStatus.Players(maxPlayers, players.size(), List.of());
 diff --git a/net/minecraft/server/PlayerAdvancements.java b/net/minecraft/server/PlayerAdvancements.java
-index e8b770c2e9a6a13ae16a0316b2c0b4c396de1f0e..348750f34b7c08accef2e5a21ea99a49d913f4f2 100644
+index b297f1cc5f0922e7628ec6dd73e91a1f787c8d7c..1265df6daa4f07372b9b358eca1e6a440d0b6cca 100644
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
 @@ -169,6 +169,11 @@ public class PlayerAdvancements {
@@ -187,7 +186,7 @@ index 636f56bfc0e9075b257e2eb14e858975bdedd801..ae735885314268594515ed3d5ee4b9da
                          .executes(c -> opPlayers(c.getSource(), GameProfileArgument.getGameProfiles(c, "targets")))
                  )
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 090edd44f9ee89e0980e02105d972966d4ea3b41..980c7995b55197394a3fb365e2045fa41f1ef18f 100644
+index 93c0771e790630af8c120b11d7bd8a56ff006f7e..ec9103d189db5b631227dd2d4603de1f64e76241 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -237,6 +237,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
@@ -206,7 +205,7 @@ index 090edd44f9ee89e0980e02105d972966d4ea3b41..980c7995b55197394a3fb365e2045fa4
      }
  
      // Paper start
-@@ -2930,6 +2932,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2925,6 +2927,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
              // ServerLevel.this.getChunkSource().addEntity(entity); // Paper - ignore and warn about illegal addEntity calls instead of crashing server; moved down below valid=true
              if (entity instanceof ServerPlayer player) {
                  ServerLevel.this.players.add(player);
@@ -218,7 +217,7 @@ index 090edd44f9ee89e0980e02105d972966d4ea3b41..980c7995b55197394a3fb365e2045fa4
                  if (player.isReceivingWaypoints()) {
                      ServerLevel.this.getWaypointManager().addPlayer(player);
                  }
-@@ -3008,6 +3015,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -3003,6 +3010,11 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
              ServerLevel.this.getChunkSource().removeEntity(entity);
              if (entity instanceof ServerPlayer player) {
                  ServerLevel.this.players.remove(player);
@@ -231,10 +230,10 @@ index 090edd44f9ee89e0980e02105d972966d4ea3b41..980c7995b55197394a3fb365e2045fa4
                  ServerLevel.this.updateSleepingPlayerList();
              }
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index a41e8e61df1f3d7a861cd1b4060bc3ec424d45bd..4e73f9539da81fdb56ed402afadfff38f904cdb8 100644
+index 88aad415396d1e74da8b7544b566844e30761219..a74c000d87d5e1b05b8fd9979e5c31a5e8e7a05a 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -228,8 +228,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -227,8 +227,8 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private static final boolean DEFAULT_SEEN_CREDITS = false;
      private static final boolean DEFAULT_SPAWN_EXTRA_PARTICLES_ON_FALL = false;
      public ServerGamePacketListenerImpl connection;
@@ -245,7 +244,7 @@ index a41e8e61df1f3d7a861cd1b4060bc3ec424d45bd..4e73f9539da81fdb56ed402afadfff38
      private final PlayerAdvancements advancements;
      private final ServerStatsCounter stats;
      private float lastRecordedHealthAndAbsorption = Float.MIN_VALUE;
-@@ -536,7 +536,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -517,7 +517,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
          // Paper start - Expand PlayerGameModeChangeEvent
          this.loadGameTypes(input);
      }
@@ -255,10 +254,10 @@ index a41e8e61df1f3d7a861cd1b4060bc3ec424d45bd..4e73f9539da81fdb56ed402afadfff38
              if (new org.bukkit.event.player.PlayerGameModeChangeEvent(this.getBukkitEntity(), org.bukkit.GameMode.getByValue(this.server.getDefaultGameType().getId()), org.bukkit.event.player.PlayerGameModeChangeEvent.Cause.DEFAULT_GAMEMODE, null).callEvent()) {
                  this.gameMode.setGameModeForPlayer(this.server.getForcedGameType(), GameType.DEFAULT_MODE);
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b67290c17 100644
+index 6f844015da3871bf25316aad4df2b96bd556e1b4..4a4941d151d0591f17d68474c0343654969a28e9 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -130,6 +130,7 @@ public abstract class PlayerList {
+@@ -129,6 +129,7 @@ public abstract class PlayerList {
      private int simulationDistance;
      private boolean allowCommandsForAllPlayers;
      private int sendAllPlayerInfoIn;
@@ -266,7 +265,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
  
      // CraftBukkit start
      private org.bukkit.craftbukkit.CraftServer cserver;
-@@ -156,6 +157,110 @@ public abstract class PlayerList {
+@@ -155,6 +156,110 @@ public abstract class PlayerList {
  
      abstract public void loadAndSaveFiles(); // Paper - fix converting txt to json file; moved from DedicatedPlayerList constructor
  
@@ -377,7 +376,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
      public void placeNewPlayer(final Connection connection, final ServerPlayer player, final CommonListenerCookie cookie) {
          player.isRealPlayer = true; // Paper
          player.loginTime = System.currentTimeMillis(); // Paper - Replace OfflinePlayer#getLastPlayed
-@@ -223,6 +328,7 @@ public abstract class PlayerList {
+@@ -222,6 +327,7 @@ public abstract class PlayerList {
  
          // player.connection.send(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(this.players)); // CraftBukkit - replaced with loop below
          this.players.add(player);
@@ -385,7 +384,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
          this.playersByName.put(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT), player); // Spigot
          this.playersByUUID.put(player.getUUID(), player);
          // this.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(player))); // CraftBukkit - replaced with loop below
-@@ -279,6 +385,12 @@ public abstract class PlayerList {
+@@ -278,6 +384,12 @@ public abstract class PlayerList {
                  continue;
              }
  
@@ -398,7 +397,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
              onlinePlayers.add(entityplayer1); // Paper - Use single player info update packet on join
          }
          // Paper start - Use single player info update packet on join
-@@ -434,6 +546,43 @@ public abstract class PlayerList {
+@@ -429,6 +541,43 @@ public abstract class PlayerList {
          }
      }
  
@@ -442,7 +441,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
      public net.kyori.adventure.text.@Nullable Component remove(final ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
          // Paper start - Fix kick event leave message not being sent
          return this.remove(player, net.kyori.adventure.text.Component.translatable("multiplayer.player.left", net.kyori.adventure.text.format.NamedTextColor.YELLOW, io.papermc.paper.configuration.GlobalConfiguration.get().messages.useDisplayNameInQuitMessage ? player.getBukkitEntity().displayName() : io.papermc.paper.adventure.PaperAdventure.asAdventure(player.getDisplayName())));
-@@ -507,6 +656,7 @@ public abstract class PlayerList {
+@@ -502,6 +651,7 @@ public abstract class PlayerList {
          player.retireScheduler(); // Paper - Folia schedulers
          player.getAdvancements().stopListening();
          this.players.remove(player);
@@ -450,7 +449,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
          this.playersByName.remove(player.getScoreboardName().toLowerCase(java.util.Locale.ROOT)); // Spigot
          this.server.getCustomBossEvents().onPlayerDisconnect(player);
          UUID uuid = player.getUUID();
-@@ -744,8 +894,7 @@ public abstract class PlayerList {
+@@ -741,8 +891,7 @@ public abstract class PlayerList {
              // CraftBukkit start
              for (int i = 0; i < this.players.size(); ++i) {
                  final ServerPlayer target = this.players.get(i);
@@ -460,7 +459,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
              }
              // CraftBukkit end
              this.sendAllPlayerInfoIn = 0;
-@@ -916,7 +1065,7 @@ public abstract class PlayerList {
+@@ -913,7 +1062,7 @@ public abstract class PlayerList {
  
      // Paper start - whitelist verify event / login event
      public LoginResult canBypassFullServerLogin(final NameAndId nameAndId, final LoginResult currentResult) {
@@ -469,7 +468,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
          final io.papermc.paper.event.player.PlayerServerFullCheckEvent fullCheckEvent = new io.papermc.paper.event.player.PlayerServerFullCheckEvent(
              new com.destroystokyo.paper.profile.CraftPlayerProfile(nameAndId),
              io.papermc.paper.adventure.PaperAdventure.asAdventure(currentResult.message),
-@@ -1075,7 +1224,7 @@ public abstract class PlayerList {
+@@ -1072,7 +1221,7 @@ public abstract class PlayerList {
      }
  
      public int getPlayerCount() {
@@ -479,7 +478,7 @@ index 5c59bb7df0a10b20b2a47857ba307861db1ce019..3ef106fe89321a829a5b84a06329284b
  
      public int getMaxPlayers() {
 diff --git a/net/minecraft/world/entity/player/Inventory.java b/net/minecraft/world/entity/player/Inventory.java
-index f004911c438e6f89d6e079437e3f4104d6cbacbd..6f2f9bbbe79965be26301f11ff1af888c09cf5b2 100644
+index cd7714dffcd7e7b6d96d18a97e65fd0914a739d1..dfc2783f52abb86a37a32e1b56da0428214a9182 100644
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
 @@ -53,7 +53,7 @@ public class Inventory implements Container, Nameable {

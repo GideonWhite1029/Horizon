@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 341021c3952b89b6e234ce777aa37856eea58ff8..7054fe5613b741e54f429cd81af1da73b50ccd73 100644
+index e33f57caf9640e891b87a0e9bdcd5a44911bec73..87ea056db1a2bd4a790b4ddb1f3aec40e19350e0 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1196,7 +1196,7 @@ public abstract class PlayerList {
+@@ -1193,7 +1193,7 @@ public abstract class PlayerList {
      }
  
      public boolean verifyChatTrusted(final PlayerChatMessage message) {

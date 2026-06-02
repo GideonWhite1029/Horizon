@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayer.java b/net/minecraft/server/level/ServerPlayer.java
-index 4e73f9539da81fdb56ed402afadfff38f904cdb8..952ac7192724fac8aa039b65866ad2112b7d07eb 100644
+index a74c000d87d5e1b05b8fd9979e5c31a5e8e7a05a..c32a9c38815d8a219255ed35f53d1969db068975 100644
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -457,6 +457,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
+@@ -438,6 +438,7 @@ public class ServerPlayer extends Player implements ca.spottedleaf.moonrise.patc
      private boolean tpsBar = false; // Purpur - Implement TPSBar
      private boolean compassBar = false; // Purpur - Add compass command
      private boolean ramBar = false; // Purpur - Implement rambar commands
@@ -19,10 +19,10 @@ index 4e73f9539da81fdb56ed402afadfff38f904cdb8..952ac7192724fac8aa039b65866ad211
      // Paper start - rewrite chunk system
      private ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData chunkLoader;
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 92ba166d849361b907953cb4a575923355dbdb06..f18dff80487a97e3b982a4099ab7add07e721fda 100644
+index 82b23fa9ba2553d778a0d5266badec31e5473900..5aaed102539c61c125b971603603beac4ac24663 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -793,8 +793,8 @@ public abstract class PlayerList {
+@@ -790,8 +790,8 @@ public abstract class PlayerList {
          byte dataToKeep = keepAllPlayerData ? ClientboundRespawnPacket.KEEP_ATTRIBUTE_MODIFIERS : 0;
          ServerLevel playerLevel = player.level();
          LevelData levelData = playerLevel.getLevelData();
@@ -33,7 +33,7 @@ index 92ba166d849361b907953cb4a575923355dbdb06..f18dff80487a97e3b982a4099ab7add0
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));
          player.connection.send(new ClientboundChangeDifficultyPacket(levelData.getDifficulty(), levelData.isDifficultyLocked()));
          player.connection.send(new ClientboundSetExperiencePacket(player.experienceProgress, player.totalExperience, player.experienceLevel));
-@@ -863,6 +863,8 @@ public abstract class PlayerList {
+@@ -860,6 +860,8 @@ public abstract class PlayerList {
          return player;
      }
  

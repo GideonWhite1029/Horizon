@@ -7,10 +7,10 @@ Original license: MIT
 Original project: https://github.com/Winds-Studio/Leaf
 
 diff --git a/net/minecraft/server/level/ServerPlayerGameMode.java b/net/minecraft/server/level/ServerPlayerGameMode.java
-index 61c4821aecf882bdab1d7df57acab060b839ef3e..5775b4f7cb0d8b7807b1eb51439c75da913e1a61 100644
+index e8da84bc04587d369266da725818d0306eae7df3..a9df1dda9f4f63b0d2689270316b857a05244d68 100644
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -322,6 +322,12 @@ public class ServerPlayerGameMode {
+@@ -321,6 +321,12 @@ public class ServerPlayerGameMode {
              }
          }
          this.level.chunkPacketBlockController.onPlayerLeftClickBlock(this, pos, action, direction, maxY, sequence); // Paper - Anti-Xray
@@ -24,19 +24,19 @@ index 61c4821aecf882bdab1d7df57acab060b839ef3e..5775b4f7cb0d8b7807b1eb51439c75da
  
      public void destroyAndAck(final BlockPos pos, final int sequence, final String exitId) {
 diff --git a/net/minecraft/world/level/Level.java b/net/minecraft/world/level/Level.java
-index 16c10fb1b424b97287af6fcb74c5ed152ad4e8d6..e3f4acac5649ad0aff19281dec79151042f7d389 100644
+index 3080311abeff74162d48c6b1a32d3b27c03b8ca7..233ed5bf14f3528401ecc8c01f13fc14e669d58b 100644
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -1134,6 +1134,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
-             }
-             // CraftBukkit end - capture blockstates
-             BlockState oldState = chunk.setBlockState(pos, blockState, updateFlags);
+@@ -1137,6 +1137,12 @@ public abstract class Level implements LevelAccessor, AutoCloseable, ca.spottedl
+         }
+         // CraftBukkit end - capture blockstates
+         BlockState oldState = chunk.setBlockState(pos, blockState, updateFlags);
 +            // Imanity start - AntiXraySDK integration
 +            dev.imanity.antixray.sdk.AntiXrayAdapter adapter = dev.imanity.antixray.sdk.AntiXraySDK.getAdapter();
 +            if (adapter != null) {
 +                adapter.callBlockChange(world, pos.getX(), pos.getY(), pos.getZ(), blockState.getBukkitMaterial());
 +            }
 +            // Imanity end - AntiXraySDK integration
-             this.chunkPacketBlockController.onBlockChange(this, pos, blockState, oldState, updateFlags, updateLimit); // Paper - Anti-Xray
-             if (oldState == null) {
-                 // CraftBukkit start - remove blockstate if failed (or the same)
+         this.chunkPacketBlockController.onBlockChange(this, pos, blockState, oldState, updateFlags, updateLimit); // Paper - Anti-Xray
+         if (oldState == null) {
+             // CraftBukkit start - remove blockstate if failed (or the same)

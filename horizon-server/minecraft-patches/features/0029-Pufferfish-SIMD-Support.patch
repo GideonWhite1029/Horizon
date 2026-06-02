@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/pufferfish-gg/Pufferfish
 
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index eac50d53a9f66708af45c2c5b3726a2ec9269f20..24a68ddb6873cfa36fbea0052eaf572cb95572db 100644
+index 6103f7c521260b29799f3550ca8f2df89dad9cca..90c75dd25c33e92cf8507620bb257823a4721d9a 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -315,6 +315,14 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -310,6 +310,14 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          */// Purpur end - Purpur config files // Purpur end - Migrate Setting to reintroduce end void rings
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  

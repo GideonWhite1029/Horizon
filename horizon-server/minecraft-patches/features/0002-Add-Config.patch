@@ -5,10 +5,10 @@ Subject: [PATCH] Add Config
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 3658b8b631fb89fb6067c8b98e590d02172fafa7..10662be6192814c6208e463c6e0e247686e329e5 100644
+index 79ad58c09c33db67c5afdd4bba9b92da7e0b7831..e70729af40e51714f4519049f841c32d96b8c0d3 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1143,6 +1143,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1133,6 +1133,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          // Paper end - rewrite chunk system
          // Paper start - Improved watchdog support - move final shutdown items here
          Util.shutdownExecutors();
@@ -17,10 +17,10 @@ index 3658b8b631fb89fb6067c8b98e590d02172fafa7..10662be6192814c6208e463c6e0e2476
          // Paper end - Improved watchdog support - move final shutdown items here
      }
 diff --git a/net/minecraft/server/dedicated/DedicatedServer.java b/net/minecraft/server/dedicated/DedicatedServer.java
-index d4c88cc35140cec61c2e9fd66e5126e80b083f3b..dd9345772c9b32eaa6b25483579ada3f9b63db7a 100644
+index 6fd7a1f5bd96f868a950097989176eb4cdf3e235..d516e8756beb8014269e1728bd06fdb9defadcd1 100644
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -315,6 +315,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
+@@ -310,6 +310,8 @@ public class DedicatedServer extends MinecraftServer implements ServerInterface
          */// Purpur end - Purpur config files // Purpur end - Migrate Setting to reintroduce end void rings
          com.destroystokyo.paper.VersionHistoryManager.INSTANCE.getClass(); // Paper - load version history now
  

@@ -5,10 +5,10 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 761acf1c9cae98fc8d7699685824f561352a8f66..3658b8b631fb89fb6067c8b98e590d02172fafa7 100644
+index d2a5a1293f276aab3136c4563d778d0d79c7ff29..79ad58c09c33db67c5afdd4bba9b92da7e0b7831 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -1338,6 +1338,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1328,6 +1328,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              // Paper end
              org.spigotmc.WatchdogThread.hasStarted = true; // Paper
              // Paper start - Add onboarding message for initial server start
@@ -17,7 +17,7 @@ index 761acf1c9cae98fc8d7699685824f561352a8f66..3658b8b631fb89fb6067c8b98e590d02
              if (io.papermc.paper.configuration.GlobalConfiguration.isFirstStart) {
                  LOGGER.info("*************************************************************************************");
                  LOGGER.info("This is the first time you're starting this server.");
-@@ -1346,6 +1348,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1336,6 +1338,8 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
@@ -27,10 +27,10 @@ index 761acf1c9cae98fc8d7699685824f561352a8f66..3658b8b631fb89fb6067c8b98e590d02
              if (false && System.getProperty("paper.disableStartupVersionCheck") == null && io.papermc.paper.configuration.GlobalConfiguration.get().updateChecker.enabled) { // Purpur - disable paper startup check
                  CompletableFuture.runAsync(com.destroystokyo.paper.PaperVersionFetcher::getUpdateStatusStartupMessage, io.papermc.paper.util.MCUtil.ASYNC_EXECUTOR);
 diff --git a/net/minecraft/server/gui/MinecraftServerGui.java b/net/minecraft/server/gui/MinecraftServerGui.java
-index 2612c6dfb9c9605a4bdd1da6d0d44d2013728089..08fafba3b8a3e46b58447de76b5713b5e0e5d5f6 100644
+index f5c52f0aa85d8ae66215fbbe94773b16e06a72a5..d4d3de543dab748701d802e9d351998b8460a875 100644
 --- a/net/minecraft/server/gui/MinecraftServerGui.java
 +++ b/net/minecraft/server/gui/MinecraftServerGui.java
-@@ -51,8 +51,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -50,8 +50,7 @@ public class MinecraftServerGui extends JComponent {
              UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
          } catch (Exception var3) {
          }
@@ -40,7 +40,7 @@ index 2612c6dfb9c9605a4bdd1da6d0d44d2013728089..08fafba3b8a3e46b58447de76b5713b5
          final MinecraftServerGui gui = new MinecraftServerGui(server);
          frame.setDefaultCloseOperation(2);
          frame.add(gui);
-@@ -60,7 +59,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -59,7 +58,7 @@ public class MinecraftServerGui extends JComponent {
          frame.setLocationRelativeTo(null);
          frame.setVisible(true);
          // Paper start - Improve ServerGUI
@@ -49,7 +49,7 @@ index 2612c6dfb9c9605a4bdd1da6d0d44d2013728089..08fafba3b8a3e46b58447de76b5713b5
          try {
              frame.setIconImage(javax.imageio.ImageIO.read(java.util.Objects.requireNonNull(MinecraftServerGui.class.getClassLoader().getResourceAsStream("logo.png"))));
          } catch (java.io.IOException ignore) {
-@@ -70,7 +69,7 @@ public class MinecraftServerGui extends JComponent {
+@@ -69,7 +68,7 @@ public class MinecraftServerGui extends JComponent {
              @Override
              public void windowClosing(final WindowEvent event) {
                  if (!gui.isClosing.getAndSet(true)) {
@@ -59,15 +59,15 @@ index 2612c6dfb9c9605a4bdd1da6d0d44d2013728089..08fafba3b8a3e46b58447de76b5713b5
                      gui.runFinalizers();
                  }
 diff --git a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
-index 9004b010d9fbdf0a2d786481293c5c0b0d896e4a..f01af8207cbc827cee9ab887578716a865cd4b5e 100644
+index 76174967cc80e8b7024b4d8cf48289c5e14bc6f2..40a7aa630a2dc819dbd5e1d1b698edfe0e5fd022 100644
 --- a/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 +++ b/net/minecraft/world/level/chunk/storage/RegionFileStorage.java
 @@ -309,7 +309,7 @@ public class RegionFileStorage implements AutoCloseable, ca.spottedleaf.moonrise
  
      // Paper start
      private static void printOversizedLog(String msg, Path file, int x, int z) {
--        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO PURPUR - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand
-+        org.apache.logging.log4j.LogManager.getLogger().fatal(msg + " (" + file.toString().replaceAll(".+[\\\\/]", "") + " - " + x + "," + z + ") Go clean it up to remove this message. /minecraft:tp " + (x<<4)+" 128 "+(z<<4) + " - DO NOT REPORT THIS TO Horizon - You may ask for help on Discord, but do not file an issue. These error messages can not be removed."); // Purpur - Rebrand // Horizon - Rebrand
+-        LOGGER.error("{} ({} - {},{}) Go clean it up to remove this message. /minecraft:tp {} 128 {} - DO NOT REPORT THIS TO PURPUR - You may ask for help on Discord, but do not file an issue. These error messages can not be removed.", msg, file.toString().replaceAll(".+[\\\\/]", ""), x, z, x << 4, z << 4); // Purpur - Rebrand
++        LOGGER.error("{} ({} - {},{}) Go clean it up to remove this message. /minecraft:tp {} 128 {} - DO NOT REPORT THIS TO HORIZON - You may ask for help on Github Issues, but do not file an issue. These error messages can not be removed.", msg, file.toString().replaceAll(".+[\\\\/]", ""), x, z, x << 4, z << 4); // Purpur - Rebrand // Horizon - Rebrand
      }
  
      private static CompoundTag readOversizedChunk(RegionFile regionfile, ChunkPos chunkCoordinate) throws IOException {

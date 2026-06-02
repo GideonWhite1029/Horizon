@@ -1,13 +1,16 @@
 --- a/purpur-server/build.gradle.kts
 +++ b/purpur-server/build.gradle.kts
-@@ -14,6 +_,7 @@
+@@ -13,7 +_,10 @@
+     id("io.papermc.fill.gradle") version "1.0.11"
  }
  
++version = providers.gradleProperty("mcVersion").get() // Horizon - set version from mcVersion
++
  val paperMavenPublicUrl = "https://repo.papermc.io/repository/maven-public/"
 +val purpurMavenPublicUrl = "https://repo.purpurmc.org/snapshots/" // Horizon - Initial build
  
  dependencies {
-     mache("io.papermc:mache:26.1.2+build.1")
+     mache("io.papermc:mache:26.1.2+build.2")
 @@ -33,7 +_,29 @@
              outputDir = rootDirectory.dir("paper-server")
          }
@@ -100,11 +103,12 @@
              "Implementation-Version" to implementationVersion,
              "Implementation-Vendor" to date,
 -            "Specification-Title" to "Purpur", // Purpur
-+            "Specification-Title" to "Horizon", // Purpur // Horizon
-             "Specification-Version" to project.version,
+-            "Specification-Version" to project.version,
 -            "Specification-Vendor" to "Purpur Team", // Purpur
 -            "Brand-Id" to "purpurmc:purpur", // Purpur
 -            "Brand-Name" to "Purpur", // Purpur
++            "Specification-Title" to "Horizon", // Purpur // Horizon
++            "Specification-Version" to mcVersion,
 +            "Specification-Vendor" to "GideonWhite1029", // Purpur // Horizon
 +            "Brand-Id" to "gideonwhite1029:horizon", // Purpur // Horizon
 +            "Brand-Name" to "Horizon", // Purpur // Horizon

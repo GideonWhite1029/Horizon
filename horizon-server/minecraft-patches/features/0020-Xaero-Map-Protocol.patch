@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/players/PlayerList.java b/net/minecraft/server/players/PlayerList.java
-index 3ef106fe89321a829a5b84a06329284b67290c17..92ba166d849361b907953cb4a575923355dbdb06 100644
+index 4a4941d151d0591f17d68474c0343654969a28e9..82b23fa9ba2553d778a0d5266badec31e5473900 100644
 --- a/net/minecraft/server/players/PlayerList.java
 +++ b/net/minecraft/server/players/PlayerList.java
-@@ -1186,6 +1186,7 @@ public abstract class PlayerList {
+@@ -1183,6 +1183,7 @@ public abstract class PlayerList {
          player.connection.send(new ClientboundInitializeBorderPacket(worldBorder));
          player.connection.send(level.clockManager().createFullSyncPacket(player)); // Paper - per-world time; per-player time
          player.connection.send(new ClientboundSetDefaultSpawnPositionPacket(level.getRespawnData()));

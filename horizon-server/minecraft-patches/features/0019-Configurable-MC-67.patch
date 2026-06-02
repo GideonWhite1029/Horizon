@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index b17bffd9ca07e273bec33c81068b52ff6734bfce..02884900aa86367089cbbaac16ee4749548e6023 100644
+index c868d42ea20bdb97796f6d435fdbbfbd4d8eafea..86a3c9c3afeafd808c83dec1b24809b1214049ed 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
-@@ -4306,6 +4306,7 @@ public abstract class Entity
+@@ -4308,6 +4308,7 @@ public abstract class Entity
      }
  
      public boolean canTeleport(final Level from, final Level to) {

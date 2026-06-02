@@ -5,7 +5,7 @@ Subject: [PATCH] Fix Entity ID Suppressor
 
 
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index 02884900aa86367089cbbaac16ee4749548e6023..92bd2babd75d68cdbb8b7d30661a7a80661f3b34 100644
+index 86a3c9c3afeafd808c83dec1b24809b1214049ed..45b2e2fea5e2626e146408eb27958a2a9d9c88a4 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -264,7 +264,7 @@ public abstract class Entity
@@ -17,7 +17,7 @@ index 02884900aa86367089cbbaac16ee4749548e6023..92bd2babd75d68cdbb8b7d30661a7a80
      public boolean blocksBuilding;
      public ImmutableList<Entity> passengers = ImmutableList.of();
      protected int boardingCooldown;
-@@ -5449,7 +5449,12 @@ public abstract class Entity
+@@ -5451,7 +5451,12 @@ public abstract class Entity
  
      // Paper start - Expose entity id counter
      public static int nextEntityId() {

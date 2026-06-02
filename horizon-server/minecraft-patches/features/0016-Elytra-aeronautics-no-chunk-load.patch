@@ -7,7 +7,7 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/server/level/ChunkMap.java b/net/minecraft/server/level/ChunkMap.java
-index 455e77bee02fb2d0907bf6f895fef99c186ac9bc..569334885f61cb999dfeae28b9511f456d3d4566 100644
+index 42ec67c53c35189838ce4767c2be620e05108159..9a6e12d32f430d15e8ed41309a22c993324cb921 100644
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
 @@ -891,7 +891,8 @@ public class ChunkMap extends SimpleRegionStorage implements ChunkHolder.PlayerP
@@ -29,7 +29,7 @@ index 455e77bee02fb2d0907bf6f895fef99c186ac9bc..569334885f61cb999dfeae28b9511f45
  
          SectionPos oldSection = player.getLastSectionPos();
 diff --git a/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index 6b24d8593ecf2e17c04ae174dd9f563c2eca8bc4..bde8e8c0bb51a5df42cae3b63f6746e7bea5b2d1 100644
+index 208c196fc18ca021f2be87a463d4390b41550b05..36dd676d80fd45a05b8ce776fd35d647b05935d3 100644
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 @@ -626,9 +626,9 @@ public class ServerGamePacketListenerImpl
@@ -46,7 +46,7 @@ index 6b24d8593ecf2e17c04ae174dd9f563c2eca8bc4..bde8e8c0bb51a5df42cae3b63f6746e7
                      this.connection.send(ClientboundMoveVehiclePacket.fromEntity(vehicle));
                      return;
 diff --git a/net/minecraft/world/entity/Entity.java b/net/minecraft/world/entity/Entity.java
-index a593c6408b007f67c2c8e534f0b40f6c17545d8d..b17bffd9ca07e273bec33c81068b52ff6734bfce 100644
+index 6807b1310c70cd50bf8a0c8828a1bb627bfe4fce..c868d42ea20bdb97796f6d435fdbbfbd4d8eafea 100644
 --- a/net/minecraft/world/entity/Entity.java
 +++ b/net/minecraft/world/entity/Entity.java
 @@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
@@ -72,7 +72,7 @@ index a593c6408b007f67c2c8e534f0b40f6c17545d8d..b17bffd9ca07e273bec33c81068b52ff
              ProfilerFiller profiler = Profiler.get();
              profiler.push("move");
              if (this.stuckSpeedMultiplier.lengthSqr() > 1.0E-7) {
-@@ -2250,6 +2257,7 @@ public abstract class Entity
+@@ -2252,6 +2259,7 @@ public abstract class Entity
          this.yo = y;
          this.zo = cz;
          this.setPos(cx, y, cz);
@@ -81,10 +81,10 @@ index a593c6408b007f67c2c8e534f0b40f6c17545d8d..b17bffd9ca07e273bec33c81068b52ff
      }
  
 diff --git a/net/minecraft/world/entity/player/Player.java b/net/minecraft/world/entity/player/Player.java
-index 3b67f40c84b9aa9190d09ea58448c511743603c3..f90e3126250423fe03beb572ac1e21e9e2cf31ed 100644
+index 4d80fd91a1f610e5af0ad258f94dc16f2f77ef0d..1a26ae5dfcf15e540355218643610c9d4ab242ed 100644
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -177,6 +177,7 @@ public abstract class Player extends Avatar implements ContainerUser {
+@@ -176,6 +176,7 @@ public abstract class Player extends Avatar implements ContainerUser {
      public int burpDelay = 0; // Purpur - Burp delay
      public boolean canPortalInstant = false; // Purpur - Add portal permission bypass
      public int sixRowEnderchestSlotCount = -1; // Purpur - Barrels and enderchests 6 rows

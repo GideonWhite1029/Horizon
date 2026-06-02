@@ -1,5 +1,14 @@
 --- a/purpur-api/build.gradle.kts
 +++ b/purpur-api/build.gradle.kts
+@@ -6,6 +_,8 @@
+     idea
+ }
+ 
++version = providers.gradleProperty("mcVersion").get() // Horizon - set version from mcVersion
++
+ java {
+     withSourcesJar()
+     withJavadocJar()
 @@ -52,6 +_,7 @@
      api("org.apache.logging.log4j:log4j-api:$log4jVersion")
      api("org.slf4j:slf4j-api:$slf4jVersion")

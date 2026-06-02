@@ -7,10 +7,10 @@ Original license: GPLv3
 Original project: https://github.com/LeavesMC/Leaves
 
 diff --git a/net/minecraft/world/level/storage/LevelStorageSource.java b/net/minecraft/world/level/storage/LevelStorageSource.java
-index 432e32b6853d9d860a7d52385d236519cf9c3ce6..ed659ef9e76dbf5636ccc0feca26600a8028ae2b 100644
+index 8db7167fab968c9e99211ce95e5d503f9d2eb5f0..219aa0d6d73f314e5f97fed1c709e47777828e0a 100644
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
-@@ -592,7 +592,10 @@ public class LevelStorageSource {
+@@ -579,7 +579,10 @@ public class LevelStorageSource {
              CompoundTag dataTag = levelData.createTag(singleplayerUUID);
              CompoundTag root = new CompoundTag();
              root.put("Data", dataTag);
@@ -22,7 +22,7 @@ index 432e32b6853d9d860a7d52385d236519cf9c3ce6..ed659ef9e76dbf5636ccc0feca26600a
          }
  
          public void saveLevelData(final Dynamic<?> tag) {
-@@ -690,7 +693,10 @@ public class LevelStorageSource {
+@@ -673,7 +676,10 @@ public class LevelStorageSource {
              this.checkLock();
              CompoundTag root = LevelStorageSource.readLevelDataTagRaw(this.levelDirectory.dataFile());
              updater.accept(root.getCompoundOrEmpty("Data"));
@@ -35,7 +35,7 @@ index 432e32b6853d9d860a7d52385d236519cf9c3ce6..ed659ef9e76dbf5636ccc0feca26600a
  
          public long makeWorldBackup() throws IOException {
 diff --git a/net/minecraft/world/level/storage/PlayerDataStorage.java b/net/minecraft/world/level/storage/PlayerDataStorage.java
-index c5898bfb8b4f075b08090cba2e9f980174e0a326..612d8c023db6c0b4bd5c147f8c49067d49d84e9f 100644
+index eddb6ebe3fa50a818e54079b73ba117be0abd195..1ab4dd2bb91bf1adec71c376ca48676ab4fcf7cc 100644
 --- a/net/minecraft/world/level/storage/PlayerDataStorage.java
 +++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
 @@ -32,6 +32,13 @@ public class PlayerDataStorage {
