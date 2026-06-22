@@ -9,7 +9,7 @@ jobs:
     outputs:
       changes_detected: ${{ steps.check_changes.outputs.changes_detected }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
