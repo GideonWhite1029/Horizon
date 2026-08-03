@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v6.2.0
         with:
           gradle-version: 9.4.1
           add-job-summary: never
